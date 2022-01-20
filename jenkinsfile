@@ -1,0 +1,24 @@
+node {
+    
+    stages {
+        
+        stage ('npm install') {
+            sh 'npm i'
+        }
+    
+        stage ('ng build') {
+            sh 'ng build'
+        }
+        
+        stage ('docker build') {
+            sh 'docker build harmani2001/demo:goval-web'
+        }
+        
+        stage ('docker push') {
+            withDockerRegistry ([ crdentialsId: 'dockerhub' ]) {
+                sh 'docker push harimani2001/demo:goval-web'
+            }
+        }
+        
+    }
+}    
