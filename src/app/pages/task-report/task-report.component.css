@@ -1,0 +1,94 @@
+/* The Modal (background) */
+.modal1 {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    padding-top: 80px;
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    border-radius: 5px;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    
+  }
+  
+ 
+
+  
+  /* The Close Button */
+  .close {
+    color:black;
+    background-color: white;
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    background-color: white;
+    cursor: pointer;
+  }
+
+  /* Modal Header */
+.modal-header1 {
+    padding: 5px 20px;
+    margin: auto;
+    background-color:white;
+    color:black;
+    width: 100%;
+    border-radius: 5px;
+    box-shadow:0px 1px rgba(0, 0, 0, 0.256) ;
+
+    
+  }
+  
+  /* Modal Body */
+  .modal-body1 {
+    padding: 10px 20px;
+    padding-bottom: 30px;   
+    
+     }
+  
+  /* Modal Footer */
+  .modal-footer1 {
+    padding: 0px 16px;
+    background-color:white;
+    color: white;
+  }
+  
+  /* Modal Content */
+  .modal-content1 {
+    position: relative;
+    border-radius: 5px;;
+    background-color: #fefefe;
+    margin: auto;
+    width: 80%;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+    text-align:left;
+  }
+  
+  /* Add Animation */
+  @keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+  }
+
+
+  @media screen and (max-width: 992px) {
+    .modal-content1 {
+      width: auto;
+    }
+    .modal-body1{
+      width: auto;
+    }
+    .modal-header1{
+      width: auto;
+    }
+  }

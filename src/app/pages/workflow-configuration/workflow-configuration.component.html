@@ -1,0 +1,1257 @@
+<div class="row">
+  <div class="col-sm-3">
+    <squeezebox [multiple]="false">
+      <sb-item [collapsed]="true" class="accordion-panel">
+        <sb-item-head class="accordion-heading accordion-msg" (click)="toggleClick($event)">Documents
+          <a container="body" href="javascript:;" (click)="addAll(this.documentList,true)" *ngIf="!this.isVsrPublished"
+            class=" crm-action-info text-muted text-primary-float" placement="top" triggers="mouseenter:mouseleave"
+            ngbTooltip="Add All">
+            <i style="color: black;cursor: pointer;" class="pl-10 icofont icofont-ui-add"></i>
+          </a>
+        </sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <div class="panel panel-default" droppable (onDrop)="addORRemove($event,false)">
+              <ul class="list-group">
+                <li [draggable] *ngFor="let item of this.documentList" [dragScope]="'Document'" [dragData]="item"
+                  [dragEnabled]="!this.isVsrPublished" class="list-group-item"><label
+                    class="label-doc">{{item.value}}</label>
+                  <i *ngIf="!this.isVsrPublished" class="p-r-20" style="float: right;cursor: pointer;"
+                    href="javascript:;"> <img class="img-50" placement="bottom"
+                      (click)="addORRemove({dragData:item},true);" triggers="mouseenter:mouseleave" ngbTooltip="Add"
+                      src="assets/icon/png-icons/plus.png" alt="">
+                  </i>
+                  <i *ngIf="!this.isVsrPublished" class="p-r-20" style="float: right;cursor: pointer;"
+                    href="javascript:;"> <img class="img-50" placement="bottom"
+                      (click)="addORRemove({dragData:item},true);this.checkForcommonworkflowChanges(item)"
+                      triggers="mouseenter:mouseleave" ngbTooltip="Add with common setup"
+                      src="assets/icon/png-icons/plus.png" alt="">
+                  </i>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item [collapsed]="true" class="accordion-panel">
+        <sb-item-head class="accordion-msg" (click)="toggleClick($event)">Forms<a *ngIf="!this.isVsrPublished"
+            container="body" href="javascript:;" (click)="addAll(this.formList,true)"
+            class=" crm-action-info text-muted text-primary-float" placement="top" triggers="mouseenter:mouseleave"
+            ngbTooltip="Add All">
+            <i style="color: black;" class="pl-10 icofont icofont-ui-add"></i>
+          </a></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <div class="panel panel-default" droppable (onDrop)="addORRemove($event,false)">
+              <ul class="list-group">
+                <li [draggable] *ngFor="let item of this.formList" [dragScope]="'Form'" [dragData]="item"
+                  [dragEnabled]="!this.isVsrPublished" class="list-group-item"><label
+                    class="label-doc">{{item.value}}</label>
+                  <i *ngIf="!this.isVsrPublished" class="p-r-20" style="float: right;cursor: pointer;"
+                    href="javascript:;"> <img class="img-50" placement="bottom"
+                      (click)="addORRemove({dragData:item},true); " triggers="mouseenter:mouseleave" ngbTooltip="Add"
+                      src="assets/icon/png-icons/plus.png" alt="">
+                  </i>
+                  <i *ngIf="!this.isVsrPublished" class="p-r-20" style="float: right;cursor: pointer;"
+                    href="javascript:;"> <img class="img-50" placement="bottom"
+                      (click)="addORRemove({dragData:item},true); this.checkForcommonworkflowChanges(item)"
+                      triggers="mouseenter:mouseleave" ngbTooltip="Add with common setup"
+                      src="assets/icon/png-icons/plus.png" alt="">
+                  </i>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item [collapsed]="true" class="accordion-panel">
+        <sb-item-head class="accordion-msg" (click)="toggleClick($event)">Templates<a *ngIf="!this.isVsrPublished"
+            container="body" href="javascript:;" (click)="addAll(this.templateList,true)"
+            class=" crm-action-info text-muted text-primary-float" placement="top" triggers="mouseenter:mouseleave"
+            ngbTooltip="Add All">
+            <i style="color: black;" class="pl-10 icofont icofont-ui-add"></i>
+          </a></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <div class="panel panel-default" droppable (onDrop)="addORRemove($event,false)">
+              <ul class="list-group">
+                <li [draggable] *ngFor="let item of this.templateList" [dragScope]="'Template'" [dragData]="item"
+                  [dragEnabled]="!this.isVsrPublished" class="list-group-item"><label
+                    class="label-doc">{{item.value}}</label>
+                  <i *ngIf="!this.isVsrPublished" class="p-r-20" style="float: right;cursor: pointer;"
+                    href="javascript:;"> <img class="img-50" placement="bottom"
+                      (click)="addORRemove({dragData:item},true);" triggers="mouseenter:mouseleave" ngbTooltip="Add"
+                      src="assets/icon/png-icons/plus.png" alt="">
+                  </i>
+                  <i *ngIf="!this.isVsrPublished" class="p-r-20" style="float: right;cursor: pointer;"
+                    href="javascript:;"> <img class="img-50" placement="bottom"
+                      (click)="addORRemove({dragData:item},true);checkForcommonworkflowChanges(item)"
+                      triggers="mouseenter:mouseleave" ngbTooltip="Add with common setup"
+                      src="assets/icon/png-icons/plus.png" alt="">
+                  </i>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+
+      <sb-item [collapsed]="true" class="accordion-panel">
+        <sb-item-head class="accordion-msg" (click)="toggleClick($event)">Form Group<a *ngIf="!this.isVsrPublished"
+            container="body" href="javascript:;" (click)="addAll(this.formGroupList,true)"
+            class=" crm-action-info text-muted text-primary-float" placement="top" triggers="mouseenter:mouseleave"
+            ngbTooltip="Add All">
+            <i style="color: black;" class="pl-10 icofont icofont-ui-add"></i>
+          </a></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <div class="panel panel-default" droppable (onDrop)="addORRemove($event,false)">
+              <ul class="list-group">
+                <li [draggable] *ngFor="let item of this.formGroupList" [dragScope]="'FormGroup'" [dragData]="item"
+                  [dragEnabled]="!this.isVsrPublished" class="list-group-item"><label class="label-doc">{{item.value}}
+                    <ul class="list-group" *ngFor="let f of item.child">
+                      <li class="list-group-item">{{f.value}}</li>
+                    </ul>
+                  </label>
+                  <i *ngIf="!this.isVsrPublished" class="p-r-20" style="float: right;cursor: pointer;cursor: pointer;"
+                    href="javascript:;"> <img class="img-50" placement="bottom"
+                      (click)="addORRemove({dragData:item},true);" triggers="mouseenter:mouseleave" ngbTooltip="Add"
+                      src="assets/icon/png-icons/plus.png" alt="">
+                  </i>
+                  <i *ngIf="!this.isVsrPublished" class="p-r-20" style="float: right;cursor: pointer;cursor: pointer;"
+                    href="javascript:;"> <img class="img-50" placement="bottom"
+                      (click)="addORRemove({dragData:item},true); this.checkForcommonworkflowChanges(item)"
+                      triggers="mouseenter:mouseleave" ngbTooltip="Add with common setup"
+                      src="assets/icon/png-icons/plus.png" alt="">
+                  </i>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item [collapsed]="true" class="accordion-panel">
+        <sb-item-head class="accordion-msg" (click)="onCLickDocumentForms()">Document Forms
+          <a *ngIf="!this.isVsrPublished" container="body" href="javascript:;"
+            class=" crm-action-info text-muted text-primary-float" placement="top" triggers="mouseenter:mouseleave"
+            ngbTooltip="Add All">
+            <i style="color: black;" class="pl-10 icofont icofont-ui-add"></i>
+          </a>
+        </sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <div class="panel panel-default">
+              <div class="row" *ngFor="let forms of documentForms">
+                <div class="col-sm-2">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input type="checkbox" name="{{forms.value}}" [disabled]="forms.mappingFlag"
+                        [checked]="forms.configuration" (click)="saveDocumentForms(forms.key,$event);" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="col-sm-10" style="padding: 0px;">
+                  {{forms.value}}
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+
+    </squeezebox>
+  </div>
+  <app-card class="col-sm-5">
+    <div class="panel panel-default" dnd-sortable-container [sortableData]="droppedItems" droppable
+      (onDragSuccess)="this.switchButtonColorFlag=true" [dropScope]="['Document','Form','Template','FormGroup']"
+      (onDrop)="addORRemove($event,true);checkForcommonworkflowChanges('');">
+      <div class="panel-heading"><strong>Selected Documents</strong>
+        <button *ngIf="droppedItems.length!=0 && !this.isVsrPublished"
+          [class]="this.switchButtonColorFlag?'btn btn-primary p-t-3 p-b-3':'btn btn-default p-t-3 p-b-3'"
+          style="cursor: pointer;"
+          (click)="updateDocumentOrderOfProject(droppedItems); this.switchButtonColorFlag=false;" type="button"><i
+            class="icofont icofont-save"></i> Update Document Order </button>
+        &nbsp; <a *ngIf="droppedItems.length!=0 && !this.isVsrPublished" container="body" placement="top"
+          triggers="mouseenter:mouseleave" ngbTooltip="Workflow Settings"
+          (click)="loadStaticDocumentSettings();staticSettingsModal.show();">
+          <i class="icofont icofont-gear "></i>
+        </a>
+        &nbsp;
+        <a *ngIf="configFlag && !this.isVsrPublished" container="body" placement="top" triggers="mouseenter:mouseleave"
+          ngbTooltip="Import
+      Setting" (click)="this.importPDFSetting.cloneSetting(projectId);">
+          <i class="fa fa-download"></i>
+        </a>
+      </div>
+      <div class="panel-body">
+        <ng-container *ngFor="let item of droppedItems; let i = index">
+          <li [draggable] dnd-sortable [sortableIndex]="i" [dragData]="item" [dragEnabled]="!item.freezeFlag"
+            class="list-group-item">
+
+            <div *ngIf="!item.mappingFlag && item.child.length==0" class="row">
+              <div class="col-sm-2"><span placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Document Order"
+                  style="font-size: 12px;">{{item.displayOrder}}</span></div>
+              <div class="col-sm-4"><span style="font-size: small;">{{item.value}}</span></div>
+              <div class="col-sm-1"><a *ngIf="i!=0 && !this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Move Up" (click)="moveUpOrDown(droppedItems,i,true)">
+                  <i class="icofont icofont-arrow-up "></i>
+                </a>
+                <a *ngIf="i!=0 && this.isVsrPublished" container="body" placement="top" triggers="mouseenter:mouseleave"
+                  ngbTooltip="Move Up">
+                  <i class="icofont icofont-arrow-up disabled"></i>
+                </a>
+                <a *ngIf="i!=(droppedItems.length-1) && !this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Move Down" (click)="moveUpOrDown(droppedItems,i,false);">
+                  <i class="icofont icofont-arrow-down "></i>
+                </a>
+                <a *ngIf="i!=(droppedItems.length-1) && this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Move Down">
+                  <i class="icofont icofont-arrow-down disabled"></i>
+                </a>
+              </div>
+
+              <div class="col-sm-1"> <a *ngIf="!this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Remove"
+                  (click)="deleteLevelOfDocumentSwal(item,false,item.freezeFlag,item.dataIncompleteFlag)">
+                  <i class="icofont icofont-bin "></i>
+                </a>
+                <a *ngIf="this.isVsrPublished" container="body" placement="top" triggers="mouseenter:mouseleave"
+                  ngbTooltip="Remove">
+                  <i class="icofont icofont-bin disabled"></i>
+                </a>
+              </div>
+
+              <div class="col-sm-1"> <a container="body" (click)="loadAllDataForDocumentForProject(item)"
+                  placement="top" triggers="mouseenter:mouseleave" ngbTooltip="View">
+                  <i class="icofont icofont-eye-alt "></i>
+                </a></div>
+              <div class="col-sm-1"> <a *ngIf="item.configuration && !this.isVsrPublished" container="body"
+                  (click)="copyConfiguration(droppedItems,item)" placement="top" triggers="mouseenter:mouseleave"
+                  ngbTooltip="Copy Configuration">
+                  <i class="icofont icofont-copy "></i>
+                </a>
+                <a *ngIf="item.configuration && this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Copy Configuration"> <i
+                    class="icofont icofont-copy disabled"></i>
+                </a>
+              </div>
+              <div class="col-sm-1">
+                <a container="body" role="button" *ngIf="!this.isVsrPublished"
+                  (click)="loadDataForFlow(i,item,item.freezeFlag)" placement="top"
+                  [style.color]="item.configuration?'black':'red'" triggers="mouseenter:mouseleave"
+                  ngbTooltip="Workflow SetUp">
+                  <i class="icofont icofont-chart-flow-alt-1 "></i>
+                </a>
+                <a container="body" role="button" *ngIf="this.isVsrPublished" placement="top"
+                  [style.color]="item.configuration?'black':'red'" triggers="mouseenter:mouseleave"
+                  ngbTooltip="Workflow SetUp">
+                  <i class="icofont icofont-chart-flow-alt-1 disabled"></i>
+                </a>
+              </div>
+              <div class="col-sm-1">
+                <a id="document-lock-{{i}}" *ngIf="  item.configuration && item.userInWorkflow"
+                  (click)="freezeOrUnFreeze(item);" container="body" placement="top" triggers="mouseenter:mouseleave"
+                  ngbTooltip="{{item.dropDowndocumentLock?'UnLock Document':'Lock Document'}}">
+                  <i class="{{item.dropDowndocumentLock?' fa fa fa-lock ':'fa fa-unlock'}}"></i>
+                </a>
+              </div>
+            </div>
+
+            <div *ngIf="!item.mappingFlag && item.child.length > 0">
+              <div class="row">
+                <div class="col-sm-2" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Document Order">
+                  <span style="font-size: 12px;">{{item.displayOrder}}</span>
+                </div>
+                <div class="col-sm-4"><span style="font-size: small;">{{item.value}}</span></div>
+                <div class="col-sm-1"> <a *ngIf="i!=0 && !this.isVsrPublished" container="body" placement="top"
+                    triggers="mouseenter:mouseleave" ngbTooltip="Move Up" (click)="moveUpOrDown(droppedItems,i,true)">
+                    <i class="icofont icofont-arrow-up "></i>
+                  </a>
+                  <a *ngIf="i!=0 && this.isVsrPublished" container="body" placement="top"
+                    triggers="mouseenter:mouseleave" ngbTooltip="Move Up">
+                    <i class="icofont icofont-arrow-up disabled"></i>
+                  </a>
+                  <a *ngIf="i!=(droppedItems.length-1) && !this.isVsrPublished" container="body" placement="top"
+                    triggers="mouseenter:mouseleave" ngbTooltip="Move Down"
+                    (click)="moveUpOrDown(droppedItems,i,false)">
+                    <i class="icofont icofont-arrow-down "></i>
+                  </a>
+                  <a *ngIf="i!=(droppedItems.length-1) && this.isVsrPublished" container="body" placement="top"
+                    triggers="mouseenter:mouseleave" ngbTooltip="Move Down">
+                    <i class="icofont icofont-arrow-down disabled"></i>
+                  </a>
+                </div>
+                <div class="col-sm-1"> <a *ngIf="!this.isVsrPublished" container="body" placement="top"
+                    triggers="mouseenter:mouseleave" ngbTooltip="Remove"
+                    (click)="deleteLevelOfDocumentSwal(item,false,item.freezeFlag,item.dataIncompleteFlag)">
+                    <i class="icofont icofont-bin "></i>
+                  </a>
+                  <a *ngIf="this.isVsrPublished" container="body" placement="top" triggers="mouseenter:mouseleave"
+                    ngbTooltip="Remove">
+                    <i class="icofont icofont-bin disabled"></i>
+                  </a>
+                </div>
+                <div class="col-sm-1"> <a container="body" (click)="loadAllDataForDocumentForProject(item)"
+                    placement="top" triggers="mouseenter:mouseleave" ngbTooltip="View">
+                    <i class="icofont icofont-eye-alt "></i>
+                  </a></div>
+                <div class="col-sm-1"> <a *ngIf="item.configuration && !this.isVsrPublished" container="body"
+                    (click)="copyConfiguration(droppedItems,item)" placement="top" triggers="mouseenter:mouseleave"
+                    ngbTooltip="Copy Configuration">
+                    <i class="icofont icofont-copy "></i>
+                  </a>
+                  <a *ngIf="item.configuration && this.isVsrPublished" container="body" placement="top"
+                    triggers="mouseenter:mouseleave" ngbTooltip="Copy Configuration">
+                    <i class="icofont icofont-copy disabled"></i>
+                  </a>
+                </div>
+                <div class="col-sm-1">
+                  <a container="body" role="button" *ngIf="!this.isVsrPublished"
+                    (click)="loadDataForFlow(i,item,item.freezeFlag)" placement="top"
+                    [style.color]="item.configuration?'black':'red'" triggers="mouseenter:mouseleave"
+                    ngbTooltip="Workflow SetUp">
+                    <i class="icofont icofont-chart-flow-alt-1 "></i>
+                  </a>
+                  <a container="body" role="button" *ngIf="this.isVsrPublished" placement="top"
+                    [style.color]="item.configuration?'black':'red'" triggers="mouseenter:mouseleave"
+                    ngbTooltip="Workflow SetUp">
+                    <i class="icofont icofont-chart-flow-alt-1 disabled"></i>
+                  </a>
+                </div>
+                <div class="col-sm-1">
+                  <a id="document-lock-{{i}}"
+                    *ngIf=" !item.dataIncompleteFlag && item.configuration && item.userInWorkflow"
+                    (click)="freezeOrUnFreeze(item);" container="body" placement="top" triggers="mouseenter:mouseleave"
+                    ngbTooltip="{{item.dropDowndocumentLock?'UnLock Document':'Lock Document'}}">
+                    <i class="{{item.dropDowndocumentLock?' fa fa fa-lock ':'fa fa-unlock'}}"></i>
+                  </a>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12 p-l-0 p-r-0">
+                  <ul class="list-group p-b-2" *ngFor="let f of item.child">
+                    <li class="list-group-item">
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <div class=" row col-sm-12 p-r-0">
+                            <p class="col-sm-11  text-right">
+                              DF Workflow:
+                            </p>
+                          </div>
+                        </div>
+                        <div class="col-sm-3 p-r-1 p-l-0 text-center">
+                          <label class="switch with-text"><input type="checkbox"
+                              (change)="!item.configuration || f.dataIncompleteFlag  || f.freezeFlag?item.dfExecutionRequired:item.dfExecutionRequired=!item.dfExecutionRequired"
+                              [disabled]="!item.configuration || f.dataIncompleteFlag || f.freezeFlag"
+                              [checked]="item.dfExecutionRequired" (change)="onChange($event.currentTarget.checked,f) "
+                              id="togBtn">
+                            <div class="slider round"></div>
+                          </label>
+                        </div>
+                        &nbsp;
+                        <div class="row col-sm-3 p-l-1 p-r-0" *ngIf="item.dfExecutionRequired">
+                          <div class="col-sm-1"> <a container="body" (click)="loadAllDataForDocumentForProject(f)"
+                              placement="top" triggers="mouseenter:mouseleave" ngbTooltip="View">
+                              <i class="icofont icofont-eye-alt "></i>
+                            </a></div> &nbsp;
+                          <div class="col-sm-1"> <a *ngIf="f.configuration && !this.isVsrPublished" container="body"
+                              (click)="copyConfiguration(droppedItems,f)" placement="top"
+                              triggers="mouseenter:mouseleave" ngbTooltip="Copy Configuration">
+                              <i class="icofont icofont-copy "></i>
+                            </a>
+                            <a *ngIf="f.configuration && this.isVsrPublished" container="body" placement="top"
+                              triggers="mouseenter:mouseleave" ngbTooltip="Copy Configuration">
+                              <i class="icofont icofont-copy disabled"></i>
+                            </a>
+                          </div>
+                          <div class="col-sm-1">
+                            <a container="body" *ngIf="!this.isVsrPublished"
+                              (click)="f.displayOrder=item.displayOrder;  loadDataForFlow(i,f);" placement="top"
+                              [style.color]="f.configuration?'black':'red'" triggers="mouseenter:mouseleave"
+                              ngbTooltip="Workflow SetUp">
+                              <i class="icofont icofont-chart-flow-alt-1 "></i>
+                            </a>
+                            <a container="body" *ngIf="this.isVsrPublished" placement="top"
+                              [style.color]="f.configuration?'black':'red'" triggers="mouseenter:mouseleave"
+                              ngbTooltip="Workflow SetUp">
+                              <i class="icofont icofont-chart-flow-alt-1 disabled"></i>
+                            </a>
+                          </div>
+                        </div>
+
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="item.mappingFlag" class="row">
+              <div class="col-sm-2" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Document Order"><span
+                  style="font-size: 12px;">{{item.displayOrder}}</span></div>
+              <div class="col-sm-6"><span style="font-size: small;">{{item.value}}</span>
+                <ul class="list-group p-b-2" *ngFor="let f of item.child">
+                  <li class="list-group-item">
+                    <div class="row">
+                      <div class="col-sm-6"><span style="font-size: small;">{{f.value}}</span></div>
+                      <div class="col-sm-1"> <a container="body" (click)="loadAllDataForDocumentForProject(f)"
+                          placement="top" triggers="mouseenter:mouseleave" ngbTooltip="View">
+                          <i class="icofont icofont-eye-alt "></i>
+                        </a></div>
+                      <div class="col-sm-1"> <a *ngIf="f.configuration && !this.isVsrPublished" container="body"
+                          (click)="copyConfiguration(droppedItems,f)" placement="top" triggers="mouseenter:mouseleave"
+                          ngbTooltip="Copy Configuration">
+                          <i class="icofont icofont-copy "></i>
+                        </a>
+                        <a *ngIf="f.configuration && this.isVsrPublished" container="body" placement="top"
+                          triggers="mouseenter:mouseleave" ngbTooltip="Copy Configuration">
+                          <i class="icofont icofont-copy disabled"></i>
+                        </a>
+                      </div>
+                      <div class="col-sm-1">
+                        <a container="body" *ngIf="!this.isVsrPublished"
+                          (click)="f.displayOrder=item.displayOrder;  loadDataForFlow(i,f,f.freezeFlag);"
+                          placement="top" [style.color]="f.configuration?'black':'red'" triggers="mouseenter:mouseleave"
+                          ngbTooltip="Workflow SetUp">
+                          <i class="icofont icofont-chart-flow-alt-1 "></i>
+                        </a>
+                        <a container="body" *ngIf="this.isVsrPublished" placement="top"
+                          [style.color]="f.configuration?'black':'red'" triggers="mouseenter:mouseleave"
+                          ngbTooltip="Workflow SetUp">
+                          <i class="icofont icofont-chart-flow-alt-1 disabled"></i>
+                        </a>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="col-sm-1"><a *ngIf="i!=0 && !this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Move Up" (click)="moveUpOrDown(droppedItems,i,true)">
+                  <i class="icofont icofont-arrow-up "></i>
+                </a>
+                <a *ngIf="i!=0 && this.isVsrPublished" container="body" placement="top" triggers="mouseenter:mouseleave"
+                  ngbTooltip="Move Up">
+                  <i class="icofont icofont-arrow-up disabled"></i>
+                </a>
+                <a *ngIf="i!=(droppedItems.length-1) && !this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Move Down" (click)="moveUpOrDown(droppedItems,i,false)">
+                  <i class="icofont icofont-arrow-down "></i>
+                </a>
+                <a *ngIf="i!=(droppedItems.length-1) && this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Move Down">
+                  <i class="icofont icofont-arrow-down disabled"></i>
+                </a>
+              </div>
+
+              <div class="col-sm-1" *ngIf="item.configuration && !this.isVsrPublished">
+                <a container="body" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Settings"
+                  (click)="loadMultiFormSettings(item);multiFormSettingsModal.show();">
+                  <i class="icofont icofont-gear "></i>
+                </a>
+              </div>
+              <div class="col-sm-1"> <a *ngIf="!this.isVsrPublished" container="body" placement="top"
+                  triggers="mouseenter:mouseleave" ngbTooltip="Remove"
+                  (click)="deleteLevelOfDocumentSwal(item,false,item.freezeFlag,item.dataIncompleteFlag)">
+                  <i class="icofont icofont-bin "></i>
+                </a>
+                <a *ngIf="this.isVsrPublished" container="body" placement="top" triggers="mouseenter:mouseleave"
+                  ngbTooltip="Remove">
+                  <i class="icofont icofont-bin disabled"></i>
+                </a>
+              </div>
+              <div class="col-sm-1">
+                <a id="document-lock-{{i}}"
+                  *ngIf=" !item.dataIncompleteFlag && item.configuration && item.userInWorkflow"
+                  (click)="freezeOrUnFreeze(item);" container="body" placement="top" triggers="mouseenter:mouseleave"
+                  ngbTooltip="{{item.dropDowndocumentLock?'UnLock Document':'Lock Document'}}">
+                  <i class="{{item.dropDowndocumentLock?' fa fa fa-lock ':'fa fa-unlock'}}"></i>
+                </a>
+              </div>
+            </div>
+          </li>
+        </ng-container>
+      </div>
+    </div>
+  </app-card>
+  <div class="col-sm-4">
+    <app-workflow-flowchart #workFlowChart></app-workflow-flowchart>
+  </div>
+</div>
+
+<app-modal-basic id="modal-lg-60" #modalWorkFlowSetting [dialogClass]="'modal-lg'" [hideHeader]="false"
+  [hideFooter]="false" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header" style="width: 100%">
+    <div style="display: inline-flex;">
+      <h5 class="font-header"><strong>Document Name : </strong>{{documentName}}</h5>
+      <div *ngIf="!add && this.switchButtonColorFlag">
+        <button *ngIf="this.saveModal.documentFlows.length>1 && !this.freezeFlagForLevel"
+          (click)="updateLevelOrderOfDocument(this.saveModal.documentFlows);this.switchButtonColorFlag=false;"
+          type="button" class="btn btn-primary btn-sm">Update Order</button>
+      </div>
+      <button type="button" id="close" name="close" class="close basic-close"
+        (click)="modalWorkFlowSetting.hide();this.loadData(this.projectId);clearSection();addButtonFlag=true;">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div *ngIf="!this.freezeFlagForLevel && this.addButtonFlag">
+      <div class="row">
+        <div class="col-sm-5">
+          Level Name
+          <select name="newLevel" class="form-control" [(ngModel)]="newLevel">
+            <option value="0">Select Level</option>
+            <option *ngFor="let level of this.workflowLevelList" [value]="level.value">{{level.label}}</option>
+          </select>
+        </div>
+        <div class="col-sm-5">
+          Users
+          <angular2-multiselect [data]="this.addNewUsers" [(ngModel)]="selectredNewUsers"
+            [settings]="newUserDropdownSettings">
+            <c-search>
+              <ng-template>
+                <input type="text" [(ngModel)]="newUserInput" (keyup)="onNewUsersSearch($event)"
+                  placeholder="Search Users" />
+              </ng-template>
+            </c-search>
+            <c-item>
+              <ng-template let-item="item">
+                <label>{{item.itemName}}</label>
+              </ng-template>
+            </c-item>
+          </angular2-multiselect>
+        </div>
+        <div class="col-sm-2 m-t-30">
+          <a *ngIf="newLevel !=0 && selectredNewUsers.length > 0" href="javascript:"><img
+              class="image-radius rounded-0 img-27 img-height m-r-10" src="assets/icon/png-icons/save.svg"
+              alt="Save Users" placement="bottom" ngbTooltip="Save" (click)="saveNewLevelUsers()"></a>
+          <button style="text-align: center;" class="btn btn-primary btn-outline-primary btn-icon"
+            ngbTooltip="Add with Advance Options" placement="top" container="body" triggers="mouseenter:mouseleave"
+            (click)="addNewLevelForDocument(this.saveModal.documentFlows)"><i
+              class="icofont icofont-plus-circle"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-body" [ngClass]="this.saveModal.documentFlows.length > 0?'':'dy-height-400'">
+    <div class="container">
+      <!-- <div class="container" [ngClass]="add?'':'dy-width-400 x-scroll-hide'">-->
+      <div class="form-group row">
+        <div class="row">
+          <div *ngIf="add " class="col-sm-12">
+            <div class="container m-0">
+              <div class="form-group row">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-sm-12">
+
+                      <div *ngIf="createLevel">
+                        <div class="row">
+                          <div class="col-sm-9">
+                            Level Name<span class="asterisk">*</span>
+                            <input class="form-control" [(ngModel)]="levelName" placeholder="Level name"
+                              style="padding-top: 0px; height: 37px;" maxlength="15" type="text">
+                          </div>
+                        </div>
+                      </div>
+                      <div *ngIf="!createLevel" class="row">
+                        <div class="col-sm-4">
+                          <label class="form-control-label" for="level">Select Levels<span class="asterisk">*</span>
+                          </label>
+                          <ng-select [ngClass]="'ng-select'" [options]="this.workflowLevelList"
+                            aria-placeholder="Select Level" id="level" (ngModelChange)="validateSave()"
+                            [disabled]="this.freezeFlagForLevel" [multiple]="false" [(ngModel)]="levelId" name="level"
+                            rounds="ngModel" required>
+                          </ng-select>
+                          <p *ngIf="!this.freezeFlagForLevel && levelId == '' && this.createLevelPermission"
+                            style="cursor: pointer !important ;float:right;text-decoration: underline;"
+                            (click)="createLevel=true;this.levelName=null;this.validateSave();"
+                            class="p-l-20 p-t-10 m-b-0 text-c-blue">Create
+                            Level</p>
+                        </div>
+                        <div class="col-sm-4 pt-5">
+                          <ng-container *ngFor="let item of workflowSettingsList">
+                            <ng-container *ngIf="item.mainPageCheck && this.levelId.length!=0">{{item.settingsName}}
+                              <ui-switch class="js-small" [disabled]="this.freezeFlagForLevel"
+                                (change)="diableOtherSetting(item,workflowSettingsList)" color="#93BE52"
+                                switchColor="#fff" defaultBgColor="#F56482" size="small" [checked]="item.check">
+                              </ui-switch>
+                            </ng-container>
+                          </ng-container>
+                        </div>
+                        <div class="col-sm-4  pt-5">
+                          <ng-container *ngFor="let item of workflowSettingsList">
+                            <ng-container *ngFor="let s of item.flowSubSettings">
+                              <ng-container *ngIf="item.check && this.levelId.length!=0">
+                                <label>{{s.subSettingsName}}</label>
+                                <ui-switch class="js-small" (change)="disableOtherSubSetting(s,item.flowSubSettings);"
+                                  color="#93BE52" switchColor="#fff" defaultBgColor="#F56482" size="small"
+                                  [checked]="s.check"></ui-switch>
+                                <span *ngIf="s.check">
+                                  <select [(ngModel)]="s.subSettingsvalue"
+                                    (change)="setSLAToAll(s.subSettingsvalue,workflowSettingsList)" name="days"
+                                    class="List of days">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+                                  </select>Day<ng-container *ngIf="s.subSettingsvalue!='1'">s</ng-container>
+                                </span>
+                              </ng-container>
+                            </ng-container>
+                          </ng-container>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="this.levelId.length!=0">
+                <div class="form-group row">
+                  <div class="col-sm-12">
+                    Do you require all user approval?
+                    <ui-switch name="all_user_workflow" id="all_user_workflow_id" class="js-small"
+                      [disabled]="this.freezeFlagForLevel"
+                      (change)="this.saveModal.allUserApproval=!this.saveModal.allUserApproval" color="#93BE52"
+                      switchColor="#fff" defaultBgColor="#F56482" size="small"
+                      [checked]="this.saveModal.allUserApproval"></ui-switch>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Departments<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="department" [data]="this.departments" id="departmentId"
+                      (ngModelChange)="this.loadUser($event, true); validateSave()" [(ngModel)]="departmentId"
+                      rounds="ngModel" required [settings]="dropdownSettingsDept"
+                      (onDeSelectAll)="onDeptDeSelect($event,true)" (onDeSelect)="onDeptDeSelect([$event],false)">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Roles<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="roles" [data]="this.roles" id="rolesId"
+                      (ngModelChange)="onChangeRoles($event); validateSave()" [(ngModel)]="rolesId" rounds="ngModel"
+                      required [settings]="dropdownSettingsRole" (onDeSelectAll)="onRolesDeSelect($event,true)"
+                      (onDeSelect)="onRolesDeSelect([$event],false)"> </angular2-multiselect>
+                  </div>
+                </div>
+
+                <div class="form-group row ">
+                  <label class="col-sm-8 col-form-label">Users<span class="asterisk">*</span>
+                    &nbsp; &nbsp; &nbsp; &nbsp;
+                    <a container="body" placement="top" triggers="mouseenter:mouseleave"
+                      ngbTooltip="User Permission Settings" (click)="loadUserPermissions(this.usersId,true);">
+                      <i class="icofont icofont-gear "></i></a>&nbsp;
+                    <i href="javascript:;"> <img style="padding-bottom: 3px;" class="img-50" placement="top"
+                        triggers="mouseenter:mouseleave" (click)="loadNotification(this.usersId, true);"
+                        ngbTooltip="Email/Notification Settings"
+                        src="assets/icon/png-icons/notification-settings-icon.png" alt="">
+                    </i>
+                  </label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="users" [data]="this.users" id="usersId"
+                      (ngModelChange)="onChangeusers($event); loadNotification($event,false); loadUserPermissions($event,false);"
+                      [(ngModel)]="usersId" rounds="ngModel" required [settings]="dropdownSettings"
+                      (onDeSelectAll)="onUserDeSelect($event,true)" (onDeSelect)="onUserDeSelect([$event],false)">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div *ngIf="!add" class="col-sm-12">
+            <div style="cursor: pointer;margin-left: 5%;margin-right: 5%;" dnd-sortable-container
+              [sortableData]="this.saveModal.documentFlows" droppable [dropScope]="[]" (onDrop)="onadd($event)">
+              <div class="panel-body ">
+                <li [draggable] dnd-sortable [sortableIndex]="i"
+                  *ngFor="let item of this.saveModal.documentFlows; let i = index" [dragData]="item"
+                  [dragEnabled]="!this.freezeFlagForLevel" class="list-group-item">
+                  <div style="text-align: left" class="container ">
+                    <div class="row">
+                      <label class="col-sm-4"><strong class="strong">Level :</strong> {{item.levelName}}</label>
+                      <div class="col-sm-5" *ngIf="!item.isEditUsers">
+                        <label style="white-space: nowrap;
+                        text-overflow: ellipsis;
+                        display: block;
+                        overflow: hidden"><strong class="strong">Users: </strong><span style="cursor: pointer;" (click)="onClickEditUsers(item);" ngbTooltip="Click to Edit">{{item.userArray}}</span></label>
+                      </div>
+                      <div class="col-sm-5" *ngIf="item.isEditUsers">
+                        <angular2-multiselect [data]="this.newUsers" [(ngModel)]="item.selectedUsers"
+                          [settings]="userDropdownSettings" (onDeSelect)="onDeSelect([$event],false,item)"
+                          (onDeSelectAll)="onDeSelect($event,true,item)">
+                          <c-search>
+                            <ng-template>
+                              <input type="text" [(ngModel)]="userInput"
+                                (keyup)="onUsersSearch($event,item.levelId,item.selectedUsers)"
+                                placeholder="Search Users" />
+                            </ng-template>
+                          </c-search>
+                          <c-item>
+                            <ng-template let-item="item">
+                              <label>{{item.itemName}}</label>
+                            </ng-template>
+                          </c-item>
+                        </angular2-multiselect>
+                      </div>
+                      <div class="col-sm-3">
+                        <a *ngIf="item.isEditUsers && item.selectedUsers.length > 0" class="m-r-5" container="body"
+                          placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Save Users"
+                          (click)="saveNewUsers(item);">
+                          <i class="icofont icofont-save"></i>
+                        </a>
+                        <a *ngIf="i!=0 && !this.freezeFlagForLevel" container="body" placement="top"
+                          triggers="mouseenter:mouseleave" ngbTooltip="Move Up"
+                          (click)="moveUpOrDown(this.saveModal.documentFlows,i,true)">
+                          <i class="icofont icofont-arrow-up "></i>
+                        </a>
+                        <a *ngIf="i!=(this.saveModal.documentFlows.length-1) && !this.freezeFlagForLevel"
+                          container="body" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Move Down"
+                          (click)="moveUpOrDown(this.saveModal.documentFlows,i,false)">
+                          <i class="icofont icofont-arrow-down "></i>
+                        </a>
+                        <a class="m-r-5" container="body" placement="top" triggers="mouseenter:mouseleave"
+                          ngbTooltip="Edit" (click)="editLevelOfDocument(item); this.addButtonFlag=false;">
+                          <i class="icofont icofont-edit "></i>
+                        </a>
+                        <a class="m-r-5" container="body" placement="top" triggers="mouseenter:mouseleave"
+                          ngbTooltip="Delete"
+                          (click)="deleteLevelOfDocumentSwal(item.id,true,freezeFlagForLevel,dataIncompleteFlag)">
+                          <i class="icofont icofont-bin "></i>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <label><strong class="strong">Order:</strong> {{item.orderId}}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <i style="font-size:500%" class="icofont icofont-long-arrow-down d-flex justify-content-center "></i>
+                </li>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="width: 100%;overflow-x: hidden;" class="app-modal-footer">
+
+    <div class="row">
+      <div style="text-align: right;" class="col-sm-12">
+        <button [disabled]="this.modalWorkFlowSetting.govalMainSpinnerFlag"
+          *ngIf="this.validSave && add && !createLevel" (click)="openSuccessUpdateSwal(this.updateFlag);clearSection()"
+          type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+        <button *ngIf="add && !createLevel"
+          (click)="this.loadDataForFlow(0, { key: this.documentConstant, value: this.documentName,freezeFlag:this.freezeFlagForLevel,displayOrder:this.documentDisplayOrder}); this.addButtonFlag=true;clearSection()"
+          type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+        <button *ngIf="createLevel" type="button" [disabled]="this.levelName==null || this.levelName==''"
+          (click)="createWorkflowLevel();clearSection()"
+          class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+        <button *ngIf="createLevel" (click)="createLevel=false;clearSection()" type="button"
+          class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #emailNotificationSettings [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Email Notification Settings</h4>
+    <button type="button" class="close basic-close" (click)="emailNotificationSettings.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" style="height: 400px; overflow-y: scroll;">
+    <app-card [classHeader]="true" [blockClass]="'table-border-style'">
+      <div class="table-responsive">
+        <table class="table table-framed">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User Name</th>
+              <th style="text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of notificationModalList;let i = index">
+              <th scope="row">{{i+1}}</th>
+              <td>{{item.userName}}</td>
+              <td style="text-align: center;">
+                <div class="border-checkbox-section">
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox" (change)="item.notification=!item.notification"
+                      [checked]="item.notification" id="checkbox0{{i}}">
+                    <label class="border-checkbox-label" for="checkbox0{{i}}">Notification</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox" (change)="item.email=!item.email"
+                      [checked]="item.email" id="checkbox1{{i}}">
+                    <label class="border-checkbox-label" for="checkbox1{{i}}">Email</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox" (change)="item.followUp=!item.followUp"
+                      [checked]="item.followUp" id="checkbox2{{i}}">
+                    <label class="border-checkbox-label" for="checkbox2{{i}}">Email follow-up</label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-success waves-effect "
+      (click)="emailNotificationSettings.hide()">Submit</button>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic #copyConfigurationModal [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Copy Configuration</h4>
+    <button type="button" class="close basic-close" (click)="copyConfigurationModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 350px;overflow: scroll;" class="app-modal-body">
+    <div>
+      <ng-container *ngFor="let copy of this.copyConfigurationList; let i=index">
+        <div class="row">
+          <label class="col-sm-2"> {{i+1}}</label>&nbsp;
+          <div class="col-sm-8">
+            <div class="border-checkbox-section">
+              <div class="border-checkbox-group border-checkbox-group-primary">
+                <input class="border-checkbox" type="checkbox" (change)="checkCopyApply(copy,copyConfigurationList)"
+                  [checked]="copy.configuration" id="checkbox{{i}}">
+                <label class="border-checkbox-label" for="checkbox{{i}}">{{copy.value}}</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: right;" class="col-sm-12">
+        <button type="button" class="btn btn-default waves-effect "
+          (click)="copyConfigurationModal.hide()">Close</button>
+        <button [disabled]="!this.applyCopy" *ngIf="this.copyConfigurationList.length!=0" type="button"
+          class="btn btn-success waves-effect "
+          (click)="applyConfigurationSwal(this.copyConfigurationList,true)">Apply</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #copyLevelConfigurationModal [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Copy Level Configuration</h4>
+    <button type="button" class="close basic-close" (click)="copyLevelConfigurationModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div *ngIf="levelConfigurationToBeApplied!=null" class="col-sm-12">
+        <label> <span class="strong"><b>{{levelConfigurationToBeApplied.levelName}}</b> configuration will be copied for
+            below selected levels</span>
+        </label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <div *ngIf="createLevel">
+          <div class="row col-sm-12">
+            <input class="form-control" [(ngModel)]="levelName" placeholder="Level name"
+              style="padding-top: 0px; height: 37px;" maxlength="15" type="text">
+          </div>
+        </div>
+
+        <div *ngIf="!createLevel" class="row">
+          <label style="padding: 2%;" class="col-sm-4" for="level">Select Levels<span class="asterisk">*</span> </label>
+          <div class="col-sm-8">
+            <ng-select [ngClass]="'ng-select'" [options]="this.workflowLevelList" aria-placeholder="Select Level"
+              id="level" [multiple]="true" [(ngModel)]="levelId" name="roles" rounds="ngModel" required>
+            </ng-select>
+            <p *ngIf="this.createLevelPermission"
+              style="cursor: pointer !important ;float:right;text-decoration: underline;"
+              (click)="createLevel=true;this.levelName=null" class="p-l-20 p-t-10 m-b-0 text-c-blue">Create Level</p>
+          </div>
+          <div style="border: 0 !important;" class="form-control col-sm-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button *ngIf="this.levelId.length!=0 && !createLevel" type="button"
+      class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+      (click)="applyConfigurationSwal(this.levelId,false)">Apply</button>
+    <button *ngIf="!createLevel" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+      (click)="copyLevelConfigurationModal.hide()">Close</button>
+
+    <button *ngIf="createLevel" type="button" [disabled]="this.levelName==null || this.levelName==''"
+      (click)="createWorkflowLevel()" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+    <button *ngIf="createLevel" (click)="createLevel=false" type="button"
+      class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #freezemodal [hideFooter]="true" [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Revision of Document</h4>
+    <button type="button" class="close basic-close-light-box" (click)="freezemodal.hide();loaddata();close();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div *ngIf="this.freezeData" class="app-modal-body">
+    <ng-container *ngIf="this.freezeData.newRevisionDocuments.length>0 || this.freezeData.documentLock;else nodata">
+      <div class="row">
+        <div class="col-sm-12" style="text-align: right;">
+          <a *ngIf="this.freezeData.draftList.length>0" href="javascript:"
+            (click)="loadRecordView(this.freezeData.draftList);">
+            View draft
+          </a> &nbsp;&nbsp;&nbsp;
+          <a *ngIf="this.freezeData.newRevisionDocuments.length>0" href="javascript:"
+            (click)="loadRecordView(this.freezeData.newRevisionDocuments);">
+            View completed
+          </a>
+        </div>
+        <div class="col-sm-12">
+          <textarea [(ngModel)]="this.freezeData.documentLockComments" id="documentApprovalComment"
+            placeholder="please enter the comments to lock or un-lock " name="description" class="form-control" rows="3"
+            cols="40"> </textarea>
+        </div>
+        <div class="col-sm-8">
+          <br>
+          <ng-container *ngIf="this.freezeData.documentLock && this.freezeData.documentLockComments">
+            <div class="row">
+              <label class="form-control-label col-sm-12">Select next revision</label>
+              <br>
+              <div class="col-sm-12  pl-5">
+                <label class="radio-inline" *ngIf="this.freezeData.revisionVersionZero">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    [value]="this.freezeData.revisionVersionZero" />{{this.freezeData.revisionVersionZero}}</label>
+                &nbsp; &nbsp;
+                <label class="radio-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    [value]="this.freezeData.revisionVersionTwo" />{{this.freezeData.revisionVersionTwo}}</label> &nbsp;
+                &nbsp;
+                <label class="radio-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    checked
+                    [value]="this.freezeData.revisionVersionOne" />{{this.freezeData.revisionVersionOne}}</label>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="col-sm-12 text-center">
+          <button
+            *ngIf="(null!=this.freezeData.selectedVersion || !this.freezeData.documentLock)&& this.freezeData.documentLockComments"
+            (click)="saveDocumentLockAndUnlock()" class="btn btn-primary btn-sm pointer" type="button"><i
+              class="icofont icofont-save"></i>
+            {{this.freezeData.documentLock?'Unlock Document':'Lock Document'}} </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #nodata>
+      <div class="text-center col-sm-12">
+        <h5>No new item created</h5>
+      </div>
+
+    </ng-template>
+    <hr>
+    <div *ngIf="this.documentlockDataLogs.length>0"
+      [ngClass]="(this.freezeData.newRevisionDocuments.length>0 || this.freezeData.documentLock)? 'dy-width-300':'dy-width-400'">
+      <h5>Document Lock Log</h5><br>
+      <div *ngFor="let item of this.documentlockDataLogs">
+        <div><b>Status : {{item.status?'Locked':'Un-Locked'}} </b>&nbsp;</div>
+        <div><b>Revision : {{item.revision}} </b>&nbsp;</div>
+        <div><b> <i class="{{item.status?' fa fa fa-lock ':'fa fa-unlock'}}"></i> By :</b>&nbsp;{{item.userName}} </div>
+        <div><b><i class="{{item.status?' fa fa fa-lock ':'fa fa-unlock'}}"></i> Time :</b>&nbsp; {{item.createdTime}}
+        </div>
+        <div><b>Comments :</b> {{item.comments}} </div>
+        <hr>
+      </div>
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic class="reset-this" #revisionDocs container="body" [hideHeader]="true" [hideFooter]="true"
+  [dialogClass]="'modal-md'">
+  <div *ngIf="null!=this.freezeData" class="app-modal-body" style="height: 300px; overflow-y: scroll;">
+
+    <button type="button" class="close basic-close-light-box" (click)="revisionDocs.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div *ngIf="null!=this.freezeData && this.viewList.length>0" class="overflow-container" slimScroll
+      railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+      allowPageScroll="false">
+      <h5>View Records</h5><br>
+      <table class="table table-framed">
+        <tr>
+          <th>#</th>
+          <th>Document Code </th>
+          <th>Title/Desc(if any) </th>
+        </tr>
+        <tr *ngFor="let n of this.viewList;let c=index">
+          <td>{{c+1}} </td>
+          <td>{{n.documentCode}}</td>
+          <td>{{n.name}} </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #multiFormSettingsModal [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Form Group Settings</h4>
+    <button type="button" class="close basic-close" #closebutton (click)="multiFormSettingsModal.hide()"></button>
+  </div>
+  <div class="app-modal-body">
+    <div class="form-group row" *ngIf="this.isFormGroupLevelsEqual">
+      <div class="col-sm-12">Common Approval &nbsp;&nbsp;
+        <ui-switch class="js-small" color="#93BE52" switchColor="#fff" defaultBgColor="#F56482" size="small"
+          [(ngModel)]="flowFormGroupSettingsDTO.commonApprovalFlag" (change)="onChangeCommonApproval()"></ui-switch>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="!flowFormGroupSettingsDTO.commonApprovalFlag">
+      <div class="col-sm-12">
+        <span>Workflow Sequence</span>
+        <div class="form-radio">
+          <form>
+            <div class="radio radio-inline1">
+              <label>
+                <input type="radio" name="radio" [value]="false"
+                  [(ngModel)]="flowFormGroupSettingsDTO.workflowSequenceFlag">
+                <i class="helper"></i><i style="padding: 5px;" class="fa fa-align-justify"
+                  aria-hidden="true"></i>Parallel
+              </label>
+            </div>
+            <div class="radio radio-inline1">
+              <label>
+                <input type="radio" name="radio" [value]="true"
+                  [(ngModel)]="flowFormGroupSettingsDTO.workflowSequenceFlag">
+                <i class="helper"></i><i style="padding: 5px;" class="fa fa-long-arrow-right"
+                  aria-hidden="true"></i>Sequential
+              </label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-success waves-effect " (click)="saveMultiFormSettings()">Save</button>
+    <button type="button" class="btn btn-default waves-effect " (click)="multiFormSettingsModal.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #staticSettingsModal [dialogClass]="'modal-md'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Workflow Settings</h4>
+    <button type="button" class="close basic-close" #staticDocumentClosebutton (click)="staticSettingsModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+
+    <div class="form-group row">
+      <div class="col-sm-12">
+        <span class="strong"><strong>Documents Sequence</strong> </span>
+        <div class="form-radio">
+          <form>
+            <div class="radio radio-inline1">
+              <label>
+                <input type="radio" name="radio" [value]="false"
+                  [(ngModel)]="staticDocumentSettingsDTO.workflowSequenceFlag">
+                <i class="helper"></i><i style="padding: 5px;" class="fa fa-align-justify"
+                  aria-hidden="true"></i>Parallel
+              </label>
+            </div>
+            <div class="radio radio-inline1">
+              <label>
+                <input type="radio" name="radio" [value]="true"
+                  [(ngModel)]="staticDocumentSettingsDTO.workflowSequenceFlag">
+                <i class="helper"></i> <i style="padding: 5px;" class="fa fa-long-arrow-right"
+                  aria-hidden="true"></i>Sequential
+              </label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <hr style="margin-left: -16px;margin-right: -16px;">
+    <div class="form-group row">
+      <div class="col-sm-12">
+        <span class="strong"><strong>User Settings</strong> </span>
+        <div class="row">
+          <div class="col-sm-7" style="padding-top: 5px;">
+            Default project for creator :
+          </div>
+          <div class="col-sm-5">
+            <label class="switch"><input type="checkbox" name="defaultProjectForCreator"
+                [(ngModel)]="staticDocumentSettingsDTO.defaultProjectForCreator" /><span
+                class="slider round"></span></label>
+          </div>
+        </div>
+        <br>
+        <div class="row">
+          <div class="col-sm-7" style="padding-top: 5px;">
+            Default project for workflow users :
+          </div>
+          <div class="col-sm-5">
+            <label class="switch"><input type="checkbox" name="defaultProjectWorkflowUsers"
+                [(ngModel)]="staticDocumentSettingsDTO.defaultProjectWorkflowUsers" /><span
+                class="slider round"></span></label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr style="margin-left: -16px;margin-right: -16px;">
+    <div class="form-group row">
+      <div class="col-sm-12">
+        <span class="strong"><strong>Auto Lock Settings</strong> </span>
+        <div class="form-radio">
+          <form>
+            <div class="radio radio-inline1">
+              <label>
+                <input type="radio" name="autoLock" [value]="true" [(ngModel)]="staticDocumentSettingsDTO.autoLock">
+                <i class="helper"></i>Automatic
+              </label>
+            </div>
+            <div class="radio radio-inline1">
+              <label>
+                <input type="radio" name="autoLock" [value]="false" [(ngModel)]="staticDocumentSettingsDTO.autoLock">
+                <i class="helper"></i>Manual
+              </label>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-success waves-effect " (click)="saveStaticDocumentSettings()">Save</button>
+    <button type="button" class="btn btn-default waves-effect " (click)="staticSettingsModal.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #userPermissionsSettings [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">User Permission Settings</h4>
+    <button type="button" class="close basic-close" (click)="userPermissionsSettings.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" style="height: 400px; overflow: scroll;">
+    <app-card [classHeader]="true" [blockClass]="'table-border-style'">
+      <div class="table-responsive">
+        <table class="table table-framed">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>User Name</th>
+              <th style="text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of userPermissionsModalList;let i = index">
+              <th scope="row">{{i+1}}</th>
+              <td>{{item.userName}}</td>
+              <td style="text-align: center;">
+                <div class="border-checkbox-section">
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox" (change)="item.viewButtonFlag=!item.viewButtonFlag"
+                      [checked]="item.viewButtonFlag" id="checkbox00{{i}}">
+                    <label class="border-checkbox-label" for="checkbox00{{i}}">View</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox"
+                      (change)="item.createButtonFlag=!item.createButtonFlag" [checked]="item.createButtonFlag"
+                      id="checkbox11{{i}}">
+                    <label class="border-checkbox-label" for="checkbox11{{i}}">Create</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox"
+                      (change)="item.updateButtonFlag=!item.updateButtonFlag" [checked]="item.updateButtonFlag"
+                      id="checkbox22{{i}}">
+                    <label class="border-checkbox-label" for="checkbox22{{i}}">Update</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox"
+                      (change)="item.deleteButtonFlag=!item.deleteButtonFlag" [checked]="item.deleteButtonFlag"
+                      id="checkbox33{{i}}">
+                    <label class="border-checkbox-label" for="checkbox33{{i}}">Delete</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox"
+                      (change)="item.exportButtonFlag=!item.exportButtonFlag" [checked]="item.exportButtonFlag"
+                      id="checkbox44{{i}}">
+                    <label class="border-checkbox-label" for="checkbox44{{i}}">Export</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox"
+                      (change)="item.workFlowButtonFlag=!item.workFlowButtonFlag" [checked]="item.workFlowButtonFlag"
+                      id="checkbox55{{i}}">
+                    <label class="border-checkbox-label" for="checkbox55{{i}}">Workflow</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox"
+                      (change)="item.publishButtonFlag=!item.publishButtonFlag" [checked]="item.publishButtonFlag"
+                      id="checkbox66{{i}}">
+                    <label class="border-checkbox-label" for="checkbox66{{i}}">Publish</label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-success waves-effect " (click)="userPermissionsSettings.hide()">Submit</button>
+  </div>
+</app-modal-basic>
+
+<app-import-setting #importPDFSetting></app-import-setting>

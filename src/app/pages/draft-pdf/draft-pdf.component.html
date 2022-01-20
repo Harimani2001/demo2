@@ -1,0 +1,36 @@
+<div tabindex="-1" style="display: block; opacity: 1;"
+  [style.display]="showModal ? 'block' : 'none'">
+  <div class="modal-dialog modal-lg m-0" style="max-width: 100% !important;">
+    <div class="modal-content">
+      <!-- <div style="padding: 10px;">
+        <div class="app-modal-header">
+          <button class="close basic-close"
+            style="top: 4px !important; margin: 0px !important; padding: 0px !important;" (click)="close();">
+            <i aria-hidden="true" class="fa fa-times" style="font-size: 25px;"></i>
+          </button>
+        </div>
+      </div> -->
+      <div class="modal-body">
+        <div style="position: relative; overflow: hidden; width: 100%;">
+          <div allowpagescroll="false" class="app-modal-body" color="#737373" opacity="0.6" railcolor="#004a6d"
+            railvisible="true" size="12px" slimscroll="" style="width: 100%;" width="100%">
+            <div class="dt-desc" style="padding: 0px;">
+              <div *ngIf="pdfSrc" style="padding: 0px;">
+                <goval-pdf-viewer [src]="pdfSrc" [fileName]="fileName" (onDownload)="loadAudit($event)" ></goval-pdf-viewer>
+              </div>
+              <div *ngIf="!pdfSrc" style="padding: 0px;">
+                <div style="text-align: center;" id="fileUploadId"></div>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="slimScrollBar"
+            style="background: rgb(115, 115, 115); width: 12px; position: absolute; top: 0px; opacity: 0; transition: opacity 0.3s ease 0s; display: none; border-radius: 7px; z-index: 99; right: 1px; height: 100% !important;">
+          </div>
+          <div class="slimScrollRail"
+            style="width: 12px; height: 100%; position: absolute; top: 0px; display: block; border-radius: 7px; background: rgb(0, 74, 109); opacity: 0; transition: opacity 0.3s ease 0s; z-index: 90; right: 1px;">
+          </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

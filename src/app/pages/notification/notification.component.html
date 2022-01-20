@@ -1,0 +1,39 @@
+<app-card>
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="row">
+        <div class="col-sm-4">
+          <h4 class="strong"> Notification</h4>
+        </div>
+        <div style="text-align: right;" class="col-sm-8">
+          <button class="btn btn-default" (click)="clearAll(this.notificationList)">Clear All</button>
+        </div>
+      </div>
+    <br><br>
+      <div class="row">
+        <div class="col-sm-12">
+          <ng-container *ngFor="let data of this.notificationList | mapFilter">
+            <div class="alert alert-primary" *ngFor="let item of data.value">
+              <button placement="top" container="body" triggers="mouseenter:mouseleave" ngbPopover="Hide"
+                (click)="item.deleteFlag='Y'; viewedFlagForsinglenotification(item)" type="button"
+                class="ml-2 mb-1 close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+              <div class="container">
+                <div class="alert-icon">
+                  <i class="material-icons">{{item.documentCode}}</i>-
+                  <i class="material-icons">{{item.message}}</i>
+                </div>
+
+                <b>created on:</b> {{item.createdTime}} ago. <ng-container *ngIf="item.viewFlag">
+                  <b> viewed on:</b> {{item.viewOn}} ago.
+                </ng-container>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-card>
+<div *ngIf="notificationSpinnerFlag" class="loading">Loading&#8230;</div>

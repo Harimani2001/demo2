@@ -1,0 +1,184 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div id="float-action" class="col-sm-12">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-4">
+            <div class="page-header-title">
+              <i class="icofont icofont-key-hole bg-c-blue"></i>
+              <div class="d-inline">
+                <h4>User Acceptance</h4>
+                <span>View all User Acceptance</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4 text-center">
+            <label> Search URS :
+              <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                class="form-control input-sm full-data-search" placeholder="search"></label>
+          </div>
+
+          <div class="col-sm-4 text-right">
+            <button type="button" class="btn btn-sm btn-warning waves-effect waves-light m-r-10"
+              (click)="verify(this.helper.User_Acceptance, '', this.helper.User_Acceptance)">Verify</button>
+            <button *ngIf="modalpermission.createButtonFlag" type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();saveData();">Save</button>
+            <a *ngIf="modalpermission.exportButtonFlag" href="javascript:;" (click)="downloadFile()" placement="top" ngbTooltip="Csv Download">
+              <span><img acement="top" container="body" style="height: 25px; width: 25px;" 
+                class="pointer" src="/assets/images/excel.png" alt="GoVal"></span>
+            </a>
+          </div>
+
+        </div>
+      </app-card>
+    </div>
+
+    <div class="col-sm-12">
+      <br><br> <br> <br>
+    </div>
+
+    <app-card [title]="" [classHeader]="true" [blockClass]="'table-border-style'">
+      <div class="table-responsive">
+        <ng-container>
+          <!-- <table id="dtBasicExample" class="table table-striped table-bordered " [mfData]="traceabilityData"
+            #mf="mfDataTable" [mfRowsOnPage]="3">
+            <tbody>
+              <ng-container *ngFor="let m of mf.data; let i = index;">
+                <tr>
+                  <th colspan="6">{{m.name}}</th>
+                </tr>
+                [headerHeight]="i==0 ?50:0"
+                [footerHeight]="0"
+                <tr width="100%"> -->
+                  <ngx-datatable [scrollbarH]="true" #myTable class="data-table" id="parentCustomTable" [limit]="30"
+                    [rows]='this.data | TraceabilityFilter : filterQuery' [columnMode]="'force'"  [headerHeight]="50" [footerHeight]="50"
+                      [rowHeight]="'auto'">
+                    <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+
+                        <div *ngIf="row.specList.length>0" class="dt-desc">
+                          <ngx-datatable #specChildTable id="childCustomTable" class="data-table dt-chk" style="overflow: unset!important;"
+                            [rows]='row.specList' [columnMode]="'force'" [headerHeight]="50" [footerHeight]="0"
+                            [rowHeight]="'auto'">
+
+                            <ngx-datatable-column [width]="100" [canAutoResize]="false" [sortable]="true" name="Code">
+                              <ng-template let-row="row" ngx-datatable-cell-template>{{row['specCode']}}</ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column [width]="600" [canAutoResize]="false" [sortable]="true"
+                              name="Description">
+                              <ng-template let-row="row" ngx-datatable-cell-template>{{row['specDesc']}}</ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="User Acceptance">
+                              <ng-template let-row="row" ngx-datatable-cell-template>
+                                <span *ngIf="!row.flag" (click)="editStatus(row)">
+                                  <ng-container *ngIf="!row.userAcceptance">
+                                    <label>No Run</label>
+                                  </ng-container>
+                                  <ng-container *ngIf="row.userAcceptance">
+                                    <label>{{row['userAcceptance']}}</label>
+                                  </ng-container>
+                                </span>
+                                <select [(ngModel)]="row.userAcceptance" name="status" *ngIf="row.flag">
+                                  <option value="" disabled selected>Select Status</option>
+                                  <option value="Yes">Yes</option>
+                                  <option value="No">No</option>
+                                  <option value="NA">N/A</option>
+                                </select>
+                              </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Remarks">
+                              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                                <textarea class="form-control" [(value)]="row.remarks" (blur)="remarks(row,$event)"
+                                  name="remarks-{{row.$$index}}" rows="1"></textarea>
+                              </ng-template>
+                            </ngx-datatable-column>
+
+                          </ngx-datatable>
+                        </div>
+                      </ng-template>
+                    </ngx-datatable-row-detail>
+
+                    <ngx-datatable-column [width]="50" [canAutoResize]=false>
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <a href="javascript:;" [class.datatable-icon-right]="!expanded" *ngIf="row.specList.length>0"
+                          [class.datatable-icon-down]="expanded" title="Expand/Collapse Row"
+                          (click)="toggleExpandRow(row)">
+                        </a>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    category
+                    <ngx-datatable-column [maxWidth]="300" name="Category">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <span class="dot small-tc-dot" [ngStyle]="{'background-color': row.priorityColor}"></span>
+                        <strong class="fontStyle">{{row['category']}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column [maxWidth]="300" name="URS Code">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <span class="dot small-tc-dot" [ngStyle]="{'background-color': row.priorityColor}"></span>
+                        <strong class="fontStyle">{{row['ursCode']}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="URS ">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong class="fontStyle">{{row['ursName']}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="User Acceptance">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <span *ngIf="!row.flag" (click)="editStatus(row)">
+                          <ng-container *ngIf="!row.userAcceptance">
+                            <label>No Run</label>
+                          </ng-container>
+                          <ng-container *ngIf="row.userAcceptance">
+                            <label>{{row['userAcceptance']}}</label>
+                          </ng-container>
+                        </span>
+                        <select [(ngModel)]="row.userAcceptance" name="status" *ngIf="row.flag">
+                          <option value="" disabled selected>Select Status</option>
+                          <option value="Yes">Yes</option>
+                          <option value="No">No</option>
+                          <option value="NA">N/A</option>
+                        </select>
+                      </ng-template>
+                    </ngx-datatable-column>
+
+                    <ngx-datatable-column name="Remarks">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <textarea class="form-control" [(value)]="row.remarks" (blur)="remarks(row,$event)"
+                          name="remarks-{{row.$$index}}" rows="1"></textarea>
+                      </ng-template>
+                    </ngx-datatable-column>
+                  </ngx-datatable>
+                <!-- </tr>
+              </ng-container>
+            </tbody> -->
+
+            <!-- <tfoot>
+              <tr>
+                <td colspan="6">
+                  <mfBootstrapPaginator></mfBootstrapPaginator>
+                </td>
+              </tr>
+            </tfoot>
+
+          </table> -->
+        </ng-container>
+      </div>
+
+      <app-file-upload-for-doc #fileupload [multiple]=true [onlyView]=false [documentCode]="this.helper.User_Acceptance"></app-file-upload-for-doc>
+
+    </app-card>
+  </div>
+</div>
+
+<app-form-esign-verification #formVerification></app-form-esign-verification>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

@@ -1,0 +1,29 @@
+table#shift-add-table tbody th,
+table#shift-add-table tbody td {
+  white-space: unset;
+  width: 33%;
+}
+table#shift-add-table,table#shift-add-table td{
+    border: 1px solid black;
+}
+
+.fontStyle {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: normal;
+}
+
+.dot.user-active, .dot.user-in-active {
+  height: 10px;
+  width: 10px;
+  margin-left: 5px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.user-active {
+  background-color: green;
+}
+
+.user-in-active {
+  background-color: red;
+}

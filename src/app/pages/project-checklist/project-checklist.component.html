@@ -1,0 +1,59 @@
+<app-modal-basic #ProjectChecklistModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+	<div class="app-modal-header">
+		<h4 class="modal-title">Checklist</h4>
+		<div style="position: absolute;top: 20px;right: 10px;">
+			<button type="button" class="btn btn-sm btn-primary" (click)="onClickHide();">{{hideButtonText}}</button>
+			<button type="button" class="btn btn-sm btn-success" (click)="onCloseProjectChecklistModal();">Submit</button>
+			<button type="button" class="btn btn-sm btn-danger" (click)="ProjectChecklistModal.hide();onCloseProjectChecklistModal()">Cancel</button>
+		</div>
+
+		<div style="position: absolute;top: 20px;right: 400px;">
+			<span> <span style="background-color: yellow;">Checklist</span> :
+				<a href="javascript:void(0)" (click)="onClickChecklistStatus()">{{this.projectChecklistStatus}}</a></span>
+			<div style="display: flex;">
+				<div style="font-size: 11px;padding-right: 3px;margin-top: -7px;">{{projectChecklistPercentage}}%</div>
+				<div>
+					<div class="progress" style="width: 90px;height: 8px;">
+						<div class="progress-bar" [style.width]="projectChecklistPercentage + '%'"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="app-modal-body">
+		<div class="col-sm-12">
+			<table id="project-table-checkList" class="table">
+			  <thead class="panel-heading">
+				<tr class="w-100">
+				  <td style="width: 1%;"><label class="strong">Status</label></td>
+				  <td class="w-40"><label class="strong">Name</label></td>
+				  <td style="width: 5%;"><label class="strong">Action Taken</label></td>
+				</tr>
+			  </thead>
+			  <tbody class="panel-body">
+				<ng-container *ngFor="let checkList of filterProjectCheckList; let i = index">
+				  <tr>
+					<td>
+						<div class="checkbox-fade fade-in-primary">
+							<label>
+								<input type="checkbox" [(ngModel)]="checkList.completed" [ngModelOptions]="{standalone: true}" (change)="onChange()" />
+								<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+							  </label>
+						</div>
+					  </td>
+					<td style=" white-space: initial;">
+					  <span [style.text-decoration]="checkList.completed ? 'line-through' : 'none'">{{checkList.checklistName}}</span>
+					</td>
+					<td>
+						<span >{{checkList.updatedBy}}<span *ngIf="checkList.updatedBy!=''">/</span>{{checkList.displayUpdatedTime}}</span>
+					  </td>
+				  </tr>
+				</ng-container>
+			  </tbody>
+			</table>
+			<div *ngIf="filterProjectCheckList.length == 0 && this.isHideCheckedItems">Everything in this checklist is complete!
+			</div>
+			<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+		  </div>
+	</div>
+</app-modal-basic>

@@ -1,0 +1,102 @@
+<section class="login p-fixed d-flex text-center bg-primary common-img-bg">
+  <!-- starts -->
+  <div class="auth-fluid">
+    <div class="row">
+      <div class="col-sm-12">
+        <!-- Authentication card start -->
+        <div class="login-card card-body auth-body">
+          <form class="md-float-material" #registerForm="ngForm" (keydown)="keyDownFunction($event,registerForm.valid)">
+            
+            <div class="auth-box">
+              <div class="row m-b-20">
+                <div class="col-md-12">
+                  <h3 class="text-center txt-primary">Sign up. It is fast and easy.</h3>
+                </div>
+              </div>
+              
+              <p class="text-inverse b-b-default text-left p-b-5">Sign in with your regular account</p>
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="First Name" id="firstNameId" required [(ngModel)]="model.firstName"
+                  name="firstName"   #fullname="ngModel" pattern="[a-zA-Z ]*$" >  
+                <span class="md-line"></span>
+              </div>
+
+              <div class="messages text-danger" *ngIf="(fullname.touched || submitted) && fullname?.errors?.required">Firstname is required</div>
+                <div class="messages text-danger" *ngIf="fullname?.errors?.pattern ">Only Alphabets and space allowed</div>
+              
+
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="Last Name" id="lastNameId" required [(ngModel)]="model.lastName"
+                    name="lastName"   #lastname="ngModel" pattern="[a-zA-Z ]*$" >  
+                  <span class="md-line"></span>
+                </div>
+  
+                <div class="messages text-danger" *ngIf="(lastname.touched || submitted) && lastname?.errors?.required">Lastname is required</div>
+                  <div class="messages text-danger" *ngIf="lastname?.errors?.pattern ">Only Alphabets and space allowed</div>
+
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Designation" id="designation" [(ngModel)]="model.designation"
+                      name="designation" #designation="ngModel" >  
+                    <span class="md-line"></span>
+                  </div>
+                  
+                  <div class="input-group"> 
+                    <input type="text" class="form-control" placeholder="User Name" id="UserNameId" required [(ngModel)]="model.userName" name="userName" (ngModelChange)="showNext()"
+                      #userName="ngModel" minlength="8" maxlength="15"  pattern="^[a-z0-9-]{8,15}$">
+                    <span class="md-line"></span>
+                  </div>
+    
+                  <div class="messages text-danger" *ngIf="(userName.touched || submitted) && userName?.errors?.required">UserName is required</div>
+                  <div class="messages text-danger" *ngIf="userName?.errors?.pattern">Alphanumeric of size 8 to 15 characters allowed</div>
+                  <div class="messages text-danger" *ngIf="userName?.errors?.minlength ">Minimum 8 characters needed</div>
+              
+                  <div class="input-group">
+                <input type="text" class="form-control" placeholder="Email Address" id="emailId" required [(ngModel)]="model.email" (ngModelChange)="showNext()"
+                name="email"  #email="ngModel"  [pattern]="helper.email_pattern">
+                <span class="md-line"></span>
+              </div>
+              <div *ngIf="valadationMessage != ''" ><p class="messages text-danger">{{valadationMessage}}</p></div>
+              <div class="messages text-danger" *ngIf="(email.touched || submitted) && email?.errors?.required">Email is required</div>
+              <div class="messages text-danger" *ngIf="email?.errors?.pattern ">Please enter a valid Email Id</div>
+           
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Your Mobile Number" id="mobileId" required [(ngModel)]="model.phoneNo"
+                  name="mobile"  (keypress)="onlyNumber($event)"   #mobile="ngModel"   minlength=10 maxlength=10  required  pattern="^[789]\d{9}$"   >
+                   <span class="md-line"></span>
+              </div>
+              <!-- pattern="\d{3}-\d{3}-\d{4}" => lg-->
+
+              <div class="messages text-danger" *ngIf="(mobile.touched || submitted) && mobile?.errors?.required">Mobile Number is required</div>
+              <div class="messages text-danger" *ngIf="mobile?.errors?.pattern ">Please enter a valid Mobile Number</div>
+
+              <div class="input-group">
+                <input type="password" class="form-control" placeholder="Choose Password (ex- Abc@123)" id="passwordId" required [(ngModel)]="model.password"
+                  name="password" autocomplete="on"    #password="ngModel" maxlength="12" required  pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?!.*\s).{6,12}$"  >
+                  <span class="md-line"></span>
+              </div>
+
+              <div class="messages text-danger" *ngIf="(password.touched || submitted) && password?.errors?.required">Password is required</div>
+              <div class="messages text-danger" *ngIf="password?.errors?.pattern ">Please choose a Password with a Capital letter,small letter , symbols , numbers</div>
+              <div class="messages text-danger" *ngIf="errorMessage != ''">{{errorMessage}}</div>
+
+
+             
+              <div class="row m-t-30">
+                <div class="col-md-12">
+                  <button [disabled]="loading" type="button" class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20" (click)="onSubmit(registerForm.valid)">Sign up now.</button>
+                </div>
+              </div>
+              <hr/>
+            
+            </div>
+          </form>
+          <!-- end of form -->
+        </div>
+        <!-- Authentication card end -->
+      </div>
+      <!-- end of col-sm-12 -->
+    </div>
+    <!-- end of row -->
+  </div>
+  <!-- end of -->
+</section>

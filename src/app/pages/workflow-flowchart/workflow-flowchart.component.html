@@ -1,0 +1,128 @@
+<app-card>
+  <div class="row">
+    <div *ngIf="workFlowChartData!=null" class="col-sm-12">
+      <div class="row"><strong class="col-sm-4 strong">Document Name</strong>
+        <label class="col-sm-8">{{workFlowChartData.documentName}}</label></div>
+      <div class="row"><strong class="col-sm-4 strong">Document Order</strong>
+        <label class="col-sm-8">{{workFlowChartData.documentDisplayOrder}}</label></div>
+      <hr class="form-hr">
+      <div class="row">
+        <strong class="col-sm-12 strong"> Levels of {{workFlowChartData.documentName}} document</strong>
+      </div>
+      
+      <div class="row-sm-12">
+        <squeezebox [multiple]="false">
+          <ng-container *ngFor="let levelData of workFlowChartData.documentFlows ">
+            <sb-item [collapsed]="true" class="accordion-panel">
+              <sb-item-head class="accordion-msg accordion-heading">{{levelData.levelName}}</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+
+                  <div class="row"><strong class="col-sm-4 strong">Level Order</strong>
+                    <label class="col-sm-8">{{levelData.orderId}}</label></div>
+                  <div class="row"><strong class="col-sm-4 strong">Action</strong>
+                    <label class="col-sm-8">{{levelData.settingsList[0].settingsName}}
+                      <span *ngIf="levelData.settingsList[0].subSettingsName!=''">({{levelData.settingsList[0].subSettingsName}})</span></label>
+                  </div>
+                  <div class="row"><strong class="col-sm-4 strong">Users</strong><label class="col-sm-8"></label></div>
+                  <div class="row">
+                    <div class="table-responsive">
+                      <table class="table table-framed">
+                        <thead>
+                          <tr>
+                            <th rowspan="2">Sl No.</th>
+                            <th rowspan="2">Name</th>
+                            <th colspan="7" class="text-center">Action</th>
+                          </tr>
+                          <tr>
+                            <th class="text-center">View</th>
+                            <th class="text-center">Create</th>
+                            <th class="text-center">Update</th>
+                            <th class="text-center">Delete</th>
+                            <th class="text-center">Export</th>
+                            <th class="text-center">Workflow</th>
+                            <th class="text-center">Publish</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let item of levelData.userPermissionList;let i = index">
+                            <td scope="row">{{i+1}}</td>
+                            <td>{{item.userName}}</td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.viewButtonFlag"
+                                class="icofont icofont-check"></i>
+                              <i style="color: red;" *ngIf="!item.viewButtonFlag" class="icofont icofont-close"></i>
+                            </td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.createButtonFlag"
+                                class="icofont icofont-check"></i> <i style="color: red;" *ngIf="!item.createButtonFlag"
+                                class="icofont icofont-close"></i></td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.updateButtonFlag"
+                                class="icofont icofont-check"></i>
+                              <i style="color: red;" *ngIf="!item.updateButtonFlag" class="icofont icofont-close"></i>
+                            </td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.deleteButtonFlag"
+                                class="icofont icofont-check"></i>
+                              <i style="color: red;" *ngIf="!item.deleteButtonFlag" class="icofont icofont-close"></i>
+                            </td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.exportButtonFlag"
+                                class="icofont icofont-check"></i>
+                              <i style="color: red;" *ngIf="!item.exportButtonFlag" class="icofont icofont-close"></i>
+                            </td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.workFlowButtonFlag"
+                                class="icofont icofont-check"></i>
+                              <i style="color: red;" *ngIf="!item.workFlowButtonFlag" class="icofont icofont-close"></i>
+                            </td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.publishButtonFlag"
+                                class="icofont icofont-check"></i>
+                              <i style="color: red;" *ngIf="!item.publishButtonFlag" class="icofont icofont-close"></i>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  
+                  <div class="row">
+                    <div class="table-responsive">
+                      <table class="table table-framed">
+                        <thead>
+                          <tr>
+                            <th rowspan="2">Sl No.</th>
+                            <th rowspan="2">Name</th>
+                            <th colspan="3" class="text-center">Action</th>
+                          </tr>
+                          <tr>
+                            <th class="text-center">Notification</th>
+                            <th class="text-center">Email</th>
+                            <th class="text-center">Email Follow-Up</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let item of levelData.flowNotificationList;let i = index">
+                            <td scope="row">{{i+1}}</td>
+                            <td>{{item.userName}}</td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.notification"
+                                class="icofont icofont-check"></i>
+                              <i style="color: red;" *ngIf="!item.notification" class="icofont icofont-close"></i>
+                            </td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.email"
+                                class="icofont icofont-check"></i> <i style="color: red;" *ngIf="!item.email"
+                                class="icofont icofont-close"></i></td>
+                            <td class="text-center"> <i style="color: green;" *ngIf="item.followUp"
+                                class="icofont icofont-check"></i>
+                              <i style="color: red;" *ngIf="!item.followUp" class="icofont icofont-close"></i>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </sb-item-body>
+            </sb-item>
+          </ng-container>
+        </squeezebox>
+      </div>
+
+    </div>
+  </div>
+</app-card>

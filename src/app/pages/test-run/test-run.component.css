@@ -1,0 +1,21 @@
+tr.jquery-multi-select-checkbox-checked {
+  background: #ebf9ff;
+}
+
+.box {
+  border: 2px solid black;
+}
+
+.list-area {
+  min-height: 300px;
+  max-height: 300px;
+  overflow-y: scroll;
+  outline: thin solid #082654;
+  padding: 10px 10px;
+  cursor: pointer;
+}
+
+.testCase-item {
+  cursor: pointer;
+  color: cornflowerblue;
+}

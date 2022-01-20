@@ -1,0 +1,362 @@
+<div>
+  <app-card [title]="'Setup Knowledge Base'" [blockClass]="'accordion-block scale-accordion'">
+    <squeezebox [multiple]="false">
+      <sb-item class="accordion-panel">
+        <sb-item-head class="accordion-heading accordion-msg">Add Category</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div style="padding-left: 30px; padding-right: 30px;">
+            <button *ngIf="permisionModal.createButtonFlag" type="button" class="btn btn-primary"
+              [disabled]="addcategoryclicked" (click)="addCategory()">
+              <i class="icofont icofont-plus-circle"></i>Add Category
+            </button>
+            <br>
+            <br>
+            <div class="alert alert-danger background-danger" *ngIf="categoryExists">
+              <strong>Category Name</strong> Already Exists
+            </div>
+            <div class="messages text-danger" *ngIf="isFieldsFilled">
+              <strong>Display order is already exist</strong>
+            </div>
+            <br>
+            <ngx-datatable #mydatatable class="material data-table" [headerHeight]="50" [limit]="10"
+              [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="categoryList">
+
+              <ngx-datatable-column name="Category Name">
+                <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                  <span title="Click to edit" (click)="editRow(row.$$index)" *ngIf="!editing[row.$$index ]">
+                    {{row['category']}}
+                  </span>
+                  <input type="text" min="0" max="10" autofocus (blur)="updateValue($event, 'category', value, row)"
+                    *ngIf="editing[row.$$index ]" [value]="row['category']" class="form-control" />
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Display Order">
+                <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                  <span title="Click to edit" (click)="editRow(row.$$index)" *ngIf="!editing[row.$$index ]">
+                    {{row['displayorder']}}
+                  </span>
+                  <input type="number" min="0" max="10" autofocus
+                    (keyup)="updateValue($event, 'displayorder', value, row)" *ngIf="editing[row.$$index ]"
+                    [value]="row['displayorder']" class="form-control" />
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="ActiveFlag">
+                <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                  <span title="Click to edit" (click)="editRow(row.$$index)" *ngIf="!editing[row.$$index ]">
+                    {{row['activeFlag']}}
+                  </span>
+                  <select *ngIf="editing[row.$$index ]" (change)="updateValue($event, 'activeFlag', value, row)"
+                    [value]="row['activeFlag']" class="form-control">
+                    <option value="Y">Yes</option>
+                    <option value="N">No</option>
+                  </select>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Add/View Icon">
+                <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                  <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+                    placement="right" (click)="modalDefault.show();viewImage(row);" placement="top"
+                    ngbTooltip="Add/View Icon">
+                    <i  class="icofont icofont-resize view"></i>
+                  </a>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column atatable-column name="Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <button *ngIf="permisionModal.updateButtonFlag && !this.isFieldsFilled" style="padding: 5px 15px 5px 15px !important;"
+                    type="submit" [disabled]="isUpdating" class="btn btn-outline-success"
+                    (click)="saveCategory(row , row['$$index'] )">Save</button>
+                  <button type="submit" *ngIf="this.isCancel && editing[row.$$index ]" class="btn btn-danger"
+                    (click)="cancel(row['$$index'])">
+                    <i class="icofont icofont-paper-plane"></i>Cancel</button>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+            <br>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item class="accordion-panel">
+        <sb-item-head class="accordion-msg">Add Sub-Category</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div style="padding-left: 30px; padding-right: 30px;">
+            <div>
+              <label>Select Category:
+                <select name="select" class="form-control input-sm full-data-search" [(ngModel)]="selectedCategory"
+                  name="categoryList1" (ngModelChange)="onChangeCategory()">
+                  <option value="">Select Category</option>
+                  <option *ngFor="let category of categoryListforSubcategory" [value]="category.id">
+                    {{category.category}}</option>
+                </select>
+              </label>
+            </div>
+            <br>
+            <div *ngIf="selectedCategory !=''">
+              <button *ngIf="permisionModal.createButtonFlag" type="button" class="btn btn-primary"
+                [disabled]="addSubCategoryclicked" (click)="addSubCategory()">
+                <i class="icofont icofont-plus-circle"></i>Add Sub Category
+              </button>
+              <br>
+              <br>
+              <div class="alert alert-danger background-danger" *ngIf="subCategoryExists">
+                <strong>Sub Category Name</strong> Already Exists
+              </div>
+              <div class="messages text-danger" *ngIf="isSubFieldsFilled">
+                <strong>Display order is already exist</strong>
+              </div>
+              <br>
+              <ngx-datatable #mydatatable class="material data-table" [headerHeight]="50" [limit]="10"
+                [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="subcategoryList">
+
+                <ngx-datatable-column name="Sub Category Name">
+                  <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                    <span title="Click to edit" (click)="editSubCategoryRow(row.$$index)"
+                      *ngIf="!subEditing[row.$$index ]">
+                      {{row['subCategoryName']}}
+                    </span>
+                    <input type="text" min="0" max="10" autofocus
+                      (blur)="updateSubcategoryValue($event, 'subCategoryName', value, row)"
+                      *ngIf="subEditing[row.$$index ]" [value]="row['subCategoryName']" class="form-control" />
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column name="Display Order">
+                  <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                    <span title="Click to edit" (click)="editSubCategoryRow(row.$$index)"
+                      *ngIf="!subEditing[row.$$index ]">
+                      {{row['displayorder']}}
+                    </span>
+                    <input type="number" min="0" max="10" autofocus
+                      (keyup)="updateSubcategoryValue($event, 'displayorder', value, row)"
+                      *ngIf="subEditing[row.$$index ]" [value]="row['displayorder']" class="form-control" />
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column name="ActiveFlag">
+                  <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                    <span title="Click to edit" (click)="editSubCategoryRow(row.$$index)"
+                      *ngIf="!subEditing[row.$$index ]">
+                      {{row['activeFlag']}}
+                    </span>
+                    <select *ngIf="subEditing[row.$$index ]"
+                      (change)="updateSubcategoryValue($event, 'activeFlag', value, row)" [value]="row['activeFlag']"
+                      class="form-control">
+                      <option value="Y">Yes</option>
+                      <option value="N">No</option>
+                    </select>
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column atatable-column name="Action">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <button *ngIf="permisionModal.updateButtonFlag && !this.isSubFieldsFilled" style="padding: 5px 15px 5px 15px !important;"
+                      type="submit" [disabled]="isUpdating" class="btn btn-outline-success"
+                      (click)="saveSubCategory(row , row['$$index'] )">Save</button>
+                    <button type="submit" *ngIf="this.isSubCategoryCancel && subEditing[row.$$index ]"
+                      class="btn btn-danger" (click)="subCategoryCancel(row['$$index'])">
+                      <i class="icofont icofont-paper-plane"></i>Cancel</button>
+                  </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+              <br>
+            </div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item [collapsed]="false" class="accordion-panel">
+        <sb-item-head class="accordion-msg">Add Content</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div [class.isDisabled]="isAddContent" style="padding-left: 30px; padding-right: 30px;">
+            <form [formGroup]="onContentForm">
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Select Category:<span class="asterisk">*</span>
+                </label>
+                <div class="col-sm-10">
+                  <select name="select" class="form-control" formControlName="categoryId" name="categoryList"
+                    (change)="onChangeFormCategory()">
+                    <option value="">Select Category</option>
+                    <option *ngFor="let category of categoryListforSubcategory" [value]="category.id">
+                      {{category.category}}</option>
+                  </select>
+                  <div class="messages text-danger"
+                    *ngIf="(onContentForm.get('categoryId').touched || this.submitted) && onContentForm.get('categoryId').hasError('required')">
+                    Category is required</div>
+                </div>
+              </div>
+              <div class="form-group row ">
+                <label class="col-sm-2 col-form-label">Select Sub Category:<span class="asterisk">*</span></label>
+                <div class="col-sm-10">
+                  <select name="select" class="form-control" formControlName="subCategoryId" name="categoryList"
+                    (change)="onChangeSubCategory()">
+                    <option value="">Select Sub Category</option>
+                    <option *ngFor="let category of subcategoryListForContent" [value]="category.id">{{category.subCategoryName}}
+                    </option>
+                  </select>
+                  <div class="messages text-danger"
+                    *ngIf="(onContentForm.get('subCategoryId').touched || this.submitted) && onContentForm.get('subCategoryId').hasError('required')">
+                    Sub Category is required</div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Content
+                </label>
+                <div class="col-sm-10">
+                  <div>
+                    <ckeditor formControlName="content" [config]="ckeConfig">
+                    </ckeditor>
+                    <div class="messages text-danger"
+                      *ngIf="(onContentForm.get('content').touched || this.submitted) && onContentForm.get('content').hasError('required')">
+                      Content is required</div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <app-file-upload-for-doc #fileupload [multiple]=true [onlyView]=false [documentId]="this.receivedId"
+                  [update]="this.isUpdate" [documentCode]="this.helper.KNOWLEDGEBASE"></app-file-upload-for-doc>
+              </div>
+              <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Select Module<span class="asterisk">*</span></label>
+                <div class="col-sm-10">
+                  <ng-select [ngClass]="'ng-select'" [options]="modulesList" [multiple]="true" formControlName="selectedmodules"
+                    name="moduleList"></ng-select>
+                  <div class="messages text-danger" *ngIf="(onContentForm.get('selectedmodules').touched || this.submitted) &&
+                                   onContentForm.get('selectedmodules').hasError('required')">
+                    Module is required</div>
+                </div>
+              </div>
+              <div class="form-group row">
+                <div style="text-align: center">
+                  <button type="button" class="btn btn-success" (click)="saveContent()">
+                    Save <span *ngIf="isLoading" class="ti-reload rotate-refresh"></span>&nbsp;</button>
+                  <button type="button" (click)="editContentDetails(this.selectedRow)" class="btn btn-danger"> Cancel
+                  </button>
+                </div>
+              </div>
+            </form>
+            <br>
+            <!-- <button *ngIf="!isAddContent && permisionModal.createButtonFlag" type="button" class="btn btn-primary" [disabled]="addSubCategoryclicked"
+              (click)="addContent()">
+              <i class="icofont icofont-plus-circle"></i>Add Content
+            </button> -->
+            <br>
+            <br>
+            <ngx-datatable #mydatatable class="material data-table" [headerHeight]="50" [limit]="10"
+              [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'" [rows]="contentList">
+
+              <ngx-datatable-column name="Sl No." [width]="50">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong>{{row['$$index']+1}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="Category Name">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['categoryName']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="Sub Category Name">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['subCategoryName']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column style="font-weight: bold;" name="Selected Modules">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['modulesNames']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column atatable-column name="Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <a *ngIf="permisionModal.updateButtonFlag" container="body" href="javascript:;"
+                    class="m-r-15 crm-action-edit text-muted text-primary" (click)="editContentDetails(row);"
+                    placement="top" ngbTooltip="Edit">
+                    <i  class="icofont icofont-edit edit"></i>
+                  </a>
+                  <a *ngIf="permisionModal.viewButtonFlag" container="body" href="javascript:;"
+                    class="m-r-15 crm-action-view text-muted text-warning"
+                    (click)="modalLarge.show();viewContentDetails(row);" placement="top" ngbTooltip="View">
+                    <i  class="icofont icofont-resize view"></i>
+                  </a>
+                  <a *ngIf="permisionModal.deleteButtonFlag" container="body" href="javascript:;"
+                    class="m-r-15 crm-action-delete text-muted text-danger" (click)="openSuccessCancelSwal(row,row.id);"
+                    placement="top" ngbTooltip="Delete">
+                    <i  class="icofont icofont-bin bin"></i>
+                  </a>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+            <br>
+          </div>
+        </sb-item-body>
+      </sb-item>
+    </squeezebox>
+  </app-card>
+</div>
+
+<app-modal-basic #modalLarge [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Content</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div [innerHTML]="content"></div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalLarge.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalDefault [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Add Icon</h4>
+    <button type="button" class="close basic-close" (click)="modalDefault.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="form-group">
+          <label class="col-sm-5 col-form-label">Choose Image</label>
+          <div class="col-sm-7">
+            <label class="custom-file mb-3">
+              <input #myInput type="file" accept="image/*" id="fileName" (change)="onFileChangeLargeImage($event)">
+              <span class="custom-file-control"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6" *ngIf="isViewImage">
+        <div class="form-group">
+          <label class="col-sm-5 col-form-label">Selected Image</label>
+          <div class="col-sm-7">
+            <label class="custom-file mb-3">
+              <img [src]="selecetdImage" height="100px" width="100px">
+              <!-- <span class="custom-file-control"></span> -->
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6" *ngIf="!isViewImage">
+        <div class="form-group">
+          <label class="text-danger">No Image Choosen</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalDefault.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

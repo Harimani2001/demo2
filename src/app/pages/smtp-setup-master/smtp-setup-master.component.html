@@ -1,0 +1,139 @@
+<!-- <div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="page-header-title">
+        <i class="icofont icofont-email bg-c-orenge"></i>
+        <div class="d-inline">
+          <h4>Email Configuration</h4>
+        </div>
+      </div>
+    </app-card> -->
+    <app-card  [title]="''">
+      <div class="row">
+        <div class="col-sm-3"></div>
+        <div class="col-sm-6">
+          <app-card>
+            <div class="page-header-title">
+              <i class="icofont icofont-email bg-c-orenge"></i>
+              <div class="d-inline">
+                <h4>Email Configuration</h4>
+              </div>
+            </div>
+            <div class="d-inline">
+              <div  style="float: right;">
+                <a *ngIf = "(disableAllFeilds && model.updateButtonFlag)" placement="top" ngbTooltip="Edit" (click)="onClickEdit()"><i style="font-size: 20px" class="icofont icofont-edit"></i></a>
+              </div>
+            </div>
+          </app-card>
+          <app-card> 
+          <form #smtpForm="ngForm">
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <label for="Oraganization">Organization </label>
+                <select name="Oraganization" class="form-control" [(ngModel)]="modal.orgId" #Oraganization="ngModel" (change)="onChangeOrg(modal.orgId)" [disabled]="(isSuperAdmin || disableAllFeilds)">
+                  <option *ngFor="let org of orgDropDown" [value]="org.key">{{org.value}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group col-sm-6">
+                <label for="host">Host</label><span class="asterisk required">*</span>
+                <input type="text" class="form-control" [(ngModel)]="modal.host" name="host" #host="ngModel" placeholder="Ex : smtp.gmail.com" required [disabled]="disableAllFeilds">
+                <div class="messages text-danger" *ngIf="(host.touched || submitted) && host.errors?.required">Enter host name here</div>
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="port">Port</label><span class="asterisk required">*</span>
+                <input type="number" [(ngModel)]="modal.port" name="port" #port="ngModel" class="form-control" placeholder="Ex : 465" required [disabled]="disableAllFeilds">
+                <div class="messages text-danger" *ngIf="(port.touched || submitted) && port.errors?.required">Enter port number here</div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <label for="email">Email Id</label><span class="asterisk required">*</span>
+                <input type="text" [(ngModel)]="modal.userName" name="email" #email="ngModel" class="form-control" placeholder="Ex : admin@gmail.com" required [disabled]="disableAllFeilds" pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$">
+                <div class="messages text-danger" *ngIf="(email.touched || submitted || email) && email.errors?.required">Enter your email here</div>
+                <div class="messages text-danger" *ngIf="email.errors && email.errors.pattern">Enter valid email here</div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <label for="password"> Password</label><span class="asterisk required">*</span>
+                <input type="password" autocomplete="off" [(ngModel)]="modal.password" name="password" #password="ngModel" class="form-control" placeholder="Ex : xxxxxxxxx" required [disabled]="disableAllFeilds">
+                <div class="messages text-danger" *ngIf="(password.touched || submitted) && password.errors?.required">Enter your password here</div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <label for="confPass">Confirm Password</label><span class="asterisk required">*</span>
+                <input [type]="isTextFieldType2 ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confPass" #confPass="ngModel" class="form-control" placeholder="Ex : xxxxxxxxx" required [disabled]="disableAllFeilds">
+                <span class="icofont icofont-eye-alt errspan" *ngIf="!isTextFieldType2" (click)="togglePasswordFieldTypeFeild2()"></span>
+                <span class="icofont icofont-eye-blocked errspan" *ngIf="isTextFieldType2" (click)="togglePasswordFieldTypeFeild2()"></span>
+                <div class="messages text-danger" *ngIf="(this.confirmPassword != modal.password) && confPass.touched">Password Mismatch</div>
+                <div class="messages text-danger" *ngIf="(confPass.touched || submitted) && confPass.errors?.required">Confirm your password here</div>
+              </div>
+            </div>  
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <label class="checkbox-inline" for="ssl">SSL/TLS&nbsp;&nbsp;&nbsp;</label>
+                <label class="switch">
+                  <input type="checkbox" [checked]="modal.sslEnable" (change)="modal.sslEnable=!modal.sslEnable" [disabled]="disableAllFeilds">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <div class="col text-center">
+                  <button *ngIf = "(smtpForm.valid && (this.confirmPassword == modal.password))"  type="button" class="btn btn-primary" (click)="testModal.show()">
+                    <i style="font-size: 20px" class="icofont icofont-send-mail"></i> Test Mail
+                  </button>
+                  <button [disabled]="!model.createButtonFlag" *ngIf = "(!disableAllFeilds && smtpTested)" type="button" class="btn btn-primary" (click)="saveEmailConfig(smtpForm.valid)">
+                    <i class="icofont icofont-check"></i> Save
+                  </button>
+                  <button type="button" class="btn btn-warning" [routerLink]="['/MainMenu']" routerLinkActive="active">
+                    <i class="icofont icofont-close"></i>Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </app-card>
+        </div>
+        <div class="col-sm-3"></div>
+      </div>
+    </app-card>
+  <!-- </div>
+</div> -->
+
+<app-modal-basic #testModal [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+    <div class="app-modal-body">
+      <button type="button" class="close basic-close-light-box" (click)="testModal.hide();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h5>Test Email</h5><br>
+      <hr>
+      <div class="col-sm-12">
+        <form #testMail="ngForm">
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <label for="test">Send to : </label>
+              <span class="asterisk required">*</span>
+              <input type="text" [(ngModel)]="modal.toAddress" name="test" #test="ngModel" class="form-control" placeholder="Ex : admin@gmail.com"
+                required pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$">
+              <div class="messages text-danger" *ngIf="(test.touched || submitted || test) && test.errors?.required">Enter sending email address here</div>
+              <div class="messages text-danger" *ngIf="test.errors && test.errors.pattern">Enter valid email here</div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <hr>
+      <div class="col-sm-12">
+        <div style="float: right;">
+          <button type="button" class="btn btn-default"  (click)="testModal.hide();">Close</button>
+          <button type="button" class="btn btn-primary" (click)="testMailConfig(testMail.valid)">Send</button>
+        </div>
+      </div>
+    </div>
+  </app-modal-basic>
+
+<div class="loading" *ngIf="spinnerFlag">Loading&#8230;</div>

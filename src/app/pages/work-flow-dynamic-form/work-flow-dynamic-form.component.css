@@ -1,0 +1,54 @@
+.pull-right {
+    position: unset !important;
+    right: 10px;
+}
+
+.template-textarea-wrap {
+    display: block !important;
+  }
+
+
+  .form-rendered .build-wrap {
+    display: none;
+  }
+
+  .render-wrap {
+    display: none;
+  }
+
+  .form-rendered .render-wrap {
+    display: block;
+  }
+
+  #edit-form {
+    display: none;
+    float: right;
+  }
+
+  .form-rendered #edit-form {
+    display: block;
+  }
+
+  .get-data, .save-template,.data-dialog{
+      display: none !important;
+  }
+  .close{
+    padding-left: 0px;
+    font-size: 25px;
+  }
+
+ngx-datatable#customTable datatable-body-cell{
+    background-color: white !important;
+}
+
+ngx-datatable#customTable datatable-header-cell{
+    background-color: white !important;
+}
+
+#tabular {
+  padding-top:90px;
+}
+
+.modal-export-form {
+  max-width: 40%;
+}

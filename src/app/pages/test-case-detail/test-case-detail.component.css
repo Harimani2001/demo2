@@ -1,0 +1,44 @@
+table#testcase-table-detail tbody th,
+table#testcase-table-detail tbody td {
+  white-space: unset;
+  width: 50%;
+}
+table#testcase-table-detail,table#testcase-table-detail td{
+    border: 1px solid black;
+}
+
+table#testcase-table-checkList tbody th,
+table#testcase-table-checkList tbody td {
+  white-space: unset;
+}
+table#testcase-table-checkList,table#testcase-table-checkList td{
+    border: 1px solid black;
+}
+
+.arrow-button {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  margin-top: -22px;
+  padding: 16px;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.arrow-button:hover{
+  background-color:white;
+  color : black;
+
+}
+table#testcase-table-urlList tbody th,
+table#testcase-table-urlList tbody td {
+white-space: unset;
+}
+table#testcase-table-urlList,table#testcase-table-urlList td{
+ border: 1px solid black;
+}

@@ -1,0 +1,333 @@
+@media (min-width: 600px) {
+  .seven-cols .col-sm-1 {
+    flex: auto;
+    max-width: 12.490714285714285714285714285714%;
+  }
+}
+
+.mainmenuCard {
+  margin: 0px -14px;
+}
+
+.bottomBorder {
+  margin: 0px -14px;
+}
+
+.showMyCard {
+  transition: 0.2s;
+  border-radius: 5px;
+  height: 100%;
+  width: 100%;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 2px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.showMyInnerCard {
+  text-align: center;
+}
+
+.showMyInnerCard:hover {
+  cursor: pointer;
+}
+
+.show-text {
+  padding-left: 5px;
+  color: darkblue;
+  display: inline;
+}
+
+.welcome {
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 37px;
+  color: #0095b7;
+}
+/*
+Separator
+*/
+.lineseparator {
+  width: 10px;
+  height: 10px;
+  margin: 20px auto;
+  background: #e74c3c;
+  position: relative;
+
+  border-radius: 50%;
+}
+.lineseparator:after {
+  position: absolute;
+  left: 5%;
+  bottom: 4px;
+  height: 1px;
+  width: 80px;
+  background: #214fc6;
+  content: "";
+
+  margin-left: 20px;
+}
+.lineseparator:before {
+  position: absolute;
+  right: 5%;
+  bottom: 4px;
+  height: 1px;
+  width: 80px;
+  background: #214fc6;
+  content: "";
+
+  margin-right: 20px;
+}
+.mess {
+  text-align: center;
+  font-size: 21px;
+  font-family: Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+}
+.module-heading {
+  text-align: left;
+  font-size: 25px;
+  color: rgb(14, 15, 15);
+  font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
+    "Lucida Sans Unicode", Geneva, Verdana, sans-serif;
+}
+.project {
+  display: inline;
+  color: #1a1110;
+}
+.homeImage {
+  background-image: url("/assets/images/homePage/goval_20_02_2020.jpg");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: cover;
+}
+.projectChange {
+  text-decoration: none;
+  border-bottom: 1px solid green;
+  cursor: pointer;
+}
+.side-by {
+  display: inline;
+  float: right;
+}
+.combobox {
+  margin: auto;
+}
+
+.combobox-input {
+  cursor: pointer;
+  border: none;
+  padding: 10px;
+  font-size: 18px;
+  /* border-bottom: 2px solid rgb(48, 158, 231); */
+}
+.combobox-input::-webkit-input-placeholder {
+  font: normal normal normal 14px/1 FontAwesome;
+  content: "\F002";
+  font-weight: normal;
+  overflow: visible;
+  vertical-align: top;
+  display: inline-block !important;
+}
+.combobox-input:focus {
+  outline-style: none;
+}
+
+.combobox-options {
+  width: 100%;
+  position: relative; /* <-- Added */
+  z-index: 1; /* <-- Added */
+  text-align: center;
+  background-color: white;
+  max-height: 200px;
+  overflow-y: auto;
+  box-shadow: 2px 2px 2px 2px #ccc;
+}
+
+.selected {
+  color: cornsilk;
+  background-color: rgb(80, 207, 144);
+}
+
+li {
+  display: block;
+  font-size: 18px;
+  padding: 10px;
+}
+
+li:hover {
+  background-color: grey;
+  color: white;
+}
+
+.error-text {
+  color: rgb(165, 112, 112);
+}
+
+.error {
+  border: 1px solid red;
+}
+.clear {
+  clear: both;
+}
+
+#tag-search {
+  display: none;
+}
+
+.search-icon {
+  cursor: pointer;
+  float: right;
+}
+
+.search-box {
+  position: relative;
+  background-color: #eee;
+  padding: 10px;
+  clear: both;
+  transform: scale(0);
+  transform-origin: 100% 0%;
+  display: none;
+}
+
+.search-box i {
+  position: absolute;
+  font-size: 18px;
+  vertical-align: middle;
+  padding: 10px;
+}
+
+input[type="text"] {
+  width: 100%;
+  height: 50px;
+  font-size: 18px;
+  background-color: #eee;
+  border: none;
+  padding-left: 50px;
+  box-sizing: border-box;
+}
+
+input:focus {
+  outline: none;
+}
+
+#tag-search:checked + div.search-box {
+  display: block;
+  animation: trans-in 1s ease;
+  animation-fill-mode: forwards;
+}
+
+@keyframes trans-in {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+table,
+th,
+td {
+  /* border: none; */
+  white-space: nowrap;
+}
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.list-wrapper {
+  width: 350px;
+  margin: 0px 20px 0px 0;
+  height: 100%;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  box-shadow: none;
+}
+.list {
+  background-color: #ebecf0;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  position: relative;
+  white-space: normal;
+}
+.card-margin {
+  margin-bottom: 10px;
+}
+.list-cards {
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin: 0px -17px 0px -12px;
+  min-height: 0;
+}
+.content-margin {
+  margin-left: -35%;
+  padding-bottom: 10px;
+}
+
+.list-wrapper-custom-css {
+  width: 408px;
+  margin-right: 2px;
+  margin-bottom: 0px;
+  border-radius: 5px;
+  box-shadow: 0 1px 11px 0 rgb(0 0 0 / 12%);
+  border: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+.font-13 {
+  font-size: 12px;
+}
+
+.horzontal_line {
+  margin: 0px;
+  margin-top: 0.2rem;
+  border: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.font-11{
+  font-size: 11px;
+}
+
+.card-main-menu-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.progress-main-menu {
+  margin-bottom: 5px!important;
+  height: 15px!important;
+}
+
+.progress-bar-main-menu {
+  height: 15px!important;
+}
+
+.col-menu-sm-2 {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 16.666667%;
+  -ms-flex: 0 0 16.666667%;
+  flex: 0 0 16.666667%;
+  max-width: 10%;
+  text-align: right;
+  margin-top: -6px;
+  margin-left: 5px;
+}
+
+.col-menu-sm-10 {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 83.333333%;
+  -ms-flex: 0 0 83.333333%;
+  flex: 0 0 83.333333%;
+  max-width: 90%;
+  margin-left: 3px;
+}

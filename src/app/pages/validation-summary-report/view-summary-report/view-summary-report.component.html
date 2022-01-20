@@ -1,0 +1,312 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card  [title]="'Validation Summary Report'" *ngIf="tableAppCard">
+      <div>
+        <button type="button" class="btn btn-primary" [routerLink]="['/Summary-Report/create-summary-report']" routerLinkActive="active">
+          <i class="icofont icofont-plus-circle"></i> Create summary report
+        </button>
+        <button type="button" *ngIf="isSelectedPublishData" class="btn btn-primary" (click)="publishData()">
+          <i class="icofont icofont-paper-plane"></i> Publish
+        </button>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+          <div>
+          </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <div style="text-align: right;">
+            <label>Search:
+              <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"class="form-control input-sm full-data-search" placeholder="Search">
+            </label>
+          </div>
+        </div>
+      </div>
+      <br>
+      <ngb-tabset>
+        <ngb-tab title="Draft">
+          <ng-template ngbTabContent>
+            <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" [rows]='data | projectsetupFilter : filterQuery' [limit]="10" [columnMode]="'force'"
+              [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+              <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false" [resizeable]="false">
+                <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row" let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input type="checkbox" name="{{row['id']}}" [checked]="data[row['$$index']].publishedFlag" (change)= "data[row['$$index']].publishedFlag=!data[row['$$index']].publishedFlag;onChangePublishData();" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Objective & Purpose">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['objectiveAndPurpose']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Scope">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['scope']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Validation Summary">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['validationSummary']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Validation Deliverables">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['validationDeliverable']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Risk Assessment">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['riskAssessment']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Summary of Deviations">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['summaryOfDeviations']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Observations and Recommendation">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['observationAndRecommendation']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="User Acceptance">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['userAcceptance']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Change Control Number">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['customCCFValue']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Periodic Review">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['validationExpiryDate']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Selected Documents">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['validationExpiryDate']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-template #popContent>
+                    <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                    <div><b>Created On :</b>&nbsp;{{row['createdTime']| date:'dd-MM-yyyy hh:mm a'}}</div>
+                    <div><b>Last Modified By : </b> {{row['lastUpdatedBy']}}</div>
+                    <div><b>Last Modified On : </b>{{row['lastUpdatedTime'] | date:'dd-MM-yy hh:mm a'}}</div>
+                  </ng-template>
+                  <a  href="javascript:;" routerLinkActive="active" class="m-r-15 crm-action-edit text-muted text-primary" [routerLink]="['/Summary-Report/create-summary-report',row.id]" routerLinkActive="active" placement="top" ngbTooltip="Edit">
+                    <i  class="icofont icofont-edit"></i>
+                  </a>
+                  <a  href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" (click)="viewReport(row.id)" placement="top" ngbTooltip="View">
+                    <i  class="icofont icofont-resize"></i>
+                  </a>
+                  <a href="javascript:;" class="m-r-15 crm-action-delete text-muted text-danger" (click)="delete(row.id)" placement="top" ngbTooltip="Delete">
+                    <i  class="icofont icofont-bin"></i>
+                  </a>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab title="Published">
+            <ng-template ngbTabContent>
+              <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" [rows]='publishedData | projectsetupFilter : filterQuery' [limit]="10" [columnMode]="'force'"
+                [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                <ngx-datatable-column name="Objective & Purpose">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['objectiveAndPurpose']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Scope">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['scope']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Validation Summary">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['validationSummary']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Validation Deliverables">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['validationDeliverable']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Risk Assessment">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['riskAssessment']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Summary of Deviations">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['summaryOfDeviations']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Observations and Recommendation">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['observationAndRecommendation']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="User Acceptance">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['userAcceptance']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Change Control Number">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['customCCFValue']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Periodic Review">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <div class="accordion-desc">
+                      <div *ngIf="modal.validationSummaryChildDto.length>0"></div>
+                      <div *ngFor="let row of modal.validationSummaryChildDto;" >
+
+                        <label class="label label-primary" *ngIf="row.check"> {{row.name}} </label>
+                      </div>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Action">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <ng-template #popContent>
+                      <span class="text-left">
+                        <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                        <div><b>Created On :</b>&nbsp;{{row['createdTime']| date:'dd-MM-yyyy hh:mm a'}}</div>
+                        <div><b>Last Modified By : </b> {{row['lastUpdatedBy']}}</div>
+                        <div><b>Last Modified On : </b>{{row['lastUpdatedTime'] | date:'dd-MM-yy hh:mm a'}}</div>
+                      </span>
+                    </ng-template>
+                    <a  href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"  placement="top" ngbTooltip="View">
+                      <i  class="icofont icofont-resize"></i>
+                    </a>
+                  </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </ng-template>
+          </ngb-tab>
+      </ngb-tabset>
+    </app-card>
+
+    <app-card  [blockClass]="'accordion-block scale-accordion'" *ngIf="viewAppCard">
+      <div *ngFor="let modal of viewData; let in = index">
+        <div><br><h4>&nbsp;&nbsp;Validation Summary Report
+          <div  style="float: right;" >
+            <a  style="cursor:pointer;font-weight: bold" class="ti-close" (click)="closeView()">&nbsp;&nbsp;</a>
+          </div>&nbsp;&nbsp;
+          </h4>
+        </div>
+        <br>
+        <br>
+        <squeezebox [multiple]="true">
+            <sb-item [collapsed]="false" class="accordion-panel" >
+              <sb-item-head class="accordion-msg">Objective & Purpose</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <p>{{modal.objectiveAndPurpose}}</p>
+                </div>
+              </sb-item-body>
+            </sb-item>
+            <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">Scope</sb-item-head>
+              <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                    <p>{{modal.scope}}</p>
+                  </div>
+              </sb-item-body>
+            </sb-item>
+            <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">Validation Summary</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                    <p>{{modal.validationSummary}}</p>
+                </div>
+              </sb-item-body>
+            </sb-item>
+            <sb-item class="accordion-panel" [collapsed]="false">
+                <sb-item-head class="accordion-msg">Validation Deliverables</sb-item-head>
+                <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                    <p>{{modal.validationDeliverable}}</p>
+                  </div>
+                </sb-item-body>
+            </sb-item>
+              <sb-item class="accordion-panel" [collapsed]="false">
+                  <sb-item-head class="accordion-msg">Risk Assessment</sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <p>{{modal.riskAssessment}}</p>
+                    </div>
+                  </sb-item-body>
+              </sb-item>
+              <sb-item class="accordion-panel" [collapsed]="false">
+                  <sb-item-head class="accordion-msg">Summary of Deviations</sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <p>{{modal.summaryOfDeviations}}</p>
+                    </div>
+                  </sb-item-body>
+            </sb-item>
+              <sb-item class="accordion-panel" [collapsed]="false">
+                  <sb-item-head class="accordion-msg">Observations and Recommendation</sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <p>{{modal.observationAndRecommendation}}</p>
+                    </div>
+                  </sb-item-body>
+            </sb-item>
+              <sb-item class="accordion-panel" [collapsed]="false">
+                  <sb-item-head class="accordion-msg">User Acceptance</sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <p>{{modal.userAcceptance}}</p>
+                    </div>
+                  </sb-item-body>
+            </sb-item>
+            <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">Change Control Number</sb-item-head>
+                <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                    <p>{{modal.customCCFValue}}</p>
+                  </div>
+                </sb-item-body>
+            </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-msg">Periodic Review</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <p>{{modal.validationExpiryDate}}</p>
+                </div>
+              </sb-item-body>
+          </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-msg">SelectedDocuments</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <div *ngIf="modal.validationSummaryChildDto.length>0"></div>
+                  <div *ngFor="let row of modal.validationSummaryChildDto;" >
+
+                    <label class="label label-primary" *ngIf="row.check"> {{row.name}} </label>
+                  </div>
+                </div>
+              </sb-item-body>
+          </sb-item>
+
+
+        </squeezebox>
+      </div>
+    </app-card>
+
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

@@ -1,0 +1,22 @@
+<div class="basic modal fade come-from-modal in right" tabindex="-1" style="opacity: 1;"
+	[style.display]="documentForumModal ? 'block' : 'none'">
+	<div class="modal-dialog modal-md">
+		<div class="modal-content">
+			<div class="modal-header" style="background-color: white;">
+				<div class="app-modal-header">
+					<button class="close basic-close-light-box" style="top: 1px;right: 0px;color: black;" type="button"
+						(click)="documentForumModal=!documentForumModal">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+			</div>
+			<div class="modal-body">
+				<div *ngIf="documentForumModal" class="app-modal-body" style=" height: 650px;overflow-y: scroll !important;">
+					<app-document-forum #forumView [constant]="this.constant" [itemId]="this.itemId"
+						[isDocumentWorkFlow]="true" [documentList]="this.documentList"></app-document-forum>
+				</div>
+			</div>
+			<div class="modal-footer"></div>
+		</div>
+	</div>
+</div>

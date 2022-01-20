@@ -1,0 +1,80 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="page-header-title">
+        <i class="icofont icofont-email bg-c-orenge"></i>
+        <div class="d-inline">
+          <h4>Email Template Configuration</h4>
+        </div>
+      </div>
+      <div class="d-inline">
+        <div  style="float: right;">
+          <a *ngIf = "(disableAllFeilds && model.updateButtonFlag)" placement="top" ngbTooltip="Edit" (click)="onClickEdit()">
+            <i style="font-size: 20px" class="icofont icofont-edit"></i></a>&nbsp;&nbsp;
+            <a *ngIf = "(deleteButton && model.deleteButtonFlag)" placement="top" ngbTooltip="Delete" (click)="onClickDelete()">
+              <i style="font-size: 20px" class="icofont icofont-ui-delete"></i></a>
+        </div>
+      </div>
+    </app-card>
+    <app-card  [title]="''">
+      <div class="row">
+        <div class="col-sm-12">
+          <form #EmailTemplate="ngForm">
+            <div class="form-row">
+              <div class="form-group col-sm-4">
+                <label for="Oraganization">Oraganization </label>
+                <select name="Oraganization" class="form-control" [(ngModel)]="modal.orgId" #Oraganization="ngModel"
+                  (change)="onChangeOrg(modal.orgId)" [disabled]="(isSuperAdmin || disableAllFeilds)">
+                  <option *ngFor="let org of orgDropDown" [ngValue]="org.key">{{org.value}}</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-4">
+                <label for="Rule">Rule </label><span class="asterisk required">*</span>
+                <select name="Rule" class="form-control" [(ngModel)]="modal.ruleId" #Rule="ngModel" required [disabled]="disableAllFeilds"> 
+                  <option value="1">demo</option>
+                </select>
+                <div class="messages text-danger" *ngIf="(Rule.touched || submitted) && Rule.errors?.required">Please select Rule</div>
+              </div>
+              <div class="form-group col-sm-4">
+                <label for="TemplateName">Template Name</label><span class="asterisk required">*</span>
+                <input type="text" name="TemplateName" [(ngModel)]="modal.templateName" #TemplateName="ngModel" class="form-control"
+                   placeholder="Ex : template-demo" required [disabled]="disableAllFeilds"> 
+                <div class="messages text-danger" *ngIf="(TemplateName.touched || submitted) && TemplateName.errors?.required">Enter template name here</div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-6">
+                <label for="Template">Sample Template</label><span class="asterisk required">*</span>
+                <input type="text" name="Template" [(ngModel)]="modal.sampleTemplate" #Template="ngModel"  class="form-control" 
+                  [disabled]="disableAllFeilds" required>
+                <div class="messages text-danger" *ngIf="(Template.touched || submitted) && Template.errors?.required">Enter template</div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-3">
+                <label class="checkbox-inline" for="active">Active&nbsp;&nbsp;&nbsp;</label>
+                <label class="switch">
+                  <input type="checkbox" [checked]="modal.activeFlag" (change)="modal.activeFlag=!modal.activeFlag" [disabled]="disableAllFeilds">
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <div class="col text-center">
+                  <button [disabled]="!model.createButtonFlag" type="button" *ngIf = "!disableAllFeilds" class="btn btn-primary" (click)="saveEmailTemplate(EmailTemplate.valid)">
+                    <i class="icofont icofont-check" ></i> Save
+                  </button>
+                  <button type="button" class="btn btn-warning" [routerLink]="['/MainMenu']" routerLinkActive="active">
+                    <i class="icofont icofont-close"></i>Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+<div class="loading" *ngIf="spinnerFlag">Loading&#8230;</div>

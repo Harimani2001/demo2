@@ -1,0 +1,44 @@
+.form-control:disabled, .form-control[readonly] {
+    background-color: white;
+    opacity: 1;
+}
+
+table#equipment-table tbody th,
+table#equipment-table tbody td {
+  white-space: unset;
+  width: 50%;
+}
+table#equipment-table,table#equipment-table td{
+    border: 1px solid black;
+}
+
+table#equipment-table-checkList tbody th,
+table#equipment-table-checkList tbody td {
+  white-space: unset;
+}
+table#equipment-table-checkList,table#equipment-table-checkList td,table#equipment-table-checkList th{
+    border: 1px solid black;
+}
+
+.card {
+  border-radius: 5px;
+  box-shadow: 0 1px 11px 0 rgba(0, 0, 0, 0.12);
+  border: none;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+}
+
+.horzontal_line {
+ margin: 0px;
+ margin-top: 0.2rem;
+ border: 0;
+ border-top: 1px solid rgba(0,0,0,.1);
+}
+
+.text-overflow-dots{
+  display: inline-block;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}

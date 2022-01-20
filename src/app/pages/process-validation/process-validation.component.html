@@ -1,0 +1,520 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="col-sm-12" id="float-action">
+        <app-card>
+          <div class="row">
+            <div class="col-sm-3 page-header-title">
+              <i class="icofont icofont-file-document bg-c-blue"></i>
+              <div class="d-inline">
+                <h4 class="strong">Statistical Process Control</h4>
+                <span>View Statistical Process Control</span>
+              </div>
+            </div>
+            <div class="col-sm-9">
+              <a href="javascript:" class="m-l-15 float-right"><img class="image-radius rounded-0 img-30"
+                  src="assets/icon/png-icons/pdfExport.png" alt="PDF Export" placement="bottom" ngbTooltip="PDF Export"
+                  (click)="pdfdownload()"></a>
+
+              <div class="text-right" *ngIf="this.tab && this.tab.activeId === 'import'">
+                <a href="javascript:">
+                  <img class="image-radius rounded-0 img-30" src="assets/icon/png-icons/csvDownload.png"
+                    alt="Sample Download" placement="bottom" ngbTooltip="Sample Download"
+                    (click)="sampleFileDownload();"></a>
+                <a *ngIf="permissionModal.createButtonFlag && processValidation.id===0" href="javascript:"
+                  class="m-l-15" (click)="onSubmit();"><img class="image-radius rounded-0 img-27 img-height"
+                    src="assets/icon/png-icons/save.svg" alt="Save" placement="bottom" ngbTooltip="Save"></a>
+              </div>
+
+              <div class="row" *ngIf="this.tab && this.tab.activeId != 'import'">
+                <div class="col-sm-1-5 pr-0 pl-0">
+                  <div class="col-sm-12 pr-0 pl-0">
+                    <my-date-picker (keypress)="$event.preventDefault();" #date1 name="startDate"
+                      (click)="openBtnClicked();" (ngModelChange)="onChangeStartDate($event);" placeholder="Start Date"
+                      [options]="myDatePickerOptions" [(ngModel)]="startDate">
+                    </my-date-picker>
+                  </div>
+                </div>
+                <div class="col-sm-1-5 pr-0 pl-0">
+                  <div class="col-sm-12 pr-0">
+                    <my-date-picker (keypress)="$event.preventDefault();" #date2 name="endDate"
+                      (click)="openBtnClicked();" (ngModelChange)="onChangeEndDate($event);" placeholder="End Date"
+                      [options]="myDatePickerOptions" [(ngModel)]="endDate">
+                    </my-date-picker>
+                  </div>
+                </div>
+                <div class="col-sm-1-5 pr-0 pl-0">
+                  <form class="form-inline">
+                    <div class="col-sm-12 pr-0">
+                      <div id="inputgroup" class="input-group">
+                        <select class="form-control" [(ngModel)]="shift" id="shiftId" name="shiftname"
+                          (ngModelChange)="loadProcessValidation($event, equipment, product, batch);">
+                          <option value="" disabled>Select Shift</option>
+                          <option *ngFor="let shift of shiftList" [value]="shift.id">{{shift.name}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-sm-1-5 pr-0 pl-0">
+                  <form class="form-inline">
+                    <div class="col-sm-12 pr-0">
+                      <div id="inputgroup" class="input-group">
+                        <select class="form-control" [(ngModel)]="equipment" id="equipmentId" name="equipmentName"
+                          (ngModelChange)="loadProcessValidation(shift, $event, product, batch);">
+                          <option value="" disabled>Select Equipment</option>
+                          <option *ngFor="let eqp of equipmentList" [value]="eqp.id">{{eqp.name}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-sm-1-5 pr-0 pl-0">
+                  <form class="form-inline">
+                    <div class="col-sm-12 pr-0">
+                      <div id="inputgroup" class="input-group">
+                        <select class="form-control" [(ngModel)]="product" id="productId" name="productName"
+                          (ngModelChange)="loadProcessValidation(shift, equipment, $event, batch);">
+                          <option value="" disabled>Select Product</option>
+                          <option *ngFor="let prod of productList" [value]="prod.key">{{prod.value}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-sm-1-5 pr-0 pl-0">
+                  <form class="form-inline">
+                    <div class="col-sm-12 pr-0">
+                      <div id="inputgroup" class="input-group">
+                        <select class="form-control" [(ngModel)]="batch" id="batchId" name="batchName"
+                          (ngModelChange)="loadProcessValidation(shift, equipment, product, $event);">
+                          <option value="" disabled>Select Batch</option>
+                          <option *ngFor="let batch of batchList" [value]="batch.key">{{batch.value}}</option>
+                        </select>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="col-sm-1 pr-0 pl-0">
+                  <form class="form-inline">
+                    <div class="col-sm-12 pr-0">
+                      <div id="inputgroup" class="input-group">
+                        <input type="text" class="form-control" name="noOfSamples" [(ngModel)]="samplesize"
+                          (ngModelChange)="dataload();" maxlength="49" placeholder="No of samples" />
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </app-card>
+      </div>
+
+      <div><br><br><br></div>
+
+      <ngb-tabset #processValTab="ngbTabset"
+        (tabChange)="tabChange($event.nextId);this.helper.toggleView('processValTab',$event.nextId);">
+        <ngb-tab id="import" title="Import">
+          <ng-template ngbTabContent>
+            <br>
+            <div class="row">
+              <div class="col-sm-12">
+                <form #processValForm="ngForm">
+                  <table id="add-table" class="table w-100">
+                    <tbody>
+                      <tr>
+                        <td>
+                          <div class="row">
+                            <div class="col-sm-3">
+                              <strong class="strong">Shift<span class="asterisk">*</span> :</strong>
+                            </div>
+                            <div class="col-sm-9">
+                              <select name="shiftName" id="shiftId" [(ngModel)]="processValidation.shiftId"
+                                #shift="ngModel" class="form-control" required>
+                                <option disabled value="">Select Shift</option>
+                                <option *ngFor="let shift of shiftList" [value]="shift.id">{{shift.name}}</option>
+                              </select>
+                              <div class="messages text-danger"
+                                *ngIf="(shift.touched || submitted) && shift.errors?.required">Please select Shift
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="row">
+                            <div class="col-sm-3">
+                              <strong class="strong">Equipment<span class="asterisk">*</span> :</strong>
+                            </div>
+                            <div class="col-sm-9">
+                              <select name="equipmentName" id="equipmentId" [(ngModel)]="processValidation.equipmentId"
+                                #equipment="ngModel" class="form-control" required>
+                                <option disabled value="">Select Equipment</option>
+                                <option *ngFor="let eqp of equipmentList" [value]="eqp.id">{{eqp.name}}</option>
+                              </select>
+                              <div class="messages text-danger"
+                                *ngIf="(equipment.touched || submitted) && equipment.errors?.required">Please select
+                                Equipment
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td>
+                          <div class="row">
+                            <div class="col-sm-3">
+                              <strong class="strong">Product<span class="asterisk">*</span> :</strong>
+                            </div>
+                            <div class="col-sm-9">
+                              <select name="productName" id="productId" [(ngModel)]="processValidation.product"
+                                #product="ngModel" class="form-control" required>
+                                <option disabled value="">Select Product</option>
+                                <option *ngFor="let prod of productList" [value]="prod.key">{{prod.value}}</option>
+                              </select>
+                              <div class="messages text-danger"
+                                *ngIf="(product.touched || submitted) && product.errors?.required">Please select Product
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div class="row">
+                            <div class="col-sm-3">
+                              <strong class="strong">Batch<span class="asterisk">*</span> :</strong>
+                            </div>
+                            <div class="col-sm-9">
+                              <select name="batchName" id="batchId" [(ngModel)]="processValidation.batch"
+                                #batch="ngModel" class="form-control" required>
+                                <option disabled value="">Select Batch</option>
+                                <option *ngFor="let batch of batchList" [value]="batch.key">{{batch.value}}</option>
+                              </select>
+                              <div class="messages text-danger"
+                                *ngIf="(batch.touched || submitted) && batch.errors?.required">Please select Batch
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+
+                      <tr>
+                        <td colspan="2">
+                          <div class="row">
+                            <div class="col-sm-2">
+                              <strong class="strong">File Upload<span class="asterisk">*</span> :</strong>
+                            </div>
+                            <div class="col-sm-9">
+                              <input #myInput type="file" ng2FileSelect [uploader]="uploader" accept=".xls"
+                                (change)="extractFile($event);">
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </form>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="summary" title="Summary">
+          <ng-template ngbTabContent>
+            <table>
+              <tr>
+                <td style="width: 700px;">
+                  <div style="width: 100%;">
+                    <div colspan="2">
+                      <div class="row">
+                        <div class="col-sm-4 no-bottom">
+                          <strong class="strong">USL :</strong>
+                        </div>
+                        <div class="col-sm-4 no-bottom">
+                          <input type="text" maxlength="50" class="form-control" name="usl" [(ngModel)]="usl"
+                            (ngModelChange)="dataload()" maxlength="50" placeholder="USL">
+                        </div>
+                      </div>
+                    </div>
+                    <div colspan="2">
+                      <div class="row">
+                        <div class="col-sm-4 no-bottom">
+                          <strong class="strong">LSL :</strong>
+                        </div>
+                        <div class="col-sm-4 no-bottom">
+                          <input type="text" maxlength="50" class="form-control" name="lsl" [(ngModel)]="lsl"
+                            (ngModelChange)="dataload()" maxlength="50" placeholder="LSL">
+                        </div>
+                      </div>
+                    </div>
+                    <div colspan="2">
+                      <div class="row">
+                        <div class="col-sm-4 no-bottom">
+                          <strong class="strong">X_Bar :</strong>
+                        </div>
+                        <div class="col-sm-4 no-bottom">
+                          <input type="text" maxlength="50" class="form-control" name="xBar" [(ngModel)]="xBar"
+                            maxlength="50" placeholder="X_BAR">
+                        </div>
+                      </div>
+                    </div>
+                    <div colspan="2">
+                      <div class="row">
+                        <div class="col-sm-4 no-bottom">
+                          <strong class="strong">Sigma_X_Bar :</strong>
+                        </div>
+                        <div class="col-sm-4 no-bottom">
+                          <input type="text" maxlength="50" class="form-control" name="sigmaXBar"
+                            [(ngModel)]="sigmaXBar" maxlength="50" placeholder="Sigma_X_Bar">
+                        </div>
+                      </div>
+                    </div>
+                    <div colspan="2">
+                      <div class="row">
+                        <div class="col-sm-4 no-bottom">
+                          <strong class="strong">R_Bar :</strong>
+                        </div>
+                        <div class="col-sm-4 no-bottom">
+                          <input type="text" maxlength="50" class="form-control" name="rBar" [(ngModel)]="rBar"
+                            maxlength="50" #Rbar="ngModel" placeholder="R_Bar">
+                        </div>
+                      </div>
+                    </div>
+                    <div colspan="2">
+                      <div class="row">
+                        <div class="col-sm-4 no-bottom">
+                          <strong class="strong">Sigma :</strong>
+                        </div>
+                        <div class="col-sm-4 no-bottom">
+                          <input type="text" maxlength="50" class="form-control" name="lsl" [(ngModel)]="sdvRoundOff"
+                            maxlength="50" placeholder="Sigma">
+                        </div>
+                      </div>
+                    </div>
+                    <div colspan="2">
+                      <div class="row">
+                        <div class="col-sm-4 no-bottom">
+                          <strong class="strong">No of SDV for Control Limits :</strong>
+                        </div>
+                        <div class="col-sm-4 no-bottom">
+                          <input type="text" maxlength="50" class="form-control" name="sdvLimit"
+                            [(ngModel)]="sdvControlLimits" maxlength="50" placeholder="No of SDV for Control Limits">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td style="width: 700px;">
+                  <table id="cpk-table" class="table w-50">
+                    <tbody>
+                      <tr>
+                        <td colspan="2">
+                          <div class="row">
+                            <div class="col-sm-2">
+                              <strong class="strong">CP :</strong>
+                            </div>
+                            <div class="col-sm-4">
+                              <input type="text" [disabled] maxlength="50" class="form-control" name="cp"
+                                [(ngModel)]="cpValue" maxlength="50" placeholder="CP">
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div class="row">
+                            <div class="col-sm-2">
+                              <strong class="strong">CPL :</strong>
+                            </div>
+                            <div class="col-sm-4">
+                              <input type="text" [disabled] [(ngModel)]="cplValue" maxlength="50" class="form-control"
+                                name="cpl" placeholder="CPL">
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div class="row">
+                            <div class="col-sm-2">
+                              <strong class="strong">CPU :</strong>
+                            </div>
+                            <div class="col-sm-4">
+                              <input type="text" [disabled] [(ngModel)]="cpuValue" maxlength="50" class="form-control"
+                                name="priorityName" placeholder="CPU">
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td colspan="2">
+                          <div class="row">
+                            <div class="col-sm-2">
+                              <strong class="strong">CPK :</strong>
+                            </div>
+                            <div class="col-sm-4">
+                              <input type="text" [disabled]=true [(ngModel)]="cpkValue" maxlength="50"
+                                class="form-control" name="priorityName" placeholder="CPK">
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </table>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="inputTable" title="Table">
+          <ng-template ngbTabContent>
+            <div>
+              <table id="customers">
+                <thead>
+                  <tr>
+                    <th *ngFor="let header of tableHead">{{header}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let row of this.chartdata">
+                    <td *ngFor="let header of tableHead"> {{row[header]}}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="xbarTable" title="X_Bar Table">
+          <ng-template ngbTabContent>
+            <ngx-datatable #myTable class="data-table dt-chk" [rows]='this.xbarData' [limit]="10" [columnMode]="'force'"
+              [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+              <ngx-datatable-column name="X_Bar">
+                <ng-template let-row="row" let-expanded="expanded" let-rowIndex="rowIndex" let-value="value"
+                  ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['xbar']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Center">
+                <ng-template let-row="row" let-expanded="expanded" let-rowIndex="rowIndex" let-value="value"
+                  ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['center']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="X_Bar LCL">
+                <ng-template let-row="row" let-expanded="expanded" let-rowIndex="rowIndex" let-value="value"
+                  ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['xBarLcl']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="X_Bar UCL">
+                <ng-template let-row="row" let-expanded="expanded" let-rowIndex="rowIndex" let-value="value"
+                  ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['xBarUcl']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="rbarTable" title="R_Bar Table">
+          <ng-template ngbTabContent>
+            <ngx-datatable #myTable class="data-table dt-chk" [rows]='this.rbarData' [limit]="10" [columnMode]="'force'"
+              [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+              <ngx-datatable-column name="X_Bar">
+                <ng-template let-row="row" let-expanded="expanded" let-rowIndex="rowIndex" let-value="value"
+                  ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['xbar']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Center">
+                <ng-template let-row="row" let-expanded="expanded" let-rowIndex="rowIndex" let-value="value"
+                  ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['center']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="R_Bar LCL">
+                <ng-template let-row="row" let-expanded="expanded" let-rowIndex="rowIndex" let-value="value"
+                  ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['rBarLcl']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="R_Bar UCL">
+                <ng-template let-row="row" let-expanded="expanded" let-rowIndex="rowIndex" let-value="value"
+                  ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['rBarUcl']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="xbargrap" title="X_Bar Graph">
+          <ng-template ngbTabContent>
+            <div style="width: 850px; height: 850px;">
+              <canvas baseChart [datasets]="lineChartDataxbar" [labels]="lineChartLabels"
+                [options]="lineChartOptionsxbar" [colors]="lineChartColors" [legend]="true" [chartType]="lineChartType">
+              </canvas>
+            </div>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="rbargrap" title="R_Bar Graph">
+          <ng-template ngbTabContent>
+            <div style="width: 850px; height: 850px;">
+              <canvas baseChart [datasets]="rbarlineChartData" [labels]="rbarlineChartLabels"
+                [options]="rbarlineChartOptionsxbar" [colors]="rbarlineChartColors" [legend]="true"
+                [chartType]="rbarlineChartType">
+              </canvas>
+            </div>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="controlInterpretation" title="Control Interpretation">
+          <ng-template ngbTabContent>
+            <div class="row">
+              <div *ngIf="con1" class="col-sm-12">
+                <strong>{{condition1}}</strong>
+              </div>
+              <div *ngIf="con2" class="col-sm-12">
+                <strong>{{condition2}}</strong>
+              </div>
+              <div *ngIf="con3" class="col-sm-12">
+                <strong>{{condition3}}</strong>
+              </div>
+              <div *ngIf="con4" class="col-sm-12">
+                <strong>{{condition4}}</strong>
+              </div>
+              <div *ngIf="con5" class="col-sm-12">
+                <strong>{{condition5}}</strong>
+              </div>
+              <div *ngIf="con6" class="col-sm-12">
+                <strong>{{condition6}}</strong>
+              </div>
+              <div *ngIf="con7" class="col-sm-12">
+                <strong>{{condition7}}</strong>
+              </div>
+            </div>
+            <div style="width: 850px; height: 850px;">
+              <canvas baseChart [datasets]="controlChartData" [labels]="lineChartLabels"
+                [options]="lineChartOptionscontrolinter" [colors]="lineChartColors" [legend]="true"
+                [chartType]="lineChartType">
+              </canvas>
+            </div>
+          </ng-template>
+        </ngb-tab>
+      </ngb-tabset>
+    </app-card>
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

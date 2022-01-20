@@ -1,0 +1,9 @@
+ngx-datatable#fileViewTable datatable-body-cell {
+  background-color: white !important;
+  border-bottom: inset !important;
+}
+a.disabled {
+  color: gray;
+  cursor: not-allowed;
+  text-decoration: underline;
+}

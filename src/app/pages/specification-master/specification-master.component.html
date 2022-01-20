@@ -1,0 +1,874 @@
+<div *ngIf="!this.viewIndividualData">
+  <div *ngIf="!showAdd" class="row">
+    <div class="col-sm-12">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-6">
+            <h4 class="f-w-600 strong">Specification</h4>
+          </div>
+          <div class="col-sm-6">
+            <a *ngIf="permissionModal.publishButtonFlag && isSelectedPublishData && !isWorkflowDocumentOrderSequence"
+              href="javascript:" class="m-l-20"><img class="image-radius rounded-0 img-25"
+                src="assets/icon/png-icons/published.png" alt="Publish" placement="bottom" ngbTooltip="Publish"
+                (click)="publishData()"></a>
+
+            <div style="float: right;">
+              <span *ngIf="this.isMultiplePDF && this.search"><i (click)="multipleDocumentPreview(false,'pdf');"
+                  placement="top" container="body" ngbTooltip="Download Pdf File"
+                  style="font-size: 34px;color: #e82c2c;" class="icofont icofont-file-pdf"
+                  title="Download Pdf File"></i>&nbsp;</span>
+
+              <span *ngIf="this.isMultiplePDF && this.search"><i (click)="multipleDocumentPreview(false,'docx');"
+                  placement="top" container="body" ngbTooltip="Download Doc File"
+                  style="font-size: 34px;color: #3232e6;" class="icofont icofont-file-word"
+                  title="Download Doc File"></i>&nbsp;</span>
+
+              <a *ngIf="this.search" href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                  src="assets/icon/png-icons/search.png" alt="Search" placement="bottom" ngbTooltip="Search"
+                  (click)="this.showSearch=!this.showSearch"></a>
+              <input *ngIf="this.search && this.showSearch" type="search" [(ngModel)]="filterQuery"
+                (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search m-r-15"
+                placeholder="Search">
+
+              <a *ngIf="permissionModal.userInWorkFlow" href="javascript:" class="m-r-15"><img
+                  class="image-radius rounded-0 img-27" src="assets/icon/png-icons/addDoc.png" alt="Add Specification"
+                  placement="bottom" ngbTooltip="Add Specification" (click)="onClickCreate()"></a>
+
+              <a *ngIf="permissionModal.exportButtonFlag && viewCsvExport" href="javascript:" class="m-r-15"><img
+                  class="image-radius rounded-0 img-25" src="assets/icon/png-icons/csvExport.png" alt="CSV Export"
+                  placement="bottom" ngbTooltip="CSV Export" (click)="excelExport()"></a>
+
+              <a *ngIf="permissionModal.userInWorkFlow && permissionModal.exportButtonFlag && viewPdfPreview && this.draftIds && this.draftIds.length>0"
+                href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                  src="assets/icon/png-icons/pdfExport.png" alt="PDF Export" placement="bottom" ngbTooltip="PDF Export"
+                  (click)="this.viewpdf=true; draftPdfPreview.show()"></a>
+
+              <a *ngIf="permissionModal.userInWorkFlow" href="javascript:" class="m-r-15"><img
+                  class="image-radius rounded-0 img-25" src="assets/icon/png-icons/menu.png" alt="Table of Content"
+                  placement="bottom" ngbTooltip="Table of Content" (click)="onClickTableOfContent()"></a>
+
+              <a *ngIf="this.search && permissionModal.userInWorkFlow" href="javascript:"><img
+                  class="image-radius rounded-0 img-30" src="assets/icon/png-icons/forum.png" alt="Forum"
+                  placement="bottom" ngbTooltip="Forum" (click)="openDocumentForum()"></a>
+            </div>
+            <br>
+          </div>
+        </div>
+        <div class="messages text-danger" *ngIf="permissionModal.publishButtonFlag && isSelectedPublishData">
+          {{isWorkflowDocumentOrderSequence}}</div>
+        <div class="messages text-danger" *ngIf="!this.permissionModal.userInWorkFlow && !spinnerFlag">Note* : You are
+          not in workflow. Please contact admin!.</div>
+        <div class="messages text-danger m-b-10" *ngIf="tab && tab.activeId=='draft' && documentLock">Note* : Document is
+          locked, Navigate to summary page to unlock a document.</div>
+        <br>
+
+        <ngb-tabset #spTab="ngbTabset" (tabChange)="tabChange($event.nextId);">
+          <ngb-tab id="summary" title="Summary">
+            <ng-template ngbTabContent>
+              <app-individual-document-summary [permissionConstant]="this.helper.SP_VALUE"
+                (onCloseSummary)="loadPermissions();"></app-individual-document-summary>
+            </ng-template>
+          </ngb-tab>
+
+          <ngb-tab id="draft" title="Draft">
+            <ng-template ngbTabContent>
+              <ngx-datatable [scrollbarH]="false" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+                [rows]='unPublishedList | specificationFilter : filterQuery' [columnMode]="'force'" [headerHeight]="50"
+                [footerHeight]="50" [rowHeight]="'auto'" [externalPaging]="true" [count]="page.totalElements"
+                [offset]="page.pageNumber" [limit]="page.size" (page)="setPage($event)">
+
+                <ngx-datatable-column *ngIf="permissionModal.publishButtonFlag" name="Select" [width]="70"
+                  [sortable]="false" [canAutoResize]="false" [draggable]="false" [resizeable]="false">
+
+                  <ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+                    <div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+                      <label *ngIf="filterQuery=='' && unPublishedList.length !=0 " container="body" placement="right"
+                        triggers="mouseenter:mouseleave" ngbPopover="Select All">
+                        <input type="checkbox" [checked]="selectAll"
+                          (click)="selectAllData($event);loadSelectAllDataForPublish($event)" />
+                        <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                      </label>
+                    </div>
+                  </ng-template>
+
+                  <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                    let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+
+                    <div class="checkbox-fade fade-in-primary" *ngIf="row.allURSWFCompleted">
+                      <label>
+
+                        <input type="checkbox" name="{{row['spCode']}}" [checked]="row.published"
+                          (change)="row.published=!row.published;onChangePublishData();" />
+                        <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                      </label>
+                    </div>
+                  </ng-template>
+
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Code" [width]="50">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong>{{row['spCode']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column style="font-weight: bold;" name="Type" [width]="150">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['spTypeValue']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Description">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;"
+                      [innerHTML]="row['spDescription']"></strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="URS">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['ursNames']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Document Status ">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Action">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <ng-template #popContent>
+                      <span class="text-left">
+                        <div><b>Status :</b>&nbsp; {{row['status']}}</div>
+                        <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                        <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                        <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                        <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                      </span>
+                    </ng-template>
+                    <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+                      placement="right" (click)="loadDocumentCommentLog(row)" placement="top" [ngbTooltip]="popContent">
+                      <i class="icofont icofont-info-square info"></i>
+                    </a>
+                    <a container="body" *ngIf="permissionModal.updateButtonFlag" (click)="onClickEdit(row)"
+                      class="m-r-15 crm-action-edit text-muted text-primary" ref="javascript:;" placement="top"
+                      ngbTooltip="Edit">
+                      <i class="icofont icofont-edit edit"></i>
+                    </a>
+                    <a container="body" *ngIf="permissionModal.deleteButtonFlag" ref="javascript:;"
+                      class="m-r-15 crm-action-delete text-muted text-danger"
+                      (click)="openSuccessCancelSwal(row , row['$$index'] );" placement="top" ngbTooltip="Delete">
+                      <i class="icofont icofont-bin bin"></i>
+                    </a>
+                    <a container="body" *ngIf="permissionModal.viewButtonFlag" href="javascript:;"
+                      class="m-r-15 crm-action-view text-muted text-warning" (click)="viewRowDetails(row.id);"
+                      data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                      <i class="icofont icofont-resize view"></i>
+                    </a>
+                  </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </ng-template>
+          </ngb-tab>
+
+          <ngb-tab id="published" title="Published">
+            <ng-template ngbTabContent>
+              <ngx-datatable [scrollbarH]="false" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+                [rows]='publishedData | specificationFilter : filterQuery' [columnMode]="'force'" [headerHeight]="50"
+                [footerHeight]="50" [rowHeight]="'auto'" [externalPaging]="true" [count]="page.totalElements"
+                [offset]="page.pageNumber" [limit]="page.size" (page)="setPage($event)">
+                <ngx-datatable-column style="font-weight: bold;" name="Code" [width]="50">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong>{{row['spCode']}} {{row.revisionNumber}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Type" [width]="150">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['spTypeValue']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Description">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;"
+                      [innerHTML]="row['spDescription']"></strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="URS">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['ursNames']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Document Status ">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Action">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <ng-template #popContent>
+                      <span class="text-left">
+                        <div><b>Status :</b>&nbsp; {{row['status']}}</div>
+                        <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                        <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                        <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                        <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                      </span>
+                    </ng-template>
+                    <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+                      placement="right" (click)="loadDocumentCommentLog(row)" placement="top" [ngbTooltip]="popContent">
+                      <i class="icofont icofont-info-square info"></i>
+                    </a>
+                    <a container="body" *ngIf="permissionModal.viewButtonFlag" href="javascript:;"
+                      class="m-r-15 crm-action-view text-muted text-warning" (click)="viewRowDetails(row.id);"
+                      data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                      <i class="icofont icofont-resize view"></i>
+                    </a>
+                    <a container="body" href="javascript:;" (click)="onClickRisk(row.id)"
+                      *ngIf="riskPermission.createButtonFlag && riskWorkFlowPer"
+                      class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Add Risk">
+                      <i style="color: black;" class="icofont icofont-login"></i>
+                    </a>
+                    <a container="body" href="javascript:;" (click)="onClickTestCases(row.id)"
+                      *ngIf="testCase.createButtonFlag && testcaseWorkFlowPer && isTestcaseModulePermission"
+                      class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Add Testcases">
+                      <i style="color: #3AA655;" class="icofont icofont-login"></i>
+                    </a>
+                    <a container="body" href="javascript:;" (click)="onClickAdHoc(row.id)"
+                      *ngIf="adHocPermission.createButtonFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+                      placement="top" ngbTooltip="Add Unscripted Testing">
+                      <i style="color: black;" class="text-warning icofont icofont-login"></i>
+                    </a>
+
+                  </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </ng-template>
+          </ngb-tab>
+          <!-- <ngb-tab id="documentForms" title="Document Forms">
+            <ng-template ngbTabContent>
+              <app-document-forms [permissionConstant]="this.helper.SP_VALUE"></app-document-forms>
+            </ng-template>
+          </ngb-tab> -->
+          <ngb-tab id="approve" title="Approve / PDF View">
+            <ng-template ngbTabContent>
+              <app-individual-document-workflow [permissionConstant]="this.helper.SP_VALUE"
+                (onClose)="tabChange('approve');">
+              </app-individual-document-workflow>
+            </ng-template>
+          </ngb-tab>
+          <ngb-tab id="feedback" title="Feedback">
+            <ng-template ngbTabContent>
+              <br>
+              <app-document-forum #forumView [constant]="this.helper.SP_VALUE" [isDocumentWorkFlow]="true"
+                [documentList]="this.commentsDocumentsList"></app-document-forum>
+            </ng-template>
+          </ngb-tab>
+          <ngb-tab id="audit" title="Audit Trail">
+            <ng-template ngbTabContent>
+              <app-audit-trail-view #auditView [permission]="this.helper.SP_VALUE"></app-audit-trail-view>
+            </ng-template>
+          </ngb-tab>
+
+        </ngb-tabset>
+      </app-card>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="showAdd">
+    <div class="col-sm-12" id="float-action">
+      <app-card>
+        <div class="row">
+          <div class="page-header-title col-sm-6">
+            <i class="icofont icofont-law-document bg-c-blue"></i>
+            <div class="d-inline">
+              <h4 class="strong">Specification</h4>
+              <span *ngIf="this.modal.id==0">Add Specification</span>
+              <span *ngIf="this.modal.id!=0">Specification Code : {{this.modal.spCode}}
+                {{this.modal.revisionNumber}}</span>
+            </div>
+          </div>
+          <div class="col-sm-6 text-right">
+            <span *ngIf="!modal.workFlowCompletionFlag && modal.documentPreviewFlag" style="float: right;"><img
+                (click)="documentPreview(true,'pdf');" container="body" ngbTooltip="Preview"
+                style="height: 35px; width: 35px;" class="pointer" src="/assets/images/pdf.png" title="Preview"></span>
+            <span style="float: right;" *ngIf="modal.documentPreviewFlag"><i (click)="documentPreview(false,'pdf');"
+                placement="top" container="body" ngbTooltip="Download Pdf File" style="font-size: 34px;color: #e82c2c;"
+                class="icofont icofont-file-pdf" title="Download Pdf File"></i></span>
+            <span style="float: right;" *ngIf="modal.documentPreviewFlag"><i (click)="documentPreview(false,'docx');"
+                placement="top" container="body" ngbTooltip="Download Doc File" style="font-size: 34px;color: #3232e6;"
+                class="icofont icofont-file-word" title="Download Doc File"></i></span>
+            <button *ngIf="this.modal.id==0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();saveAndGoto(spMaster.valid);">Save</button>
+            <button *ngIf="this.modal.id!=0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();openSuccessUpdateSwal(spMaster.valid);">Update</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="onClickBack();">Cancel</button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <div class="col-sm-12">
+      <br><br><br><br>
+      <app-card>
+        <form #spMaster="ngForm">
+
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">URS<span class="asterisk">*</span>
+              <span *ngIf="!isReadOnly" style="cursor: pointer;color: blue;"><u class="black"
+                  (click)="loadMultipleSelectUrs();">Click here to select multiple URS</u></span>
+              <span *ngIf="isReadOnly" style="cursor: pointer;color: blue;"><u class="black">Click here to select
+                  multiple URS</u></span>
+              <span class="pointer" (click)="this.ursDetailedView = !this.ursDetailedView">&nbsp;<i
+                  [ngClass]="this.ursDetailedView?'fa-minus-square text-danger':'fa-plus-square text-success'"
+                  class="fa" aria-hidden="true"></i></span>
+            </label>
+            <div class="col-sm-12">
+              <ng-select [ngClass]="'ng-select'" [options]="simpleOption" [multiple]="true" [(ngModel)]="selectedUrsIds"
+                [attr.autofocus]="true" (ngModelChange)="onChangeURS()" name="ursName" rounds="ngModel" required
+                #urs="ngModel" [disabled]="isReadOnly"></ng-select>
+              <div class="messages text-danger" *ngIf="(urs.touched || submitted) && urs.errors?.required">URS is
+                required</div>
+            </div>
+          </div>
+
+          <app-urs-view *ngIf="this.ursDetailedView && selectedUrsDetails && this.selectedUrsDetails.length>0"
+            [url]="'/sp-master'" [ursList]="this.selectedUrsDetails" [documentCode]="this.helper.SP_VALUE">
+          </app-urs-view>
+
+          <table id="add-table" class="table w-100">
+            <tbody>
+              <tr>
+                <td>
+                  <div class="row">
+                    <div class="col-sm-2">
+                      <strong class="strong">Type<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-10">
+                      <select name="select" class="form-control" [(ngModel)]="modal.spTypeKey" #type="ngModel" required>
+                        <option value="">Select Type</option>
+                        <option *ngFor="let data of spType" [value]="data.key">{{data.value}}</option>
+                      </select>
+                      <div class="messages text-danger" *ngIf="(type.touched || submitted) && type.errors?.required">
+                        Type is required</div>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Description<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <ui-switch (click)="this.modal.id==0?editorSwap=!editorSwap:editorSwap"
+                        [disabled]="this.modal.id!=0" [checked]="editorSwap" class="js-small" color="#3498DB"
+                        switchColor="#fff" size="small" unchecked>
+                      </ui-switch>&nbsp;
+                      <label class="text-success" *ngIf="!editorSwap">Enable Advance Editor</label>
+                      <label class="text-danger" *ngIf="editorSwap">Disable Advance Editor</label>
+                      <div *ngIf="editorSwap">
+                        <quill-editor [(ngModel)]="modal.spDescription" [options]="this.helper.editQuillOptions"
+                          (ready)="onEditorCreated($event)" name="description" #textarea="ngModel" required>
+                        </quill-editor>
+                        <div class="messages text-danger"
+                          *ngIf="(textarea.touched || submitted) && textarea.errors?.required">Description is required
+                        </div>
+                      </div>
+                      <ng-container *ngIf="!editorSwap">
+                        <textarea class="form-control max-textarea" id="specDescription"
+                          [(ngModel)]="modal.spDescription" name="description" #textarea="ngModel" required></textarea>
+                        <div class="messages text-danger"
+                          *ngIf="(textarea.touched || submitted) && textarea.errors?.required">Description is required
+                        </div>
+                      </ng-container>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="form-group row">
+            <app-file-upload-for-doc #fileupload [multiple]=true [onlyView]=false [documentId]="this.receivedId"
+              [update]="this.modal.id!=0" [documentCode]="this.helper.SP_VALUE"></app-file-upload-for-doc>
+          </div>
+          <div *ngIf="this.inputField">
+            <app-form-extended #formExtendedId [(inputField)]='inputField' [documentId]="this.helper.URS_NAME"
+              [(submitted)]='submitted'></app-form-extended>
+          </div>
+        </form>
+      </app-card>
+    </div>
+  </div>
+</div>
+
+<!-- detail view -->
+<div *ngIf="this.viewIndividualData==true">
+  <div *ngFor="let data of popupdata; let in = index">
+    <app-card id="individual-header-card">
+      <div class="row">
+        <div class="col-sm-3">
+          <span class="strong">&nbsp;&nbsp;Specification Code : </span>
+          <span style="font-size: 14px;">{{data.spCode}} {{data.revisionNumber}}</span>
+        </div>
+        <div class="col-sm-3" style="text-align: center;">
+          <app-navigation-bar #navigate (resultValue)='reload($event)' id='{{data.id}}' [total]='this.total'
+            [current]='this.current' [freeznext]='data.navigationNextEnds' [freezprevious]='data.navigationPreviousEnds'
+            docType='{{this.helper.SP_VALUE}}' routeBack='{{this.routeback}}'></app-navigation-bar>
+        </div>
+        <div class="col-sm-3">
+          <app-stepperprogress *ngIf="data.published" [isIcon]="true"></app-stepperprogress>
+        </div>
+        <div class="col-sm-3" style="text-align: right;">
+          <button *ngIf="(this.permissionModal.updateButtonFlag && !data.published)" type="submit"
+            (click)="onClickEdit(data)" class="btn btn-sm btn-primary  waves-effect waves-light m-r-10">Edit</button>
+
+          <button
+            *ngIf="permissionModal.publishButtonFlag && !data.published && !isWorkflowDocumentOrderSequence && data.allURSWFCompleted"
+            type="button" class="btn btn-sm btn-warning  waves-effect waves-light m-r-10"
+            (click)="SinglepublishData(data)">Publish</button>
+
+          <button *ngIf="(this.permissionModal.deleteButtonFlag && !data.published)" type="button"
+            class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+            (click)="openSuccessCancelSwal(data,in)">Delete &nbsp;&nbsp;</button>
+
+          <span *ngIf="data.documentPreviewFlag"><i (click)="documentPreview(false,'pdf',data);" placement="top"
+              container="body" ngbTooltip="Download Pdf File" style="font-size: 34px;color: #e82c2c;"
+              class="icofont icofont-file-pdf" title="Download Pdf File"></i></span>
+
+          <span *ngIf="data.documentPreviewFlag"><i (click)="documentPreview(false,'docx',data);" placement="top"
+              container="body" ngbTooltip="Download Doc File" style="font-size: 34px;color: #3232e6;"
+              class="icofont icofont-file-word" title="Download Doc File"></i></span>
+
+          <a container="body" href="javascript:;" (click)="onClickRisk(data.id)"
+            *ngIf="riskPermission.createButtonFlag && riskWorkFlowPer && data.published"
+            class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Add Risk">
+            <i style="color: black;" class="icofont icofont-login"></i></a>
+
+          <a container="body" href="javascript:;" (click)="onClickTestCases(data.id)"
+            *ngIf="testCase.createButtonFlag && testcaseWorkFlowPer && isTestcaseModulePermission && data.status!='Draft'"
+            class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Add Testcases">
+            <i style="color: #3AA655;" class="icofont icofont-login"></i></a>
+
+          <a container="body" href="javascript:;" (click)="onClickAdHoc(data.id)"
+            *ngIf="adHocPermission.createButtonFlag && data.published"
+            class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Add Unscripted Testing">
+            <i style="color: black;" class="text-warning icofont icofont-login"></i></a>
+
+          <button type="button" class="btn btn-sm btn-danger  waves-effect waves-light m-r-10"
+            (click)="onClickClose()">Cancel</button>
+        </div>
+      </div>
+    </app-card>
+    <div class="row p-l-2">
+      <div class="col-sm-12">
+        <label><strong class="strong">URS : </strong>
+          <ng-container *ngFor="let urs of data.ursDetails; let i = index;">
+            <a (click)="urlRedirection(urs.id, data.id)"><u class="black pointer text-primary">{{urs.ursCode}}<label
+                  *ngIf="data.ursDetails.length!=(i+1)">,</label></u></a>
+          </ng-container>
+          <span class="pointer" (click)="this.ursDetailedView = !this.ursDetailedView">&nbsp;<i
+              [ngClass]="this.ursDetailedView?'fa-minus-square text-danger':'fa-plus-square text-success'" class="fa"
+              aria-hidden="true"></i></span>
+        </label>
+      </div>
+      <div class="col-sm-12" *ngIf="this.ursDetailedView">
+        <app-urs-view [ursList]="data.ursDetails" [id]="data.id" [url]="'/sp-master'"
+          [documentCode]="this.helper.SP_VALUE"> </app-urs-view>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-12">
+        <table id="add-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td>
+                <div><strong class="strong">Document Status : </strong><span class="text-warning">{{data.status}}</span>
+                </div>
+              </td>
+              <td>
+                <div><strong class="strong">Type : </strong>{{data.spTypeValue}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2">
+                <div><strong class="strong">Description : </strong>{{data.spDescription}}</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="this.fileFlag" class="form-group row">
+          <strong class="strong m-l-20">View Uploaded Files : </strong><br><br>
+          <app-file-upload-for-doc #fileupload [uniqueCodeForAudit]="data.spCode" [multiple]=false [onlyView]=true
+            [documentCode]="this.helper.SP_VALUE"></app-file-upload-for-doc>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="this.popupdata">
+      <app-view-form [inputField]='this.popupdata'></app-view-form>
+    </div>
+
+    <div *ngIf="this.specData.length > 0"><br></div>
+    <div class="row" *ngIf="this.specData.length > 0">
+      <div class="col-sm-12">
+        <app-card>
+          <div class="row">
+            <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Spec Mapped To</strong></div>
+            <div class="col-sm-6" style="text-align: right;">
+              <a container="body" *ngIf="!this.viewFlagSpec" href="javascript:;"
+                (click)="this.viewFlagSpec = !this.viewFlagSpec" class="m-r-15 crm-action-edit text-muted text-primary"
+                placement="top" ngbTooltip="Expand"><i style="font-size: 25px;color: black;"
+                  class="icofont icofont-circled-down"></i>
+              </a>
+              <a container="body" *ngIf="this.viewFlagSpec" href="javascript:;"
+                (click)="this.viewFlagSpec = !this.viewFlagSpec" class="m-r-15 crm-action-edit text-muted text-primary"
+                placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;"
+                  class="icofont icofont-circled-up"></i>
+              </a>
+            </div>
+          </div>
+          <br>
+          <div *ngIf="this.viewFlagSpec">
+            <div *ngFor="let d of this.specData">
+              <div *ngIf="d.key === '150'">
+                <div>&nbsp;&nbsp;<Strong>{{d.name}}</Strong></div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+                      style="overflow: unset!important;" [rows]='d.value' [limit]="5" [columnMode]="'force'"
+                      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+
+                      <ngx-datatable-column style="font-weight: bold;" name="Test Id">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <a href="javascript:;" (click)="navigateToChild(d.key,row)" class="btn btn-link p-0">
+                            <strong>{{row['testCaseCode']}}</strong>
+                          </a>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column style="font-weight: bold;" name="Test RunName">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong style="font-weight: normal;">{{row['testRunName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column style="font-weight: bold;" name="Test Description">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Document Status">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['approvedStatus']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Expected Result">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['expectedResult']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Actual Result">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['actualResult']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Status">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+                    </ngx-datatable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="d.key === '201'">
+                <div>&nbsp;&nbsp;<Strong><br>{{d.name}}</Strong></div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+                      style="overflow: unset!important;" [rows]='d.value' [limit]="5" [columnMode]="'force'"
+                      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+
+                      <ngx-datatable-column style="font-weight: bold;" name="Ad-hoc Id">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <a href="javascript:;" (click)="navigateToChild(d.key,row)" class="btn btn-link p-0">
+                            <strong>{{row['testCaseCode']}}</strong>
+                          </a>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Test Description">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Test Result">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['expectedResult']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Status">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Business Impact">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['businessImpact']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+                    </ngx-datatable>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="d.key === '113'">
+                <div>&nbsp;&nbsp;<Strong><br>{{d.name}}</Strong></div>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+                      style="overflow: unset!important;" [rows]='d.value' [limit]="5" [columnMode]="'force'"
+                      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+
+                      <ngx-datatable-column style="font-weight: bold;" name="Risk Id">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <a href="javascript:;" (click)="navigateToChild(d.key,row)" class="btn btn-link p-0">
+                            <strong>{{row['assessmentCode']}} {{row.revisionNumber}}</strong>
+                          </a>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column style="font-weight: bold;" name="Risk Factor">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['riskFactor']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Severity">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['severityName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Probability">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['probabilityOfOccuranceName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Detectability">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['detectabilityName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="RPN">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['rpn']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Criticality">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['critical']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Priority">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['priorityName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Residual Severity">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['residualServerityName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Residual Probability">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['residualProbabilityName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Residual Detectability">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['residualDetetablityName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Residual RPN">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['residualRpn']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Residual Priority">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['residualPriorityName']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Conclusion">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['residualConclusion']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column name="Document Status">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                        </ng-template>
+                      </ngx-datatable-column>
+                    </ngx-datatable>
+                  </div>
+                </div>
+                <br>
+              </div>
+            </div>
+          </div>
+        </app-card>
+      </div>
+    </div>
+
+    <app-individual-audit-trail [permission]="this.helper.SP_VALUE" [id]="data.id"></app-individual-audit-trail>
+
+    <hr>
+    <app-document-forum></app-document-forum>
+
+  </div>
+</div>
+
+<app-modal-basic #ursModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select URS</h4>
+    <button type="button" class="close basic-close" (click)="onCloseUrsPopup(false);">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" *ngIf="ursModal.visible">
+    <div class="dt-desc" style="padding: 0px;">
+      <div style="padding-left: 0px;" class="row" class="col-sm-12">
+        <label style="float: right;"> Search :
+          <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+            class="form-control input-sm full-data-search" placeholder="search"></label><br><br>
+      </div>
+      <ngx-datatable #myTable class="data-table dt-chk" [rows]='ursList| combinedFilter : filterQuery' [limit]="10"
+        [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row" let-isSelected="isSelected"
+            let-onCheckboxChangeFn="onCheckboxChangeFn">
+            <div class="checkbox-fade fade-in-primary">
+              <input type="checkbox" class="cr" name="{{row['ursCode']}}_{{row.selected ? row.selected : false}}"
+                [checked]="row.selected" (change)="row.selected=!row.selected;" />
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="ID">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['ursCode']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="Requirement">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['ursName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Category">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['categoryName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Priority">
+          <ng-template let-row="row" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['priorityName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Testing Required">
+          <ng-template let-row="row" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['testingRequiredText']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Testing Method">
+          <ng-template let-row="row" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row.testingMethod?row.testingMethod:'N/A'}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Specification">
+          <ng-template let-row="row" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['specificationName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="onCloseUrsPopup(true);">Submit</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #draftPdfPreview [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="draftPdfPreview.hide(); this.viewpdf=false;">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <app-draft-pdf *ngIf="viewpdf" [permissionConstant]="this.helper.SP_VALUE" [draftIds]="this.draftIds">
+    </app-draft-pdf>
+  </div>
+</app-modal-basic>
+
+<app-document-status-comment-log #documentcomments></app-document-status-comment-log>
+
+<app-individual-document-forum #forumView [constant]="this.helper.SP_VALUE" [documentList]="this.commentsDocumentsList">
+</app-individual-document-forum>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

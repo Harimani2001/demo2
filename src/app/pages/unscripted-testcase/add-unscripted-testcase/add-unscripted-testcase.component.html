@@ -1,0 +1,752 @@
+<div class="row" *ngIf="showAppCard">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-6">
+          <i class="icofont icofont-law-document bg-c-blue"></i>
+          <div class="d-inline">
+            <h4 class="strong">Unscripted TestCase</h4>
+            <span *ngIf="this.modal.id==0">Add Unscripted TestCase</span>
+            <span *ngIf="this.modal.id!=0">Unscripted TestCase Code : {{this.modal.testCaseCode}}</span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div style="text-align: right;">
+            <a href="javascript:;" class="strong bottom" *ngIf="this.modal.id > 0"
+              (click)="urlchecklist.show();this.referenceFlag =! this.referenceFlag" placement="top"
+              ngbTooltip="Reference"><i class="icofont icofont-link m-r-10"></i></a>
+            <!-- <button type="button"  *ngIf="this.modal.id!=0"
+              class="btn btn-sm btn-primary  waves-effect waves-light m-r-10" (click)="show()">
+              <i class="icofont icofont-video"></i></button> -->
+            <button *ngIf="this.modal.id ==0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();onsubmit(IQTC.valid);">Save</button>
+            <button *ngIf="this.modal.id!=0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();openSuccessUpdateSwal(IQTC.valid);">Update</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" [disabled]="isLoading"
+              (click)="onClickClose()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+    </app-card>
+  </div>
+  <div class="col-sm-12">
+    <br><br><br>
+    <app-card>
+      <form #IQTC="ngForm">
+        <ng-container>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="row">
+                <label class="col-sm-10 col-form-label">URS<span class="asterisk">*</span>
+                  <span class="btn-link m-r-10"><u class="black"
+                      (click)="loadMultipleSelectUrsAndSpec();">Select URS & Specification</u></span>
+                      <span class="btn-link"><u class="black"
+                        (click)="loadMultipleSelectRisk();">Select Risk Assessment</u></span>
+                  <span class="pointer" (click)="this.ursDetailedView = !this.ursDetailedView">&nbsp;<i
+                      [ngClass]="this.ursDetailedView?'fa-minus-square text-danger':'fa-plus-square text-success'"
+                      class="fa" aria-hidden="true"></i></span>
+                </label>
+                <div class="col-sm-12">
+                  <ng-select [ngClass]="'ng-select'" disabled [options]="simpleOption" [multiple]="true"
+                    [(ngModel)]="ursIdsForView"  name="name" rounds="ngModel" required>
+                  </ng-select>
+                  <div class="messages text-danger" *ngIf="this.validateUrs">URS can't be blank</div>
+                </div>
+              </div>
+              <br>
+            </div>
+          </div>
+
+          <app-urs-spec-risk-view *ngIf="this.ursDetailedView" constant="201" [dataList]="this.selectedUrsDetails" backUrl="/Ad-hoc/view-Ad-hoc-testcase"></app-urs-spec-risk-view>
+
+        </ng-container>
+        
+        <table id="AdHoc-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Test Description<span class="asterisk">*</span>:</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <input type="text" [(ngModel)]="modal.description" #description="ngModel" required
+                      class="form-control" name="description" placeholder="sample project" #test="ngModel"
+                      [readonly]="isReadOnly">
+                    <div class="messages text-danger"
+                      *ngIf="(description.touched || submitted) && description.errors?.required">Test description
+                      can't be blank</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Type :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select name="testingType" class="form-control" [(ngModel)]="modal.testingType">
+                      <option value="">Select Type</option>
+                      <option *ngFor="let type of testingTypeList" [value]="type.key">{{type.value}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Environment :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select name="select" class="form-control" [(ngModel)]="modal.environment">
+                      <option value="">Select Environment</option>
+                      <option *ngFor="let data of enviroments" [value]="data.key">{{data.key}}</option>
+                    </select>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Status<span class="asterisk">*</span> : </strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select [(ngModel)]="modal.status" name="status" #status="ngModel" class="form-control" required>
+                      <option value="" disabled selected>Select Status</option>
+                      <option value="NA">NA</option>
+                      <option value="In-Progress">In-Progress</option>
+                      <option value="Pass">Pass</option>
+                      <option value="Fail">Fail</option>
+                    </select>
+                    <div class="messages text-danger" *ngIf="(submitted) && status.errors?.required">Please select the
+                      status
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Test Result :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" [(ngModel)]="modal.expectedResult" rows="2"
+                      name="expectedResult" [readonly]="isReadOnly"> </textarea>
+                  </div>
+                </div>
+              </td>
+              <td colspan="2">
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Business Impact :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" [(ngModel)]="modal.businessImpact" rows="2"
+                    name="businessImpact" [readonly]="isReadOnly"> </textarea>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-container *ngIf="this.modal.id > 0">
+          <div class="form-group row" *ngIf="modal.checklist && modal.checklist.length==0">
+              <div class="col-sm-4"></div>
+              <div class="col-sm-4">
+                  <button type="button" class="btn btn-primary btn-sm" (click)="this.addChecklistItem();">
+                      <i class="icofont icofont-checked"></i>Add Test Steps
+                  </button>
+              </div>
+              <div class="col-sm-4"></div>
+          </div>
+          <ng-container *ngIf="modal.checklist && modal.checklist.length>0">
+              <div class="form-group row">
+                  <div class="col-sm-12"><strong class="strong"> Test Steps</strong> </div>
+                  <div class="col-sm-12">
+                      <div id="check-list-drag-id" class="panel panel-default" dnd-sortable-container [sortableData]="modal.checklist"
+                          droppable [dropScope]="[]">
+                          <table id="testcase-table-checkList" class="table">
+                              <thead  class="panel-heading">
+                                  <tr class="w-100">
+                                      <td class="w-5"><label class="strong">S No.</label></td>
+                                      <td class="w-5"><label class="strong">Select</label></td>
+                                      <td class="w-20"><label class="strong">Test Steps</label></td>
+                                      <td class="w-20"><label class="strong">Expected Result</label></td>
+                                      <td class="w-20"><label class="strong">Actual Result</label></td>
+                                      <td class="w-10"><label class="strong">Status</label></td>
+                                      <td class="w-10"><label class="strong">Upload Screenshots</label></td>
+                                      <td class="w-20"><label class="strong">Remarks</label></td>
+                                      <td class="w-5"><label class="strong">Actions</label></td>
+                                  </tr>
+                              </thead>
+                              <tbody class="panel-body">
+                                  <ng-container >
+                                      <tr *ngFor="let checkList of modal.checklist; let i = index">
+                                          <td>
+                                              <label placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Test Steps Order">{{i+1}} </label>
+                                          </td>
+                                          <td>
+                                            <div class="checkbox-fade fade-in-primary">
+                                                <label>
+                                                    <input type="checkbox" name="{{checkList.checklistName}}"
+                                                        [checked]="checkList.completedFlag"
+                                                        (change)="checkList.completedFlag=!checkList.completedFlag;" />
+                                                    <span class="cr"><i
+                                                            class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                          <td>
+                                              <input type="text" id="check_list_name_id_{{i}}" autofocus class="form-control" [(ngModel)]="checkList.checklistName" name="checklistName-{{i}}"
+                                                  (ngModelChange)="onChangecheckList()" [ngModelOptions]="{standalone: true}" />
+                                          </td>
+                                          <td>
+                                              <textarea class="form-control" [ngModelOptions]="{standalone: true}" name="expectedResult-{{i}}"
+                                                  [(ngModel)]="checkList.expectedResult" rows="2"></textarea>
+                                          </td>
+                                          <td>
+                                            <textarea class="form-control" [ngModelOptions]="{standalone: true}" name="actualResult-{{i}}"
+                                                [(ngModel)]="checkList.actualResult" rows="2"></textarea>
+                                        </td>
+                                        <td> <select [(ngModel)]="checkList.status" name="{{checkList.checklistName}}{{i}}"
+                                          (ngModelChange)="onChangestatus($event,checkList)" class="form-control">
+                                          <option value="" disabled selected>Status</option>
+                                          <option value="NA">NA</option>
+                                          <option value="In-Progress">In-Progress</option>
+                                          <option value="Pass">Pass</option>
+                                          <option value="Fail">Fail</option>
+                                      </select></td>
+                                      <td (paste)="copyChecklistImage($event,checkList)">
+                                        <div class="row">
+                                            <div class="col-sm-2 text-center">
+                                                <input class="d-none" #checkListFileInput type="file" accept=".png,.jpg"
+                                                    multiple id="upload_button_{{i}}"
+                                                    (change)="onChangeCheckListImage($event,checkList)" />
+                                                <label for="upload_button_{{i}}" placement="top" container="body"
+                                                    ngbTooltip="Upload Images"><i
+                                                        class="icofont icofont-plus-circle"></i></label>
+                                            </div>
+                                            <div class="col-sm-4 m-r-10">
+                                               Ctrl + V
+                                            </div>
+                                            <div class="col-sm-2 text-center">
+                                                <a *ngIf="checkList.filesCount > 0" (click)="showCheckListModal(checkList);"
+                                                    placement="top" container="body" [ngbTooltip]="checkList.filesCount + ' image added'"><i
+                                                        class="icofont icofont-eye-alt" aria-hidden="true">&nbsp;</i></a>
+                                            </div>
+                                          <div class="col-sm-2 text-center">
+                                            <a style="color: black;" ngbTooltip="Reorder Images" *ngIf="checkList.filesCount > 0" href="javascript:" (click)="checklistImagesReOrderModal.show();onclickReOrderChecklistImages(checkList);">
+                                                <i class="icofont icofont-retweet"></i>
+                                            </a>
+                                          </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <textarea class="form-control" [(ngModel)]="checkList.remarks" (blur)="updateValue(checkList)"
+                                            name="remarks-{{i}}" rows="2"></textarea></td>
+                                          <td>
+                                              <a class="pointer m-r-10" role="button" title="Add Test Steps" (click)="addChecklistItem(checkList);">
+                                                  <i class="icofont icofont-ui-add text-success"></i></a>
+                                              <a  class="pointer m-r-10" style="color: black;" href="javascript:" (click)="saveTestStep(checkList);">
+                                                    <i class="icofont icofont-save"></i>
+                                              </a>
+                                              <a class="pointer" role="button" title="Delete" (click)="deleteCheckList(checkList);onChangecheckList()">
+                                                  <i class="icofont icofont-ui-delete text-danger"></i></a>
+                                          </td>
+                                      </tr>
+                                  </ng-container>
+                              </tbody>
+                          </table>
+                         
+                      </div>
+                  </div>
+                  <div class="col-sm-12">
+                      <div class="messages text-danger" *ngIf="isCheckListEntered">Please Fill the Details to Continue . . .
+                      </div>
+                      <div class="messages text-danger" *ngIf="this.isValidDocumentOrder">Display Order can't be Duplicate . .
+                          .
+                          <br>
+                      </div>
+                  </div>
+              </div>
+          </ng-container>
+      </ng-container>
+      <div class="form-group row" *ngIf="this.modal.id > 0">
+        <label class="col-sm-2 col-form-label">Upload Image</label>
+        <div class="col-sm-8 pt-3">
+            <div class="row">
+                <div class="col-sm-12">
+                    <label for="file-upload-main" class="btn btn-info btn-sm mb-0"> <input #imageUpload type="file" accept=".png,.jpg"
+                            id="file-upload-main" multiple (change)="onFileChangeLargeImage($event)" class="d-none">
+                        <i class="icofont icofont-image"></i>
+                        {{this.processedImages.length > 0?'Add Images':'Choose images'}}</label>
+                    <input type="text" id="main-paste-id" class="paste paste-color" placeholder="Paste here!"
+                        (paste)="copyImageToClipboard($event)" />
+
+                    <a *ngIf="modal.imagesCount > 0" (click)="modalSmall.show();loadTestcaseImages()"
+                          placement="top" container="body" [ngbTooltip]="modal.imagesCount + ' image added'"><i
+                          class="icofont icofont-eye-alt m-l-10" style="font-size: 25px;" aria-hidden="true">&nbsp;</i></a>
+                    <a style="color: black;" ngbTooltip="Reorder Images" *ngIf="modal.imagesCount > 0"href="javascript:" class="m-l-10" (click)="imagesReOrderModal.show();loadReorderImages();">
+                              <i style="font-size: 25px;" class="icofont icofont-retweet"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+        <div class="form-group row">
+          <app-file-upload-for-doc #fileupload [multiple]=true [onlyView]=false
+            [uniqueCodeForAudit]="this.modal.testCaseCode" [documentId]="this.receivedId" [update]="true"
+            [documentCode]="this.helper.Unscripted_Value" (onTCFileChange)="onTCFileChange($event,false)" (onTCFileDelete)="onTCFileDelete($event)"></app-file-upload-for-doc>
+        </div>
+
+        <div *ngIf="this.inputField">
+          <app-form-extended #formExtendedId [(inputField)]='inputField' [documentId]="this.helper.Unscripted_Value"
+            [(submitted)]='submitted'></app-form-extended>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #ursAndSpecificationModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select URS & Specification</h4>
+    <button type="button" class="close basic-close" (click)="onCloseUrsAndSpecPopup(false);">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" *ngIf="ursAndSpecificationModal.visible">
+    <div class="dt-desc" style="padding: 0px;">
+      <div style="padding-left: 0px;" class="row" class="col-sm-12">
+        <label style="float: right;"> Search :
+          <input type="search" [(ngModel)]="filterQuery" class="form-control input-sm full-data-search"
+            placeholder="search"></label>
+        <br><br>
+      </div>
+
+      <ngx-datatable #selectDataTable id="parentCustomTable" class="data-table dt-chk" [limit]="10"
+        [rows]='ursAndSpecList | ursAndSpecificationFilter : filterQuery' [columnMode]="'force'" [headerHeight]="50"
+        [footerHeight]="50" [rowHeight]="'auto'">
+        <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+            <div *ngIf="row.childList && row.childList.length>0" class="dt-desc">
+
+              <ngx-datatable #specChildTable id="childCustomTable" class="data-table dt-chk" style="overflow: unset!important;"
+                [rows]='row.childList' [limit]="10" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+                [rowHeight]="'auto'">
+                <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+                  [draggable]="false" [resizeable]="false">
+                  <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                    let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                    <div class="checkbox-fade fade-in-primary">
+                      <label>
+                        <input type="checkbox" name="{{row['code']}}" [checked]="row.selected"
+                          (change)="selectSpec(row)" />
+                        <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                      </label>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Code">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['code']}}</ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="550" [canAutoResize]="false" [sortable]="true" name="Description">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['description']}}</ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="150" [canAutoResize]="true" [sortable]="true" name="Status">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['status']}}</ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Risk #">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['riskCount']}}</ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Test #">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['testCaseCount']}}</ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </div>
+          </ng-template>
+        </ngx-datatable-row-detail>
+
+        <ngx-datatable-column [resizeable]="true" [width]="30" [sortable]="false" [draggable]="false"
+          [canAutoResize]="false">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <a *ngIf="row.childList && row.childList.length>0" href="javascript:;"
+              [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded"
+              title="Expand/Collapse Row" (click)="toggleExpandRow(row)"></a>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row" let-isSelected="isSelected"
+            let-onCheckboxChangeFn="onCheckboxChangeFn">
+            <div class="checkbox-fade fade-in-primary">
+              <label>
+                <input type="checkbox" name="{{row['code']}}" [checked]="row.selected"
+                  (change)="selectURS(row)" />
+                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+              </label>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Code">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['code']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="300" [canAutoResize]="false" [sortable]="true" name="Requirement">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['description']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Testing Required">
+          <ng-template let-row="row" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['testingRequiredText']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Testing Method">
+          <ng-template let-row="row" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row.testingMethod?row.testingMethod:'N/A'}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="150" [canAutoResize]="true" [sortable]="true" name="Status">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['status']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Spec #">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['specCount']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Risk #">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['riskCount']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Test #">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['testCaseCount']}}</ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="onCloseUrsAndSpecPopup(true);">Submit</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #riskModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+      <h4 class="modal-title">Select Risk Assessment</h4>
+      <button type="button" class="close basic-close" (click)="onCloseRiskPopup(false);">
+          <span aria-hidden="true">&times;</span>
+      </button>
+  </div>
+  <div class="app-modal-body" *ngIf="riskModal.visible">
+      <div class="dt-desc" style="padding: 0px;">
+          <div style="padding-left: 0px;" class="row" class="col-sm-12">
+              <label style="float: right;"> Search :
+                  <input type="search" [(ngModel)]="filterQuery" class="form-control input-sm full-data-search"
+                      placeholder="search"></label><br><br>
+          </div>
+          <ngx-datatable [scrollbarV]="false" [scrollbarH]="true" id="parentCustomTable" class="data-table dt-chk"
+              [rows]='riskList| RiskFilterPipe : filterQuery' [limit]="10" [columnMode]="'force'" [headerHeight]="50"
+              [footerHeight]="50" [rowHeight]="'auto'">
+              <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+                  [draggable]="false" [resizeable]="false">
+                  <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                      let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                      <div class="checkbox-fade fade-in-primary">
+                          <label>
+                              <input type="checkbox" name="{{row['assessmentCode']}}" [checked]="row.selected"
+                                  (change)="row.selected=!row.selected; onDeSelectRisk(row)" />
+                              <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                          </label>
+                      </div>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="ID">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong>{{row['assessmentCode']}}</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="Status">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong>{{row['status']}}</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Risk Factor">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong>{{row['riskFactor']}}</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Prob of Occurance">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['probabilityOfOccurance']}}({{row['probabilityOfOccuranceName']}})</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="Severity">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['severity']}}({{row['severityName']}})</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="Detectability">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['detectability']}}({{row['detectabilityName']}})</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="RPN Number">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['rpn']}}</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="Criticality">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['critical']}}</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column style="font-weight: bold;" name="Priority">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;"
+                          [ngStyle]="{'background-color': row['priorityColor'] }" class="badge"
+                          style="width: 100px;font-size:15px;color: black;">{{row['priorityName']}}</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Mapped To">
+                  <ng-template let-row="row" ngx-datatable-cell-template> <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['riskMappedItems']}}</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+          </ngx-datatable>
+      </div>
+  </div>
+  <div class="app-modal-footer">
+      <button type="button" class="btn btn-default waves-effect" (click)="onCloseRiskPopup(true);">Submit</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalSmall [dialogClass]="'modal-xl'">
+  <div class="loading-spinner" *ngIf="spinnerFlag">
+    <span class="loading-spinner-msg-align">Processing</span>
+  </div>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Image View</h4>
+    <a class="modal-delete-icon pointer" role="button" (click)="deleteSlide();"><i class="fa fa-trash delete"></i></a>
+    <button type="button" class="close basic-close"
+      (click)="modalSmall.hide();this.loadDataById();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-1 pr-5 text-right">
+        <a class="arrow-button" role="button" (click)="plusSlides(-1)">&#10094;</a>
+      </div>
+      <div class="col-sm-10" width="100%">
+        <ng-container *ngFor="let data of processedImages;let in = index">
+          <img *ngIf="data.visible == true" src="{{data.imageDataUrl}}" width="100%" height="400" alt="No Image" />
+        </ng-container>
+      </div>
+      <div class="col-sm-1 text-left">
+        <a class="arrow-button" role="button" (click)="plusSlides(1)">&#10095;</a>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect"
+      (click)="modalSmall.hide()"><i class="icofont icofont-close"></i>Close</button>
+  </div>
+  </app-modal-basic>
+
+  <app-modal-basic #urlchecklist [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+    <div class="app-modal-header">
+        <h4 class="modal-title">Reference</h4>
+        <button type="button" class="close basic-close" (click)="closereference(modal.urlChecklist)">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="app-modal-body" *ngIf="this.referenceFlag">
+        <app-urlchecklist #checkListURL [checkList]="modal.urlChecklist"></app-urlchecklist>
+    </div>
+    <div class="app-modal-footer">
+        <button type="button" class="btn btn-default waves-effect"
+            (click)="saveReference(modal.urlChecklist)">Submit</button>
+        <button type="button" class="btn btn-default waves-effect"
+            (click)="closereference(modal.urlChecklist)">Close</button>
+    </div>
+</app-modal-basic>
+
+<app-modal-basic #checkListImageModal [dialogClass]="'modal-xl'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Image View</h4>
+    <a class="modal-delete-icon pointer" role="button" (click)="deleteCheckListSlide();"><i class="fa fa-trash delete"></i></a>
+    <button type="button" class="close basic-close"
+      (click)="checkListImageModal.hide();this.loadDataById();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+<div class="app-modal-body">
+    <div class="row">
+        <div class="col-sm-1 pr-5 text-right">
+            <a class="arrow-button" role="button" (click)="plusCheckListSlides(-1)">&#10094;</a>
+        </div>
+        <div class="col-sm-10" width="100%">
+            <ng-container *ngFor="let file of processedChecklistImages;let in = index">
+                <img *ngIf="file.visible" src="{{file.imageDataUrl}}" width="100%" height="400" alt="No Image" />
+            </ng-container>
+        </div>
+        <div class="col-sm-1 text-left">
+            <a class="arrow-button" role="button" (click)="plusCheckListSlides(1)">&#10095;</a>
+        </div>
+    </div>
+</div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect"
+      (click)="checkListImageModal.hide()"><i class="icofont icofont-close"></i>Close</button>
+  </div>
+  </app-modal-basic>
+
+  <app-modal-basic id="modal-lg-60" #imagesReOrderModal [hideHeader]="false" [hideFooter]="false"
+	[dialogClass]="'modal-lg'">
+	<div class="app-modal-header">
+		<h4 class="modal-title strong">Update Order</h4>
+		<button type="button" class="close basic-close"
+			(click)="imagesReOrderModal.hide(); this.viewpdf=false;">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="app-modal-body" style="height: 500px; overflow-y: scroll;">
+		<div>
+			<div class="panel panel-default" dnd-sortable-container [sortableData]="this.processedImages"
+				droppable>
+				<div class="panel-heading"><strong>
+						<div class="row">
+							<div class="col-sm-6"> Image</div>
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-3">Order</div>
+						</div>
+					</strong>
+				</div>
+				<div class="panel-body">
+					<ng-container *ngFor="let data of this.processedImages; let i = index;">
+						<li [draggable] dnd-sortable [sortableIndex]="i"
+							(onDragSuccess)="reOrderImages(this.processedImages)" [dragData]="data"
+							class="list-group-item">
+							<div class="row">
+								<div class="col-sm-6">
+                                    <img src="{{data.imageDataUrl}}" width="30%" height="50"
+                                    alt="No Image" />
+                                </div>
+                                <div class="col-sm-3"> <a *ngIf="i!=0" container="body" placement="top"
+                                    triggers="mouseenter:mouseleave" ngbTooltip="Move Up"
+                                    (click)="moveUpOrDown(this.processedImages,i,true)">
+                                    <i class="icofont icofont-arrow-up "></i>
+                                </a>
+                                <a *ngIf="i!=(this.processedImages.length-1)" container="body"
+                                    placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Move Down"
+                                    (click)="moveUpOrDown(this.processedImages,i,false);">
+                                    <i class="icofont icofont-arrow-down "></i>
+                                </a>
+                            </div>
+								<div class="col-sm-3">{{data.fileName}} {{data.displayOrder}}</div>
+							</div>
+
+						</li>
+					</ng-container>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class="form-group row">
+			<div class="col-sm-12 text-center">
+                <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                (click)="imagesReOrderModal.hide();saveReOrderImages()">Submit
+				</button>
+			</div>
+		</div>
+	</div>
+</app-modal-basic>
+
+<app-modal-basic id="modal-lg-60" #checklistImagesReOrderModal [hideHeader]="false" [hideFooter]="false"
+	[dialogClass]="'modal-lg'">
+	<div class="app-modal-header">
+		<h4 class="modal-title strong">Update Order</h4>
+		<button type="button" class="close basic-close"
+			(click)="checklistImagesReOrderModal.hide(); this.viewpdf=false;">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="app-modal-body" style="height: 500px; overflow-y: scroll;">
+		<div>
+			<div class="panel panel-default" dnd-sortable-container [sortableData]="this.processedChecklistImages"
+				droppable>
+				<div class="panel-heading"><strong>
+						<div class="row">
+							<div class="col-sm-6"> Image</div>
+                            <div class="col-sm-3"></div>
+                            <div class="col-sm-3">Order</div>
+						</div>
+					</strong>
+				</div>
+				<div class="panel-body">
+					<ng-container *ngFor="let data of this.processedChecklistImages; let i = index;">
+						<li [draggable] dnd-sortable [sortableIndex]="i"
+							(onDragSuccess)="reOrderChecklistImages(this.processedChecklistImages)" [dragData]="data"
+							class="list-group-item">
+							<div class="row">
+								<div class="col-sm-6">
+                                    <img src="{{data.imageDataUrl}}" width="30%" height="50"
+                                    alt="No Image" />
+                                </div>
+                                <div class="col-sm-3"> <a *ngIf="i!=0" container="body" placement="top"
+                                    triggers="mouseenter:mouseleave" ngbTooltip="Move Up"
+                                    (click)="moveUpOrDown(this.processedChecklistImages,i,true)">
+                                    <i class="icofont icofont-arrow-up "></i>
+                                </a>
+                                <a *ngIf="i!=(this.processedChecklistImages.length-1)" container="body"
+                                    placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Move Down"
+                                    (click)="moveUpOrDown(this.processedChecklistImages,i,false);">
+                                    <i class="icofont icofont-arrow-down "></i>
+                                </a>
+                            </div>
+								<div class="col-sm-3">{{data.fileName}}  {{data.displayOrder}}</div>
+							</div>
+
+						</li>
+					</ng-container>
+				</div>
+			</div>
+		</div>
+		<br>
+		<div class="form-group row">
+			<div class="col-sm-12 text-center">
+                <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                (click)="onSubmitChecklistImagesOrder();checklistImagesReOrderModal.hide();">Submit
+				</button>
+			</div>
+		</div>
+	</div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

@@ -1,0 +1,57 @@
+<div  class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <app-card>
+        <div class="page-header-title">
+          <i class="icofont icofont-key-hole bg-c-blue"></i>
+          <div class="d-inline">
+            <h4>Date Format Settings</h4>
+            <span>Date Format For Organization</span>
+          </div>
+        </div>
+      </app-card>
+      <form [formGroup]="onDateForm">
+        <div class="form-group row ">
+          <label class="col-sm-2 col-form-label">Select TimeZone</label>
+          <div class="col-sm-10">
+            <ng-select [ngClass]="'ng-select'" required name="TimeZone"  aria-placeholder="Select TimeZone"  [options]="timeZoneList" [multiple]="false" (ngModelChange)="onChangeDateFormat()" formControlName="timeZone"></ng-select>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label class="col-sm-2 col-form-label">Select Date Format</label>
+          <div class="col-sm-10">
+            <select *ngIf="!isSelectedOtherFormat" name="dateFormat" class="form-control" formControlName="dateFormat" (change)="onChangeDateFormat()">
+              <option value="" disabled>Select Date Format</option>
+              <option *ngFor="let format of dateFormatList" [ngValue]="format.value">{{format.value}}</option>
+              <option value="Other">Other</option>
+            </select>
+            <input *ngIf="isSelectedOtherFormat" type="text" name="code" class="form-control" placeholder="type the Date format" formControlName="dateFormat" maxlength="50"
+                   (ngModelChange)="onTypeDateFormat()">
+            <label>&nbsp;&nbsp;&nbsp;Date: {{convertedDate}}</label>
+            <div class="messages text-danger" *ngIf="isValidDateFormat">Invalid Date Format</div>
+          </div>
+        </div>
+        <div class="form-group row ">
+          <label class="col-sm-4 col-form-label">Select Date Format For Datepicker</label>
+          <div class="col-sm-10">
+            <select  name="datePattern" class="form-control" formControlName="datePattern" (change)="onChangePickerFormat()">
+              <option *ngFor="let format of datePatternList" [ngValue]="format.value">{{format.label}}</option>
+              </select>
+              <label>&nbsp;&nbsp;&nbsp;Datepicker Date: {{pattern}}</label>
+          </div>
+        </div>
+        <br>
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <div>
+              <button *ngIf="!isValidDateFormat" type="button" class="btn btn-success" [disabled]="!(onDateForm.valid && permissionModal.updateButtonFlag)" (click)="saveOrgDateFormat();">
+                <i class="icofont icofont-save"></i>Update
+              </button>&nbsp;
+            </div>
+          </div>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

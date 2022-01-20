@@ -1,0 +1,455 @@
+<body class="main">
+  <div class="navigation-wrap pt-0 pb-0 start-header start-style">
+    <nav *ngIf="this.isloading==true" class="navbar navbar-expand-xl p-0 navbar-light goval-bg-color">
+
+      <a *ngIf="!this.isApplicationAdmin && this.currentUser" [routerLink]="['/MainMenu']" routerLinkActive="active"
+        class="menupics float-left">
+        <img class="img-170 p-t-10 p-b-10 p-l-20 p-r-30" src="/assets/images/GoVal_Logo.png" alt="GoVal">
+      </a>
+      <a *ngIf="this.isApplicationAdmin && this.currentUser" class="menupics float-left">
+        <img class="img-170 p-t-10 p-b-10 p-l-20 p-r-30" src="/assets/images/GoVal_Logo.png" alt="GoVal">
+      </a>
+
+      <a *ngIf="!this.isApplicationAdmin && projectPermission.createButtonFlag && projectCountFlag" href="javascript:" class="nav-link m-l-40 m-r-20"
+        (click)="onClickCreateProject();" alt="Create Project" placement="bottom" ngbTooltip="Create Project">
+        <i class="fa fa-plus-circle"></i>
+      </a>
+
+      <label *ngIf="!this.isApplicationAdmin && this.currentUser" class="project-link text-overflow-dots">
+        <span class="text-link" (click)="showProjectModal();">{{this.currentUser.projectName}}</span>
+      </label>
+
+      <button class="navbar-toggler float-right p-t-10" type="button" data-toggle="collapse"
+        data-target="#navbarSupportedContent,#navbarSupportedContent2" aria-controls="navbarSupportedContent"
+        aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav container ml-auto flex-direction-row justify-content-end">
+
+          <li *ngIf="!this.isApplicationAdmin" class="nav-item m-r-20">
+            <div class="dropdown-container">
+              <input *ngIf="!this.isApplicationAdmin" type="text" maxlength="40" class="search-box m-r-20"
+                data-dropdown="searchMenu" [(ngModel)]="searchText" (keyup)="onKeyPress($event);"
+                (ngModelChange)="getFilteredList();" (keyup.enter)="moduleSearch();"
+                (click)="openSearchDropdown($event);" placeholder="&#61442;&nbsp;Search">
+              <ul *ngIf="filteredList && filteredList.length>0" class="dropdown" id="search_dropdown" name="searchMenu"
+                style="width: 100%;">
+                <div class="notification-group notification-tab">
+                  <div *ngFor="let item of filteredList;let i = index;" id="search-item" (click)="selectItem(i);"
+                    [ngClass]="{'search-selected': i===selectedIndex}">{{item}}</div>
+                </div>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item m-r-20" *ngIf="!this.isApplicationAdmin">
+            <a *ngIf="!this.isApplicationAdmin" href="javascript:" class="nav-link showdefinition"
+              [routerLink]="['/MainMenu']">
+              <img class="image-radius rounded-0 img-15" src="assets/icon/png-icons/project.png" alt="Workspace"
+                placement="bottom" ngbTooltip="Workspace">
+            </a>
+          </li>
+
+          <li class="nav-item m-r-20" *ngIf="!this.isApplicationAdmin && this.isViewDashboard">
+            <a *ngIf="!this.isApplicationAdmin" href="javascript:" class="nav-link showdefinition"
+              [routerLink]="['/dashboard']">
+              <img class="image-radius rounded-0 img-15" src="assets/icon/png-icons/dashBoardNav.png" alt="Dashboard"
+                placement="bottom" ngbTooltip="Dashboard">
+            </a>
+          </li>
+
+          <li class="nav-item m-r-20" *ngIf="!this.isApplicationAdmin && this.isViewDocumentApproval">
+            <a *ngIf="!this.isApplicationAdmin" href="javascript:" class="nav-link showdefinition"
+              [routerLink]="['/documentapprovalstatus']">
+              <img class="image-radius rounded-0 img-15" src="assets/icon/png-icons/docApprovalStatus.png" alt="eSign"
+                placement="bottom" ngbTooltip="eSign">
+            </a>
+          </li>
+
+          <!-- this for application Admin -->
+          <ng-container *ngIf="this.isApplicationAdmin">
+            <li class="nav-item m-r-20">
+              <a class="nav-link showdefinition" [routerLink]="['/organization/view-organization']">Organization</a>
+            </li>
+
+            <li class="nav-item m-r-20">
+              <a class="nav-link showdefinition" [routerLink]="['/smtpMasterSetup']">Email Configuration</a>
+            </li>
+
+            <li class="nav-item m-r-20">
+              <a class="nav-link showdefinition" [routerLink]="['/templatelibrary/view-template']">Template Library</a>
+            </li>
+
+            <li class="nav-item m-r-20">
+              <a class="nav-link showdefinition" [routerLink]="['/templatebuilder']">Email Template</a>
+            </li>
+
+            <li class="nav-item m-r-20">
+              <a class="nav-link showdefinition" [routerLink]="['/knowledgeBase/add-knowledgeBase']">Knowledge
+                Base</a>
+            </li>
+
+            <li class="nav-item m-r-20">
+              <a class="nav-link showdefinition" [routerLink]="['/emailRule']">Email Rule</a>
+            </li>
+
+            <li class="nav-item m-r-20">
+              <a class="nav-link showdefinition" [routerLink]="['/look-up/lookup-item']">Look&nbsp;Up</a>
+            </li>
+
+            <li class="nav-item m-r-20">
+              <a class="nav-link showdefinition" [routerLink]="['/error-logs']">Error&nbsp;Logs</a>
+            </li>
+          </ng-container>
+
+          <li *ngIf="!this.isApplicationAdmin" class="nav-item m-r-20">
+            <a class="nav-link" [routerLink]="['/search']">
+              <i class="fa fa-search"></i>
+            </a>
+          </li>
+
+          <li *ngIf="!this.isApplicationAdmin" class="nav-item m-r-20">
+            <div class="dropdown-container">
+              <a href="#" (click)="opennotificationdropdown($event)" data-dropdown="notificationMenu"
+                class="nav-link has-notifications circle">
+                <i class="fa fa-bell"> <span *ngIf="getMapSize(this.notificationList)!=0"
+                    class="badge notificationbadge">{{getMapSize(this.notificationList)}}</span></i>
+              </a>
+              <ul class="dropdown" name="notificationMenu" *ngIf="null!=this.notificationList">
+                <li class="notification-group" *ngFor="let data of this.notificationList | mapFilter">
+                  <div (click)="ovenenvelope($event)" class="notification-tab">
+                    <div class="row">
+                      <div class="col-sm-2"><i class="fa fa-flag"></i></div>
+                      <div class="col-sm-8" style="padding-top: 20px;"><label class="f-12">{{data.key}}</label></div>
+                      <div class="col-sm-2"><span class="label label-primary">{{ data.value.length}}</span></div>
+                    </div>
+                  </div>
+                  <ul class="notification-list">
+                    <li class="alert notification-list-item" *ngFor="let item of data.value; let i=index"
+                      style="padding: 0px !important; margin-bottom: 0px !important;">
+                      <div role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false"
+                        style="padding: 5%;">
+                        <div *ngIf="item.documentCode">
+                          <div class="toast-header">
+                            <span *ngIf="item.subFormGroupName!=''">{{item.subFormGroupName}}&nbsp;&nbsp;<br></span>
+                            <strong class="mr-auto"><a (click)="routeToUrl(item)">
+                                {{item.documentCode}}</a></strong>
+                            <button (click)="item.deleteFlag='Y'; viewedFlagForsinglenotification(item,data.value, i);"
+                              type="button" class="ml-2 mb-1 close" data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                        </div>
+                        <button *ngIf="!item.documentCode"
+                          (click)="item.deleteFlag='Y'; viewedFlagForsinglenotification(item,data.value, i);"
+                          type="button" class="ml-2 mb-1 close" data-dismiss="alert" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                        <div class="f-12" style="padding-left: 5px;"><small>{{item.createdTime}} ago</small></div>
+                        <div (click)="routeToUrl(item)" class="f-14" style="padding-left: 5px;">
+                          {{item.projectName}}
+                          <br>{{item.message}}
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </li>
+
+                <li class="notification-group" *ngIf="getMapSize(this.notificationList)==0">
+                  <div class="notification-tab">
+                    <i class="fa fa-flag"></i>
+                    <label class="f-15 ">No notification</label>
+                  </div>
+                </li>
+
+                <li>
+                  <div style="text-align: center;">
+                    <strong class="mr-auto"><a href="" [routerLink]="['/notification']">View All</a></strong>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </li>
+
+          <li class="nav-item  m-r-20">
+            <a class="nav-link" (click)="onClick();"> <i class="icofont icofont-question-circle"></i></a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink-4" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i> </a>
+            <div class="dropdown-menu dropdown-menu-right dropdown-cyan" aria-labelledby="navbarDropdownMenuLink-4"
+              style="padding: 12px;position: absolute;">
+              <span>{{this.userName}}</span> - <b>{{this.roleName}}</b><br>
+              <a *ngIf="!isApplicationAdmin" class="dropdown-item" (click)="showProjectModal()"><i
+                  class="ti-layout-sidebar-left"></i>Change Project</a>
+              <a class="dropdown-item" [routerLink]="['/user/profile']"><i class="ti-user"></i>View Profile</a>
+              <a *ngIf="isViewOrgProfile" class="dropdown-item" [routerLink]="['/user/org-profile']"><i
+                  class="fa fa-users"></i>Org Profile</a>
+              <a class="dropdown-item" [routerLink]="['/changePassword']"><i class="icofont icofont-key"></i>Change
+                Password</a>
+              <a class="dropdown-item" [routerLink]="['/knowledgeBase/view-knowledgeBase']"><i
+                  class="icofont icofont-question-circle"></i>Help</a>
+              <a class="dropdown-item" [routerLink]="['/support']"><i
+                  class="icofont icofont-question-circle"></i>Support</a>
+              <a class="dropdown-item" (click)="logOut();"><i class="fa fa-sign-out"></i>Logout</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </div>
+
+  <div class="my-5">
+    <div class="inner-content">
+      <div class="main-body">
+        <div class="page-wrapper">
+          <router-outlet>
+            <app-spinner></app-spinner>
+          </router-outlet>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <a *ngIf="this.taskEnbleFlag == true && this.isApplicationAdmin==false" class="float pointer"
+    (click)="loadTaskDetails();">
+    <img src="/assets/images/Task_logo.png" style="max-width: 25px; max-height: 25px;" class="my-float">
+  </a>
+</body>
+
+<app-modal-basic style="height: 100%;" #modalLarge [dialogClass]="'modal-lg'" class="modal-dialog">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Help</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="400px" size="9px"
+    color="#737373" opacity="0.6" allowPageScroll="false">
+    <div style="height: 400px;">
+      <div class="row">
+        <div class="col-sm">
+          <p class="text-muted" [innerHtml]="content">
+          </p>
+        </div>
+        <div class="col-sm">
+          <app-file-upload-for-doc #fileuploadAdmin [multiple]=true [onlyView]=true [documentId]="this.receivedId"
+            [update]="false" [documentCode]="this.config.helper.KNOWLEDGEBASE"></app-file-upload-for-doc>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalLarge.hide();">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #videoModalSmall [hideHeader]="false" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5>Screen Record</h5>
+    <button type="button" class="close basic-close-light-box" (click)="closeView();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body modal-view-scroll-y modal-body-for-video" id="videoBody">
+    <div id="mainElement" [ngStyle]="{'display': mainElementDisplay? 'none' : 'block' }">
+      <div class="row">
+        <div class="col-sm-6 form-group">
+          <select class="recording-media form-control">
+            <option value="record-screen">Full Screen</option>
+            <option value="record-audio-plus-screen">Microphone+Screen</option>
+          </select>
+        </div>
+        <div class="col-sm-6 form-group">
+          <select class="media-container-format form-control">
+            <option>default</option>
+            <option>vp8</option>
+            <option>vp9</option>
+            <option>h264</option>
+            <option>mkv</option>
+          </select>
+        </div>
+      </div>
+      <div class="row" style="display: none;">&nbsp;&nbsp;
+        <div class="col-sm-2 form-group">
+          <input type="checkbox" id="chk-timeSlice" title="Use intervals based recording" />
+          <label for="chk-timeSlice" title="Use intervals based recording">Use timeSlice?</label>
+        </div>
+        <div class="col-sm-2 form-group">
+          <input type="checkbox" id="chk-fixSeeking" title="Fix video seeking issues?">
+          <label for="chk-fixSeeking" title="Fix video seeking issues?">Fix Seeking Issues?</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4 form-group">
+          <select class="media-resolutions form-control">
+            <option value="default">Default resolutions</option>
+            <option value="640x480">480p</option>
+            <option value="1920x1080">1080p</option>
+            <option value="1280x720">720p</option>
+          </select>
+        </div>
+        <div class="col-sm-4 form-group">
+          <select class="media-framerates form-control">
+            <option value="default">Default framerates</option>
+            <option value="15">15 fps</option>
+            <option value="5">5 fps</option>
+            <option value="24">24 fps</option>
+            <option value="30">30 fps</option>
+            <option value="60">60 fps</option>
+          </select>
+        </div>
+        <div class="col-sm-4 form-group">
+          <select class="media-bitrates form-control">
+            <option value="default">Default bitrates</option>
+            <option value="800000000">100 MB bps</option>
+            <option value="800000">100 KB bps</option>
+            <option value="8000">1 KB bps</option>
+            <option value="800">100 Bytes bps</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-3 form-group">
+          <button id="btn-start-recording" class="btn btn-primary" (click)="videoModalSmall.hide()">Start
+            Recording</button>&nbsp;&nbsp;
+          <button id="btn-pause-recording" class="btn btn-warning"
+            style="display: none; font-size: 15px;">Pause</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div id="videoViewTag" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px"
+        color="#999" opacity="0.6" allowPageScroll="false">
+        <div class="col-sm-12" id="videoPlayer">
+          <video src="" style="display: none;" id="video_iframe" height="400" width="100%" controls="true" autoplay
+            muted></video>
+          <video srcObject="" id="gum" style="display: none;" width="100%" autoplay muted></video>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-success" *ngIf="showSuccessMsg">
+      <strong>Upload Successfully! </strong> Video has been uploaded for document
+      <strong>{{this.documentName}}.</strong>
+    </div>
+
+    <div class="row" id="saveButton" [ngStyle]="{'display': mainElementDisplay? 'block' : 'none' }">
+      <div style="display: none;" class="col-sm-6 form-group">
+        <button id="save-to-disk" class="btn btn-primary btn-sm waves-effect waves-light m-r-10"><i
+            class="icofont icofont-download"></i>Save To Disk</button>&nbsp;&nbsp;&nbsp;
+        <button id="upload-to-test-case" class="btn btn-primary btn-sm waves-effect waves-light m-r-10"
+          (click)="uploadFile()"><i class="icofont icofont-upload-alt"></i>Upload</button>&nbsp;&nbsp;&nbsp;
+        <button id="btn-start-show" style="display: none;"
+          class="btn btn-primary btn-sm waves-effect waves-light m-r-10" (click)="scrollToViewVideo();">Start
+          Recording</button>
+      </div>
+    </div>
+    <div style="display: none;" id="recording-player"></div>
+  </div>
+</app-modal-basic>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic id="app-modal" style="background-color:#fff;" #modalSmallProjectGlobal [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <div class="row">
+      <div class="col-sm-6">
+        <select name="select" class="form-control" id="locationConfigurationId" required name="location"
+          #globallocation="ngModel" (change)="loadProjects();" [(ngModel)]="this.location">
+          <option value="0">Select Location</option>
+          <option *ngFor="let location of locationsList" [value]="location.id">{{location.name}}</option>
+        </select>
+      </div>
+      <div class="col-sm-6 p-t-5">
+        Draft&nbsp;<ui-switch (change)="onChangeStatus();" [checked]="this.projectStatus" class="js-small"
+          color="#3498DB" switchColor="#fff" size="small">
+        </ui-switch>&nbsp;Published
+      </div>
+    </div>
+    <button type="button" class="close basic-close" (click)="modalSmallProjectGlobal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12 project-selection-area">
+        <ng-container *ngFor="let item of titleList; let i = index;">
+          <div class="row m-r-5" (click)="saveDefaultProject(item.id);">
+            <div class="col-sm-11">{{item.itemName}}</div>
+            <div class="col-sm-1">
+              <a *ngIf="item.id==globalProjectId"><i class="fa fa-star" aria-hidden="true"></i></a>
+              <a *ngIf="item.id!=globalProjectId"><i class="fa fa-star-o" aria-hidden="true"></i></a>
+            </div>
+          </div>
+          <hr class="dotted-hr-line">
+        </ng-container>
+      </div>
+      <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+    </div>
+  </div>
+  <div class="app-modal-footer float-right" *ngIf="this.currentUser.disableModel==='N' && showProjectSelectionModel">
+    <input type="checkbox" name="showMe" [checked]="showMeFlag" (change)="enableShowMe();" />
+    <label>Don't show me again</label>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalSmallTaskGlobal id="modal-lg-70" [dialogClass]="'modal-lg'"
+  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Task Creation</h4>
+    <button type="button" class="close basic-close" (click)="modalSmallTaskGlobal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <app-gobal-task-creation [gobalDocType]="this.taskDocType" [createFlag]=true [gobalDocId]="this.taskDocTypeUniqueId"
+      [gobalEquId]="this.taskEquipmentId" #TaskCreation (onTaskPopupHide)="onCloseOfTask($event)">
+    </app-gobal-task-creation>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+      (click)="onClickSave();">Save</button>
+    <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+      (click)="modalSmallTaskGlobal.hide()">Cancel</button>
+  </div>
+</app-modal-basic>
+
+<file-view style="background-color:#fff" #viewFileGlobal></file-view>
+
+<app-modal-basic style="background-color:#fff" #createProjectModal [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Create Project </h4>
+    <button type="button" class="close basic-close" (click)="createProjectModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="form-group row">
+      <label class="col-sm-12 col-form-label">Project Name</label>
+      <div class="col-sm-10">
+        <input class="form-control" type="text" name="projectName" [(ngModel)]="projectName" maxlength="49"
+          (ngModelChange)="showNext()">
+      </div>
+      <div class="messages text-danger col-sm-10" *ngIf="this.validationMessage!=''">{{this.validationMessage}}
+      </div>
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-12">
+        <label class="form-label">Is GxP Assessment Required:</label>
+        <ui-switch (change)="this.gxpFormFlag =!this.gxpFormFlag" [checked]="this.gxpFormFlag" class="js-small"
+          color="#3498DB" switchColor="#fff" size="small"></ui-switch>
+      </div>
+    </div>
+    <div *ngIf="createprojectSpinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div class="app-modal-footer">
+    <button *ngIf="projectName != '' && this.validationMessage === ''" type="button"
+      class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="onClickSaveProject();">Create</button>
+    <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+      (click)="createProjectModal.hide()">Cancel</button>
+  </div>
+</app-modal-basic>

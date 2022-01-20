@@ -1,0 +1,295 @@
+<br>
+<div class="row">
+  <app-card class="col" title="Rule Creation">
+    <form #emailRule="ngForm" *ngIf="!isTable && !this.viewIndividualData">
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Rule Name
+          <span class="asterisk required">*</span>
+        </label>
+        <div class="col-sm-12">
+          <input type="text" [(ngModel)]="model.ruleName" class="form-control" name="ruleName" #ruleName="ngModel"
+            placeholder="Rule Name" maxlength="100" required (ngModelChange)="showNext()">
+          <div class="messages text-danger" *ngIf="(ruleName.touched || submitted) && ruleName.errors?.required">Rule
+            Name can't be blank</div>
+          <div class="messages text-danger" *ngIf="ruleNameValidation!=''">{{ruleNameValidation}}</div>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="well well-lg">
+          <app-card>
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">Project<span class="asterisk required">*</span>
+              </label>
+              <div class="col-sm-12">
+                <angular2-multiselect name="project" [data]="this.projectList" id="apiConfigurationId"
+                  (ngModelChange)="loadDataForProject($event);" [(ngModel)]="globalProjectId" #project="ngModel"
+                  [required]="!this.rootUser" [settings]="dropdownSettings"> </angular2-multiselect>
+                <div class="messages text-danger" *ngIf="(project.touched || submitted) && project.errors?.required">
+                  Project can't be blank</div>
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">Document Type<span class="asterisk required">*</span>
+              </label>
+              <div *ngIf="model.id==0" class="col-sm-12">
+                <select name="documentName" [required]="!this.rootUser" [disabled]="this.rootUser"
+                  [(ngModel)]="this.model.documentId" #document="ngModel" class="form-control"
+                  (ngModelChange)="resetData();">
+                  <option value="0" disabled selected>Select Document</option>
+                  <option *ngFor="let document of documentList" [ngValue]="document.key">{{document.value}}</option>
+                </select>
+                <div class="messages text-danger" *ngIf="(document.touched || submitted) && document.errors?.required">
+                  Document can't be blank</div>
+              </div>
+              <div *ngIf="model.id!=0" class="col-sm-12">
+                <select name="documentName" [(ngModel)]="model.documentId"
+                  (ngModelChange)=" this.model.documentIds=[model.documentId];" #document="ngModel"
+                  [required]="!this.rootUser" [disabled]="this.rootUser" class="form-control">
+                  <option value="0" disabled>Select Document</option>
+                  <option *ngFor="let document of documentList" [ngValue]="document.key">{{document.value}}</option>
+                </select>
+                <div class="messages text-danger" *ngIf="(document.touched || submitted) && document.errors?.required">
+                  Document can't be blank</div>
+              </div>
+            </div>
+
+            <app-card title="Action" *ngIf="model.documentId && model.documentId.length>0">
+              <div class="messages text-danger" *ngIf="this.model.conditionList && this.model.conditionList.length==0">
+                Action can't be blank</div>
+              <div class="form-row" *ngFor="let condition of this.model.conditionList ; let i=index;">
+                <div class="form-group col-sm-2">
+                  <label>Select condition</label>
+                  <select class="table-control col-sm-12" name="actionType_{{i}}" [(ngModel)]="condition.actionType"
+                    (change)="addCondition(this.model.conditionList,false)" #status="ngModel" required>
+                    <option selected value="">Select</option>
+                    <option *ngFor="let action of actionTypeList" [disabled]="action.disabled" [value]="action.key">
+                      {{action.value}}
+                    </option>
+                  </select>
+                </div>
+                <div class="form-group col-sm-6">
+                  <label style="padding-left: 15px">Send mail to</label>
+                  <ng-select [ngClass]="'ng-select'" [options]="userList" [multiple]="true" name="userList_{{i}}"
+                    class="col-sm-12" [(ngModel)]="condition.userIds" #rounds="ngModel">
+                  </ng-select>
+                </div>
+                <div class="form-group col-sm-2">
+                  <label>Frequency</label>
+                  <select name="frequency_{{i}}" [(ngModel)]="condition.frequency" #frequency="ngModel" required
+                    class="table-control col-sm-12">
+                    <option value="" disabled>Select</option>
+                    <option *ngFor="let frequency of this.frequencyList " [value]="frequency.key">{{frequency.value}}
+                    </option>
+                  </select>
+                  <div class="messages text-danger"
+                    *ngIf="(frequency.touched || submitted) && frequency.errors?.required">
+                    Frequency can't be blank
+                  </div>
+                </div>
+                <div class="form-group col-sm-2">
+                  <label>&nbsp;</label>
+                  <div>
+                    <a href="javascript:;" routerLinkActive="active" *ngIf="(condition.templateId==0)"
+                      class="m-r-15 crm-action-edit text-muted text-danger"
+                      (click)="loadTemplateList();addTemplate(condition,i);" placement="top"
+                      ngbTooltip="Select Template">
+                      <i style="font-size: 25px;color: red;" class="icofont icofont-papers"></i>
+                    </a>
+                    <a href="javascript:;" routerLinkActive="active" *ngIf="(condition.templateId!=0)"
+                      class="m-r-15 crm-action-edit text-muted text-primary"
+                      (click)="loadTemplateList();addTemplate(condition,i);" placement="top"
+                      ngbTooltip="{{condition.templateName}}">
+                      <i class="icofont icofont-papers"></i>
+                    </a>
+                    <button style="float: none;font-size: 25px;" type="button" class="close basic-close-light-box"
+                      (click)="removeCondition(this.model.conditionList,i)">
+                      <i class="asterisk icofont icofont-close"></i>
+                    </button>
+                  </div>
+                  <span *ngIf="(condition.templateId==0)" class="messages text-danger">
+                    Template can't be blank
+                  </span>
+                </div>
+              </div>
+              <br>
+              <button style="text-align: center;" class="btn btn-primary btn-outline-primary btn-icon"
+                (click)="addCondition(this.model.conditionList,true)"><i
+                  class="icofont icofont-plus-circle"></i></button>
+            </app-card>
+            <label class="messages text-danger" *ngIf="!templateEmptyFlag">Template can't be blank</label>
+          </app-card>
+        </div>
+      </div>
+
+      <div class="form-group row">
+        <div class="col-sm-3">Active: <ui-switch [(ngModel)]="model.activeFlag" name="activeFlag"
+            (change)="model.activeFlag=!model.activeFlag" class="js-small" color="#3498DB" switchColor="#fff"
+            size="small">
+          </ui-switch>
+        </div>
+      </div>
+      <div style="text-align: center;" class="form-group row">
+        <div class="col">
+          <button type="button" *ngIf="model.id!=0" [disabled]="!permissionModal.updateButtonFlag"
+            class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+            (click)="$event.preventDefault();saveRule(emailRule.valid);">Update
+          </button>
+          <button type="button" [disabled]="!permissionModal.createButtonFlag"
+            class="btn btn-sm btn-success waves-effect waves-light m-r-10" *ngIf="model.id==0"
+            (click)="saveRule(emailRule.valid);">Save
+          </button>
+          <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="submitted=false; loadAll()"
+            routerLinkActive="active">Cancel</button>
+        </div>
+      </div>
+    </form>
+
+    <div *ngIf="isTable">
+      <button [disabled]="!permissionModal.createButtonFlag" *ngIf="isTable" type="button" class="btn btn-primary"
+        (click)="addRule();">
+        <i class="icofont icofont-plus-circle"></i>&nbsp;Add Rule&nbsp;
+      </button>
+      <br><br>
+      <div class="col-xs-12 col-sm-12 col-md-12">
+        <div style="text-align: right;">
+          <label>Search:
+            <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+              class="form-control input-sm full-data-search" placeholder="">
+          </label>
+        </div>
+      </div>
+      <ngx-datatable *ngIf="isTable" [scrollbarH]="true" #myTable class="data-table dt-chk"
+        [rows]='list | emailRuleFilter : filterQuery' [limit]="10" [columnMode]="'force'" [headerHeight]="50"
+        [footerHeight]="50" [rowHeight]="'auto'" (page)="onPage($event)">
+        <ngx-datatable-column name="Rule Name">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong class="fontStyle">{{row['ruleName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Project Name">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong class="fontStyle">{{row['projectName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Document">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong class="fontStyle">{{row['documentName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Action">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <a container="body" href="javascript:;" *ngIf="permissionModal.viewButtonFlag"
+              class="crm-action-view text-muted text-warning" (click)="viewRowDetails(row);" placement="top"
+              ngbTooltip="View">
+              <i class="icofont icofont-resize view"></i>
+            </a>
+            <a container="body" href="javascript:;" *ngIf="permissionModal.createButtonFlag"
+              class="crm-action-view text-muted text-warning" (click)="createCopy(row);" placement="top"
+              ngbTooltip="Create Copy">
+              <i class="icofont icofont-ui-copy"></i>
+            </a>
+            <a container="body" href="javascript:;" *ngIf="permissionModal.updateButtonFlag" routerLinkActive="active"
+              class="m-r-15 crm-action-edit text-muted text-primary" (click)="viewForEdit(row);" placement="top"
+              ngbTooltip="Edit">
+              <i class="icofont icofont-edit edit"></i>
+            </a>
+            <a container="body" href="javascript:;" *ngIf="permissionModal.deleteButtonFlag"
+              class="m-r-15 crm-action-delete text-muted text-danger"
+              (click)="openSuccessCancelSwal(row , row['$$index'] );" placement="top" ngbTooltip="Delete">
+              <i class="icofont icofont-bin bin"></i>
+            </a>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+
+    <app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData==true">
+      <div *ngFor="let data of popupdata; let in = index">
+        <div><br>
+          <h4>&nbsp;&nbsp;View Rule Details
+            <div style="float: right;">
+              <button [disabled]="!permissionModal.updateButtonFlag" type="submit"
+                class="btn btn-outline-primary btn-primary btn-round" (click)="viewForEdit(data)">Edit</button>
+              &nbsp;&nbsp;
+              <button *ngIf="permissionModal.deleteButtonFlag" type="button"
+                class="btn btn-outline-danger btn-danger btn-round"
+                (click)="openSuccessCancelSwal(data,data.$$index)">Delete</button> &nbsp;&nbsp;
+              <a style="cursor:pointer;font-weight: bold" class="ti-close"
+                (click)="this.viewIndividualData=false;this.isTable=true;">&nbsp;&nbsp;</a>
+            </div>
+          </h4>
+        </div>
+        <br>
+        <squeezebox [multiple]="true">
+          <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-msg">Rule Name</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <p><span>{{data.ruleName}}</span></p>
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-msg">Project</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <p><span>{{data.projectName}}</span></p>
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-msg">Document</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <p><span>{{data.documentName}}</span></p>
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <div *ngFor="let condition of data.conditionList; let j=index">
+            <sb-item *ngIf="condition.frequencyText!=''&&condition.actionTypeText!=''" class="accordion-panel"
+              [collapsed]="false">
+              <sb-item-head class="accordion-heading accordion-msg">Condition-{{j+1}} </sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <p>{{condition.actionTypeText}} send mail to {{condition.users}} {{condition.frequencyText}}</p>
+                  <br>
+                  <p>Template : </p>
+                  <br>
+                  <div width="100%" [innerHtml]="condition.templateSample"></div>
+                </div>
+              </sb-item-body>
+            </sb-item>
+          </div>
+        </squeezebox>
+      </div>
+    </app-card>
+  </app-card>
+</div>
+
+<!-- Modal for template selection and preview-->
+<app-modal-basic #modal [hideHeader]="false" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5>Template Selection</h5>
+    <button type="button" class="close basic-close-light-box" (click)="modal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button><br>
+  </div>
+  <div class="app-modal-body">
+    <div class="dy-width-400">
+      <br>
+      Template : &nbsp;&nbsp;<select name="template_{{i}}" [(ngModel)]="templateId" #template="ngModel"
+        (change)="setTemplateValue(templateId,i)" required class="table-control">
+        <option value="0" disabled>Select Template</option>
+        <option *ngFor="let temp of this.templateModalArray; let j=index; " [value]="temp.id">{{temp.templateName}}
+        </option>
+      </select>
+      <br>
+      <div width="100%" [innerHtml]="templateViewData"></div>
+    </div>
+    <hr>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

@@ -1,0 +1,61 @@
+<div class="form-group row" *ngIf="ursList && this.ursList.length>0">
+  <div class="col-sm-12">
+      <div class="dt-desc table-responsive" style="padding: 0px; max-height: 200px;">
+        <div>
+          <table class="table-striped table-bordered" style="width: 100%;table-layout: fixed;">
+            <thead>
+              <tr style="width: 100%">
+                <th style="width: 5%;">Sl. No</th>
+                <th style="width: 15%;">URS</th>
+                <ng-container *ngIf="documentCode!='200'">
+                  <th style="width: 30%;">Spec Code</th>
+                  <th style="width: 40%;">Description</th>
+                </ng-container>
+                <ng-container *ngIf="documentCode=='200'">
+                  <th style="width: 30%;">Description</th>
+                </ng-container>
+                <th style="width: 10%;">Priority</th>
+                <th style="width: 10%;">Testing Required</th>
+                <th style="width: 10%;">Testing Method</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of this.ursList ; let i = index" style="vertical-align: top;">
+                <td>{{i+1}}</td>
+                <td ><a  href="javascript:;" class="btn btn-link p-0" (click)="urlRedirection(u.id)">{{u.ursCode}}</a></td>
+                <ng-container *ngIf="documentCode!='200'">
+                  <td style="width: 30%;">
+                    <div style="width:100%">
+                      <textarea class="multiple-textarea" [rows]="(u.specificationName.length/30)+1"
+                        [innerHtml]="u.specificationName"></textarea>
+                    </div>
+                  </td>
+                  <td style="width: 40%;">
+                    <div style="width:100%" *ngIf="u.description != null">
+                      <textarea class="multiple-textarea overflow-hidden" [rows]="(u.description.length/30)+1"
+                        [innerHtml]="u.description"></textarea>
+                    </div>
+                  </td>
+                </ng-container>
+                <ng-container *ngIf="documentCode=='200'">
+                  <td style="width: 70%;">
+                    <div style="width:100%" *ngIf="u.ursName">
+                      <textarea class="multiple-textarea overflow-hidden" [rows]="(u.ursName.length/30)+1"
+                        [innerHtml]="u.ursName"></textarea>
+                    </div>
+                  </td>
+                </ng-container>
+                <td>{{u.priorityName}}</td>
+                <td>
+                  {{u.testingRequiredText}}
+                </td>
+                <td>
+                  {{u.testingMethod?u.testingMethod:'N/A'}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </div>
+</div>

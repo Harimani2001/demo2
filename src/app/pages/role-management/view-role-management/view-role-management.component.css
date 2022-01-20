@@ -1,0 +1,34 @@
+div.scrollmenu {
+    background-color:white;
+    overflow: auto;
+    white-space: nowrap;
+  }
+  
+  div.scrollmenu a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+  }
+  
+  div.scrollmenu a:hover {
+    background-color: white;
+  }
+
+  ngx-datatable#rolesCustomTable datatable-body-cell{
+    background-color: white !important;
+}
+
+ngx-datatable#rolesCustomTable datatable-header-cell{
+    background-color: white !important;
+}
+
+.custom .switch-small[_ngcontent-c16] {
+  width: 28px;
+  height: 15px;
+}
+.custom .switch-small[_ngcontent-c16] small[_ngcontent-c16] {
+  width: 14px;
+  height: 14px;
+}

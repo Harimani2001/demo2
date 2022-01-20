@@ -1,0 +1,207 @@
+<br>
+<div class="messages text-danger" *ngIf="this.validityExpiryFlag"><h3 style="text-align:center">URL Expired, Please contact the Admin</h3></div>
+<div class="row" *ngIf="!this.validityExpiryFlag">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-9">
+          <div class="page-header-title">
+            <div class="d-inline" style="padding-top: 4px;">
+              <h4>{{projectName}} : {{documentName}}</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3" *ngIf="this.completionFlag" style="text-align: right;">
+          <span style="color: #28a745;">verifed Successfully</span>
+          <a role="button"><img *ngIf="!forumFlag" class="image-radius rounded-0 img-30"
+            src="assets/icon/png-icons/forum.png" alt="Forum" placement="bottom" ngbTooltip="Forum"
+            (click)="forumFlag=!forumFlag;"></a> 
+        </div>
+        <div class="col-sm-3" *ngIf="!this.completionFlag" style="text-align: right;">
+          <a role="button"><img class="image-radius rounded-0 img-25 m-r-20"
+            src="assets/icon/png-icons/esign.png" alt="Forum" placement="bottom" ngbTooltip="Approve"
+            (click)="openMyModal('effect-1')"></a>
+            <a *ngIf="logs.length > 0" href="javascript:" class="m-r-10"><img class="image-radius rounded-0 img-27" src="assets/icon/png-icons/info.png"
+                alt="Recommended deliverables" placement="bottom" ngbTooltip="info"
+                (click)="commentsmodal.show();"></a>
+          <a role="button"><img *ngIf="!forumFlag" class="image-radius rounded-0 img-30"
+            src="assets/icon/png-icons/forum.png" alt="Forum" placement="bottom" ngbTooltip="Forum"
+            (click)="forumFlag=!forumFlag;"></a>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+<!-- <div class="col-sm-12">
+  <div style="text-align: center;" id="fileUploadIdBulkApproval"></div>
+</div> -->
+<div class="col-sm-12">
+  <div *ngIf="pdfSrc" class="row pl-5 pr-2">
+    <ng-template #infoForForum>
+    <div> Use the following symbol for document reference :<br>@ - User<br>* - Section<br># - Document</div>
+    </ng-template>
+    <div *ngIf="forumFlag" class="col-sm-8 text-right p-0">
+     
+    </div>
+    <div *ngIf="forumFlag" class="col-sm-4 p-0">
+      <a  [ngbPopover]="infoForForum" triggers="mouseenter:mouseleave" container="body">
+        <i class="icofont icofont-info-square info"></i>
+      </a>
+      <a role="button" (click)="forumFlag=!forumFlag;" container="body" triggers="mouseenter:mouseleave"
+        [ngbPopover]="forumFlag?'Collapse':'Expand'"> <i
+          [ngClass]="forumFlag?'fa fa-minus-circle':'fa fa-plus-circle'"
+          aria-hidden="true"></i></a>
+    </div>
+    <div  [ngClass]="forumFlag?'col-sm-8':'col-sm-12'" [ngStyle]="{'overflow': 'auto','max-height':this.height}">
+      <pdf-viewer style="display: block;" #ApprovalPDFViewerComponent [src]="pdfSrc" [page]="pageVariable"
+        [show-all]="showAll" (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom" [stick-to-page]="true"
+        (error)="onError($event)"></pdf-viewer>
+    </div>
+    <div *ngIf="forumFlag" class="col-sm-4" [ngStyle]="{'overflow': 'auto','max-height':this.height}">
+      <app-document-forum #forumView [constant]="this.permissionConstant" [isDocumentWorkFlow]="true"
+        [documentList]="this.commentsDocumentsList" [chapter]="this.outLineList" [isExterApproval]="true" [exterApprovalReferenceId]="this.receivedId"></app-document-forum>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-animation #documentEsign container="body" [modalID]="'effect-1'" [modalClass]="'md-effect-1'">
+  <h3>Electronic Signature</h3>
+
+  <div class="row" style="text-align: left;">
+    <form [formGroup]="esignForm">
+
+      <div class="row">
+        <div class="col-sm-6">
+          <strong>Please enter your Comments </strong>
+        </div>
+        <div class="col-sm-6">
+          <textarea class="form-control" id="workFlowCommentsId" placeholder="Comments" formControlName="comments"
+            name="description" cols="50" rows="4"> </textarea>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <strong>Do you Approve or Reject this Document?</strong>
+        </div>
+        <div class="col-sm-6">
+          <input type="radio" [(ngModel)]="finalstatus" [ngModelOptions]="{standalone: true}" name="status"
+            [value]="true"> Approve &nbsp;&nbsp;&nbsp;
+          <input type="radio" [(ngModel)]="finalstatus" [ngModelOptions]="{standalone: true}" name="status"
+            [value]="false"> Reject
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <strong class="strong">This form requires your electronic signature. </strong>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm-2">
+          <input type="checkbox" [checked]="this.agreementCheck" [name]="check" (change)="this.agreementCheck=!this.agreementCheck"> I Accept
+        </div>
+        <div class="col-sm-10"><h6>{{this.esignAgreementMessage.agreementMessage}}</h6></div>
+      </div>
+      <div class="row" *ngIf="this.agreementCheck">
+        <div class="col-sm-6">
+          <div class="form-group row" >
+            <label class="col-sm-10 col-form-label">Please enter your Email</label>
+            <div class="col-sm-10">
+              <input class="form-control" size="49" formControlName="userName" type="email" autocomplete="new-password"
+                placeholder="Email Id" name="userName" required />
+            </div>
+          </div>
+          <div class="form-group row" *ngIf="isOtpSuccess">
+            <label class="col-sm-10 col-form-label"> Please enter OTP</label>
+            <div class="col-sm-10">
+              <input class="form-control" size="49" formControlName="password" type="text" placeholder="OTP"
+                name="OTP"/>
+                <a style="float:right" href="javascript:;" (click)="sendOtp();">resend OTP</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6" *ngIf="isOtpSuccess">
+          <div class="row">
+            <label class="col-sm-6 col-form-label">Upload Esign Image
+            </label>
+            <label class="switch">
+              <input type="checkbox" name="activeFlag" (click)="switch()" />
+              <span class="slider round"></span>
+            </label>
+          </div>
+          <div *ngIf="this.enableEsign">
+            <div class="row">
+              <div class="col-md-5">
+                <input type="file" id="avatar" accept="image/*" (change)="onFileChange($event)"
+                  #fileInput name="photo">
+                <p style="color: red" *ngIf="error != ''">{{error}}</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-12">
+            <div class="table-responsive">
+              <table class="table">
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="sig-container" *ngIf="!this.enableEsign">
+                        <div fxLayout="row">
+                          <signature-pad [options]="signaturePadOptions" (onBeginEvent)="drawStart()"
+                            (onEndEvent)="drawComplete()"></signature-pad>
+                        </div>
+                        <a style="float:right;font-size: 14px;" href="javascript:;" (click)="clear();">Clear</a>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="row">
+        <p class="text-danger p-0" *ngIf="this.submitted && esignForm.get('userName').hasError('required')">
+         Email is Required</p>
+        &nbsp;&nbsp;<p class="text-danger p-0"
+          *ngIf="(this.otpSubmitted) && esignForm.get('password').hasError('required')">
+          <span>OTP is Required</span></p>
+        &nbsp;&nbsp;<p class="text-danger p-0"
+          *ngIf="(this.otpSubmitted) && esignForm.get('comments').hasError('required')">
+          <span>Comments are Required</span></p>
+          &nbsp;&nbsp;<p class="text-danger p-0"
+          *ngIf="isInvalidEmail">
+          <span>Invalid Email</span></p>
+          &nbsp;&nbsp;<p class="text-danger p-0"
+          *ngIf="isInvalidOtp">
+          <span>Invalid Otp</span></p>
+      </div>
+    </form>
+    <button style="text-align: center;" *ngIf="isOtpSuccess && !esignSpinnerFlag && this.agreementCheck" (click)="onSubmit()"
+        class="btn btn-danger waves-effect waves-light ">ESign</button>
+        <button style="text-align: center;" *ngIf="!isOtpSuccess && !esignSpinnerFlag && this.agreementCheck" (click)="sendOtp()"
+        class="btn btn-danger waves-effect waves-light ">Get OTP</button>
+        <div *ngIf="esignSpinnerFlag" class="loading">Loading&#8230;</div>
+      </div>
+  <button (click)="closeMyModal($event)" aria-label="Close" class="md-close-btn"><i class="icofont icofont-ui-close"></i></button>
+</app-modal-animation>
+
+<app-modal-basic #commentsmodal [hideFooter]="true" [dialogClass]="'modal-md'"  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow Comments</h4>
+    <button type="button" class="close basic-close" (click)="commentsmodal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div *ngFor="let log of logs ;let in = index">
+      <div><b>Commented By :</b>&nbsp; {{log.approvedBy}}</div>
+      <div><b>Document Comments :</b>{{log.comments}}</div>
+      <div><b>Commented On :</b>{{log.createdTime}}</div>
+      <hr>
+    </div>
+	</div>
+</app-modal-basic>
+

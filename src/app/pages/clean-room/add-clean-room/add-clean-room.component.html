@@ -1,0 +1,755 @@
+<div class="row">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-4">
+          <i class="icofont icofont-file-document bg-c-blue"></i>
+          <div class="d-inline">
+            <h4 *ngIf="cleenRoomInfo.id==0" class="strong">Cleanroom</h4>
+            <h4 *ngIf="cleenRoomInfo.id!=0" class="strong">{{cleenRoomInfo.roomName}}</h4>
+            <span *ngIf="cleenRoomInfo.id==0">Add Cleanroom</span>
+            <span *ngIf="cleenRoomInfo.id!=0">Room ID : {{cleenRoomInfo.cleanRoomCode}}</span>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <div *ngIf="cleenRoomInfo.id!=0">
+            <label>Validation status :</label>
+            <a href="javascript:" (click)="onClickRoomStatusModal();">{{cleenRoomInfo.validationStatus}}</a>
+          </div>
+        </div>
+        <div class="col-sm-4 text-right">
+          <a *ngIf="title!='Basic Information'" href="javascript:" class="m-r-10"><img
+              class="image-radius rounded-0 img-27" src="assets/icon/png-icons/previous.svg" alt="Previous"
+              placement="bottom" ngbTooltip="Previous" (click)="navigatePrevious();refreshSearch();"></a>
+
+          <a *ngIf="(cleenRoomInfo.id!=0 && title=='Basic Information') || (specificationInfo.id!=0 && title=='Specification') || title=='Attachment' || title=='Workflow Configurtion'"
+            href="javascript:" class="m-r-10"><img class="image-radius rounded-0 img-27"
+              src="assets/icon/png-icons/next.svg" alt="Next" placement="bottom" ngbTooltip="Next"
+              (click)="navigateNext();refreshSearch();"></a>
+
+          <a *ngIf="title==='Basic Information' && cleenRoomInfo.id==0 && permissionModal.createButtonFlag"
+            href="javascript:" class="m-r-10" (click)="saveBasicInfo(cleanRoomInfo.valid, '')"><img
+              class="image-radius rounded-0 img-27 img-height" src="assets/icon/png-icons/save.svg" alt="Save"
+              placement="bottom" ngbTooltip="Save"></a>
+
+          <a *ngIf="title==='Basic Information' && cleenRoomInfo.id!=0 && permissionModal.updateButtonFlag"
+            href="javascript:" class="m-r-10" (click)="openSuccessCancelSwal('tab1', cleanRoomInfo.valid);"><img
+              class="image-radius rounded-0 img-27 img-height" src="assets/icon/png-icons/save.svg" alt="Update"
+              placement="bottom" ngbTooltip="Update"></a>
+
+          <a *ngIf="title==='Specification' && specificationInfo.newOrUpdatedRecord && permissionModal.createButtonFlag"
+            href="javascript:" class="m-r-10" (click)="saveSpecification('')"><img
+              class="image-radius rounded-0 img-27 img-height" src="assets/icon/png-icons/save.svg" alt="Save"
+              placement="bottom" ngbTooltip="Save"></a>
+
+          <a *ngIf="title==='Specification'  && !specificationInfo.newOrUpdatedRecord && permissionModal.updateButtonFlag"
+            href="javascript:" class="m-r-10" (click)="openSuccessCancelSwal('tab2', this.validSpecificationTable);"><img
+              class="image-radius rounded-0 img-27 img-height" src="assets/icon/png-icons/save.svg" alt="Update"
+              placement="bottom" ngbTooltip="Update"></a>
+
+          <a *ngIf="title==='Attachment' && permissionModal.createButtonFlag" href="javascript:" class="m-r-10"
+            (click)="saveAttachments()"><img class="image-radius rounded-0 img-27 img-height"
+              src="assets/icon/png-icons/save.svg" alt="Save" placement="bottom" ngbTooltip="Save"></a>
+
+          <a *ngIf="cleenRoomInfo.id!=0 && !specificationInfo.newOrUpdatedRecord && permissionModal.publishButtonFlag" class="m-r-10"
+            href="javascript:" (click)="publishCleanRoom()"><img class="image-radius rounded-0 img-30"
+              src="assets/icon/png-icons/published.png" alt="Publish" placement="bottom" ngbTooltip="Publish"></a>
+
+          <a href="javascript:"><img class="image-radius rounded-0 img-27 img-height"
+              src="assets/icon/png-icons/cancel.svg" alt="Cancel" placement="bottom" ngbTooltip="Cancel"
+              [routerLink]="['/Clean-room/view-cleanroom']" routerLinkActive="active"></a>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+<div><br><br><br></div>
+
+<form-wizard id="project-form-wizard" #formWizard (onStepChanged)="onStepChange($event)">
+  <wizard-step #wizardStep [title]="'Basic Information'" id="basicInfo" [showNext]="false">
+    <br>
+    <div class="row">
+      <div class="col-sm-12">
+        <form #cleanRoomInfo="ngForm">
+          <table id="clean-room-table" class="table w-100">
+            <tbody>
+              <tr>
+                <td colspan="2">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Location<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <select name="locationName" id="locationId" [(ngModel)]="cleenRoomInfo.locationId"
+                        #location="ngModel" (ngModelChange)="onChangeLocation($event)" class="form-control" required>
+                        <option disabled value="">Select Location</option>
+                        <option *ngFor="let loc of locationList" [value]="loc.id">{{loc.name}}</option>
+                      </select>
+                      <div class="messages text-danger"
+                        *ngIf="(location.touched || submitted) && location.errors?.required">Please select Location
+                      </div>
+                    </div>
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Department<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <angular2-multiselect class="form-control" name="departmentName" [data]="this.departmentList"
+                        id="departmentId" [(ngModel)]="cleenRoomInfo.departments" #department="ngModel" required
+                        [settings]="departmentDropdownSettings">
+                      </angular2-multiselect>
+                      <div class="messages text-danger" *ngIf="submitted && department.errors?.required">Please select
+                        Department</div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <tr>
+                <td colspan="2">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Project<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <angular2-multiselect class="form-control" name="projectName" [data]="this.projectList"
+                        id="projectId" [(ngModel)]="cleenRoomInfo.project" #project="ngModel" required
+                        [settings]="projectDropdownSettings">
+                      </angular2-multiselect>
+                      <div class="messages text-danger" *ngIf="submitted && project.errors?.required">Please select
+                        Project</div>
+                    </div>
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Room Classification<span class="asterisk">*</span>:</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <select name="classificationName" id="classificationId" [(ngModel)]="cleenRoomInfo.classification"
+                        #classification="ngModel" [disabled]="cleenRoomInfo.id!=0" class="form-control" required>
+                        <option value="">Select Classification</option>
+                        <option *ngFor="let class of classificationList" [value]="class.key">{{class.value}}</option>
+                      </select>
+                      <div class="messages text-danger"
+                        *ngIf="(classification.touched || submitted) && classification.errors?.required">Please select
+                        Room Classification
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              
+              <tr>
+                <td colspan="2">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Room Orientation :</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="roomOrientation" [(ngModel)]="cleenRoomInfo.roomOrientation"
+                        placeholder="Room Orientation" maxlength="49">
+                    </div>
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Room Name<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="roomName" [(ngModel)]="cleenRoomInfo.roomName"
+                        #roomName="ngModel" placeholder="Room Name" required maxlength="49">
+                      <div class="messages text-danger"
+                        *ngIf="(roomName.touched || submitted) && roomName.errors?.required">Room Name is required</div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Building :</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <input type="text" class="form-control" name="txtBuilding" [(ngModel)]="cleenRoomInfo.building"
+                        placeholder="Building" maxlength="49">
+                    </div>
+                  </div>
+                </td>
+                <td colspan="1">
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <strong class="strong">Room No :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" name="roomNo" placeholder="Room No"
+                        [(ngModel)]="cleenRoomInfo.roomNo" maxlength="49">
+                    </div>
+                  </div>
+                </td>
+                <td colspan="1">
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <strong class="strong">Floor :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                      <input type="text" class="form-control" name="floor" placeholder="Floor"
+                        [(ngModel)]="cleenRoomInfo.floor" maxlength="49">
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="1">
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <strong class="strong">Length<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                      <input type="number" class="form-control" name="lengthName" required id="specLength"
+                        [(ngModel)]="specificationInfo.length" #length="ngModel" placeholder="Length" min="1"
+                        (ngModelChange)="calculateArea($event)" (keypress)="onlyNumber($event)">
+                      <div class="messages text-danger"
+                        *ngIf="(length.touched || submitted) && length.errors?.required">Length is required</div>
+                    </div>
+                  </div>
+                </td>
+                <td colspan="1">
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <strong class="strong">Width<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                      <input type="number" class="form-control" name="widthName" required
+                        [(ngModel)]="specificationInfo.width" #width="ngModel" placeholder="Width" min="1"
+                        (ngModelChange)="calculateArea($event)" (keypress)="onlyNumber($event)">
+                      <div class="messages text-danger" *ngIf="(width.touched || submitted) && width.errors?.required">
+                        Width is required</div>
+                    </div>
+                  </div>
+                </td>
+                <td colspan="1">
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <strong class="strong">Height<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                      <input type="number" class="form-control" name="heightName" required
+                        [(ngModel)]="specificationInfo.height" #height="ngModel" placeholder="Height" min="1"
+                        (ngModelChange)="calculateArea($event)" (keypress)="onlyNumber($event)">
+                      <div class="messages text-danger"
+                        *ngIf="(height.touched || submitted) && height.errors?.required">Height is required</div>
+                    </div>
+                  </div>
+                </td>
+                <td colspan="1">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <strong class="strong">Total Area(SF) : </strong>
+                    </div>
+                    <div class="col-sm-7">
+                      <label>{{specificationInfo.totalArea}}</label>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="12">
+                  <div class="row">
+                    <div class="col-sm-2">
+                      <strong class="strong">Equipment :</strong>
+                    </div>
+                    <div class="col-sm-10">
+                      <ng-select [ngClass]="'ng-select'" name="equipmentName" [(ngModel)]="cleenRoomInfo.equipments"
+                        [options]="equipmentList" [multiple]="true">
+                      </ng-select>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </form>
+      </div>
+    </div>
+  </wizard-step>
+
+  <wizard-step [title]="'Specification'" id="specification" [showPrev]="false" [showNext]="false">
+    <br>
+    <div class="row">
+      <div class="col-sm-12">
+        <!-- <form #specification="ngForm">
+          <table id="specification-table" class="table w-100">
+            <tbody> -->
+              <!-- <tr>
+                <td>
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <strong class="strong">Length<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                      <input type="number" class="form-control" name="lengthName" required id="specLength"
+                        [(ngModel)]="specificationInfo.length" #length="ngModel" placeholder="Length" min="1"
+                        (ngModelChange)="calculateArea($event)" (keypress)="onlyNumber($event)">
+                      <div class="messages text-danger"
+                        *ngIf="(length.touched || submitted) && length.errors?.required">Length is required</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <strong class="strong">Width<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                      <input type="number" class="form-control" name="widthName" required
+                        [(ngModel)]="specificationInfo.width" #width="ngModel" placeholder="Width" min="1"
+                        (ngModelChange)="calculateArea($event)" (keypress)="onlyNumber($event)">
+                      <div class="messages text-danger" *ngIf="(width.touched || submitted) && width.errors?.required">
+                        Width is required</div>
+                    </div>
+                  </div>
+                </td>
+
+                <td>
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <strong class="strong">Height<span class="asterisk">*</span> :</strong>
+                    </div>
+                    <div class="col-sm-8">
+                      <input type="number" class="form-control" name="heightName" required
+                        [(ngModel)]="specificationInfo.height" #height="ngModel" placeholder="Height" min="1"
+                        (ngModelChange)="calculateArea($event)" (keypress)="onlyNumber($event)">
+                      <div class="messages text-danger"
+                        *ngIf="(height.touched || submitted) && height.errors?.required">Height is required</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <strong class="strong">Total Area(SF) : </strong>
+                    </div>
+                    <div class="col-sm-7">
+                      <label>{{specificationInfo.totalArea}}</label>
+                    </div>
+                  </div>
+                </td>
+              </tr> -->
+            <!-- </tbody>
+          </table>
+        </form> -->
+        <!-- <br> -->
+          <div class="row">
+            <div class="col-sm-12">
+              <div style="text-align: right;">
+                <a *ngIf="permissionModal.createButtonFlag" href="javascript:" class="m-r-15"><img
+                    class="image-radius rounded-0 img-25" src="assets/icon/png-icons/import.png" alt="Bulk Import"
+                    placement="bottom" ngbTooltip="Bulk Import"
+                    (click)="bulkSpecificationModal.show(); resetBulk();"></a>
+
+                <button title="Add Category" type="button" class="btn btn-primary btn-sm m-r-20"  (click)="addItemCategory();"
+                  [disabled]="disableAddCategory"><i class="icofont icofont-checked"></i>Add
+                </button>
+                <!-- <label>Search:
+                  <input type="search" id="search" [(ngModel)]="filterQuery" class="form-control input-sm full-data-search"
+                    placeholder="Search">
+                </label> -->
+              </div>
+            </div>
+          </div>
+          <div class="messages text-danger" *ngIf="!validSpecificationTable">Please Fill Category, Sub Category and Description. . .
+          </div>
+          <br> 
+          <div class="col-sm-12" *ngFor="let data of specificationInfo.specificationTableInfo | RoomSpecFilter : filterQuery; let i = index;" >
+            <div class ="row">
+              <div class ="col-sm-6">
+                <span title="Click to edit" style="font-size: large;" (click)="editCategoryRow(i, 'category');" *ngIf="!editCategory[i]"
+                    placeholder="Please Fill"><strong>{{data.category ? data.category : 'N/A'}}</strong>
+                  </span>
+                <input id="category_{{i}}" autofocus (input)="updateCategory($event, i, 'category');" 
+                    *ngIf="editCategory[i]" type="text" [value]="data['category']" placeholder="Please Fill Category"
+                    name="category_{{i}}" class="form-control" />
+              </div>
+            </div>
+            <div *ngFor="let sub of data.subCategoryList; let j = index;">
+              <div class ="row">
+                <div *ngIf = "sub.subCategory != data.category && sub.subCategory != '' || sub.id == 0" class ="col-sm-6">
+                  <span title="Click to edit" (click)="editSubCategoryRow(i, j, 'subCategory');" *ngIf="!editSubCategory[i][j]"
+                  placeholder="Please Fill"><strong>{{sub.subCategory ? sub.subCategory : 'N/A'}}</strong>
+                  </span>
+                  <input id="subCategory_{{i}}{{j}}" autofocus (input)="updateSubCategory($event, i, j, 'subCategory');" 
+                    *ngIf="editSubCategory[i][j]" type="text" [value]="sub['subCategory']" placeholder="Please Fill Sub Category"
+                    name="subCategory_{{i}}{{j}}" class="form-control" />
+                </div>
+              </div>
+              <ngx-datatable [scrollbarH]="false" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+                [rows]='sub.specificationTableSubData' [columnMode]="'force'" [headerHeight]="50"
+                [footerHeight]="50" [rowHeight]="'auto'">
+                <ngx-datatable-column name="Sl No" [width]="70" [canAutoResize]="false" [sortable]="false">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong>{{row['$$index']+1}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column name="Description">
+                  <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                    <span title="Click to edit" (click)="editRow(i, row.$$index, j, 'field');" *ngIf="!editingTest[i][j][row.$$index]"
+                      placeholder="Please Fill">{{row.field ? row.field : 'N/A'}}
+                    </span>
+                    <input id="field_{{i}}{{row.$$index}}" autofocus (input)="updateValue($event, i, j, 'field', row);"
+                      *ngIf="editingTest[i][j][row.$$index]" type="text" [value]="row['field']" placeholder="Please Fill"
+                      name="field_{{i}}{{row.$$index}}" class="form-control" />
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column name="Acceptance Criteria">
+                  <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                    <span title="Click to edit" (click)="editRow(i, row.$$index, j, 'value');" *ngIf="!editingTest[i][j][row.$$index]"
+                      placeholder="Please Fill">{{row.value ? row.value : 'N/A'}}
+                    </span>
+                    <input id="value_{{i}}{{row.$$index}}" autofocus (input)="updateValue($event, i, j, 'value', row);"
+                      *ngIf="editingTest[i][j][row.$$index]" type="text" [value]="row['value']" placeholder="Please Fill"
+                      name="value_{{i}}{{row.$$index}}" class="form-control" />
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column name="Observation">
+                  <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                    <span title="Click to edit" (click)="editRow(i, row.$$index, j, 'observation');" *ngIf="!editingTest[i][j][row.$$index]"
+                      placeholder="Please Fill">{{row.observation ? row.observation : 'N/A'}}
+                    </span>
+                    <input id="observation_{{i}}{{row.$$index}}" autofocus (blur)="updateValue($event, i, j, 'observation', row);"
+                      *ngIf="editingTest[i][j][row.$$index]" type="text" [value]="row['observation']" placeholder="Please Fill"
+                      name="observation_{{i}}{{row.$$index}}" class="form-control" />
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Updated User/Time">
+                  <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+                    <div>
+                      <span>{{row.updatedBy}} </span>
+                      <span>{{row.updatedDate}}</span>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="70" name="Action" [canAutoResize]="false" [sortable]="false">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <div class="row">
+                      <a class="pointer col-sm-2" role="button" title="Delete" (click)="onclickDelete(i, j, row.$$index);">
+                      <i class="icofont icofont-ui-delete text-danger"></i></a>
+                      <a class="pointer col-sm-2" *ngIf="sub.specificationTableSubData.length == row.$$index+1"
+                        role="button" title="Add Item" (click)="addItemClick(i, j, row.$$index);">
+                      <i class="icofont icofont-ui-add text-success"></i></a>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+              <br>
+            </div>
+          </div>  
+      </div>
+    </div>
+  </wizard-step>
+
+  <wizard-step [title]="'Attachment'" id="attachment" [showPrev]="false" [showNext]="false">
+    <br>
+    <app-file-upload-for-doc #fileupload [multiple]=true [onlyView]=false [documentId]="this.cleenRoomInfo.id"
+      [update]="this.cleenRoomInfo.id!=0" [documentCode]="this.helper.CLEAN_ROOM_VALUE"></app-file-upload-for-doc>
+  </wizard-step>
+
+  <wizard-step [title]="'Workflow Configurtion'" id="workflow" [showPrev]="false" [showNext]="false">
+    <br>
+    <div class="text-center">
+      <a href="javascript:" class="m-r-10" (click)="openIndividualWorkflowSetup();"><img
+          class="image-radius rounded-0 img-27 img-height" src="assets/icon/png-icons/addWorkflow.png" alt="Add Level"
+          placement="top" ngbTooltip="Add Level"></a>
+    </div>
+    <br>
+    <div *ngIf="this.getStatus && this.getStatus.length>0">
+      <div style="max-height: 400px !important;">
+        <div style="max-height: 300px !important;">
+          <div class="dt-desc dy-width-300">
+            <ul class="progress-indicator">
+              <li *ngFor="let status of this.getStatus;" class="completed">
+                <label>
+                  <span style="white-space: pre-line;" class="bubble"></span>
+                  <div class="strong">{{status.levelName}} : {{status.type}}<br><br>
+                    <div style="text-align: left;"><b class="black"><u>Users</u></b>
+              <li *ngFor="let user of status.userArray; let i = index;">{{i+1}}.{{user}}</li>
+          </div>
+        </div>
+        </label>
+        </li>
+        </ul><br><br>
+      </div>
+    </div>
+    </div>
+    </div>
+    <app-individual-document-item-workflow #individualDocumentItemWorkflow
+      [permissionConstant]="this.helper.CLEAN_ROOM_VALUE" (onCloseModel)="loadDocumentTimeline($event)">
+    </app-individual-document-item-workflow>
+  </wizard-step>
+
+  <wizard-step [title]="'Summary'" id="summary" [showPrev]="false" [showNext]="false">
+    <br>
+    <div *ngIf="cleenRoomInfo">
+      <div class="row">
+        <div class="col-sm-12">
+          <table id="room-view-table" class="table w-100">
+            <tbody>
+              <tr>
+                <td colspan="2">
+                  <div><strong class="strong">Location : </strong>{{cleenRoomInfo.locationName}}</div>
+                </td>
+                <td colspan="2">
+                  <div><strong class="strong">Department(s) : </strong>{{cleenRoomInfo.departmentName}}</div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <div><strong class="strong">Project : </strong>
+                    <a href="javascript:void(0)"
+                      (click)="onClickProject(cleenRoomInfo.projectId)"><u>{{cleenRoomInfo.projectName}}</u></a>
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div><strong class="strong">Classification : </strong>{{cleenRoomInfo.classification ?
+                    cleenRoomInfo.classification : 'N/A'}}</div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <div><strong class="strong">Room No/Floor : </strong>{{cleenRoomInfo.roomNo ? cleenRoomInfo.roomNo : 'N/A'}}/{{cleenRoomInfo.floor ? cleenRoomInfo.floor : 'N/A'}}
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div><strong class="strong">Building : </strong>{{cleenRoomInfo.building ? cleenRoomInfo.building :
+                    'N/A'}}</div>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <div><strong class="strong">Room Orientation : </strong>{{cleenRoomInfo.roomOrientation ? cleenRoomInfo.roomOrientation :
+                      'N/A'}}
+                  </div>
+                </td>
+                <td colspan="2">
+                  <div><strong class="strong">Equipment(s) : </strong>
+                    <label *ngIf="cleenRoomInfo.equipmentDto && cleenRoomInfo.equipmentDto.length > 0;else empty_eqp">
+                      <ng-container *ngFor="let eqp of cleenRoomInfo.equipmentDto; let i = index;">
+                        <a href="javascript:void(0)" (click)="equipmentRedirection(eqp.id)"><u>{{eqp.name}}<label
+                              *ngIf="cleenRoomInfo.equipmentDto.length!=(i+1)">,</label></u></a>
+                      </ng-container>
+                    </label>
+                    <ng-template #empty_eqp>N/A</ng-template>
+                  </div>
+                </td>
+              </tr>
+              <tr *ngIf="specificationInfo">
+                <td>
+                  <div><strong class="strong">length : </strong>{{specificationInfo.length}}</div>
+                </td>
+                <td>
+                  <div><strong class="strong">Width : </strong>{{specificationInfo.width}}</div>
+                </td>
+                <td>
+                  <div><strong class="strong">Height : </strong>{{specificationInfo.height}}</div>
+                </td>
+                <td>
+                  <div><strong class="strong">Total Area(SF) : </strong>{{specificationInfo.totalArea}}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div *ngIf="specificationInfo.specificationTableInfo && specificationInfo.specificationTableInfo.length > 0">
+            <div><strong class="strong-specification">Specification :</strong></div>
+            <br>
+            <div class="col-sm-12" *ngFor="let data of specificationInfo.specificationTableInfo; let i = index;" >
+              <div class ="row">
+                <div><strong class="strong-category">{{data.category}}</strong></div>
+              </div>
+              <div class ="row" *ngFor="let sub of data.subCategoryList; let k = index;" >
+                <div *ngIf=" sub.subCategory != data.category"><strong class="strong">{{sub.subCategory}}</strong></div>
+                <div class="table-responsive">
+                  <table class="table">
+                    <tr class="header-bg">
+                      <th class="w-10">Sl No</th>
+                        <!-- <th>Sub Category</th> -->
+                      <th>Description</th>
+                      <th>Acceptance Criteria</th>
+                      <th>Observation</th>
+                      <th>Updated User/Time</th>
+                    </tr>
+                    <tr *ngFor="let item of sub.specificationTableSubData; let j = index;">
+                      <td>{{j+1}}</td>
+                      <!-- <td style="white-space:initial;">{{item.subCategory}}</td> -->
+                      <td style="white-space:initial;">{{item.field}}</td>
+                      <td>{{item.value ? item.value : 'N/A'}}</td>
+                      <td style="white-space:initial;">{{item.observation ? item.observation : 'N/A' }}</td>
+                      <td style="white-space:initial;">{{item.updatedBy}} {{item.updatedDate}}
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-sm-12" *ngIf="fileFlag"><strong class="strong">View Uploaded Files :</strong></div>
+            <div class="col-sm-12 p-0">
+              <app-file-upload-for-doc #viewFileupload [uniqueCodeForAudit]="cleenRoomInfo.cleanRoomCode"
+                [documentId]="cleenRoomInfo.id" [multiple]=false [onlyView]=true
+                [documentCode]="this.helper.CLEAN_ROOM_VALUE"></app-file-upload-for-doc>
+            </div>
+          </div>
+        </div>
+      </div>
+      <app-individual-audit-trail [permission]="this.helper.CLEAN_ROOM_VALUE" [id]="cleenRoomInfo.id">
+      </app-individual-audit-trail>
+    </div>
+  </wizard-step>
+</form-wizard>
+
+<app-modal-basic #bulkSpecificationModal [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Bulk Import Specification Excel</h4>
+    <button type="button" class="close basic-close"
+      (click)="bulkSpecificationModal.hide(); closeBulkSpecificationModel()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="400px" size="12px"
+    color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="row">
+      <div class="col-sm-12">
+        <div><button class="btn btn-primary" (click)="sampleSpecificationDownload();" style="float: right;"><i
+              class="icofont icofont-download-alt"></i>Sample Download</button></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="sub-title">Single File</div>
+        <label class="custom-file">
+          <input #myInput type="file" ng2FileSelect [uploader]="uploader" accept=".xls" (change)="extractFile($event);">
+          <span class="custom-file-control"></span>
+        </label>
+      </div>
+    </div>
+    <br>
+    <div class="col-sm-12">
+      <div>
+        <div style="color: darkgreen" *ngIf="this.validationMessage!=''">{{this.validationMessage}}</div>
+      </div>
+    </div>
+    <ng-container *ngIf="excelData && excelData.length > 0">
+      <div *ngIf="this.isUploaded" class="table-responsive">
+        <table id="tableIdDivRefresh1" #tableIdDivRefresh class="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Sl No</th>
+              <th>Category</th>
+              <th>Sub Category</th>
+              <th>Description</th>
+              <th>Acceptance Criteria</th>
+              <th>Observation</th>
+            </tr>
+          </thead>
+          <tbody *ngFor="let row of excelData ; let i = index" [attr.data-index]="i">
+            <tr>
+              <td>
+                <label>{{i+1}}</label>
+              </td>
+              <td>
+                <input type="text" name="category-{{i}}" class="form-control" [(ngModel)]="row.category"
+                  maxlength="50" />
+              </td>
+              <td>
+                <input type="text" name="subCategory-{{i}}" class="form-control" [(ngModel)]="row.subCategory"
+                  maxlength="50" />
+              </td>
+              <td>
+                <input type="text" name="desription-{{i}}" class="form-control" [(ngModel)]="row.field" maxlength="50"
+                  (ngModelChange)="checkDescription(excelData, row);"
+                  [ngStyle]="{'background-color': (row.field == '' || row.fieldValMsg != '') ? '#FD3A4A' : 'white'}" />
+                <div class="messages text-danger" *ngIf="row.fieldValMsg != ''">{{row.fieldValMsg}}
+                </div>
+              </td>
+              <td>
+                <input type="text" name="value-{{i}}" class="form-control" [(ngModel)]="row.value" maxlength="50" />
+              </td>
+              <td>
+                <input type="text" name="value-{{i}}" class="form-control" [(ngModel)]="row.observation"
+                maxlength="50" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="text-align: center" class="messages text-danger" *ngIf="this.enableImportButton">Please Fill all the
+        Data</div>
+      <br>
+    </ng-container>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+      [disabled]="!permissionModal.createButtonFlag || this.enableImportButton" (click)="importData()">Import</button>
+    <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+      (click)="bulkSpecificationModal.hide(); closeBulkSpecificationModel()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #roomStatusModal [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Cleanroom Status</strong></h5>
+    <button type="button" class="close basic-close" (click)="onCloseRoomStatusModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Validation status <span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <span>
+              <select class="form-control" [(ngModel)]="cleanRoomStatusDTO.validationStatus">
+                <option *ngFor="let data of this.validationStatusList;" [value]="data.key">{{data.value}}
+                </option>
+              </select>
+            </span>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Comments<span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <span>
+              <textarea style="width:-webkit-fill-available" [(ngModel)]="cleanRoomStatusDTO.comments" name="remarks"
+                #remarks="ngModel" [attr.rows]="2"></textarea>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+          [disabled]="cleanRoomStatusDTO.comments == ''" (click)="saveValidationStatus();">Update</button>
+        <button type="button" class="btn btn-sm btn-danger waves-effect waves-light"
+          (click)="onCloseRoomStatusModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

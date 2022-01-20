@@ -1,0 +1,26 @@
+table.riskTable {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: inherit;
+    box-sizing: inherit;
+    text-align: center;
+  }
+td.tdForriskTable {
+    width:100px;
+    height:60px;
+    border: 1px solid black;
+  }
+th.thForRiskTable{
+  width:100px;
+  height:60px;
+}
+strong.riskCount{
+  color: red;
+}
+.foo {
+  width: 75px;
+  height: 28px;
+  border: 1px solid black;
+  text-align: center;
+  font-weight: bold;
+}

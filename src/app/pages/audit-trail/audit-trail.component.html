@@ -1,0 +1,297 @@
+<div class="row">
+	<div class="col-sm-12">
+		<div class="col-sm-12" id="float-action">
+			<app-card>
+				<div class="row">
+					<div class="col-sm-1-5 pr-0 pl-0">
+						<label class="col-form-label">&nbsp;&nbsp;From Date</label>
+						<div class="col-sm-12 pr-0 pl-0">
+							<my-date-picker (keypress)="$event.preventDefault();" #date name="startDate"
+								(click)="openBtnClicked(date)" #dobstart="ngModel" placeholder="From Date"
+								[options]="myDatePickerOptions" [(ngModel)]="startdate1"
+								(ngModelChange)="startDateChange($event)" required></my-date-picker>
+						</div>
+					</div>
+					<div class="col-sm-1-5 pr-0 pl-0">
+						<label class="col-form-label">&nbsp;&nbsp;&nbsp;To Date </label>
+						<div class="col-sm-12 pr-0">
+							<my-date-picker (keypress)="$event.preventDefault();" #date1 name="endDate"
+								(click)="openBtnClicked(date1)" placeholder="To Date" [options]="myDatePickerOptions"
+								[(ngModel)]="Enddate1" #dobend="ngModel" (ngModelChange)="endDateChange($event)"
+								required>
+							</my-date-picker>
+						</div>
+					</div>
+					<div class="col-sm-1-5 pr-0 pl-0">
+						<label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Location </label>
+						<form class="form-inline">
+							<div class="col-sm-12 pr-0 ">
+								<div id="inputgroup" class="input-group">
+									<select name="selectLocation" class="form-control"
+										[(ngModel)]="modal.selectedLocation"
+										(change)="onChangeLocation($event.srcElement.value)">
+										<option value="">Select Location</option>
+										<option *ngFor="let loc of locationList" [value]="loc.id">{{loc.name}}</option>
+									</select>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-sm-1-5 pr-0 pl-0">
+						<label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Project </label>
+						<form class="form-inline">
+							<div class="col-sm-12 pr-0 ">
+								<div id="inputgroup" class="input-group">
+									<select name="selectproject" class="form-control"
+										[(ngModel)]="modal.selectedProject"
+										(change)="onChangeProject($event.srcElement.value)">
+										<option value="">Select Project</option>
+										<option *ngFor="let project of projectList" [value]="project.id">
+											{{project.projectName}}</option>
+									</select>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-sm-2 pr-0 pl-0">
+						<label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Document </label>
+						<form class="form-inline">
+							<div class="col-sm-12 pr-0">
+								<div id="inputgroup" class="input-group">
+									<select [disabled]="isDisable" name="selectdocument" class="form-control"
+										[(ngModel)]="documentSearch" (change)="eventChange()">
+										<option value="">Select Document</option>
+										<option *ngFor="let doc of documentList ;let i=index; " [value]="i">
+											{{doc.value}}
+										</option>
+									</select>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-sm-1-5 pr-0 pl-0">
+						<label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Event </label>
+						<form class="form-inline">
+							<div class="col-sm-12 pr-0 ">
+								<div id="inputgroup" class="input-group">
+									<select name="selectevent" class="form-control" [(ngModel)]="eventSearch">
+										<option value="">Select Event</option>
+										<option *ngFor="let event of eventList; " [value]="event.key">{{event.value}}
+										</option>
+									</select>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-sm-1-5 pr-0 pl-0" *ngIf="this.currentUser && this.currentUser==='Y'">
+						<label class="col-form-label">&nbsp;&nbsp;&nbsp;Select User </label>
+						<form class="form-inline">
+							<div class="col-sm-12 pr-0">
+								<div id="inputgroup" class="input-group">
+									<select name="selectuser" class="form-control" [(ngModel)]="userSearch">
+										<option value="0">Select User</option>
+										<option *ngFor="let user of userlist;" [value]="user.key">{{user.value}}
+										</option>
+									</select>
+								</div>
+							</div>
+						</form>
+					</div>
+					<div class="col-sm-1 pr-0 pl-0">
+						<br>&nbsp;&nbsp;
+						<button style="float: right; margin-top: 12px;" type="button"
+							class="btn btn-sm btn-primary waves-effect waves-light"
+							(click)="loadAuditDateRange();">Search</button>
+					</div>
+				</div>
+			</app-card>
+		</div>
+
+		<br><br><br><br><br>
+
+		<app-card>
+			<ngb-tabset #taskTab="ngbTabset">
+				<ngb-tab id="detail" title="">
+					<ng-template ngbTabContent>
+						<div style="text-align: right;">
+							<a href="javascript:" class="m-r-10"><img class="image-radius rounded-0 img-25"
+									src="assets/icon/png-icons/search.png" alt="Search" placement="bottom"
+									ngbTooltip="Search" (click)="this.showSearch=!this.showSearch"></a>
+							<input *ngIf="this.showSearch" type="search" [(ngModel)]="filterQuery"
+								(ngModelChange)="this.helper.setPaginator(table); rowsAfterFilter();"
+								class="form-control input-sm full-data-search m-r-15" placeholder="Search">
+
+							<a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+									src="assets/icon/png-icons/csvExport.png" alt="CSV Export" placement="top"
+									ngbTooltip="CSV Export" (click)="downloadFile()"></a>
+
+							<a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+									src="assets/icon/png-icons/pdfExport.png" alt="PDF Export" placement="top"
+									ngbTooltip="PDF Export" (click)="pdfdownload()"></a>
+
+							<a href="javascript:"><img class="image-radius rounded-0 img-25"
+									src="assets/icon/png-icons/menu.png" alt="Table of Content" placement="top"
+									ngbTooltip="Table of Content" (click)="onClickTableOfContent()"></a>
+						</div>
+						<ngx-datatable [scrollbarH]="true" #myTable class="material data-table"
+							[rows]='data | auditTrailFilter : filterQuery' [limit]="rowsOnPage" [offset]="tableOffset"
+							(page)="onChangePage($event)" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+							<!-- Row Detail Template -->
+							<ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+								<ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+									<div class="dt-desc">
+										<table class="table-striped table-bordered">
+											<tr>
+												<th colspan="3">
+													<strong>System Remarks</strong>
+												</th>
+											</tr>
+											<tr *ngFor="let system of row.systemRemarks ;let in = index">
+												<td [innerHtml]="in+1"></td>
+												<td style="white-space: pre-line" class="fontStyle">
+													<label for="systemRemarks-{{in+1}}">
+														<pre [innerHtml]="system"></pre>
+													</label>
+												</td>
+											</tr>
+										</table>
+										<br>
+										<table class="table-striped table-bordered">
+											<tr>
+												<th colspan="3">Device info</th>
+											</tr>
+											<tr>
+												<td>Browser And Device</td>
+												<td class="fontStyle">{{row['browser']}}</td>
+											</tr>
+										</table>
+										<br>
+										<table class="table-striped table-bordered">
+											<tr>
+												<th colspan="3">
+													<strong>User Remarks</strong>
+												</th>
+											</tr>
+											<tr *ngFor="let user of row.userRemarks ;let in = index">
+												<td [innerHtml]="in+1"></td>
+												<td style="white-space: pre-line" class="fontStyle">
+													<label for="userRemmarks-{{in+1}}"><label
+															[innerHtml]="user"></label></label>
+												</td>
+											</tr>
+										</table>
+										<br>
+										<table *ngIf="row.tableAudit.length>0" class="table-striped table-bordered">
+											<tr>
+												<th colspan="3">
+													<strong>Table Changes</strong>
+												</th>
+											</tr>
+											<tr *ngFor="let table of row.tableAudit ;let tableIndex = index">
+												<td>{{tableIndex+1}}</td>
+												<td>
+													{{table.name}} <a class="btn btn-link strong" role="button"
+														(click)="loadTableChanges(table)">Click here!</a>
+												</td>
+											</tr>
+
+										</table>
+									</div>
+
+								</ng-template>
+							</ngx-datatable-row-detail>
+							<ngx-datatable-column [resizeable]="true" [width]="5" [sortable]="false" [draggable]="false"
+								[canAutoResize]="true">
+								<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+									<a href="javascript:;" [class.datatable-icon-right]="!expanded"
+										[class.datatable-icon-down]="expanded" title="Expand/Collapse Row"
+										(click)="toggleExpandRow(row)"> </a>
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column [width]="300" [resizeable]="true" [sortable]="true" name="UserName">
+								<ng-template let-row="row" ngx-datatable-cell-template>{{row['loginUserName']}}
+								</ng-template>
+							</ngx-datatable-column>
+
+							<ngx-datatable-column [width]="300" [sortable]="true" name="Event">
+								<ng-template let-row="row" ngx-datatable-cell-template>{{row['event']}}</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column [width]="200" [sortable]="true" name="Project Name">
+								<ng-template let-row="row" ngx-datatable-cell-template>{{row['projectName']}}
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column [width]="200" [sortable]="true" name="Document Type">
+								<ng-template let-row="row" ngx-datatable-cell-template>{{row['displayOrder']}}
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column [width]="150" [sortable]="true" name="Item ID">
+								<ng-template let-row="row" ngx-datatable-cell-template>{{row['uniqueDocCode']}}
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column [sortable]="true" name="IP Address">
+								<ng-template let-row="row" ngx-datatable-cell-template>{{row['ipAddress']}}
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column [sortable]="true" name="CreatedTime" [width]="150">
+								<ng-template let-row="row" ngx-datatable-cell-template>{{row['createdTime']}}
+								</ng-template>
+							</ngx-datatable-column>
+						</ngx-datatable>
+					</ng-template>
+				</ngb-tab>
+			</ngb-tabset>
+		</app-card>
+	</div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+
+<app-modal-basic #auditForTable [dialogClass]="'modal-lg'" class="modal-dialog">
+	<div class="app-modal-header">
+		<h4 class="modal-title">Table Changes</h4>
+		<button type="button" class="close basic-close" (click)="auditForTable.hide()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div style="max-height: 500px !important;overflow: scroll;" class="app-modal-body">
+		<div class="dt-desc" style="padding: 0px;">
+			<div class="row">
+				<div class="col-sm-6">
+					<table class="table-responsive" id="oldTableId">
+						<thead>
+							<tr>
+								<th *ngFor="let col of this.oldTable.column">{{col}}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr *ngFor="let row of this.oldTable.rows ; let i=index;">
+								<td id="oldtd_{{i}}_{{j}}" *ngFor="let rowData of row; let j=index">{{rowData}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="col-sm-6">
+					<table class="table-responsive" id="newTableId">
+						<thead>
+							<tr>
+								<th *ngFor="let col of this.oldTable.column">{{col}}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr *ngFor="let row of this.newTable.rows ; let i=index;">
+								<td id="newtd-{{i}}" *ngFor="let rowData of row">{{rowData}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="app-modal-footer container">
+		<label><i style="color: #FBE870" class="icofont icofont-info-circle"></i>-&nbsp;Added</label>&nbsp;&nbsp;
+		<label><i style="color: #F08080" class="icofont icofont-info-circle"></i>-&nbsp;Old value</label>&nbsp;&nbsp;
+		<label><i style="color: #90EE90" class="icofont icofont-info-circle"></i>-&nbsp;Updated</label>
+		<button type="button" class="btn btn-default waves-effect float-right"
+			(click)="auditForTable.hide()">Close</button>
+	</div>
+</app-modal-basic>

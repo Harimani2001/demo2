@@ -1,0 +1,45 @@
+<app-modal-basic #modalFileViewer [hideHeader]="false" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div style="width: 100%;" class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="modalFileViewer.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="row">
+      <div class="col-sm-4">
+        <h5>Screenshot Images</h5>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-modal-body">
+    <div class="row">
+      <div *ngFor="let d of fileList;let i = index" class="col-sm-2" style="text-align: center;">
+        <img src="assets/images/interface (2).png" (click)="onclickViewImageOrVideo(d.filePath)" class="pointer"><br>
+        <a href="javascript:;" (click)="onclickViewImageOrVideo(d.filePath)">
+          {{d.fileName}}</a>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalFileViewerVideo [hideHeader]="false" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div style="width: 100%;" class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="modalFileViewerVideo.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="row">
+      <div class="col-sm-4">
+        <h5>Screen Record Videos</h5>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-modal-body">
+    <div class="row">
+      <div *ngFor="let d of fileList;let i = index" class="col-sm-2" style="text-align: center;">
+        <img src="assets/images/computer.png" (click)="onclickViewImageOrVideo(d.filePath)" class="pointer"><br>
+        <a href="javascript:;" (click)="onclickViewImageOrVideo(d.filePath)">
+          {{d.fileName}}</a>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>

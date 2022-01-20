@@ -1,0 +1,179 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card [title]="'Category LookUp'" [classHeader]="true">
+
+      <div>
+      </div>
+
+      <div class="row">
+        <div class="col-sm-12 col-xl-4 m-b-30">
+
+          <label class="label-control">
+            <select name="select" class="form-control" id="categoryList" [(ngModel)]="selectedCategory" name="templateList" (ngModelChange)="categoryChanged($event)">
+              <option value="0">-Select Category-</option>
+              <option *ngFor="let lookupcategory of lookUpCategoryList" [value]="lookupcategory.id">{{lookupcategory.name}}</option>
+            </select>
+          </label>
+          &nbsp;&nbsp;&nbsp;
+          <button type="button" class="btn btn-primary" (click)="modalDefault.show();">
+            <i class="icofont icofont-plus-circle"></i>Add Category
+          </button>
+
+          <button *ngIf="selectedCategory != 0" type="button" class="btn btn-primary" [disabled]="addItemAlreadyclicked"
+            (click)="addItemClick()">
+            <i class="icofont icofont-plus-circle"></i>Add Item
+          </button>
+        </div>
+
+
+        <div class="col-sm-12 col-xl-4 m-b-30">
+        </div>
+
+        <div class="col-sm-12 col-xl-4 m-b-30">
+          <div style="text-align: right;">
+            <label>Search:
+              <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search" placeholder="">
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-danger background-danger" *ngIf="lookUpkeyExists">
+        <strong>Key</strong> Already Exists
+      </div>
+
+      <div class="alert alert-danger background-danger" *ngIf="isFieldsFilled">
+        <strong>Please enter data for all fields</strong>
+      </div>
+
+      <ngx-datatable #mydatatable class="material data-table" [headerHeight]="50" [limit]="10" [columnMode]="'force'" [footerHeight]="50"
+        [rowHeight]="'auto'" [rows]="lookUpItemList | lookUpFilter : filterQuery ">
+        <ngx-datatable-column name="Key">
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value" let-rowIndex="rowIndex">
+
+
+            <span *ngIf="isdocumentlist==false">
+              <span title="Click to edit" (click)="editRow(row.$$index)" *ngIf="!editing[row.$$index ]" placeholder="Please Fill">
+                {{row['key']}}
+              </span>
+              <input autofocus (blur)="updateValue($event, 'key', value, row )" *ngIf="editing[row.$$index ]" type="text" [value]="row['key']"
+                class="form-control" />
+            </span>
+
+            <span *ngIf="isdocumentlist==true">
+              <span title="Click to edit" (click)="editRow(row.$$index)" *ngIf="!editing[row.$$index ]" placeholder="Please Fill">
+                {{row['key']}}
+              </span>
+              <select [value]="row['key']" autofocus (blur)="updateValue($event, 'key', value, row )" *ngIf="editing[row.$$index ]" [disabled]="isDisabled"
+                name="select" class="form-control" id="userRole" required name="userRole">
+                <option value=0>select the document</option>
+                <option *ngFor="let doc of docItemList" [value]="doc.permissionConstantName">{{doc.permissionTitle}}</option>
+              </select>
+            </span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Value">
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+            <span title="Click to edit" (click)="editRow(row.$$index)" *ngIf="!editing[row.$$index ]">
+              {{row['value']}}
+            </span>
+            <input autofocus (blur)="updateValue($event, 'value', value, row)" *ngIf="editing[row.$$index ]" type="text" [value]="row['value']"
+              class="form-control" />
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="DisplayOrder">
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+            <span title="Click to edit" (click)="editRow(row.$$index)" *ngIf="!editing[row.$$index ]">
+              {{row['displayOrder']}}
+            </span>
+            <input type="number" min="0" max="10" autofocus (blur)="updateValue($event, 'displayOrder', value, row)" *ngIf="editing[row.$$index ]"
+              [value]="row['displayOrder']" class="form-control" />
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="ActiveFlag">
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+            <span title="Click to edit" (click)="editRow(row.$$index)" *ngIf="!editing[row.$$index ]">
+              {{row['activeFlag']}}
+            </span>
+            <select *ngIf="editing[row.$$index ]" (change)="updateValue($event, 'activeFlag', value, row)" [value]="row['activeFlag']"
+              class="form-control">
+              <option value="Y">Yes</option>
+              <option value="N">No</option>
+            </select>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Action">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <button type="submit" [disabled]="isUpdating" class="btn btn-primary" (click)="updateRow(row , row['$$index'] )">Update</button>
+            <!-- <span  class="ti-reload rotate-refresh"></span>&nbsp; -->
+            <button style="padding: 10px 10px;" type="submit" class="btn btn-danger" (click)="openSuccessCancelSwal(row , row['$$index']);">Delete</button>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+
+    </app-card>
+  </div>
+</div>
+
+
+<form #addCategory="ngForm" name="popUpForm" novalidate>
+  <app-modal-basic #modalDefault>
+    <div class="app-modal-header">
+      <h4 class="modal-title">Add Category</h4>
+      <button type="button" id="popUpCloseId" class="close basic-close" (click)="modalDefault.hide();resetFormValues(addCategory);">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body">
+
+      <div class="alert alert-danger background-danger" *ngIf="categoryKeyExists" (blur)="checkIfCategoryKeyExists();">
+        <strong>Key</strong> Already Exists
+      </div>
+
+      <div class="input-group">
+
+        <span class="input-group-addon" id="basic-addon1">
+          <i class="icofont icofont-user"></i>
+        </span>
+        <input type="text" class="form-control" placeholder="Key" name="userName" (blur)="checkIfCategoryKeyExists();" [(ngModel)]="addCategoryModel.name"
+          #key="ngModel" required maxlength="50" pattern="[a-zA-Z0-9/s]+">
+      </div>
+
+      <div class="input-group">
+        <div class="messages text-danger" *ngIf="(key.touched || submitted) && key.errors?.required">Key can't be blank</div>
+        <div class="messages text-danger" *ngIf="(key.touched || submitted) && key?.errors?.pattern">Alphanumeric without space allowed</div>
+
+      </div>
+
+
+      <div class="input-group">
+        <span class="input-group-addon" id="basic-addon1">
+          <i class="icofont icofont-user"></i>
+        </span>
+        <input type="text" class="form-control" placeholder="Description" name="fullName" [(ngModel)]="addCategoryModel.description"
+          #description="ngModel" required pattern="[a-zA-Z0-9\s]+" maxlength="40">
+
+      </div>
+
+      <div class="input-group">
+        <div class="messages text-danger" *ngIf="(description.touched || submitted) && description.errors?.required">Description can't be blank</div>
+        <div class="messages text-danger" *ngIf="(description.touched || submitted) && description?.errors?.pattern ">Only Alphanumeric and space allowed</div>
+      </div>
+
+      <h6 *ngIf="iserrorinSaving" style="color: red">Record Not Saved</h6>
+
+    </div>
+    <div class="app-modal-footer">
+      <button type="button" [disabled]="isLoading" (click)="$event.preventDefault();addCategoryClick(addCategory.form.valid);" class="btn btn-success">Save
+        <span *ngIf="isLoading" class="ti-reload rotate-refresh"></span>
+      </button>
+      <button type="button" id="popUpCloseId1" class="btn btn-default waves-effect" (click)="modalDefault.hide();resetFormValues(addCategory);">Close</button>
+    </div>
+  </app-modal-basic>
+
+</form>

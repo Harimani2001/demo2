@@ -1,0 +1,60 @@
+<app-card title="Form Reference">
+  <form #formLink="ngForm">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="row">
+        <div class="col-sm-4">Select Form<span class="asterisk required">*</span></div>
+        <div class="col-sm-8">
+          <ng-select  [options]="simpleOption" name="documentTypeName"  [(ngModel)]="dto.documentType" required #documentType="ngModel" 
+          (ngModelChange)="loadLinkedMasterForm(this.dto.documentType)"></ng-select>
+          <!-- <select name="documentTypeName" class="form-control" id="docList" [(ngModel)]="dto.documentType" required #documentType="ngModel" 
+            (change)="loadLinkedMasterForm(this.dto.documentType)">
+            <option disabled value="">Select Form</option>
+            <option *ngFor="let document of this.documentList;let i=index" [value]="document.key">{{document.value}}</option>
+          </select> -->
+          <div class="messages text-danger" *ngIf="(documentType.touched || submitted )&& dto.documentType==undefined">Please select the form</div>
+        </div>
+      </div>
+      <br>
+      <ng-container >
+      <div class="row">
+        <div class="col-sm-4">Select Form Reference <span class="asterisk required">*</span></div>
+        <div class="col-sm-8">
+          <ng-select [ngClass]="'ng-select'" [options]="masterFormList" [multiple]="true" required name="linkedMasterFormName"
+            [(ngModel)]="this.dto.linkedMasterForm" #linkedMasterForm="ngModel" (ngModelChange)="linkedMFWithProjectJsonCreation(this.dto.linkedMasterForm,masterFormList)"></ng-select>
+            <div class="messages text-danger" *ngIf="(linkedMasterForm.touched || submitted )&& linkedMasterForm.errors?.required">Please select atleast one master form</div>
+        </div>
+      </div>
+      <br>
+      <div *ngIf="this.dto.linkedMasterForm && this.dto.linkedMasterForm.length>0" class="row">
+        <div class="col-sm-4">Select Project</div>
+        <div class="col-sm-8">
+          <ng-container *ngFor="let projectLink of this.dto.linkedMFWithProject">
+            <div class="row">
+               <div class="col-sm-4 pt-2">
+                  <label class="form-control-label">{{projectLink.linkedFormName}}</label>
+               </div>
+               <div class="col-sm-8">
+                <ng-select [ngClass]="'ng-select'" [options]="projectLink.projectList" [multiple]="true"  name="projectListName"
+                [(ngModel)]="projectLink.project" #projectListModal="ngModel">
+              </ng-select>
+              </div>
+            </div>
+            <br>
+          </ng-container>
+        </div>
+      </div>
+      <br> <br>
+      <div class="row">
+        <div class="col-sm-12 text-center">
+            <button *ngIf="!dto.id" type="button" (click)="save(formLink.valid)" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+            <button *ngIf="dto.id" type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="save(formLink.valid)">Update</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="cancel()">Cancel</button>
+        </div>
+      </div>
+    </ng-container>
+    </div>
+  </div>
+</form>
+</app-card>
+<div *ngIf="linkSpinnerFlag" class="loading">Loading&#8230;</div>

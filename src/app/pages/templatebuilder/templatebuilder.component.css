@@ -1,0 +1,32 @@
+.left{
+  float: left;
+}
+.form-input {
+  height: 43px;
+  font-size: 16px;
+}
+
+
+.thumbnail {
+    position: relative;
+    padding: 0px;
+    margin-bottom: 20px;
+
+}
+.borderanimated:hover {
+  box-shadow: 0 0 2px 1px rgba(0, 140, 186, 0.5);
+}
+.thumbnail img {
+
+    width: 100%;
+}
+.borderanimated{
+  cursor: pointer;
+  border: 1px solid #ddd;
+}
+
+.buttoninsideBox{
+  font-size: 10px;
+  margin: 10px;
+}
+

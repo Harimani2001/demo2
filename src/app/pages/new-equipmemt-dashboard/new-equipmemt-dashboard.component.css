@@ -1,0 +1,24 @@
+.card-heading{
+    padding: 10px 0px 10px 0px;
+    text-align: center;
+}
+.p-10{
+     padding: 10px;
+}
+.vertical-line {
+    border-left: 1px solid #e0e0e0;
+  }
+  .border-radius{
+    border-radius: 35px;
+  }
+  .align-center{
+      text-align: center;
+  }
+
+  .hovereffect{
+      border: 1px solid #4680ff;
+      padding: 10px;
+    }
+     .solid {
+        border: 1px solid #4680ff;
+    }

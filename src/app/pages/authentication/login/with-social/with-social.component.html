@@ -1,0 +1,104 @@
+<section class="p-fixed d-flex text-center">
+  <div class="bg-login-img content auth-fluid">
+    <div class="bg-login-img-caption row">
+      <div class="col-sm-12">
+        <div class="login-card card-body auth-body">
+          <form class="md-float-material" #loginform="ngForm" (keydown)="keyDownFunction($event,loginform.valid)">
+            <div class="auth-box">
+              <div class="row m-b-20">
+                <div class="text-center col-md-12">
+                  <img src="assets/images/GoVal_Logo_App.png">
+                </div>
+              </div>
+
+              <p class="text-inverse b-b-default text-left p-b-5"></p>
+              <div class="form-group">
+                <input type="email" id="userName" class="form-control" placeholder="Username" name="email"
+                  [(ngModel)]="this.userName" #email="ngModel" required (change)="this.checkLDAPSetting();"
+                  (ngModelChange)="onChange();onChangeUserName();" />
+                <div class="messages text-danger" *ngIf="(email.touched || submitted) && email.errors?.required">
+                  Email/Username is required</div>
+                <span class="md-line"></span>
+              </div>
+
+              <div class="form-group" *ngIf="isValidUser">
+                <input type="password" id="pwd" class="form-control" placeholder="password" name="password" autocomplete="off"
+                  [(ngModel)]="this.password" #passwordModal="ngModel" required (ngModelChange)="onChange()" />
+                <div class="messages text-danger"
+                  *ngIf="(passwordModal.touched || submitted) && passwordModal.errors?.required"
+                  class="messages text-danger">Password is required</div>
+                <span class="md-line"></span>
+              </div>
+
+              <div class="form-group" *ngIf="isValidUser && this.userOrganizations.length > 1">
+                <select class="form-control" required name="organization" #organizationModel="ngModel"
+                  [(ngModel)]="this.organization">
+                  <option value="">Select Organization</option>
+                  <option *ngFor="let org of this.userOrganizations" [value]="org.value">{{org.value}}</option>
+                </select>
+                <div class="messages text-danger"
+                  *ngIf="(organizationModel.touched || submitted) && organizationModel.errors?.required"
+                  class="messages text-danger">Organization is required</div>
+                <span class="md-line"></span>
+              </div>
+
+              <div class="row m-t-25 text-left">
+                <div class="col-sm-6 col-xs-12">
+                </div>
+                <div class="col-sm-6 col-xs-12 forgot-phone text-right">
+                  <a *ngIf="!forgotPasswordFlag" class="text-right f-w-600 text-inverse" style="cursor: pointer;"
+                    (click)="onclick()">Forgot Password?</a>
+                </div>
+              </div>
+
+              <div *ngIf="inValidCredentials" class="form-group col-md-12 ">
+                <div class="messages text-danger">
+                  <b>{{message}}</b>
+                </div>
+              </div>
+
+              <div *ngIf="invalidUserMessage" class="form-group col-md-12 ">
+                <div class="messages text-danger">
+                  <b>Invalid User</b>
+                </div>
+              </div>
+
+              <div *ngIf="inActiveSession" class="form-group col-md-12 ">
+                <div class="messages text-danger">
+                  <b>You have already active session. Please logout all sessions and try.</b>
+                </div>
+              </div>
+
+              <div *ngIf="inToManyAtt" class="form-group col-md-12 ">
+                <div class="messages text-danger">
+                  <b>Too many attempts, please wait</b>
+                  <p>{{timeLeft}} Seconds Left....</p>
+                </div>
+              </div>
+
+              <div class="row m-t-30">
+                <div class="col-md-12">
+                  <button type="button" [disabled]="this.loading" *ngIf="!inToManyAtt && isValidUser"
+                    class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
+                    (click)="onSubmit(loginform.valid)">Sign in&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span *ngIf="loading"
+                      class="ti-reload rotate-refresh"></span></button>
+                  <button type="button" *ngIf="!isValidUser" [disabled]="!this.userName || loading"
+                    class="btn btn-primary btn-md btn-block waves-effect text-center m-b-20"
+                    (click)="checkUserName()">Go&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span *ngIf="loading"
+                      class="ti-reload rotate-refresh"></span></button>
+                </div>
+                <div class="col-sm-12 p-l-0 f-10 text-center">
+                  <a href="https://www.govalidation.com/terms-and-conditions" target="_blank"
+                    class="text-black card-link"><u>Terms & Condition</u></a><br>
+                  <a class="text-black card-link"> GoVal Version-1.3</a>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="loaderNew" *ngIf="loading">Loading...</div>

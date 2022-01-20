@@ -1,0 +1,289 @@
+<app-card title="">
+    <form #form="ngForm" novalidate>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <strong >Document Numbering :</strong>
+                        &nbsp;&nbsp;
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="specific" id="org-spec-id"
+                                    [(ngModel)]="this.documentNumberingDTO.specific" value="organization" />
+                                Organization Specific
+                            </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="specific" id="location-spec-id"
+                                    [(ngModel)]="this.documentNumberingDTO.specific" value="location" />
+                                Location Specific
+                            </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="specific" id="project-spec-id"
+                                    [(ngModel)]="this.documentNumberingDTO.specific" value="project" />
+                                Project Specific
+                            </label>
+                        </div>
+                        <div class="form-check-inline">
+                            <label class="form-check-label">
+                                <input type="radio" class="form-check-input" name="specific" id="document-spec-id"
+                                    [(ngModel)]="this.documentNumberingDTO.specific" value="document" />
+                                Document Specific
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <p ><ng-container *ngIf="this.documentNumberingDTO.specific == 'project'">Note:<span class="message text-danger">Please select Project code to avoid duplicate document numbering</span></ng-container></p>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <strong >Document Numbering Configuration :</strong>
+                    </div>
+                    <br>
+                    <div class="col-sm-9">
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                
+                                <table class="table doc-numbering-table" id="doc-numbering-id">
+                                    <tbody>
+                                        <tr>
+                                            <td width="50%">
+                                                <div class="row">
+                                                    <strong class="form-control-label strong col-sm-4">Prefix</strong>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" class="form-control"
+                                                            [(ngModel)]="this.documentNumberingDTO.prefix"
+                                                            name="prefix" />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td width="50%">
+                                                <div class="row">
+                                                    <strong class="form-control-label strong col-sm-4">Suffix</strong>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" class="form-control"
+                                                            [(ngModel)]="this.documentNumberingDTO.suffix"
+                                                            name="suffix" />
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                        </tr>
+
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+                                                    <strong class="form-control-label strong col-sm-4">Serial Number
+                                                        Start
+                                                        From</strong>
+                                                    <div class="col-sm-8">
+                                                        <input type="number" min="0" class="form-control"
+                                                            [(ngModel)]="this.documentNumberingDTO.serialNumberStartForm"
+                                                            name="serialNumberStartFormName"
+                                                            (keypress)="this.helper.onlyNumber($event)" />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="row">
+                                                    <strong class="form-control-label strong col-sm-4">Serial Number
+                                                        Limit</strong>
+                                                    <div class="col-sm-8">
+                                                        <div class="range-wrap">
+                                                            <div class="range-value" id="range-tooltip-id">
+                                                                <span
+                                                                    *ngIf="this.documentNumberingDTO.serialNumberLength">
+                                                                    {{this.documentNumberingDTO.serialNumberLength}}
+                                                                </span>
+                                                            </div>
+                                                            <input id="range" name="serialNumberLengthName"
+                                                                type="range" min="3" [max]="20"
+                                                                [(ngModel)]="this.documentNumberingDTO.serialNumberLength"
+                                                                step="1"
+                                                                (ngModelChange)="csscal(this.documentNumberingDTO.serialNumberLength);">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
+                                                <div class="row">
+                                                    <strong class="form-control-label strong col-sm-4">Version Numbering Format</strong>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="row">
+                                                    <strong class="form-control-label strong col-sm-4">Version Prefix</strong>
+                                                    <div class="col-sm-8">
+                                                        <input type="text" class="form-control" maxlength="4" [(ngModel)]="this.documentNumberingDTO.versionPrefix" style="text-transform:uppercase" (keypress)="this.helper.onlyString($event)"
+                                                            name="versionPrefix" />
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="row">
+                                                    <strong class="form-control-label strong col-sm-4">Version Serial Number</strong>
+                                                    <div class="col-sm-8">
+                                                        
+                                                        <div class="form-check-inline">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-check-input" name="versionStartFrom"
+                                                                    [(ngModel)]="this.documentNumberingDTO.versionStartFrom" value="1" />
+                                                                1
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check-inline">
+                                                            <label class="form-check-label">
+                                                                <input type="radio" class="form-check-input" name="versionStartFrom"
+                                                                    [(ngModel)]="this.documentNumberingDTO.versionStartFrom" value="2" />
+                                                                2
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col-sm-12 p-5">
+                                <div class="row well well-lg">
+                                    <div class="col-sm-4">
+                                        <strong class="strong">Preview &nbsp;&nbsp; <i class="icofont icofont-eye-alt"
+                                                (click)="preview(this.documentNumberingDTO)"></i></strong>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div *ngIf="previewData" class="text-center">
+                                            <strong class="strong">Intial Version - {{this.previewData}}</strong><br>
+                                            <strong class="strong">Next Version's - {{this.previewData}}-{{ this.previewDataVersion}}</strong>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="col-sm-3">
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12 well well-lg">
+                                <table class="row">
+                                    <thead class="col-sm-12">
+                                        <tr class="row">
+                                            <th class="col-sm-6"><strong class="strong">Element</strong></th>
+                                            <th class="col-sm-6"><strong class="strong">Element Code</strong></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="col-sm-12">
+                                        <tr class="row">
+                                            <td class="col-sm-6">Location Code</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[LC]')">
+                                                    [LC]</span></td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-6">Department Code</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[DPC]')">
+                                                    [DPC]</span></td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-6">Project Code</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[PC]')">
+                                                    [PC]</span></td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-6">Document Code</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[DC]')">
+                                                    [DC]</span></td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-6">Day</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[DD]')">
+                                                    [DD]</span></td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-6">Month</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[MM]')">
+                                                    [MM]</span></td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-6">Year</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[YYYY]')">
+                                                    [YYYY]</span>
+                                                    <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[YY]')">
+                                                    [YY]</span></td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-6">Hour</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[hh]','Hour','')">
+                                                    [hh]</span></td>
+                                        </tr>
+                                        <tr class="row">
+                                            <td class="col-sm-6">Minute</td>
+                                            <td class="col-sm-6"> <span title="Copy to clipboard"
+                                                    class="badge badge-pill badge-primary pointer"
+                                                    (click)="copyInputMessage('[mm]','Month','')">
+                                                    [mm]</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="form-check-inline">
+                            <label for="checkbox-id" class="form-check-label">
+                                <input type="checkbox" class="form-check-input" [checked]="this.documentNumberingDTO.autoReset"
+                                    id="checkbox-id" (change)="this.documentNumberingDTO.autoReset=!this.documentNumberingDTO.autoReset">Auto
+                                reset for year
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <button [disabled]="documentNumberingDTO.disabled" *ngIf="this.documentNumberingDTO.id==0" type="submit"
+                            class="btn btn-success" (click)="save(form.valid)">Save</button>
+                        <button [disabled]="documentNumberingDTO.disabled" *ngIf="this.documentNumberingDTO.id!=0" type="submit"
+                            class="btn btn-success" (click)="updateWithComments(form.valid)">Update</button>
+                        <button type="button" class="btn btn-danger" [routerLink]="['/MainMenu']" routerLinkActive="active">Cancel</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</app-card>
+<ng2-toasty position='bottom-right'></ng2-toasty>

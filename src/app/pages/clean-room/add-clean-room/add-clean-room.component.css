@@ -1,0 +1,38 @@
+table#clean-room-table tbody th, table#clean-room-table tbody td {
+    white-space: unset;
+    width: 25%;
+}
+
+table#clean-room-table, table#clean-room-table td {
+    border: 1px solid black;
+}
+
+table#specification-table tbody th, table#specification-table tbody td {
+    white-space: unset;
+    width: 25%;
+}
+
+table#specification-table, table#specification-table td {
+    border: 1px solid black;
+}
+
+table#room-view-table tbody th, table#room-view-table tbody td {
+    white-space: unset;
+    width: 25%;
+}
+
+table#room-view-table, table#room-view-table td {
+    border: 1px solid black;
+}
+
+.room-summary-table table, th, td {
+    border: 1px solid #ececec;
+}
+
+.header-bg {
+    background-color: #f6f6f6;
+}
+
+.modal-body .slimScrollDiv {
+    height: 400px !important;
+}

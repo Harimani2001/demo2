@@ -1,0 +1,205 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-6">
+          <h4>Equipment Status Dashboard</h4>
+        </div>
+      </div>
+      <hr style="margin-top: -1px">
+        <div class="row">
+          <div class="col-sm-4">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Equipment</label>
+            <div class="col-sm-11">
+              <div id="inputgroup" class="input-group">
+                <select name="select" class="form-control" [(ngModel)]="formReports.equipmentId"
+                  (ngModelChange)="onChangeEquipment()">
+                  <option value="">Select Equipment</option>
+                  <option *ngFor="let equipment of equipmentList" [value]="equipment.id">{{equipment.name}}</option>
+                </select>
+                <span *ngIf="formReports.equipmentId !=''" style="padding: 5px;"><i class="icofont icofont-info-square"
+                   (click)="modalLarge.show();"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Log Book</label>
+            <div class="col-sm-11">
+              <div id="inputgroup" class="input-group">
+                <select name="select" class="form-control" [(ngModel)]="formReports.formId"
+                  (ngModelChange)="onChangeForm()">
+                  <option value="">Select Log</option>
+                  <option *ngFor="let form of formList" [value]="form.key">{{form.value}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+    </app-card>
+    <app-card *ngIf="isCurrentbatch || isPreviousbatch">
+      <div class="row">
+        <div class="col-sm-6" *ngIf="isCurrentbatch">
+          <app-card>
+            <div class="row">
+                <h4>Current Batch</h4>
+            </div>
+            <hr style="margin-top: -1px">
+            <div class="dt-desc" style="padding: 0px; overflow-x:auto;">
+              <table class="table-striped table-bordered" style="width: 100%;">
+                <tr>
+                  <td>Equipment Code</td>
+                  <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{equipmentDetails.code}}</td>
+                </tr>
+                <tr>
+                  <td width="50%">Batch No</td>
+                  <td width="50%" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{currentbatchData.batchName}}</td>
+                </tr>
+                <tr>
+                  <td>Produt Name</td>
+                  <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{currentbatchData.productName}}</td>
+                </tr>
+                <tr *ngFor="let col of currentbatchColumns;">
+                    <td><label [innerHtml]="col.header"></label></td>
+                    <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: bold; background-color:	#FFFF00;">
+                        {{col.value}}</td>
+                  </tr>
+                <tr>
+                  <td>Updated By</td>
+                  <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{currentbatchData.updatedByName}}</td>
+                </tr>
+                <tr>
+                  <td>Updated Time</td>
+                  <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{currentbatchData.updatedTime}}</td>
+                </tr>
+              </table>
+            </div>
+          </app-card>
+        </div>
+        <div class="col-sm-6" *ngIf="isPreviousbatch">
+          <app-card>
+            <div class="row">
+                <h4>Previous Batch</h4>
+            </div>
+            <hr style="margin-top: -1px">
+            <div class="dt-desc" style="padding: 0px; overflow-x:auto;">
+              <table class="table-striped table-bordered" style="width: 100%;">
+                <tr>
+                  <td>Equipment Code</td>
+                  <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{equipmentDetails.code}}</td>
+                </tr>
+                <tr>
+                  <td width="50%">Batch No</td>
+                  <td width="50%" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{previousbatchData.batchName}}</td>
+                </tr>
+                <tr>
+                  <td>Produt Name</td>
+                  <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{previousbatchData.productName}}</td>
+                </tr>
+                <!-- <tr *ngFor="let col of previousbatchColumns;">
+                    <td>{{col.header}}</td>
+                    <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                        {{col.value}}</td>
+                  </tr> -->
+                <tr>
+                  <td>Updated By</td>
+                  <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{previousbatchData.updatedByName}}</td>
+                </tr>
+                <tr>
+                  <td>Updated Time</td>
+                  <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{previousbatchData.updatedTime |  date:'dd-MM-yyyy HH:mm:ss'}}</td>
+                </tr>
+              </table>
+            </div>
+          </app-card>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic #modalLarge [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Equipment Details</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto"
+  size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="dt-desc" style="padding: 0px;">
+      <table class="table-striped table-bordered" style="width: 100%;">
+        <tr>
+          <td width="50%" >Equipment Name</td>
+          <td width="50%" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.name}}</td>
+        </tr>
+        <tr>
+          <td>Equipment Code </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.code}}</td>
+        </tr>
+        <tr>
+          <td>Date Of Purchase </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.dateOfPurchase| date:'yyyy-MM-dd'}}</td>
+        </tr>
+        <tr>
+            <td>Make / Manufactured By</td>
+            <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+              {{equipmentDetails.manufacturer}}</td>
+          </tr>
+        <tr>
+          <td>Supplied / Sold By</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.soldBy}}</td>
+        </tr>
+        <tr>
+          <td>Model</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.model}}
+          </td>
+        </tr>
+        <tr>
+          <td>Total Capacity </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.totalCapacity}}
+          </td>
+        </tr>
+        <tr>
+          <td>Recommended usage Capacity</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.usageCapacity}}
+          </td>
+        </tr>
+        <tr>
+          <td>Initial IQ completion Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.iqCompletionDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr>
+          <td>Initial OQ completion Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.oqCompletionDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalLarge.hide()">Close</button>
+  </div>
+</app-modal-basic>

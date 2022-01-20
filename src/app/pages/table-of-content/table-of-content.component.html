@@ -1,0 +1,55 @@
+<app-card>
+
+  <div class="row col-sm-12">
+    <div class="col-sm-4">
+      <select name="documentType" class="form-control" [(ngModel)]="this.documentId"
+        (ngModelChange)="onDocumentChange()">
+        <option disabled value="0">Select Document</option>
+        <option *ngFor="let document of documentList;let i=index" [value]="document.key">{{document.value}}</option>
+      </select>
+    </div>
+    <div class="col-sm-8 text-right">
+      <a *ngIf="documentId!=0" href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-30"
+          src="assets/icon/png-icons/uploadTemplate.png" alt="Upload Template" placement="bottom"
+          ngbTooltip="Upload Template" (click)="onClickUpload()"></a>
+      <a *ngIf="documentId!=0 && isTemplateImported" href="javascript:" class="m-r-15"><img
+          class="image-radius rounded-0 img-30" src="assets/icon/png-icons/downloadTemplate.png" alt="Download Template"
+          placement="bottom" ngbTooltip="Download Template" (click)="onClickDownload()"></a>
+      <a *ngIf="documentId!=0" href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-30"
+          src="assets/icon/png-icons/verify.png" alt="Verify" placement="bottom" ngbTooltip="Verify"
+          (click)="verify(this.documentId, '', '')"></a>
+
+      <a *ngIf="documentId!=0" href="javascript:"><img class="image-radius rounded-0 img-30"
+          src="assets/icon/png-icons/forum.png" alt="Forum" placement="bottom" ngbTooltip="Forum"
+          (click)="openDocumentForum()"></a>
+    </div>
+  </div>
+
+  <br>
+  <div *ngIf="this.showTabs">
+    <ngb-tabset #tocTab="ngbTabset" (tabChange)="this.currentTab=$event.nextId">
+      <ngb-tab id="tab-2">
+        <ng-template ngbTabTitle>PDF Configuration</ng-template>
+        <ng-template ngbTabContent>
+          <app-pdf-preferences-default-pdf #pdfPreferences [document]='true' [isDocChapter]='true'
+            [docId]='this.documentId'></app-pdf-preferences-default-pdf>
+        </ng-template>
+      </ngb-tab>
+      <ngb-tab id="tab-1">
+        <ng-template ngbTabTitle>PDF Chapter</ng-template>
+        <ng-template ngbTabContent>
+          <app-pdf-chapter #pdfChapter [isDocChapter]='true' [docId]='this.documentId'></app-pdf-chapter>
+        </ng-template>
+      </ngb-tab>
+    </ngb-tabset>
+  </div>
+
+</app-card>
+
+<app-form-esign-verification #formVerification></app-form-esign-verification>
+<app-individual-document-forum #forumView [constant]="this.documentId" [documentList]="this.commentsDocumentsList">
+</app-individual-document-forum>
+
+<app-import-chapter #importChapter (onClose)="onCloseImportChapterModal()"></app-import-chapter>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

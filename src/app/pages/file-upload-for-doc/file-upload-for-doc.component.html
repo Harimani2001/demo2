@@ -1,0 +1,92 @@
+
+<div class="row">
+  <div class="col-sm-12">
+    <form #FUform="ngForm">
+
+    <ng-container *ngIf="!this.onlyView">
+      <ng-container *ngIf="this.multiple">
+        <label class="col-sm-6 col-form-label">Upload Your Files </label>
+        <div class="col-sm-7">
+          <form method="post" action="#" >
+            <div class="files color">
+              <input *ngIf="this.helper.KNOWLEDGEBASE!=this.documentCode && !dfFile" #fileuploaddiv type="file" (change)="onFileChange($event)" multiple [accept]="accept">
+              <input *ngIf="this.helper.KNOWLEDGEBASE==this.documentCode && !dfFile" #fileuploaddiv type="file" (change)="onFileChange($event)" multiple accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.png,.jpeg,.mp4">
+              <input *ngIf="dfFile" #fileuploaddiv type="file" (change)="onFileUpload($event)" multiple accept=".pdf,.doc,.docx,.txt,.xls,.xlsx,.png,.jpeg,.mp4">
+            </div>
+          </form>
+        </div>
+      </ng-container>
+      <br>
+      <ng-container *ngIf="!this.multiple">
+        <label class="col-sm-6 col-form-label">Upload Your File </label>
+        <div class="col-sm-7">
+          <div class="upload-btn-wrapper">
+            <button class="btn-file-upload">Upload a file</button>
+            <input type="file" #fileuploaddiv (change)="onFileChange($event,true)" [accept]="accept" />
+          </div>
+        </div>
+      </ng-container>
+    </ng-container>
+
+      <div class="form-group row">
+        <div class="col-sm-12">
+          <div *ngIf="this.fileList.length > 0">
+            <div class="dt-desc" style="padding: 0px;padding-left: 1%; overflow-x:auto;">
+              <div class="dt-desc dy-ui">
+                <table class="table-striped table-bordered" style="width: 100%;">
+                  <thead>
+                    <th>Sl. No</th>
+                    <th>File Name</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let file of this.fileList ; let i = index ">
+                      <td>{{i+1}}</td>
+                      <td><label>{{file.name}}</label></td>
+                      <td><label>{{file.displayDate}}</label></td>
+                      <td>
+                        <a *ngIf="file.id !== undefined"
+                          container="body" href="javascript:;" class="crm-action-view text-muted text-warning"
+                          (click)="downloadFileOrView(file.filePath,true,file.name)" data-ng-open="modalSmall"
+                          placement="top" ngbTooltip="View">
+                          <i style="font-size: 20px" class="icofont icofont-eye-alt"></i>
+                        </a>&nbsp;&nbsp;
+                        <a *ngIf="file.id !== undefined && !this.update" style="cursor:pointer;font-weight: bold" class="icofont icofont-download" placement="top" container="body"
+                         ngbTooltip="Download" (click)="downloadFileOrView(file.filePath,false,file.name)"></a>&nbsp;&nbsp;
+                         
+                         <a *ngIf="this.download" style="cursor:pointer;font-weight: bold" class="icofont icofont-download" placement="top" container="body"
+                         ngbTooltip="Download" (click)="downloadFileOrView(file.filePath,false,file.name)"></a>&nbsp;&nbsp;
+                        
+                         <a *ngIf="!this.update && !this.onlyView"
+                          style="cursor:pointer;font-weight: bold" style="cursor: pointer;"
+                          class="icofont icofont-ui-delete" placement="top" container="body" ngbTooltip="delete"
+                          (click)="deleteUploadedFile(this.fileList,i,file.lastModified)"></a>&nbsp;&nbsp;
+                        <a *ngIf="this.update && !this.onlyView && this.multiple" 
+                          style="cursor:pointer;font-weight: bold" style="cursor: pointer;"
+                          class="icofont icofont-ui-delete" placement="top" container="body" ngbTooltip="delete"
+                          (click)="deleteUploadedFileForDoc(file.id, file.filePath, file.name)"></a>&nbsp;&nbsp;
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+
+
+<div *ngIf="fileUploadspinnerFlag" class="loading ">Loading&#8230; </div>
+<div *ngIf="fileUploadspinnerFlag && this.newFileLength>0">
+<div class="row">
+  <div class="col-sm-12"> Uploading {{this.count}}</div>
+</div>
+</div>
+
+

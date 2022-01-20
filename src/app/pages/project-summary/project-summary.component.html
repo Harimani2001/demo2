@@ -1,0 +1,858 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="col-sm-12" id="float-action">
+      <app-card style="font-family:Roboto, sans-serif">
+        <div class="row">
+          <div class="col-sm-2">
+            <strong class="strong">
+              <h4>Project Summary</h4>
+            </strong>
+          </div>
+          <div class="col-sm-6 text-right">
+            <label *ngIf="projectDetails" class="m-r-20"><strong class="strong">Validation Status : </strong>
+              <span
+                class="bg-yellow">{{projectDetails.validationStatus?projectDetails.validationStatus:'N/A'}}</span></label>
+            <label *ngIf="projectDetails" class="m-r-20"><strong class="strong">System Status : </strong>
+              <span class="bg-yellow">{{projectDetails.systemStatus?projectDetails.systemStatus:'N/A'}}</span></label>
+            <label *ngIf="projectDetails"><strong class="strong">Task(Open)</strong> :
+              <a href="javascript:void(0)" (click)="onClickTaskCount()">{{projectDetails.openTaskCount}}</a></label>
+          </div>
+          <div class="col-sm-2" style="display: inline-flex;">
+            <div>
+              <span *ngIf="this.projectChecklistStatus !=''"> <strong class="strong">Checklist</strong> :
+                <a href="javascript:void(0)"
+                  (click)="onClickChecklistStatus()">{{this.projectChecklistStatus}}</a></span>
+              <div *ngIf="this.projectChecklistStatus !=''" style="display: flex;">
+                <div style="font-size: 11px;padding-right: 3px;margin-top: -7px;">{{projectChecklistPercentage}}%</div>
+                <div>
+                  <div class="progress" style="width: 90px;height: 8px;">
+                    <div class="progress-bar" [style.width]="projectChecklistPercentage + '%'"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <div class="row float-right">
+              <label class="col-form-label">Version</label>
+              <div class="col-sm-5">
+                <select name="select" class="form-control w-130" [(ngModel)]="selectedVersion"
+                  (ngModelChange)="loaddata()">
+                  <option *ngFor="let version of versions" [ngValue]="version.id">{{version.versionName}}</option>
+                </select>
+              </div>
+              <div *ngIf="ftpFolderSize" class="col-sm-1 m-t-7">
+                <ng-template #popContent>
+                  <span class="text-left">
+                    <div><label style="font-size: 12px !important"><b>FTP : </b>{{ftpFolderSize}}</label></div>
+                  </span>
+                </ng-template>
+                <a container="body" href="javascript:;" class="crm-action-info text-muted text-primary"
+                  placement="bottom" [ngbTooltip]="popContent"><i class="icofont icofont-info-square info"></i>
+                </a>
+              </div>
+              <a *ngIf="projectDetails && projectDetails.workFlowCompletionFlag" href="javascript:" container="body"
+                class="m-l-15 m-t-5"><img class="image-radius rounded-0 img-25"
+                  src="assets/icon/png-icons/pdfExport.png" (click)="projectSetUpPdfDownload(projectDetails.id)"
+                  alt="PDF Export" placement="bottom" ngbTooltip="PDF Export"></a>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+    <div><br><br><br></div>
+
+    <app-card *ngIf="projectDetails">
+      <div class="row">
+        <div class="col-sm-8">
+          <app-card>
+            <div style="overflow-x: scroll;">
+              <table id="projectSummary" class="table w-100 show-my-request-table">
+                <tbody>
+                  <tr>
+                    <td class="w-20"><strong class="strong">Project Name</strong></td>
+                    <td class="w-30"><a href="javascript:void(0)"
+                        (click)="onClickProject(projectDetails.id)">{{projectDetails.projectName}}</a></td>
+                    <td class="w-20"><strong class="strong">Project Type</strong></td>
+                    <td class="w-30">{{projectDetails.projectType}}</td>
+                  </tr>
+                  <tr>
+                    <td><strong class="strong">System Owner</strong></td>
+                    <td>{{projectDetails.systemOwnerName?projectDetails.systemOwnerName:'N/A'}}</td>
+                    <td><strong class="strong">Business Owner</strong></td>
+                    <td>{{projectDetails.businessOwnerName?projectDetails.businessOwnerName:'N/A'}}</td>
+                  </tr>
+                  <tr>
+                    <td><strong class="strong">Software Name</strong></td>
+                    <td>
+                      {{projectDetails.systemDescription.softwareName?projectDetails.systemDescription.softwareName:'N/A'}}
+                    </td>
+                    <td><strong class="strong">Software Version</strong></td>
+                    <td>
+                      {{projectDetails.systemDescription.softwareVersion?projectDetails.systemDescription.softwareVersion:'N/A'}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong class="strong">Gamp Category</strong></td>
+                    <td>
+                      {{projectDetails.systemDescription.gampCategory?projectDetails.systemDescription.gampCategory:'N/A'}}
+                    </td>
+                    <td><strong class="strong">Equipment</strong></td>
+                    <td>{{projectDetails.systemDescription.equipmentName}}</td>
+                  </tr>
+                  <tr>
+                    <td><strong class="strong">Expected Start Date</strong></td>
+                    <td>{{projectDetails.startDate?projectDetails.startDate:'N/A'}}</td>
+                    <td><strong class="strong">Expected End Date</strong></td>
+                    <td>{{projectDetails.endDate?projectDetails.endDate:'N/A'}}</td>
+                  </tr>
+                  <tr>
+                    <td><strong class="strong">Change Control Number</strong></td>
+                    <td>{{projectDetails.customCCFValue?projectDetails.customCCFValue:'N/A'}}</td>
+                    <td><strong class="strong">GxP Criticality</strong></td>
+                    <td>
+                      {{projectDetails.systemDescription.gxpCriticality?projectDetails.systemDescription.gxpCriticality:'N/A'}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong class="strong">Supplier Name</strong></td>
+                    <td>
+                      {{projectDetails.systemDescription.supplierDisplayName?projectDetails.systemDescription.supplierDisplayName:'N/A'}}
+                    </td>
+                    <td><strong class="strong">Hosting Type</strong></td>
+                    <td>
+                      {{projectDetails.systemDescription.hostingType?projectDetails.systemDescription.hostingType:'N/A'}}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong class="strong">Created By</strong></td>
+                    <td>{{projectDetails.createdBy}}</td>
+                    <td><strong class="strong">Created Time</strong></td>
+                    <td>{{projectDetails.displayCreatedTime}}</td>
+                  </tr>
+                  <tr>
+                    <td><strong class="strong">Release Date</strong></td>
+                    <td>{{projectDetails.displayReleaseDate?projectDetails.displayReleaseDate:'N/A'}}</td>
+                    <td><strong class="strong">Next Review Date</strong></td>
+                    <td>{{nextReviewDate?nextReviewDate:'N/A'}}</td>
+                  </tr>
+                  <tr *ngIf="showMore">
+                    <td><strong class="strong">Introduction</strong></td>
+                    <td colspan="3">
+                      <label name="introduction"
+                        [innerHtml]="projectDetails.introduction?projectDetails.introduction:'N/A'"></label>
+                    </td>
+                  </tr>
+                  <tr *ngIf="showMore">
+                    <td><strong class="strong">Purpose</strong></td>
+                    <td colspan="3">
+                      <label name="purposeAndScope"
+                        [innerHtml]="projectDetails.purposeAndScope?projectDetails.purposeAndScope:'N/A'"></label>
+                    </td>
+                  </tr>
+                  <tr *ngIf="showMore">
+                    <td><strong class="strong">Scope</strong></td>
+                    <td colspan="3">
+                      <label name="description"
+                        [innerHtml]="projectDetails.description?projectDetails.description:'N/A'"></label>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <label style="float: right;">
+                <a *ngIf="showMore" container="body" href="javascript:;" (click)="showMore = false">View Less</a>
+                <a *ngIf="!showMore" container="body" href="javascript:;" (click)="showMore = true">View More</a>
+              </label>
+            </div>
+          </app-card>
+        </div>
+
+        <div class="col-sm-4">
+          <app-card>
+            <div style="overflow-x: scroll;">
+              <div class="row col-sm-12">
+                <div class="m-r-15">
+                  <h3 class="f-w-600 text-center">{{allDocumentCount}}</h3>
+                  <p class="f-w-400">Total Documents</p>
+                </div>
+                <div class="m-r-15 draft">
+                  <h3 class="f-w-600 text-center">{{DraftDocumentCount}}</h3>
+                  <p class="f-w-400">Draft</p>
+                </div>
+                <div class="m-r-15 publish">
+                  <h3 class="f-w-600 text-center">{{inProgressDocumentCount}}</h3>
+                  <p class="f-w-400">In Progress</p>
+                </div>
+                <div class="total">
+                  <h3 class="f-w-600 text-center">{{completedDocumentCount}}</h3>
+                  <p class="f-w-400">Completed</p>
+                </div>
+              </div>
+              <hr class="bar">
+              <br>
+              <div *ngIf="this.chartData && this.chartData.length>0" class="row col-sm-12">
+                <canvas baseChart [data]="this.chartData" [labels]="this.pieChartLabels"
+                  [options]="this.pieChartOptions" [chartType]="this.pieChartType" [colors]="this.pieChartColors"
+                  (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)" [legend]="true">
+                </canvas>
+              </div>
+              <br>
+              <div class="row col-sm-12">
+                <div class="m-l-10 m-r-50 draft">
+                  <h3 class="f-w-600 text-center">{{allUnPublishedItemCount}}</h3>
+                  <p class="f-w-400">Draft</p>
+                </div>
+                <div class="m-r-50 publish">
+                  <h3 class="f-w-600 text-center">{{allPublishedItemCount}}</h3>
+                  <p class="f-w-400">Published</p>
+                </div>
+                <div class="total">
+                  <h3 class="f-w-600 text-center">{{allItemCount}}</h3>
+                  <p class="f-w-400">Total Items</p>
+                </div>
+              </div>
+              <div class="row d-inline">
+                <div class="col-sm-12">
+                  <a href="javascript:" class="m-r-25"><img class="image-radius rounded-0 img-30"
+                      src="assets/icon/png-icons/audit.png" alt="Audit Trail" placement="top" ngbTooltip="Audit Trail"
+                      (click)="urlRedirect('/auditTrail')"></a>
+                  <a href="javascript:" class="m-r-25"><img class="image-radius rounded-0 img-30"
+                      src="assets/icon/png-icons/matrix.png" alt="Traceability Matrix" placement="top"
+                      ngbTooltip="Traceability Matrix" (click)="urlRedirect('/traceability')"></a>
+                  <a *ngIf="projectDetails && projectDetails.vsrCreated" href="javascript:" class="m-r-25"><img
+                      class="image-radius rounded-0 img-30" src="assets/icon/png-icons/vsr.png" alt="VSR"
+                      placement="top" ngbTooltip="VSR"
+                      (click)="urlRedirect('/Summary-Report/create-summary-report')"></a>
+                  <a href="javascript:"><img class="image-radius rounded-0 img-30"
+                      src="assets/icon/png-icons/requirement.png" alt="Requirement Summary" placement="top"
+                      ngbTooltip="Requirement Summary" (click)="urlRedirect('/requirementSummary')"></a>
+                </div>
+              </div>
+            </div>
+          </app-card>
+        </div>
+      </div>
+
+      <ngb-tabset #summaryTab="ngbTabset" (tabChange)="onTabChange($event.nextId)" [activeId]="activeTabId">
+        <ngb-tab title="Summary" id="Summary">
+          <ng-template ngbTabContent>
+            <br>
+            <div class="row col-sm-12">
+              <label class="col-form-label p-l-30">Document</label>
+              <div class="col-sm-5">
+                <div class="input-group">
+                  <select name="select" class="form-control" [(ngModel)]="category"
+                    (ngModelChange)="onTabChange('Summary')">
+                    <option value="">ALL</option>
+                    <option *ngFor="let doc of docItemList" [ngValue]="doc.key">{{doc.value}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <app-card style="width: 100%;">
+              <div>
+                <div class="row" class="col-sm-12">
+                  <small>
+                    <a *ngIf="!showExpansion" href="javascript:void(0)"
+                      (click)="myTable.rowDetail.expandAllRows(); showExpansion=!showExpansion">Expand All</a>
+                    <a *ngIf="showExpansion" href="javascript:void(0)"
+                      (click)="myTable.rowDetail.collapseAllRows(); showExpansion=!showExpansion">Collapse All</a>
+                  </small>
+                </div>
+
+                <label style="float: right; padding-top: 15px;">
+                  <a *ngIf="showColumn" container="body" href="javascript:;" class="m-r-15 crm-action-view"
+                    data-ng-open="modalSmall" (click)="showColumn = false" placement="top" ngbTooltip="Expand Col">
+                    <i class="text-primary icofont icofont-rounded-double-right"></i>
+                  </a>
+                  <a *ngIf="!showColumn" container="body" href="javascript:;" class="m-r-15 crm-action-view"
+                    data-ng-open="modalSmall" (click)="showColumn = true" placement="top" ngbTooltip="Collapse Col">
+                    <i class="text-primary icofont icofont-rounded-double-left"></i>
+                  </a>
+                </label>
+
+                <ngx-datatable #myTable id="summaryCustomTable" class="data-table dt-chk" [headerHeight]="50"
+                  [footerHeight]="0" [rows]='filteredDocumentSummaryList' [columnMode]="'force'" [rowHeight]="'auto'">
+                  <ngx-datatable-row-detail [rowHeight]="'auto'">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+
+                      <app-card *ngIf="row.projectPlan.length > 0 || row.testCaseCount.length > 0">
+                        <ng-container *ngIf="row.projectPlan.length > 0">
+                          <div class="dot approved p-b-10"><i class="icofont icofont-law-document"></i>
+                            <strong>Plan</strong>
+                          </div>
+                          <div class="card-notification" *ngFor="let level of row.projectPlan">
+                            <div class="card-noti-conatin">
+                              <small>{{level.itemName}}</small>
+
+                              <div class="dy-ui">
+                                <table id="planTable" class="table-striped table-bordered">
+                                  <thead class="lightGary">
+                                    <tr>
+                                      <th>Target Start Date</th>
+                                      <th>Target End Date</th>
+                                      <th>Actual Start Date</th>
+                                      <th>Actual End Date</th>
+                                      <th>AssignedTo</th>
+                                      <th>Status</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <td>{{level.startTargetDate}}</td>
+                                      <td>{{level.endTargetDate}}</td>
+                                      <td>{{level.actualStartTargetDate|date:this.datePipeFormat}}</td>
+                                      <td>{{level.actualEndTargetDate|date:this.datePipeFormat}}</td>
+                                      <td style="width:max-content;">
+                                        <span *ngFor="let user of level.selectedUsers">{{user.itemName}}<br></span>
+                                      </td>
+                                      <td>
+                                        <span class="dot small-tc-dot m-r-10"
+                                          [ngStyle]="{'background-color': level.statusType=='A' ? 'deeppink' : level.statusType=='O' ? 'green' : level.statusType=='B' ? 'blue' : ''}"></span>{{level.status}}
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                                <br>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+
+                        <ng-container
+                          *ngIf="row.testCaseCount.length && (row.documentType == '108' || row.documentType == '109' || row.documentType == '110' || row.documentType == '207' || row.documentType == '208')">
+                          <div class="dot total"><i class="icofont icofont-prescription"></i>
+                            <Strong>Test Case</Strong>
+                          </div>
+                          <ng-container *ngFor="let testCase of row.testCaseCount">
+                            <div class="row">
+                              <div class="col-sm-3"><span><strong class="strong">Test
+                                    Run:&nbsp;</strong>{{testCase.testRunName}}</span></div>
+                              <div class="col-sm-2"><span> <strong
+                                    class="strong">Total&nbsp;</strong>{{testCase.total}}</span></div>
+                              <div class="col-sm-2"><span> <strong class="strong">Workflow
+                                    InProgress&nbsp;</strong>{{testCase.incompleted}}</span></div>
+                              <div class="col-sm-2"><span><strong class="strong">Workflow
+                                    Completed&nbsp;</strong>{{testCase.completed}}</span></div>
+                            </div>
+                            <table cellpadding="5" id="projectSummary" style="width: 55%;">
+                              <thead>
+                                <tr class="lightGary">
+                                  <th>No Run</th>
+                                  <th>In Progress</th>
+                                  <th>Pass</th>
+                                  <th>Fail</th>
+                                  <th>N/A</th>
+                                  <th>DF</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr>
+                                  <td>{{testCase.runCount}}</td>
+                                  <td>{{testCase.testCaseInProgressCount}}</td>
+                                  <td>{{testCase.passCount}}</td>
+                                  <td>{{testCase.failCount}}</td>
+                                  <td>{{testCase.nACount}}</td>
+                                  <td>{{testCase.discrepancyCount}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+
+                        <ng-container *ngIf="row.expectedStartDate!=null">
+                          <div class="row ">
+                            <h4 class="strong">Plan</h4>
+                          </div>
+                          <div class="row">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4"><label class="strong">Start date</label></div>
+                            <div class="col-sm-4"> <label class="strong">End date</label></div>
+                          </div>
+                          <div class="row">
+                            <div class="col-sm-4"> <label class="strong"><i
+                                  class="icofont icofont-ui-calendar"></i>Expected</label></div>
+                            <div class="col-sm-4"> {{row.expectedStartDate | date: 'yyyy-MM-dd'}}</div>
+                            <div class="col-sm-4">{{row.expectedEndDate | date: 'yyyy-MM-dd'}}</div>
+                          </div>
+                          <div class="row">
+                            <div class="col-sm-4"> <label class="strong"><i
+                                  class="icofont icofont-ui-calendar"></i>Actual</label></div>
+                            <div class="col-sm-4"> {{row.actualStartDate | date: 'yyyy-MM-dd'}}</div>
+                            <div class="col-sm-4">{{row.actualEndDate | date: 'yyyy-MM-dd'}}</div>
+                          </div>
+                        </ng-container>
+                      </app-card>
+                    </ng-template>
+                  </ngx-datatable-row-detail>
+
+                  <ngx-datatable-column [width]="30" [cellClass]="'bg-white'" [sortable]="false" [draggable]="false"
+                    [canAutoResize]="false">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <a *ngIf="row.projectPlan.length > 0 || row.testCaseCount.length > 0 || row.expectedStartDate!=null"
+                        href="javascript:;" [class.datatable-icon-right]="!expanded"
+                        [class.datatable-icon-down]="expanded" title="Expand/Collapse Row"
+                        (click)="toggleExpandRow(row)"></a>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column [width]="400" [sortable]="false" name="Document">
+                    <ng-template let-row="row" let-rowIndex="rowIndex" ngx-datatable-cell-template>
+                      <div class="page-header-title">
+                        <i class="icofont icofont-file-document bg-c-blue"
+                          style="font-size: 15px; height: 30px; width: 30px;"></i>
+                        <div class="d-inline p-t-10">
+                          <strong>{{row.documentName}}</strong>
+                        </div>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column [width]="170" [cellClass]="'bg-white'" [sortable]="false" name="Draft">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="text-center text-warning" (click)="goToDetails(row.documentType, 'draft', row.draft)">
+                        {{row.draft}}</div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column [width]="170" [cellClass]="'bg-white'" [sortable]="false" name="Published">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <div class="text-center deepPink"
+                        (click)="goToDetails(row.documentType, 'published', row.published)">{{row.published}}</div>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column [width]="170" [cellClass]="'bg-white'" [sortable]="false" name="In Progress">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <ng-container
+                        *ngIf="!(row.documentType == '108' || row.documentType == '109' || row.documentType == '110' || row.documentType == '207' || row.documentType == '208')">
+                        <div class="text-center blue"
+                          (click)="goToDetails(row.documentType, 'inProgress', row.inProgress)">{{row.inProgress}}</div>
+                      </ng-container>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column [width]="170" [cellClass]="'bg-white'" [sortable]="false" name="Completed">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <ng-container
+                        *ngIf="!(row.documentType == '108' || row.documentType == '109' || row.documentType == '110' || row.documentType == '207' || row.documentType == '208')">
+                        <div class="text-center green"
+                          (click)="goToDetails(row.documentType, 'completed', row.completed)">{{row.completed}}</div>
+                      </ng-container>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column *ngIf="!showColumn" [width]="180" [cellClass]="'bg-white'" [sortable]="false"
+                    name="Progress Status">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <ng-container
+                        *ngIf="!(row.documentType == '108' || row.documentType == '109' || row.documentType == '110' || row.documentType == '207' || row.documentType == '208')">
+                        {{calculatePercentage(row.published, row.completed)}}
+                        <div style="width:100%;">
+                          <div class="row">
+                            <div class="col-sm-9">
+                              <div style="font-size: 60%;text-align:end;">{{this.percentage}}%</div>
+                              <div class="progress" style="height: 0.5em !important;">
+                                <div class={{this.progressBarColour}} role="progressbar" aria-valuenow=this.percentage
+                                  aria-valuemin="0" aria-valuemax="100" [style.width]="this.percentage + '%'">
+                                </div>
+                              </div>
+                            </div>
+                            <div *ngIf="getPercentage(row.published, row.completed)" class="col-sm-3"
+                              style="margin-left: -10px;"><i class="icofont icofont-tick-mark text-success"></i></div>
+                          </div>
+                        </div>
+                      </ng-container>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column *ngIf="!showColumn" [width]="320" [cellClass]="'bg-white'" [sortable]="false"
+                    name="Action">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <ng-template #popContent>
+                        <span>
+                          <ng-container *ngIf="row.documentNumber">
+                            <div>Document Number:<br>{{row.documentNumber}}</div><br>
+                          </ng-container>
+                          <div>Last updated by:<br>{{row.lastUpdatedBy}}</div><br>
+                          <div>Last updated time:<br>{{row.lastUpdatedTime}}</div>
+                        </span>
+                      </ng-template>
+                      <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted"
+                        placement="right" placement="top" [ngbTooltip]="popContent">
+                        <i class="summary-icon icofont icofont-info-square"></i>
+                      </a>
+                      <a *ngIf="showAction(row.documentType)" container="body" href="javascript:;" placement="top"
+                        class="m-r-15 crm-action-view text-muted "
+                        (click)="loadStepperData(row); modalLargeWorkFlowProjectSummary.show();" ngbTooltip="Workflow">
+                        <i class="summary-icon icofont icofont-chart-flow-alt-1"></i>
+                      </a>
+                      <a *ngIf="showAction(row.documentType)" container="body" href="javascript:;" placement="top"
+                        class="m-r-15 crm-action-view text-muted"
+                        (click)="loadWorkflowUsers(row.documentType); shareGraphEmail.show()" ngbTooltip="Share">
+                        <i class="summary-icon icofont icofont-share-alt"></i>
+                      </a>
+                      <a container="body" href="javascript:;" placement="top" class="m-r-15 crm-action-view text-muted"
+                        (click)="urlRedirect(row.documentUrl)" ngbTooltip="View Document">
+                        <i class="summary-icon icofont icofont-eye-alt"></i>
+                      </a>
+                      <a *ngIf="showAction(row.documentType)" container="body" href="javascript:;" placement="top"
+                        class="m-r-15 crm-action-view text-muted text-warning"
+                        (click)="checkdocumentIslockOrNot(row.documentType)" ngbTooltip="Document Freeze">
+                        <i
+                          class="{{row.freezeFlagIcon ? 'icofont summary-icon icofont-unlock' : 'icofont summary-icon icofont-unlocked'}}"></i>
+                      </a>
+                      <a *ngIf="showAction(row.documentType) && row.canPdfDownload" container="body" href="javascript:;" placement="top"
+                        class="m-r-15 crm-action-view text-muted"
+                        (click)="downloadPdf(row.documentType,row.documentName)" ngbTooltip="Download PDF">
+                        <i class="icofont icofont-download summary-icon"></i>
+                      </a>
+                    </ng-template>
+                  </ngx-datatable-column>
+                </ngx-datatable>
+              </div>
+            </app-card>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="Tasks" title="Tasks">
+          <ng-template ngbTabContent>
+            <br>
+            <div class="table-responsive">
+              <table id="dtBasicExample" class="table table-bordered">
+                <tbody>
+                  <ng-container *ngFor="let data of taskData; let i = index;">
+                    <tr *ngIf="data.list && data.list.length>0">
+                      <th colspan="5"><label class="text-nav-color">{{data.name}}</label></th>
+                    </tr>
+
+                    <tr *ngIf="data.list && data.list.length>0" class="lightGary" width="100%">
+                      <th>Task Id</th>
+                      <th>Title</th>
+                      <th>Assigned To</th>
+                      <th>Due Date</th>
+                      <th>Remaining</th>
+                    </tr>
+
+                    <tr *ngFor="let row of data.list ; let i=index;">
+                      <td>{{row['taskCode']}}</td>
+                      <td>
+                        <label class="text-c-blue" style="cursor: pointer !important;" (click)="routeView(row);">
+                          <a href="javascript:"></a>{{row['taskTitle']}}
+                        </label>
+                      </td>
+                      <td>{{row['selectedUserNames']}}</td>
+                      <td>{{row['dueDate']}}</td>
+                      <td>{{row['remaingDays']}}</td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="GxP" title="GxP Assessment" *ngIf="projectDetails.systemDescription.gxpForm">
+          <ng-template ngbTabContent>
+            <div class="text-right">
+              <a href="javascript:" class="m-r-10"><img class="image-radius rounded-0 img-27"
+                  src="assets/icon/png-icons/pdfDownload.svg" alt="PDF Download" placement="top"
+                  ngbTooltip="PDF Download" (click)="this.gxpFormComponent.download();"></a>
+            </div>
+            <div class="row col-sm-12 p-0 ml-0">
+              <div style="pointer-events: none;" class="col-sm-12 p-0">
+                <app-gxp #gxpFORM [projectId]="projectDetails.id" [freezeFlag]="true"></app-gxp>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab title="Details" id="Details">
+          <ng-template ngbTabContent>
+            <br>
+            <div class="row">
+              <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+                <div class="row container">
+                  <label class="col-form-label">Document</label>
+                  <div class="col-sm-8">
+                    <div id="inputgroup" class="input-group">
+                      <select name="select" class="form-control" [(ngModel)]="category"
+                        (ngModelChange)="onTabChange('Details')">
+                        <option *ngFor="let doc of docItemList" [ngValue]="doc.key">{{doc.value}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-12 col-sm-12 col-md-6">
+                <div style="text-align: right;">
+                  <label>Search:
+                    <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                      class="form-control input-sm full-data-search" placeholder="Search name">
+                  </label>
+                </div>
+              </div>
+            </div>
+            <ngx-datatable #myTable [scrollbarH]="true" class="data-table dt-chk"
+              [rows]='filterData | ProjectSummaryFilterPipe : filterQuery' [limit]="20" [columnMode]="'force'"
+              [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+              <ngx-datatable-column [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+                [resizeable]="false" name="Sl No.">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong>{{row['$$index']+1}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ng-container
+                *ngIf="category && (category==108||category==109||category==110||category==207||category==208)">
+                <ngx-datatable-column style="font-weight: bold;" name="Test Case Description">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong>{{row['testCaseDescription']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Test Run Name">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong>{{row['testRunName']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+              </ng-container>
+              <ngx-datatable-column style="font-weight: bold;" name="Document Code">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong>{{row['documentCode']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column
+                *ngIf="category && (category==108||category==109||category==110||category==207||category==208)"
+                style="font-weight: bold;" name="Status">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong>{{row['testcaseStatus']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column style="font-weight: bold;" name="Document Status">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong class="{{(row['status']=='Completed')?'approved':'black'}}">{{row['documentStatus']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column style="font-weight: bold;" name="Updated By">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong>{{row['updatedByName']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column style="font-weight: bold;" name="Updated Time">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong>{{row['displayUpdatedTime']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column *ngIf="this.currentVersion==selectedVersion" name="Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <a container="body" class="m-r-15 crm-action-view text-muted text-warning" data-ng-open="modalSmall"
+                    (click)="urlRedirect(row['url'],row['id'])" placement="top" ngbTooltip="View">
+                    <i class="icofont icofont-resize view"></i>
+                  </a>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab title="References" id="References">
+          <ng-template ngbTabContent>
+            <br>
+            <app-project-url-checklist #checkListURLId view="project-summary" [projectId]="this.projectDetails.id"
+              (onSuccess)="saveURLList($event);"> </app-project-url-checklist>
+          </ng-template>
+        </ngb-tab>
+      </ngb-tabset>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #freezemodal [hideFooter]="true" [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Revision of Document</h4>
+    <button type="button" class="close basic-close-light-box" (click)="freezemodal.hide();loaddata();close();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div *ngIf="this.freezeData" class="app-modal-body">
+    <ng-container *ngIf="this.freezeData.newRevisionDocuments.length>0 || this.freezeData.documentLock;else nodata">
+      <div class="row">
+        <div class="col-sm-12" style="text-align: right;">
+          <a *ngIf="this.freezeData.draftList.length>0" href="javascript:"
+            (click)="loadRecordView(this.freezeData.draftList);">
+            View draft
+          </a> &nbsp;&nbsp;&nbsp;
+          <a *ngIf="this.freezeData.newRevisionDocuments.length>0" href="javascript:"
+            (click)="loadRecordView(this.freezeData.newRevisionDocuments);">
+            View completed
+          </a>
+        </div>
+        <div class="col-sm-12">
+          <textarea [(ngModel)]="this.freezeData.documentLockComments" id="documentApprovalComment"
+            placeholder="please enter the comments to lock or un-lock " name="description" class="form-control" rows="3"
+            cols="40"> </textarea>
+        </div>
+        <div class="col-sm-8">
+          <br>
+          <ng-container *ngIf="this.freezeData.documentLock && this.freezeData.documentLockComments">
+            <div class="row">
+              <label class="form-control-label col-sm-12">Select next revision</label>
+
+              <div class="col-sm-12  pl-5">
+                <label class="radio-inline" *ngIf="this.freezeData.revisionVersionZero">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    [value]="this.freezeData.revisionVersionZero" />{{this.freezeData.revisionVersionZero}}</label>
+                &nbsp; &nbsp;
+                <label class="radio-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    [value]="this.freezeData.revisionVersionTwo" />{{this.freezeData.revisionVersionTwo}}</label> &nbsp;
+                &nbsp;
+                <label class="radio-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    checked
+                    [value]="this.freezeData.revisionVersionOne" />{{this.freezeData.revisionVersionOne}}</label>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <div class="col-sm-12 text-center">
+          <button
+            *ngIf="(null!=this.freezeData.selectedVersion || !this.freezeData.documentLock)&& this.freezeData.documentLockComments"
+            (click)="saveDocumentLockAndUnlock()" class="btn btn-primary btn-sm pointer" type="button"><i
+              class="icofont icofont-save"></i>
+            {{this.freezeData.documentLock?'Unlock Document':'Lock Document'}} </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #nodata>
+      <div class="text-center col-sm-12">
+        <h5>No new item created</h5>
+      </div>
+
+    </ng-template>
+    <hr>
+    <div *ngIf="this.documentlockDataLogs.length>0"
+      [ngClass]="(this.freezeData.newRevisionDocuments.length>0 || this.freezeData.documentLock)? 'dy-width-300':'dy-width-400'">
+      <h5>Document Lock Log</h5><br>
+      <div *ngFor="let item of this.documentlockDataLogs">
+        <div><b>Status : {{item.status?'Locked':'Un-Locked'}} </b>&nbsp;</div>
+        <div><b>Revision : {{item.revision}} </b>&nbsp;</div>
+        <div><b> <i class="{{item.status?' fa fa fa-lock ':'fa fa-unlock'}}"></i> By :</b>&nbsp;{{item.userName}} </div>
+        <div><b><i class="{{item.status?' fa fa fa-lock ':'fa fa-unlock'}}"></i> Time :</b>&nbsp; {{item.createdTime}}
+        </div>
+        <div><b>Comments :</b> {{item.comments}} </div>
+        <hr>
+      </div>
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic class="reset-this" #revisionDocs container="body" [hideHeader]="true" [hideFooter]="true"
+  [dialogClass]="'modal-md'">
+  <div *ngIf="null!=this.freezeData" class="app-modal-body" style="height: 300px; overflow-y: scroll;">
+    <button type="button" class="close basic-close-light-box" (click)="revisionDocs.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div *ngIf="null!=this.freezeData && this.viewList.length>0" class="overflow-container" slimScroll
+      railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+      allowPageScroll="false">
+      <h5>View Records</h5><br>
+      <table class="table table-framed">
+        <tr>
+          <th>#</th>
+          <th>Document Code </th>
+          <th>Title/Desc(if any) </th>
+        </tr>
+        <tr *ngFor="let n of this.viewList;let c=index">
+          <td>{{c+1}} </td>
+          <td>{{n.documentCode}}</td>
+          <td>{{n.name}} </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalLargeWorkFlowProjectSummary [dialogClass]="'modal-lg'" [hideClickOutSide]="true"
+  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow Configuration of {{docName}}</h4>
+    <button type="button" class="close basic-close" (click)="modalLargeWorkFlowProjectSummary.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body">
+    <div style="max-height: 300px !important;" class="col-sm slimScrollDiv">
+      <div class="dt-desc dy-width-300">
+        <ng-container *ngFor="let loadStepper of this.loadStepperList;">
+          <h4 class="modal-title strong">{{loadStepper.docName}}</h4>
+          <ul class="progress-indicator">
+            <li *ngFor="let data of loadStepper.stepperList;" class="completed">
+              <label>
+                <span style="white-space: pre-line;" class="bubble"></span>
+                <div class="strong"> {{data.levelName}} : {{data.type}}<br>
+                  <span *ngIf="data.allUserApproval">(All User Approval)</span><br>
+                  <div style="text-align: left;"><b class="black"><u>Users</u></b>
+            <li *ngFor="let user of data.userArray;let i = index ">{{i+1}}.{{user}}</li>
+      </div>
+    </div>
+    </label>
+    </li>
+    </ul><br><br>
+    </ng-container>
+  </div>
+  </div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #shareGraphEmail [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="onClose();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Users <span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <span>
+              <angular2-multiselect name="users" [data]="userList" id="users" required #users="ngModel"
+                [(ngModel)]="selectedUsersForEmail" [settings]="dropdownSettings">
+              </angular2-multiselect>
+              <div class="messages text-danger" *ngIf="isSubmitted && users.errors?.required">Users can't be blank</div>
+            </span>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Remarks</label>
+          <div class="col-sm-10">
+            <span>
+              <textarea style="width:-webkit-fill-available" [(ngModel)]="graphRemarks" name="remarks"
+                #remarks="ngModel" [attr.rows]="2"></textarea>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button class="btn btn-success" (click)="sendGraphEmail();">Send</button>
+        <button class="btn btn-danger" (click)="onClose();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-project-checklist #projectCheckList (onClose)="onClosecheckListModal()"></app-project-checklist>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

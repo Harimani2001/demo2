@@ -1,0 +1,89 @@
+<div  class="row">
+    <div class="col-md-12">
+  <app-card title='Document Freeze'>
+      <form #permission="ngForm" novalidate="true" *ngIf="freezeModule.length>0">
+        <div class="container" style="border-style: groove;border-spacing: 10px">
+            <div class="row">
+              <div class="col-sm">
+
+                      <tr *ngFor="let module of this.freezeModule; let in=index  " >
+                      <td><strong style="font-size: 120%" class="col-sm-1 col-form-label" >{{module.documentName}}</strong></td>
+                      <td>&nbsp;&nbsp;&nbsp;</td>
+                      <td ><label class="switch"><input type="checkbox" name="flag" id="module.flag" [checked]="module.flag" (change)="savedata.show();onremovecheckComment(module,in);module.flag=!module.flag" ><span class="slider round"></span></label></td>
+                      <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                                      (click)="modalOverflow.show();loadDocumentCommentLog(module)" placement="top" ngbTooltip="Info">
+                                      <i style="font-size: 30px" class="icofont icofont-info-square"></i>
+                                    </a>
+                    </tr>
+
+
+              </div>
+              <div class="col-sm">
+                <br>
+                <br>
+                <br>
+
+              </div>
+
+            </div>
+          </div>
+
+
+
+      </form>
+  </app-card>
+    </div>
+  </div>
+  <app-modal-basic data-keyboard='false' data-backdrop='static' #savedata  [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+      <div class="app-modal-body">
+        <button type="button" class="close basic-close-light-box" (click)="savedata.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <div  class="form-group row">
+            <div class="col-sm-5">
+              COMMENTS:
+                <textarea *ngIf="null!=valdiatedDocument"rows="5" [(ngModel)]="comments" cols="50">
+
+
+
+                    </textarea>
+            </div>
+            <br>
+            <div class="container">
+                <div class="row">
+                  <div class="col-sm-2" *ngIf="''!=this.comments && undefined!=this.comments && null!=this.comments">
+                      <button type="button" class="btn btn-success" (click)="saveAndGoTo();savedata.hide()">Save
+                        </button>
+                  </div>
+                  <div class="col-sm">
+                      <button type="button" class="btn btn-danger" (click)="savedata.hide()"  routerLinkActive="active">Back
+                        </button>
+                  </div>
+                  <div class="col-sm">
+
+                  </div>
+                </div>
+              </div>
+
+
+          </div>
+      </div>
+    </app-modal-basic>
+
+  <app-modal-basic #modalOverflow [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+    <div class="app-modal-body">
+      <button type="button" class="close basic-close-light-box" (click)="modalOverflow.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+        <h5>Document  freeze Log</h5><br>
+        <div *ngFor="let log of this.seeComments ;let in = index">
+          <div>{{in+1}}</div>
+          <div><b>current Date :</b>{{log.createdTime | date:'dd-MM-yy hh:mm a'}}</div>
+          <div><b>Comments :</b>{{log.comments}}</div>
+          <hr>
+
+        </div> <div *ngIf="this.modalSpinner" class="loader"></div>
+      </div>
+    </div>
+  </app-modal-basic>

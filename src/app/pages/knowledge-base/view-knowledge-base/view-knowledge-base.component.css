@@ -1,0 +1,9 @@
+.embed-responsive .card-img-top {
+  object-fit: cover;
+}
+
+.modal-content {
+  height: auto;
+  min-height: 100%;
+  border-radius: 0;
+}

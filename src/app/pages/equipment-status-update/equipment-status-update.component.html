@@ -1,0 +1,636 @@
+<div *ngIf="!this.viewIndividualData">
+  <div class="row" *ngIf="!isLogEntry">
+    <div class="col-sm-12">
+      <app-card *ngIf="!tableViewFlag">
+        <div class="col-sm-12" id="float-action">
+          <app-card>
+            <div class="page-header-title">
+              <i class="icofont icofont-key-hole bg-c-blue"></i>
+              <div class="d-inline">
+                <h4>Equipment Status Update</h4>
+                <span>Update the Equipment Status</span>
+              </div>
+            </div>
+          </app-card>
+        </div>
+
+        <br><br><br>
+        <form [formGroup]="onStatusForm">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Equipment<span class="asterisk required">*</span></label>
+            <div class="col-sm-10">
+              <ng-select [ngClass]="'ng-select'" [options]="this.equipmentData" aria-placeholder="Select Equipment"
+                name="selectEquipment" formControlName="equipmentId" #eqId (selected)="onChangeEquipment($event.value)"
+                [multiple]="false" required>
+              </ng-select>
+              <span
+                *ngIf="this.onStatusForm.get('equipmentId').value !=''&&this.onStatusForm.get('equipmentId').value !=0"
+                style="padding: 5px;"><i class="icofont icofont-info-square"
+                  (click)="modalLarge.show();loadEquipmentDetails()"></i></span>
+              <div class="messages text-danger"
+                *ngIf="(onStatusForm.get('equipmentId').touched || this.submitted) && onStatusForm.get('equipmentId').hasError('required')">
+                Please Select Equipment</div>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Status<span class="asterisk required">*</span></label>
+            <div class="col-sm-10">
+              <select name="selectStatus" class="form-control" formControlName="status">
+                <option value="">Select Status</option>
+                <option *ngFor="let status of statusList" [value]="status.id">{{status.checklistName}}</option>
+              </select>
+              <div class="messages text-danger"
+                *ngIf="(onStatusForm.get('status').touched || this.submitted) && onStatusForm.get('status').hasError('required')">
+                Please Enter Status</div>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Batch</label>
+            <div class="col-sm-10">
+              <select name="selectBatch" class="form-control" formControlName="batchId" (change)="newonChangeOfBatch()">
+                <option disabled value="">Select Batch</option>
+                <option *ngFor="let batch of batchList" [value]="batch.key">{{batch.value}}</option>
+                <option value="0">N/A</option>
+              </select>
+              <span *ngIf="this.onStatusForm.get('batchId').value !=''&&this.onStatusForm.get('batchId').value !=null"
+                style="padding: 5px;"><i class="icofont icofont-info-square"
+                  (click)="modalLarge1.show();loadBatchDetails()"></i></span>
+            </div>
+          </div>
+
+          <div class="row" *ngIf="isProduct">
+            <label class="col-sm-6 col-form-label">Product Name:- <b>{{productName}}</b></label>
+          </div>
+
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Notes<span class="asterisk required">*</span></label>
+            <div class="col-sm-10">
+              <input type="text" name="notes" class="form-control" placeholder="" formControlName="taskDescription"
+                maxlength="50">
+              <div class="messages text-danger"
+                *ngIf="(onStatusForm.get('taskDescription').touched || this.submitted) && onStatusForm.get('taskDescription').hasError('required')">
+                Please Enter Notes</div>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-sm-10">
+              <input type="checkbox" name="logCheckbox" [checked]="isFormDisable" id="html1" (click)="logsRequried()"
+                formControlName="formEnable">
+              <label for="html1">logs requried</label>
+            </div>
+          </div>
+
+          <div class="form-group row" *ngIf="isFormDisable">
+            <label class="col-sm-2 col-form-label">Select Logs</label>
+            <div class="col-sm-10">
+              <div id="inputgroup">
+                <ng-select formControlName="forms" name="selectLogs" [ngClass]="'ng-select'" [options]="formOptionList"
+                  [multiple]="true">
+                </ng-select>
+              </div>
+              <div class="messages text-danger" *ngIf="(onStatusForm.get('forms').value.length==0)&&
+                (onStatusForm.get('forms').touched || this.submitted)">
+                Please Select One Log</div>
+            </div>
+          </div><br>
+
+          <div class="form-group row">
+            <div class="col-sm-12 text-center">
+              <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                (click)="onClickSave();">Save
+              </button>
+              <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+                (click)="onClickCancel()">Cancel
+              </button>
+            </div>
+          </div>
+
+        </form>
+      </app-card>
+
+      <div *ngIf="tableViewFlag">
+        <app-card>
+          <div class="col-sm-12" id="float-action">
+            <app-card>
+              <div class="page-header-title">
+                <i class="icofont icofont-garbage bg-c-blue"></i>
+                <div class="d-inline">
+                  <h4>Equipment Status view</h4>
+                  <span>view all Details</span>
+                </div>
+              </div>
+            </app-card>
+          </div>
+          <br><br><br>
+          <div>
+            <button [disabled]="!permissionModal.createButtonFlag" type="button" class="btn btn-primary"
+              (click)="onClickCreate()">
+              <i class="icofont icofont-plus-circle"></i>Add Status
+            </button>
+          </div>
+          <br>
+          <ngb-tabset>
+            <ngb-tab>
+              <ng-template ngbTabTitle>
+                <div (click)="onTabChange()">Pending Items</div>
+              </ng-template>
+              <ng-template ngbTabContent>
+                <div class="col-xs-12 col-sm-12 col-md-12">
+                  <div style="text-align: right;">
+                    <a href="javascript:;" *ngIf="permissionModal.exportButtonFlag" (click)="pdfdownload('Pending')"
+                      placement="top" ngbTooltip="PDF Download"><img
+                        src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAANSSURBVFhH7ZZLT1NBFIBZ+SP8Ce7FYI1BKDUQyqOkJCBFYsJLHgsEISRCQhAjhYRXWEg3BBOCFhdsmhBdIfIogra05Y0BigiUd1vb0h4505FXb80tzMDGLzlpZ+bemS8z98xM2H9YUqHWAKuoaur8TLtlB3bMAuynoeOdj7kkS8EDu5O9JEtBhLkka0GEqSQPQYSZJC9BhIkkT0Hk0pK8BZFLSYoV3DOZYFQuh+/Z2bA/NUVrT8B+xAQdVjz4khhWe3rA2t0NK11dYCwooLWhwVVwa3AQ5urrwbOzA0NSKfg8HtoiHq6Chw4HjGdkkN+h6Gjw7O7SFvFwFUQWW1thubMThmNiAHw+Wise7oK/19ZAn5gI37KyaE1ocBdEZmprYbq6mpZC40oETaWlMBIbC46lJVojHu6CbpsNvqamwkJLC0wWFYHP66Ut4uAu+LO3F360t4PX6YSJzEyyL4aCednGUfAoaw05OWCfmyNFPFlG4uJgW68nZTFwFdweHgZTSQkt+Vnr6yNZvW82g31xEfaMRiIutEeGR8oFg2oER6zgZHEx2AYGyAyuarUwp1aDIT+f7Im4cU+oVGAuKwNjYSGZ2emqKvqmH5TRaD+dCSaCXpeLzBRK6JOSSOA2g9/f9ugoSZxfOh2Mp6eT4xBxrqyQ5/Fb/QtzQRxkvrGRLCEOhsmBt5hgmXswO0tmbzwtDcYUCjLDp2Em6HW7YaG5mQyypNGQC4KlvFz00eZaXycnznmYCVoqK2GhqYksDy4ZLp1rc5O2XhxmgrikTqsVNvr7YUyphH2LhbZcDmaCmBB4c8asvchxFgxmgiyoa2gjg58PIUGBeEPV/PAQdB/dtjNzS+BpeV2AVLDIK6s9vCdLMd5SKm9QNT88BJGNTRs8TFbBC3WHoNDpwGcipIqtu9KEm1TrBF6CiGHSAlHxadCg0QqKYWCbJEbhuH0/PoIqnYWnIPKhTwdxyifQ3q0LkMO6qIRH9jsP5PlUJxDegkjN6xZIz34GHe8/Hsvh/5SsIodEpuiiKsJchSAmzeOjpCmoeHUsmPf8pVsiSzEEJMV5UJBn1LS9hbEZK3wxzoMsSQXVjRoSEmmyTTAprhNMBEyIfybFdRMeGZ+LQYsChIX9ARRfoiPSJnT3AAAAAElFTkSuQmCC"></a>
+                    <label>Search:
+                      <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                        class="form-control input-sm full-data-search" name=search placeholder="Search">
+                    </label>
+                  </div>
+                </div>
+                <ngx-datatable #myTable [scrollbarH]="true" class="data-table dt-chk"
+                  [rows]='data | EquipmentStatusPipeFilter : filterQuery' [limit]="10" [columnMode]="'force'"
+                  [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                  <ngx-datatable-column name="Complete" [width]="70" [sortable]="false" [canAutoResize]="false"
+                    [draggable]="false" [resizeable]="false">
+                    <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                      let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                      <div class="checkbox-fade fade-in-primary">
+                        <label *ngIf="permissionModal.createButtonFlag || permissionModal.updateButtonFlag">
+                          <input type="checkbox" name="{{row['id']}}" [checked]="data[row['$$index']].executionFlag"
+                            (change)="data[row['$$index']].executionFlag=!data[row['$$index']].executionFlag;onChangeCompletStatus(row);" />
+                          <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                        </label>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+                    [resizeable]="false" name="Sl No.">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong>{{row['$$index']+1}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Equipment Name">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['equipmentName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Batch Number">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['batchName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Product">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['productName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Status">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['statusDesc']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Description">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskDescription']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column style="font-weight: bold;" name="From">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['displayFromDate']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="To">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong *ngIf="row.statusActiveFlag !='N'"
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">On going</strong>
+                      <strong *ngIf="row.statusActiveFlag =='N'"
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['displayToDate']}}</strong>
+
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Hours">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong *ngIf="row.statusActiveFlag =='N'"
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['totalHours']}}</strong>
+                      <strong *ngIf="row.statusActiveFlag !='N'"
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;"></strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Updated By">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['updatedName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column name="Action">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <a container="body" href="javascript:;" (click)="logEntry(row)"
+                        *ngIf="(row.statusActiveFlag !='N' && row.dynamicFormsList.length>0)"
+                        class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Log Entry">
+                        <i class="icofont icofont-login"></i>
+                      </a>
+                      <a container="body" href="javascript:;" (click)="changeStatus(row)"
+                        *ngIf="row.statusActiveFlag !='N' && permissionModal.updateButtonFlag"
+                        class="m-r-15 crm-action-edit text-muted text-primary" placement="top"
+                        ngbTooltip="Change Status">
+                        <i class="icofont icofont-edit edit"></i>
+                      </a>
+                      <a container="body" href="javascript:;"
+                        *ngIf="row.statusActiveFlag !='N' && permissionModal.deleteButtonFlag"
+                        class="m-r-15 crm-action-delete text-muted text-danger"
+                        (click)="openSuccessCancelSwal(row , row['$$index'] );" placement="top" ngbTooltip="Delete">
+                        <i class="icofont icofont-bin bin"></i>
+                      </a>
+                    </ng-template>
+                  </ngx-datatable-column>
+                </ngx-datatable>
+              </ng-template>
+            </ngb-tab>
+
+            <ngb-tab>
+              <ng-template ngbTabTitle>
+                <div (click)="onTabChange($event.nextId)">Completed Items</div>
+              </ng-template>
+              <ng-template ngbTabContent>
+                <div class="row">
+                  <div class="col-xs-12 col-sm-12 col-md-12">
+                    <div style="text-align: right;">
+                      <a href="javascript:;" *ngIf="permissionModal.exportButtonFlag" (click)="pdfdownload('Completed')"
+                        placement="top" ngbTooltip="Pdf Download"><img
+                          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAANSSURBVFhH7ZZLT1NBFIBZ+SP8Ce7FYI1BKDUQyqOkJCBFYsJLHgsEISRCQhAjhYRXWEg3BBOCFhdsmhBdIfIogra05Y0BigiUd1vb0h4505FXb80tzMDGLzlpZ+bemS8z98xM2H9YUqHWAKuoaur8TLtlB3bMAuynoeOdj7kkS8EDu5O9JEtBhLkka0GEqSQPQYSZJC9BhIkkT0Hk0pK8BZFLSYoV3DOZYFQuh+/Z2bA/NUVrT8B+xAQdVjz4khhWe3rA2t0NK11dYCwooLWhwVVwa3AQ5urrwbOzA0NSKfg8HtoiHq6Chw4HjGdkkN+h6Gjw7O7SFvFwFUQWW1thubMThmNiAHw+Wise7oK/19ZAn5gI37KyaE1ocBdEZmprYbq6mpZC40oETaWlMBIbC46lJVojHu6CbpsNvqamwkJLC0wWFYHP66Ut4uAu+LO3F360t4PX6YSJzEyyL4aCednGUfAoaw05OWCfmyNFPFlG4uJgW68nZTFwFdweHgZTSQkt+Vnr6yNZvW82g31xEfaMRiIutEeGR8oFg2oER6zgZHEx2AYGyAyuarUwp1aDIT+f7Im4cU+oVGAuKwNjYSGZ2emqKvqmH5TRaD+dCSaCXpeLzBRK6JOSSOA2g9/f9ugoSZxfOh2Mp6eT4xBxrqyQ5/Fb/QtzQRxkvrGRLCEOhsmBt5hgmXswO0tmbzwtDcYUCjLDp2Em6HW7YaG5mQyypNGQC4KlvFz00eZaXycnznmYCVoqK2GhqYksDy4ZLp1rc5O2XhxmgrikTqsVNvr7YUyphH2LhbZcDmaCmBB4c8asvchxFgxmgiyoa2gjg58PIUGBeEPV/PAQdB/dtjNzS+BpeV2AVLDIK6s9vCdLMd5SKm9QNT88BJGNTRs8TFbBC3WHoNDpwGcipIqtu9KEm1TrBF6CiGHSAlHxadCg0QqKYWCbJEbhuH0/PoIqnYWnIPKhTwdxyifQ3q0LkMO6qIRH9jsP5PlUJxDegkjN6xZIz34GHe8/Hsvh/5SsIodEpuiiKsJchSAmzeOjpCmoeHUsmPf8pVsiSzEEJMV5UJBn1LS9hbEZK3wxzoMsSQXVjRoSEmmyTTAprhNMBEyIfybFdRMeGZ+LQYsChIX9ARRfoiPSJnT3AAAAAElFTkSuQmCC"></a>
+                      <label>Search:
+                        <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                          class="form-control input-sm full-data-search" name=search placeholder="Search">
+                      </label>
+                    </div>
+                  </div>
+
+                </div>
+
+                <ngx-datatable #myTable [scrollbarH]="true" class="data-table dt-chk"
+                  [rows]='completedData | EquipmentStatusPipeFilter : filterQuery' [limit]="10" [columnMode]="'force'"
+                  [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                  <ngx-datatable-column [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+                    [resizeable]="false" name="Sl No.">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong>{{row['$$index']+1}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Equipment Name">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['equipmentName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Batch Number">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['batchName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Product">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['productName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Status">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['statusDesc']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Description">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskDescription']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="From">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['displayFromDate']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="To">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['displayToDate']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Hours">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['totalHours']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Updated By">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['updatedName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                </ngx-datatable>
+              </ng-template>
+            </ngb-tab>
+
+            <ngb-tab id="audit" title="Audit Trail">
+              <ng-template ngbTabContent>
+                <app-audit-trail-view #auditView [permission]="this.helper.STATUS_UPDATE_VALUE"></app-audit-trail-view>
+              </ng-template>
+            </ngb-tab>
+
+          </ngb-tabset>
+        </app-card>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" *ngIf="isLogEntry">
+    <div class="col-sm-12">
+      <app-card>
+        <div class="col-sm-12" id="float-action">
+          <app-card>
+            <div class="page-header-title">
+              <i class="icofont icofont-key-hole bg-c-blue"></i>
+              <div class="d-inline">
+                <h4>Equipment Status Log Entry</h4>
+                <span>Log Entry for Equipment Status Update</span>
+              </div>
+            </div>
+          </app-card>
+        </div>
+
+        <br><br><br>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label">Select Log<span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <select name="select" [(ngModel)]="selectedForm" (change)="onChangeLog()" class="form-control">
+              <option value="">Select Log</option>
+              <option *ngFor="let form of selectedFormList" [value]="form.key">{{form.value}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div *ngIf="selectedForm !=''">
+          <button class="btn btn-primary" (click)=navigate()>
+            <i class="icofont icofont-plus-circle"></i>Add
+          </button>
+          <div style="text-align: right;">
+            <label> Search :
+              <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                class="form-control input-sm full-data-search" placeholder="search"></label><br>
+          </div>
+          
+          <ngx-datatable #myTable class="data-table dt-chk" [rows]='dynamicFormData | dyanmicFormFilter : filterQuery'
+            [limit]="rowsOnPage" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]='"auto"'
+            [loadingIndicator]='loading' [scrollbarH]="true">
+            <ngx-datatable-column name="Action">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <a container="body" class="crm-action-view text-muted text-warning"
+                  (click)="viewRowDetails(row,row.commonDocumentStatusValue);" data-ng-open="modalSmall" placement="top"
+                  ngbTooltip="View">
+                  <i class="icofont icofont-resize"></i>
+                </a>
+                <ng-template #popContent>
+                  <span class="text-left">
+                    <div><label style="font-size: 10px !important"><b>Created By:</b> {{row['createdByName']}}</label>
+                    </div>
+                    <div><label style="font-size: 10px !important"><b>Created Time:</b>
+                        {{row['displayCreatedTime'] }}</label></div>
+                    <div><label style="font-size: 10px !important"><b>Updated By:</b> {{row['updatedByName']}}</label>
+                    </div>
+                    <div><label style="font-size: 10px !important"><b>Updated Time:</b>
+                        {{row['displayUpdatedTime'] }}</label></div>
+                  </span>
+                </ng-template>
+                <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+                  placement="right" placement="top" [ngbTooltip]="popContent">
+                  <i class="icofont icofont-info-square info"></i>
+                </a>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="ID">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong>{{row['dynamicFormCode']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Equipment">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong>{{row['equipmentName']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Batch">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong>{{row['batchName']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Product">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong>{{row['productName']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;"
+              *ngFor="let col of publishedMandatoryFeildJson.columns; let i = index" [name]="col" flexGrow="1.0">
+              <ng-template ngx-datatable-header-template>
+                <span class="datatable-header-cell-wrapper">
+                  <span class="datatable-header-cell-label draggable"><label [innerHtml]="col"></label></span>
+                </span>
+              </ng-template>
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <strong>{{ publishedMandatoryFeildJson.rows[row['$$index']][i] }}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Document Status">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong>{{row['status']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Updated By">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong>{{row['updatedByName']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Updated Time">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong>{{row['displayUpdatedTime'] }}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <div style="text-align: center;">
+              <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+                (click)="cancelLogEntry()">Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+  </div>
+</div>
+
+<app-modal-basic #modalLarge [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Equipment Details</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d"
+    width="100%" height="auto" size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="dt-desc" style="padding: 0px;">
+      <table class="table-striped table-bordered" style="width: 100%;">
+        <tr>
+          <td width="50%">Equipment Name</td>
+          <td width="50%" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.name}}</td>
+        </tr>
+        <tr>
+          <td>Equipment Code </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.code}}</td>
+        </tr>
+        <tr>
+          <td>Date Of Purchase </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.dateOfPurchase| date:'yyyy-MM-dd'}}</td>
+        </tr>
+        <tr>
+          <td>Make / Manufactured By</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.manufacturer}}</td>
+        </tr>
+        <tr>
+          <td>Supplied / Sold By</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.soldBy}}</td>
+        </tr>
+        <tr>
+          <td>Model</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.model}}
+          </td>
+        </tr>
+        <tr>
+          <td>Total Capacity </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.totalCapacity}}
+          </td>
+        </tr>
+        <tr>
+          <td>Recommended usage Capacity</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.usageCapacity}}
+          </td>
+        </tr>
+        <tr>
+          <td>Initial IQ completion Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.iqCompletionDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr>
+          <td>Initial OQ completion Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.oqCompletionDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+      (click)="modalLarge.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalLarge1 [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Batch Details</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge1.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="dt-desc" style="padding: 0px;">
+      <table class="table-striped table-bordered" style="width: 100%;">
+        <tr>
+          <td width="50%">Product Name</td>
+          <td width="50%" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{batchDetails.productName}}</td>
+        </tr>
+        <tr>
+          <td>Batch Number</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{batchDetails.batchNumber}}</td>
+        </tr>
+        <tr>
+          <td>Batch Quantity</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{batchDetails.batchQuantity}}</td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{batchDetails.status}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+      (click)="modalLarge1.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData==true">
+  <div *ngFor="let data of popupdata; let in = index">
+    <div><br>
+      <h4>&nbsp;&nbsp;Details
+        <div style="float: right;">
+          <a style="cursor:pointer;font-weight: bold" *ngIf="routeback==null" class="ti-close"
+            (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a>
+        </div>
+      </h4>
+    </div>
+    <br>
+    <app-stepperprogress></app-stepperprogress>
+    <app-view-form [inputField]='this.popupdata'></app-view-form><br>
+    <ngb-tabset class="md-tabs">
+
+      <ngb-tab *ngFor="let formDatas of data.formDataList; let f = index " id="{{f}}" class="col-md-2">
+        <ng-template ngbTabTitle>
+          <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary">
+            <h5 class="card-header-text">{{formDatas.formName}}</h5>
+          </a>
+        </ng-template>
+
+        <ng-template ngbTabContent>
+
+          <div class="row">
+            <div class="col-sm-12">
+              <app-view-form [inputField]='formDatas.formDataArray'></app-view-form>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-tab>
+    </ngb-tabset>
+
+  </div>
+</app-card>

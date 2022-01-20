@@ -1,0 +1,108 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="col-sm-12" id="float-action">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-4 page-header-title">
+            <i class="icofont icofont-file-document bg-c-blue"></i>
+            <div class="d-inline">
+              <h4 class="strong">SFTP Documents</h4>
+              <span>View SFTP Documents</span>
+            </div>
+          </div>
+          <div class="col-sm-8 text-right">
+            <a href="javascript:" class="m-r-15">
+              <img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/search.png" alt="Search"
+                placement="bottom" ngbTooltip="Search" (click)="onChangeSearch();"></a>
+            <input *ngIf="this.showSearch" #filter id="search" type="search"
+              class="form-control input-sm full-data-search m-r-15" (keyup)="tree.treeModel.filterNodes(filter.value);"
+              placeholder="Search" />
+
+            <ng-template #popContent>
+              <span class="text-left">
+                <div>
+                  <label style="font-size: 12px !important"><b>FTP : </b>{{ftpFolderSize}}</label>
+                </div>
+              </span>
+            </ng-template>
+            <a container="body" href="javascript:" class="m-r-10 crm-action-info text-muted text-primary"
+              placement="bottom" [ngbTooltip]="popContent"><i class="icofont icofont-info-square info"></i>
+            </a>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <div><br><br></div>
+
+    <app-card>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="m-t-15">
+            <div class="row">
+              <div class="col-lg-12">
+                <div class="general-info">
+                  <div class="row">
+                    <div class="col-lg-12 col-xl-10">
+                      <div class="table-responsive">
+                        <table class="table m-0">
+                          <tbody>
+                            <tr>
+                              <td scope="row" *ngIf="!isNodesThere">
+                                <h6>No Documents available</h6>
+                              </td>
+                              <td scope="row" *ngIf="isNodesThere">
+                                <tree-root #tree style=" font-size: 20px;" [nodes]="nodes" [options]="options"
+                                  style="font-size:14px;">
+                                  <ng-template #treeNodeTemplate let-node let-index="index">
+                                    <div style="width: 1000px;">
+                                      <img *ngIf="node.hasChildren" src="assets/icon/svg-animated/folder.svg"
+                                        width="20px" height="20px">
+                                      <span *ngIf="!node.hasChildren">
+                                        <a href="javascript:;" (click)="loadDocumentCommentLog(node.data);"
+                                          placement="top"><i class="icofont icofont-info-square"></i>
+                                        </a>
+                                      </span>
+                                      <span (click)="downloadFileOrView(node.data);">{{node.data.name}}</span>
+                                      <span *ngIf="!node.hasChildren" class="float-right">
+                                        <label>Created By : {{node.data.createdBy}} | Date Modified : {{node.data.date}}</label>
+                                      </span>
+                                    </div>
+                                  </ng-template>
+                                </tree-root>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #modelInfo [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="modelInfo.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto"
+      size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+      <h5>File Info</h5><br>
+      <div *ngIf="this.infoData">
+        <hr>
+        <div><b>Created By : </b>{{this.infoData.createdBy}}</div>
+        <div><b>Created Time : </b>{{this.infoData.date}}</div>
+        <div><b>File Size : </b>{{this.infoData.ftpFileSize}}</div>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

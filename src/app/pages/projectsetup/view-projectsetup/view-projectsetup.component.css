@@ -1,0 +1,122 @@
+  .squeezebox .sb-item {
+    overflow: hidden;
+  }
+
+  .squeezebox .sb-item .sb-item-body {
+    height: 0;
+    overflow: hidden;
+    transition: 0.5s height;
+  }
+
+  .modal-body .slimScrollDiv {
+    height: 350px;
+  }
+
+  .modal {
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  table#projectsetup-table tbody th, table#projectsetup-table tbody td {
+    white-space: unset;
+    width: 50%;
+  }
+
+  table#projectsetup-table, table#projectsetup-table td {
+    border: 1px solid black;
+  }
+
+  .card {
+    border-radius: 5px;
+    box-shadow: 0 1px 11px 0 rgba(0, 0, 0, 0.12);
+    border: none;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+  }
+
+  .horzontal_line {
+    margin: 0px;
+    margin-top: 0.2rem;
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, .1);
+  }
+
+  .inprogres {
+    color: #f0ad4e;
+  }
+
+  .bg-yellow {
+    background-color: yellow;
+  }
+
+  body, html {
+    height: 100%;
+  }
+
+  .card-title {
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .list-wrapper {
+    width: 410px;
+    margin: 0px 20px 0px 0;
+    height: 100%;
+    box-sizing: border-box;
+    display: inline-block;
+    vertical-align: top;
+    box-shadow: none;
+  }
+
+  .list {
+    background-color: #ebecf0;
+    border-radius: 3px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    position: relative;
+    white-space: normal;
+  }
+
+  .card-margin {
+    margin-bottom: 6px;
+  }
+
+  .list-cards {
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    margin: 0px -17px 0px -12px;
+    min-height: 0;
+  }
+
+  .content-margin {
+    margin-left: -35%;
+    padding-bottom: 10px;
+  }
+
+  #modal-lg-60 .modal-lg {
+    max-width: 60%;
+  }
+
+  .font-13 {
+    font-size: 12px;
+  }
+
+  .horzontal_line {
+    margin: 0px;
+    margin-top: 0.2rem;
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, .1);
+  }
+
+  .card-title-padding {
+    padding: 17px;
+    margin: -10px;
+  }
+
+  #view-project-table-id .datatable-scroll {
+    min-height: 300px;
+  }

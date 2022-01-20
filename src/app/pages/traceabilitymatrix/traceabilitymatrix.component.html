@@ -1,0 +1,706 @@
+<div class="row">
+  <div id="float-action" class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="page-header-title">
+            <i class="icofont icofont-key-hole bg-c-blue"></i>
+            <div class="d-inline">
+              <h4>Traceability Matrix</h4>
+              <span>View all Traceability Matrix</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-8 text-right">
+          <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25 img-pb-4"
+              src="assets/icon/png-icons/search.png" alt="Search" placement="bottom" ngbTooltip="Search"
+              (click)="this.showSearch=!this.showSearch"></a>
+          <input *ngIf="this.showSearch" type="search" [(ngModel)]="filterQuery"
+            (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search m-r-15"
+            placeholder="Search">
+            <a *ngIf="permissions.publishButtonFlag && isDocumentWorkflowAdded && !isDocumentPublished"
+              href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+              src="assets/icon/png-icons/published.png" alt="Publish GxP Form" placement="bottom"
+              ngbTooltip="Publish Traceability Matrix" (click)="this.publishDocument();"></a>
+
+          <a href="javascript:" class="m-r-15">
+            <img class="image-radius rounded-0 img-25 img-pb-4" [ngStyle]="{'border-bottom':tableView?'2px solid':'' }"
+              src="assets/icon/png-icons/tableView.png" alt="Table View" placement="bottom" ngbTooltip="Table view"
+              (click)="changeview('table')"></a>
+
+          <!-- <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25 img-pb-4" [ngStyle]="{'border-bottom':detailView?'2px solid':'' }"
+              src="assets/icon/png-icons/detailView.png" alt="Detail View" placement="bottom" ngbTooltip="Detail View"
+              (click)="changeview('detail')"></a> -->
+
+          <a  href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-pb-4" style="height: 33px;width: 30px;" [ngStyle]="{'border-bottom':(!detailView && !tableView)?'2px solid':'' }"
+              src="assets/icon/png-icons/trace_noTestcases.png" alt="URS not mapped to Test case" placement="bottom" ngbTooltip="URS not mapped to Test case"
+              (click)="changeview('noTestcases')"></a>
+          
+          <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-27" src="assets/icon/png-icons/checkList.png"
+            alt="Approval History" placement="bottom" ngbTooltip="Approval History" (click)="onClickWorkflowHistory()"></a>
+
+          <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25 img-pb-4"
+              src="assets/icon/png-icons/menu.png" alt="Table of Content" placement="bottom"
+              ngbTooltip="Table of Content" (click)="onClickTableOfContent()"></a>
+
+          <a *ngIf="traceabilityData && traceabilityData.length>0" href="javascript:"><img
+              class="image-radius rounded-0 img-25 img-pb-4" src="assets/icon/png-icons/pdfExport.png" alt="PDF Export"
+              placement="bottom" ngbTooltip="PDF Export" (click)="pdfdownload()"></a>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  <div class="col-sm-12">
+    <br><br> <br> <br>
+  </div>
+
+  <!-- Basic table card start -->
+  <div class="col-sm-12">
+    <app-card [title]="" [classHeader]="true" [blockClass]="'table-border-style'">
+      <div class="row" class="col-sm-12">
+        <small>
+          <a href="javascript:void(0)" (click)="table.rowDetail.expandAllRows()">Expand All</a>
+          |
+          <a href="javascript:void(0)" (click)="table.rowDetail.collapseAllRows()">Collapse All</a>
+        </small>
+      </div>
+      <ng-container *ngIf="tableView">
+        <ngx-datatable [scrollbarH]="true" #myTable class="data-table" id="traceMatrixId"
+          [rows]='traceabilityData | TraceabilityFilter : filterQuery' [columnMode]="'force'"
+          [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [externalPaging]="true"
+          [count]="page.totalElements"
+          [offset]="page.pageNumber"
+          [limit]="page.size"
+          (page)="setPage($event)">
+          <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+              <table class="table-bordered">
+                <thead>
+                  <tr>
+                    <th class="width-50px"></th>
+                    <th class="p-2" *ngIf="row.specFlag">Specification</th>
+                    <th class="p-2" *ngIf="row.riskFlag">Risk Assessment</th>
+                    <th class="p-2" *ngIf="row.iqtcFlag">IQTC</th>
+                    <th class="p-2" *ngIf="row.oqtcFlag">OQTC</th>
+                    <th class="p-2" *ngIf="row.pqtcFlag">PQTC</th>
+                    <th class="p-2" *ngIf="row.ioqtcFlag">IOQTC</th>
+                    <th class="p-2" *ngIf="row.opqtcFlag">OPQTC</th>
+                    <th class="p-2" *ngIf="row.adHocFlag">Unscripted Test Case</th>
+                  </tr>
+                </thead>
+
+                <tbody class="fixed-header">
+                  <ng-container *ngFor="let spec of row.specList | mapFilter;">
+                    <tr style="vertical-align: top;">
+                      <td class="width-50px"></td>
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.specFlag">
+                        <table class="w-100" *ngIf="spec.key!=0">
+                          <thead>
+                            <tr class="w-100">
+                              <td class="w-50"><strong>Spec-Code</strong></td>
+                              <td class="w-50"><strong>Specification Type</strong></td>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <td> <a [routerLink]="['/sp-master']"
+                                [queryParams]="{ id: spec.key,status:'/traceability'}">{{spec.value.specCode}}</a>
+                            </td>
+                            <td>{{spec.value.specType}}</td>
+                          </tbody>
+                        </table>
+                      </td>
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.riskFlag">
+                        <ng-container *ngIf="row.riskList[spec.value.specCode]">
+                          <table class="w-100">
+                            <thead>
+                              <tr>
+                                <td rowspan="2"><strong>Risk-Code</strong></td>
+                                <td rowspan="2"><strong>Priority</strong></td>
+                                <td rowspan="2"><strong>RPN</strong></td>
+                                <td colspan="2"><strong>Residual Risk</strong></td>
+                              </tr>
+                              <tr>
+                                <td class="td-header-bg"><strong>Priority</strong></td>
+                                <td class="td-header-bg"><strong>RPN</strong></td>
+                              </tr>
+                            </thead>
+                            <tbody *ngFor="let r of row.riskList[spec.value.specCode]">
+                              <td> <a [routerLink]="['/riskAssessment']"
+                                  [queryParams]="{ id: r.id,status:'/traceability'}">{{r.documentCode}}</a></td>
+
+                              <td [ngStyle]="{'color':  r.priorityColor}">{{r.priority}}</td>
+                              <td>{{r.rpn}}</td>
+                              <td *ngIf="r.residualPriority !='N/A'" [ngStyle]="{'color':  r.residualPriorityColor}">
+                                {{r.residualPriority}}</td>
+                              <td *ngIf="r.residualPriority ==='N/A'"></td>
+                              <td>{{r.residualRpn}}</td>
+                            </tbody>
+                          </table>
+                          <br>
+                        </ng-container>
+                      </td>
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.iqtcFlag">
+                        <ng-container *ngFor="let iqtc of row.iqtcList | mapFilter;">
+                          <ng-container *ngIf="iqtc.value[spec.value.specCode]">
+                            <table class="w-100">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-50"><strong>{{iqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let iq of iqtc.value[spec.value.specCode];">
+                                <td>
+                                  <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: iq.id,status:'/traceability'}">{{iq.documentCode}}</a>
+                                  <span *ngIf="iq.discrepancy"><br>DF : <a [routerLink]="['/df/view-df']"
+                                      [queryParams]="{ id: iq.dfId,status:'/traceability'}">{{iq.discrepancy}}</a></span>
+                                </td>
+                                <td class="align-text-top"
+                                  [ngStyle]="{'color': this.helper.getTestCaseStatusColors(iq.status) }">{{iq.status}}
+                                </td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.oqtcFlag">
+                        <ng-container *ngFor="let oqtc of row.oqtcList | mapFilter;">
+                          <ng-container *ngIf="oqtc.value[spec.value.specCode]">
+                            <table class="w-100">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-50"><strong>{{oqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let oq of oqtc.value[spec.value.specCode];">
+                                <td>
+                                  <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: oq.id,status:'/traceability'}">{{oq.documentCode}}</a>
+                                  <span *ngIf="oq.discrepancy"><br>DF : <a [routerLink]="['/df/view-df']"
+                                      [queryParams]="{ id: oq.dfId,status:'/traceability'}">{{oq.discrepancy}}</a></span>
+                                </td>
+                                <td class="align-text-top"
+                                  [ngStyle]="{'color': this.helper.getTestCaseStatusColors(oq.status) }">{{oq.status}}
+                                </td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.pqtcFlag">
+                        <ng-container *ngFor="let pqtc of row.pqtcList | mapFilter;">
+                          <ng-container *ngIf="pqtc.value[spec.value.specCode]">
+                            <table class="w-100">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-50"><strong>{{pqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let pq of pqtc.value[spec.value.specCode];">
+                                <td>
+                                  <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: pq.id,status:'/traceability'}">{{pq.documentCode}}</a>
+                                  <span *ngIf="pq.discrepancy"><br>DF : <a [routerLink]="['/df/view-df']"
+                                      [queryParams]="{ id: pq.dfId,status:'/traceability'}">{{pq.discrepancy}}</a></span>
+                                </td>
+                                <td class="align-text-top"
+                                  [ngStyle]="{'color': this.helper.getTestCaseStatusColors(pq.status) }">{{pq.status}}
+                                </td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.ioqtcFlag">
+                        <ng-container *ngFor="let ioqtc of row.ioqtcList | mapFilter;">
+                          <ng-container *ngIf="ioqtc.value[spec.value.specCode]">
+                            <table class="w-100">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-50"><strong>{{ioqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let ioq of ioqtc.value[spec.value.specCode];">
+                                <td>
+                                  <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: ioq.id,status:'/traceability'}">{{ioq.documentCode}}</a>
+                                  <span *ngIf="ioq.discrepancy"><br>DF : <a [routerLink]="['/df/view-df']"
+                                      [queryParams]="{ id: ioq.dfId,status:'/traceability'}">{{ioq.discrepancy}}</a></span>
+                                </td>
+                                <td class="align-text-top"
+                                  [ngStyle]="{'color': this.helper.getTestCaseStatusColors(ioq.status) }">{{ioq.status}}
+                                </td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.opqtcFlag">
+                        <ng-container *ngFor="let opqtc of row.opqtcList | mapFilter;">
+                          <ng-container *ngIf="opqtc.value[spec.value.specCode]">
+                            <table class="w-100">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-50"><strong>{{opqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let opq of opqtc.value[spec.value.specCode];">
+                                <td>
+                                  <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: opq.id,status:'/traceability'}">{{opq.documentCode}}</a>
+                                  <span *ngIf="opq.discrepancy"><br>DF : <a [routerLink]="['/df/view-df']"
+                                      [queryParams]="{ id: opq.dfId,status:'/traceability'}">{{opq.discrepancy}}</a></span>
+                                </td>
+                                <td class="align-text-top"
+                                  [ngStyle]="{'color': this.helper.getTestCaseStatusColors(opq.status) }">{{opq.status}}
+                                </td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+                      </td>
+
+
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.adHocFlag">
+                        <ng-container *ngIf="row.adHocList[spec.value.specCode]">
+                          <table class="w-100">
+                            <thead>
+                              <tr>
+                                <td><strong>Code</strong></td>
+                                <td><strong>Status</strong></td>
+                              </tr>
+                            </thead>
+                            <tbody *ngFor="let r of row.adHocList[spec.value.specCode]">
+                              <td><a [routerLink]="['/Ad-hoc/view-Ad-hoc-testcase']"
+                                  [queryParams]="{ id: r.id,status:'/traceability'}">{{r.documentCode}}</a></td>
+                              <td [ngStyle]="{'color': this.helper.getTestCaseStatusColors(r.status) }">{{r.status}}
+                              </td>
+                            </tbody>
+                          </table>
+                          <br>
+                        </ng-container>
+                      </td>
+
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+
+            </ng-template>
+          </ngx-datatable-row-detail>
+          <ngx-datatable-column [width]="50" [canAutoResize]=false>
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <a href="javascript:;" [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded"
+                title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+              </a>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column [maxWidth]="300" name="Category" ngx-datatable-cell>
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['category']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column [maxWidth]="300" name="URS Code">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <span class="dot small-tc-dot" [ngStyle]="{'background-color': row.priorityColor}"></span>
+              <strong class="fontStyle">{{row['ursCode']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Requirement">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['ursName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Testing Required">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['testingRequired']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Testing Method">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row.testingMethod}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </ng-container>
+
+      <ng-container *ngIf="detailView">
+        <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+          [rows]='this.tableData | TraceabilityFilter : filterQuery' [limit]="10" [columnMode]="'force'"
+          [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" (page)="onPage($event)">
+          <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+              <table style="width: fit-content;" class="table-striped table-bordered">
+                <thead>
+                  <tr class="bg-white">
+                    <th _ngcontent-c12="" class="width-50px">&nbsp;&nbsp;
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                    <th class="p-2 bg-white " *ngIf="row.specFlag">Specification</th>
+                    <th class="p-2 bg-white " *ngIf="row.riskFlag">Risk Assessment</th>
+                    <th class="p-2 bg-white " *ngIf="row.iqtcFlag">IQTC</th>
+                    <th class="p-2 bg-white " *ngIf="row.oqtcFlag">OQTC</th>
+                    <th class="p-2 bg-white " *ngIf="row.pqtcFlag">PQTC</th>
+                    <th class="p-2 bg-white " *ngIf="row.ioqtcFlag">IOQTC</th>
+                    <th class="p-2 bg-white " *ngIf="row.poqtcFlag">OPQTC</th>
+                    <th class="p-2 bg-white " *ngIf="row.adHocFlag">Unscripted Test Case</th>
+                  </tr>
+                </thead>
+                <tbody class="fixed-header">
+                  <ng-container *ngFor="let spec of row.specList | mapFilter;">
+                    <tr style="vertical-align:top">
+                      <td class="width-50px">&nbsp;&nbsp;</td>
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.specFlag">
+                        <table class="w-100" *ngIf="spec.key!=0">
+                          <thead>
+                            <tr class="w-100">
+                              <td class="w-50"><strong>Spec-Code</strong></td>
+                              <td class="w-50"><strong>Specification Type</strong></td>
+                              <td class="w-50"><strong>Description</strong></td>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <td> <a [routerLink]="['/sp-master']"
+                                [queryParams]="{ id: spec.key,status:'/traceability'}">{{spec.value.specCode}}</a>
+                            </td>
+                            <td>{{spec.value.specType}}</td>
+                            <td>{{spec.value.specDescription}}</td>
+                          </tbody>
+                        </table>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.riskFlag">
+                        <ng-container *ngIf="row.riskList[spec.value.specCode]">
+                          <table class="w-100 ">
+                            <thead>
+                              <tr>
+                                <td rowspan="2"><strong>Risk-Code</strong></td>
+                                <td rowspan="2"><strong>Risk Factor</strong></td>
+                                <td rowspan="2"><strong>Risk Scenario</strong></td>
+                                <td rowspan="2"><strong>Probable Cause Of Risk</strong></td>
+                                <td rowspan="2"><strong>Probability Of Occurance</strong></td>
+                                <td rowspan="2"><strong>Severity</strong></td>
+                                <td rowspan="2"><strong>Detectability</strong></td>
+                                <td rowspan="2"><strong>Proposed Mitigation</strong></td>
+                                <td rowspan="2"><strong>RPN</strong></td>
+                                <td rowspan="2"><strong>Risk Priority</strong></td>
+                                <td style="text-align: center;" colspan="6"><strong>Residual Risk</strong></td>
+                              </tr>
+                              <tr>
+                                <td class="td-header-bg"><strong>Probability Of Occurance</strong></td>
+                                <td class="td-header-bg"><strong>Severity</strong></td>
+                                <td class="td-header-bg"><strong>Detectability</strong></td>
+                                <td class="td-header-bg"><strong>RPN</strong></td>
+                                <td class="td-header-bg"><strong>Risk Priority</strong></td>
+                                <td class="td-header-bg"><strong>Conclusion</strong></td>
+                              </tr>
+                            </thead>
+                            <tbody *ngFor="let r of row.riskList[spec.value.specCode]">
+                              <td> <a [routerLink]="['/riskAssessment']"
+                                  [queryParams]="{ id: r.id,status:'/traceability'}">{{r.documentCode}}</a></td>
+                              <td>{{r.riskFactor}}</td>
+                              <td>{{r.riskScenario}}</td>
+                              <td>{{r.probableCauseofRisk}}</td>
+                              <td>{{r.probilityOfOccurance}}</td>
+                              <td>{{r.severity}}</td>
+                              <td>{{r.detectability}}</td>
+                              <td>{{r.proposedMitigation}}</td>
+                              <td>{{r.rpn}}</td>
+                              <td [ngStyle]="{'color':  r.priorityColor}">{{r.priority}}</td>
+
+                              <td>{{r.residualProbability}}</td>
+                              <td>{{r.residualServerity}}</td>
+                              <td>{{r.residualDetetablity}}</td>
+                              <td>{{r.residualRpn}}</td>
+                              <td *ngIf="r.residualPriority !='N/A'" [ngStyle]="{'color':  r.residualPriorityColor}">
+                                {{r.residualPriority}}</td>
+                              <td *ngIf="r.residualPriority =='N/A'"></td>
+                              <td>{{r.residualConclusion}}</td>
+                            </tbody>
+                          </table>
+                          <br>
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.iqtcFlag">
+                        <ng-container *ngFor="let iqtc of row.iqtcList | mapFilter;">
+                          <ng-container *ngIf="iqtc.value[spec.value.specCode]">
+                            <table class="w-100 ">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-25"><strong>{{iqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Description</strong></td>
+                                  <td class="w-50"><strong>Environment</strong></td>
+                                  <td class="w-50"><strong>Expected Result</strong></td>
+                                  <td class="w-25"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let iq of iqtc.value[spec.value.specCode];">
+                                <td> <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: iq.id,status:'/traceability'}">
+                                    {{iq.documentCode}}</a></td>
+                                <td>{{iq.description}}</td>
+                                <td>{{iq.environment}}</td>
+                                <td>{{iq.expected}}</td>
+                                <td [ngStyle]="{'color': this.helper.getTestCaseStatusColors(iq.status) }">{{iq.status}}
+                                </td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.oqtcFlag">
+                        <ng-container *ngFor="let oqtc of row.oqtcList | mapFilter;">
+                          <ng-container *ngIf="oqtc.value[spec.value.specCode]">
+                            <table class="w-100 ">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-25"><strong>{{oqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Description</strong></td>
+                                  <td class="w-50"><strong>Environment</strong></td>
+                                  <td class="w-50"><strong>Expected Result</strong></td>
+                                  <td class="w-25"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let oq of oqtc.value[spec.value.specCode];">
+                                <td> <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: oq.id,status:'/traceability'}">{{oq.documentCode}}</a></td>
+                                <td>{{oq.description}}</td>
+                                <td>{{oq.environment}}</td>
+                                <td>{{oq.expected}}</td>
+                                <td [ngStyle]="{'color': this.helper.getTestCaseStatusColors(oq.status) }">{{oq.status}}
+                                </td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.pqtcFlag">
+                        <ng-container *ngFor="let pqtc of row.pqtcList | mapFilter;">
+                          <ng-container *ngIf="pqtc.value[spec.value.specCode]">
+                            <table class="w-100 ">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-25"><strong>{{pqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Description</strong></td>
+                                  <td class="w-50"><strong>Environment</strong></td>
+                                  <td class="w-50"><strong>Expected Result</strong></td>
+                                  <td class="w-25"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let pq of pqtc.value[spec.value.specCode];">
+                                <td> <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: pq.id,status:'/traceability'}">
+                                    {{pq.documentCode}}</a></td>
+                                <td>{{pq.description}}</td>
+                                <td>{{pq.environment}}</td>
+                                <td>{{pq.expected}}</td>
+                                <td [ngStyle]="{'color': this.helper.getTestCaseStatusColors(pq.status) }">{{pq.status}}
+                                </td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.ioqtcFlag">
+                        <ng-container *ngFor="let ioqtc of row.ioqtcList | mapFilter;">
+                          <ng-container *ngIf="ioqtc.value[spec.value.specCode]">
+                            <table class="w-100 ">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-25"><strong>{{ioqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Description</strong></td>
+                                  <td class="w-50"><strong>Environment</strong></td>
+                                  <td class="w-50"><strong>Expected Result</strong></td>
+                                  <td class="w-25"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let ioq of ioqtc.value[spec.value.specCode];">
+                                <td> <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: ioq.id,status:'/traceability'}">{{ioq.documentCode}}</a></td>
+                                <td>{{ioq.description}}</td>
+                                <td>{{ioq.environment}}</td>
+                                <td>{{ioq.expected}}</td>
+                                <td [ngStyle]="{'color': this.helper.getTestCaseStatusColors(ioq.status) }">
+                                  {{ioq.status}}</td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+                      </td>
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.opqtcFlag">
+                        <ng-container *ngFor="let opqtc of row.opqtcList | mapFilter;">
+                          <ng-container *ngIf="opqtc.value[spec.value.specCode]">
+                            <table class="w-100 ">
+                              <thead>
+                                <tr class="w-100">
+                                  <td class="w-25"><strong>{{opqtc.key}}</strong></td>
+                                  <td class="w-50"><strong>Description</strong></td>
+                                  <td class="w-50"><strong>Environment</strong></td>
+                                  <td class="w-50"><strong>Expected Result</strong></td>
+                                  <td class="w-25"><strong>Status</strong></td>
+                                </tr>
+                              </thead>
+                              <tbody *ngFor="let opq of opqtc.value[spec.value.specCode];">
+                                <td> <a [routerLink]="['/tc-execution']"
+                                    [queryParams]="{ id: opq.id,status:'/traceability'}">{{opq.documentCode}}</a></td>
+                                <td>{{opq.description}}</td>
+                                <td>{{opq.environment}}</td>
+                                <td>{{opq.expected}}</td>
+                                <td [ngStyle]="{'color': this.helper.getTestCaseStatusColors(opq.status) }">
+                                  {{opq.status}}</td>
+                              </tbody>
+                            </table>
+                            <br>
+                          </ng-container>
+                        </ng-container>
+                      </td>
+
+
+
+                      <td class="p-2 width-300px td-data-bg" *ngIf="row.adHocFlag">
+                        <ng-container>
+                          <table class="w-100">
+                            <thead>
+                              <tr>
+                                <td><strong>Code</strong></td>
+                                <td><strong>Status</strong></td>
+                                <td><strong>Description</strong></td>
+                                <td><strong>Test Result</strong></td>
+                                <td><strong>Business Impact</strong></td>
+                              </tr>
+                            </thead>
+                            <tbody *ngFor="let r of row.adHocList[spec.value.specCode]">
+                              <td><a [routerLink]="['/Ad-hoc/view-Ad-hoc-testcase']"
+                                  [queryParams]="{ id: r.id,status:'/traceability'}">{{r.documentCode}}</a></td>
+                              <td [ngStyle]="{'color': this.helper.getTestCaseStatusColors(r.status) }">{{r.status}}
+                              </td>
+                              <td>{{r.description}}</td>
+                              <td>{{r.testResult}}</td>
+                              <td>{{r.businessImpact}}</td>
+                            </tbody>
+                          </table>
+                          <br>
+                        </ng-container>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </ng-template>
+
+          </ngx-datatable-row-detail>
+          <ngx-datatable-column [width]="50" [resizeable]="false" [sortable]="false" [draggable]="false"
+            [canAutoResize]="false">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <a href="javascript:;" [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded"
+                title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+              </a>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column [maxWidth]="300" name="Category">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['category']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column [maxWidth]="300" name="URS Code">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <span class="dot small-tc-dot" [ngStyle]="{'background-color': row.priorityColor}"></span>
+              <strong class="fontStyle">{{row['ursCode']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column [maxWidth]="300" name="Requirement">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['ursName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Description">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['ursDescription']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <!-- <ngx-datatable-column name="Testing Required">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['testingRequired']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Testing Method">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row.testingMethod?row.testingMethod:'N/A'}}</strong>
+            </ng-template>
+          </ngx-datatable-column> -->
+        </ngx-datatable>
+      </ng-container>
+      <ng-container *ngIf="!tableView && !detailView">
+        <ngx-datatable [scrollbarH]="true" #myTable class="data-table" id="traceMatrixId"
+          [rows]='traceabilityNoTestcasesData | TraceabilityFilter : filterQuery' [limit]="10" [columnMode]="'force'"
+          [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+          <ngx-datatable-column [width]="50" [canAutoResize]=false>
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <a href="javascript:;" [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded"
+                title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+              </a>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column [maxWidth]="300" name="Category" ngx-datatable-cell>
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['category']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column [maxWidth]="300" name="URS Code">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <span class="dot small-tc-dot" [ngStyle]="{'background-color': row.priorityColor}"></span>
+              <strong class="fontStyle">{{row['ursCode']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Requirement">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['ursName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Testing Required">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle" style="color: red;">{{row['testingRequired']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Testing Method">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row.testingMethod}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </ng-container>
+    </app-card>
+  </div>
+
+</div>
+
+<app-form-esign-verification #formVerification></app-form-esign-verification>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-document-workflow-history  #documentWorkFlowHistory [permissionConstant]="129"></app-document-workflow-history>

@@ -1,0 +1,15 @@
+    table.risk-rpm-table {
+      font-family: arial, sans-serif;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    
+    table.risk-rpm-table td,table.risk-rpm-table th {
+      border: 2px solid #dddddd;
+      text-align: center;
+      padding: 8px;
+    }
+    .hidden{
+      visibility:0;
+      display:None;
+    }

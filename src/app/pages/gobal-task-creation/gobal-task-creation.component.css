@@ -1,0 +1,18 @@
+.bs-example{
+    margin: 20px;        
+}
+.input-group-addon {
+    background-color: #fff;
+    color: rgb(32, 28, 28);
+}
+.due {
+    padding-right: 108px;
+    padding-top: 15px;
+}
+table#equipment-table-checkList tbody th,
+table#equipment-table-checkList tbody td {
+  white-space: unset;
+}
+table#equipment-table-checkList,table#equipment-table-checkList td,table#equipment-table-checkList th{
+    border: 1px solid black;
+}

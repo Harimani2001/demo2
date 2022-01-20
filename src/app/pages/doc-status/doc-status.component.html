@@ -1,0 +1,765 @@
+<div>
+
+
+
+</div>
+
+
+
+
+
+<app-modal-basic #modalforhistory [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+    <div *ngIf="logsData!=null" class="app-modal-body">
+      <button type="button" class="close basic-close-light-box" (click)="modalforhistory.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+
+      <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+          {{logsData.documentCode}}
+        <h5>Document  Status Log</h5><br>
+        <div >
+         <div class="table-responsive" style="height: 320px; overflow-y: scroll;">
+      <table class="table table-framed" >
+         <thead style=" position: sticky; top: 0;padding: 8px 16px; ">
+      <tr  style=" position: sticky; top: 0;padding: 8px 16px; ">
+        <th style=" position: sticky; top: 0;padding: 8px 16px; ">Created By</th>
+        <th style=" position: sticky; top: 0;padding: 8px 16px; ">Created Date</th>
+        <th style=" position: sticky; top: 0;padding: 8px 16px; ">Event</th>
+        <th style=" position: sticky; top: 0;padding: 8px 16px; ">Comment</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor= "let data of logsData.logs" >
+          <td class="fontStyle">{{data.createdBy}}</td>
+          <td class="fontStyle">{{data.createdTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+          <td class="fontStyle">{{data.event}}</td>
+          <td class="fontStyle">{{data.comments}}</td>
+      </tr>
+      </tbody>
+</table>
+
+        </div>
+      </div>
+    </div>
+    </div>
+  </app-modal-basic>
+
+
+
+
+<app-modal-basic  #modalLarge [dialogClass]="'modal-lg'" tabindex="-1" role="dialog"  aria-hidden="true">
+    <div class="loading-spinner" *ngIf="spinnerFlag">
+        <span class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing&#8230;</span>
+      </div>
+  <div class="app-modal-header">
+  <h4 class="modal-title">Document Decision</h4>
+  <button type="button" class="close basic-close" (click)="modalLarge.hide();" >
+  <span aria-hidden="true">&times;</span>
+  </button>
+  </div>
+  <div class="app-modal-body">
+	<div class="row">
+
+</div>
+<div class="row">
+
+	<div class="col-sm-12">
+		 </div>
+		 </div>
+		 <div class="col-sm-12">
+        <app-card [title]="''" [classHeader]="false" [blockClass]="'table-border-style'">
+            <div class="table-responsive" style="height: 200px; overflow-y: scroll;">
+              <table class="table table-framed">
+        <tr>
+          <th>id  </th>
+          <th>Type  </th>
+          <th>Id   </th>
+          <th>Document Title  </th>
+        </tr>
+        <tr  *ngFor="let n of this.filteredData;let c=index">
+          <td>{{c+1}} </td>
+          <td>{{n.documentType}}  </td>
+          <td>{{n.documentCode}}</td>
+          <td>{{n.documentTitle}}</td>
+        </tr>
+
+
+        </table>
+    </div>
+    </app-card>
+    <div class="col-sm-12">
+        <div class="container">
+            <div class="row">
+              <div class="col-sm">
+              </div>
+
+              <div class="col-sm">
+                  <textarea placeholder="Please provide your comments to make the decision" [(ngModel)]="comments" rows="4" cols="50%" maxlength="480"></textarea>
+              </div>
+              <div class="col-sm" >
+                  <div class="container">
+                      <div *ngIf="modal.approvedButtonFlag" class="row">
+                        <div class="col-sm" *ngIf="comments!=null && comments!=''">
+                            <div ><button class="btn btn-primary" (click)="modalLarge.hide();approve()"  ><i class="icofont icofont-check-circled"></i>Approve</button></div>
+                        </div>
+                        <div class="col-sm">
+                        </div>
+                        <div class="col-sm">
+                        <div *ngIf="comments!=null && comments!=''"><button style="padding-right: 37px;"  (click)="modalLarge.hide();reject()" class="btn btn-danger" ><i class="icofont icofont-close-circled"></i>Reject</button></div>
+                        </div>
+                      </div>
+                    </div>
+              </div>
+            </div>
+          </div>
+
+
+      </div>
+		 </div>
+
+
+		<div>
+		  <div style="color: darkgreen" *ngIf="this.validationMessage!=''"></div>
+		</div>
+
+</div>
+  <div class="app-modal-footer">
+
+  </div>
+  </app-modal-basic>
+  <app-modal-basic #modalOverflow [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+    <div class="app-modal-body">
+      <button type="button" class="close basic-close-light-box" (click)="modalOverflow.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <h5>Document Current Status</h5><br>
+      <div ><br>
+        <div><b>Document Type :</b>&nbsp;{{currentDocType}}</div>
+        <div><b>Document Status :</b>&nbsp;<span style="background-color:	#FFFF00">{{currentDocStatus}}</span></div>
+        <div><b>Created By :</b>&nbsp; {{currentCreatedBy}}</div>
+        <div><b>Last Modified On : </b>{{currentModifiedDate | date:'dd-MM-yy hh:mm a'}}</div>
+      </div>
+      <hr>
+      <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+
+        <h5>Document  Status Log</h5><br>
+        <div *ngFor="let log of this.docinfo ;let in = index">
+          <div>{{in+1}}</div>
+          <div><b>Document Status :</b>document has passed  {{(log.levelName=='0')?'workflow is completed':log.levelName}} </div>
+          <div><b>Document Comments :</b>{{log.comments}}</div>
+          <div><b>Commented By :</b>&nbsp; {{log.approvedBy}}</div>
+          <div><b>Commented On :</b>{{log.createdTime | date:'dd-MM-yy hh:mm a'}}</div>
+          <hr>
+
+        </div> <div *ngIf="this.modalSpinner" class="loader"></div>
+      </div>
+    </div>
+  </app-modal-basic>
+
+
+  <app-modal-basic #modalOverflowforesign [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+    <div class="app-modal-body">
+      <button type="button" class="close basic-close-light-box" (click)="modalOverflowforesign.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+
+      <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+
+        <h5>Document  Electronic Signature Log</h5><br>
+        <div >
+          <div class="table-responsive" style="height: 300px; overflow-y: scroll;">
+            <table class="table table-framed" >
+               <thead style=" position: sticky; top: 0;padding: 8px 16px; ">
+            <tr  style=" position: sticky; top: 0;padding: 8px 16px; ">
+                <th style=" position: sticky; top: 0;padding: 8px 16px; ">No</th>
+              <th style=" position: sticky; top: 0;padding: 8px 16px; ">Signed By</th>
+              <th style=" position: sticky; top: 0;padding: 8px 16px; ">level</th>
+              <th style=" position: sticky; top: 0;padding: 8px 16px; ">Signed Date</th>
+              <th style=" position: sticky; top: 0;padding: 8px 16px; ">Comment</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor= "let data of esignHistoryList;let in = index" >
+                <td class="fontStyle">{{in+1}}</td>
+                <td class="fontStyle">{{data.userName}}</td>
+                <td class="fontStyle">{{data.levelName}}</td>
+                <td class="fontStyle">{{data.createdTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+                <td class="fontStyle">{{data.comments}}</td>
+            </tr>
+            </tbody>
+    </table>
+</div>
+
+        </div> <div *ngIf="this.modalSpinner" class="loader"></div>
+      </div>
+    </div>
+  </app-modal-basic>
+
+  <div class="row">
+    <!-- Right column start -->
+    <div class="col-xl-3 col-lg-12 push-xl-9">
+      <!-- Search box card start -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-header-text">Search Box</h5></div>
+        <div class="card-body p-t-10">
+          <div class="input-group">
+            <input [(ngModel)]="searchData" (input)="searcheverywhere()" type="text" class="form-control" placeholder="Search here...">
+            <span class="input-group-addon" id="basic-addon1"><i class="icofont icofont-search"></i></span>
+          </div>
+
+          <div  class="task-right">
+            <div class="accordion-block scale-accordion">
+              <squeezebox [multiple]="true">
+
+                <sb-item [collapsed]="false" class="accordion-panel">
+                  <sb-item-head class="accordion-heading">
+                    <div class="task-right-header-users">
+                      <span data-toggle="collapse">Assigned Users</span>
+                      <i class="icofont icofont-rounded-down f-right"></i>
+                    </div>
+                  </sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div *ngFor="let data of UserList" class="user-box assign-user taskboard-right-users">
+                      <div class="media">
+                        <div class="media-left media-middle photo-table">
+                          <a href="javascript:;">
+                            <img class="media-object img-circle" src="assets/images/user-icon.png" alt="Generic placeholder image">
+                            <div class="live-status bg-danger"></div>
+                          </a>
+                        </div>
+                        <div class="media-body">
+                          <h6>{{data}}</h6>
+
+                        </div>
+                      </div>
+
+                    </div>
+                  </sb-item-body>
+                </sb-item>
+
+              </squeezebox>
+            </div>
+            <!-- end of task-right-revision -->
+          </div>
+          <!-- end of sidebar-right -->
+        </div>
+        <!-- end of card-body -->
+      </div>
+      <!-- Search box card end -->
+    </div>
+    <!-- Right column end -->
+    <!-- Left column start -->
+
+    <div class="col-xl-9 col-lg-12 pull-xl-3 filter-bar">
+      <!-- Nav Filter tab start -->
+      <nav class="navbar navbar-light bg-faded m-b-30 p-10">
+        <ul class="nav navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="javascript:;">Filter: <span class="sr-only">(current)</span></a>
+          </li>
+
+
+
+
+              <select name="select" class="form-control input-sm full-data-search" id="apiConfigurationId" required
+                [(ngModel)]="Title" name="Title" #role="ngModel" (ngModelChange)="onChange(Title)">
+                <option value="" selected>Select Document</option>
+                <option *ngFor="let doc of docItemList" [ngValue]="doc">{{doc.name}}</option>
+              </select>
+
+
+          <!-- end of by date dropdown -->
+
+        </ul>
+        <div *ngIf="tableView==false" class="nav-item nav-grid">
+            <span class="m-r-15">Filter: </span>
+            <button type="button" class="btn btn-sm {{changetoPublished?'btn-primary':'btn-danger'}}   btn-primary waves-effect waves-light" (click)="changePublished(false)"  data-toggle="tooltip" data-placement="top" title="Action items">
+                Action Items
+              </button>
+
+            <button type="button" class="btn btn-sm {{!changetoPublished?'btn-primary':'btn-danger'}} waves-effect waves-light m-r-10" (click)="changePublished(true)"  data-toggle="tooltip" data-placement="top" title="Workflow completed Documents">
+                Completed Items
+            </button>
+
+          </div>
+        <div class="nav-item nav-grid">
+          <span class="m-r-15">View Mode: </span>
+          <button type="button" class="btn btn-sm {{tableView?'btn-primary':'btn-danger'}} waves-effect waves-light" (click)="changeview(false)"  data-toggle="tooltip" data-placement="top" title="grid view">
+            Grid View
+            </button>
+          <button type="button" class="btn btn-sm {{!tableView?'btn-primary':'btn-danger'}} btn-primary waves-effect waves-light m-r-10" (click)="changeview(true)"  data-toggle="tooltip" data-placement="top" title="list view">
+              Table View
+          </button>
+
+        </div>
+
+        <!-- end of by priority dropdown -->
+      </nav>
+      <!-- Nav Filter tab end -->
+      <!-- Task board design block start-->
+
+      <app-card *ngIf="this.tableView" [title]="''">
+
+
+          <br>
+
+          <ngb-tabset #t="ngbTabset">
+            <ngb-tab title="Pending Documents ({{this.filteredPendingDocList.length}})" id="tab-selectbyid1">
+
+              <ng-template ngbTabContent>
+                <div class="card">
+                    <button *ngIf="isSelectedPublishData" type="button" class="btn btn-primary" (click)="modalLarge.show();getdata()">
+                        <i class="icofont icofont-order"></i> Approve/Reject
+                      </button>
+                  <div class="card-body user-desc">
+                    <br>
+                    <ngx-datatable #myTable class="data-table dt-chk" [rows]='filteredPendingDocList' [limit]="10"
+                      [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                      <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+                        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+                          <div class="dt-desc">
+                            <br>
+                            <app-card class="col-sm">
+                              <br>
+                              <ul class="progress-indicator">
+                                  <li   class="completed">
+                                      <span class="bubble" ></span>
+                                      Level 0. published <br><small></small>
+                                  </li>
+                                <li *ngFor=" let  d of row.documentChildDto;let i = index"  class="{{(d!=undefined)?'completed':''}}">
+
+                                  <label *ngIf="d==undefined">
+                                      <span  class="bubble"></span>
+                                      Level {{i+1}}. <br><small></small>
+                                  </label>
+                                  <label *ngIf="d!=undefined">
+                                      <span  class="bubble"></span>
+                                       {{d.levelName}}. <br><small></small>
+                                  </label>
+
+                                </li>
+
+                            </ul>
+                            </app-card>
+
+                              <app-card [title]="'Document Workflow  History'" [classHeader]="true" [blockClass]="'table-border-style'">
+                                  <div class="table-responsive" style="height: 200px; overflow-y: scroll;">
+                                    <table class="table table-framed" >
+                                       <thead style=" position: sticky; top: 0;padding: 8px 16px; ">
+                                    <tr  style=" position: sticky; top: 0;padding: 8px 16px; ">
+                                      <th style=" position: sticky; top: 0;padding: 8px 16px; ">Created By</th>
+                                      <th style=" position: sticky; top: 0;padding: 8px 16px; ">Created Date</th>
+                                      <th style=" position: sticky; top: 0;padding: 8px 16px; ">Event</th>
+                                      <th style=" position: sticky; top: 0;padding: 8px 16px; ">Comment</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr *ngFor= "let data of row.logs" >
+                                        <td class="fontStyle">{{data.createdBy}}</td>
+                                        <td class="fontStyle">{{data.createdTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+                                        <td class="fontStyle">{{data.event}}</td>
+                                        <td class="fontStyle">{{data.comments}}</td>
+                                    </tr>
+                                    </tbody>
+                            </table>
+      </div>
+                           <br>
+                          </app-card>
+
+      </div>
+                        </ng-template>
+                      </ngx-datatable-row-detail>
+                      <ngx-datatable-column name="View" [width]="70" [sortable]="false" [canAutoResize]="false"
+                        [draggable]="false" [resizeable]="false">
+
+                        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                          <a href="javascript:;" [class.datatable-icon-right]="!expanded"
+                            [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+                          </a>
+                        </ng-template>
+                      </ngx-datatable-column>
+                      <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+                        [draggable]="false" [resizeable]="false">
+                        <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                          let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                          <div class="checkbox-fade fade-in-primary">
+                            <label>
+                              <input type="checkbox" name="{{row['documentCode']}}" [checked]="filteredPendingDocList[row['$$index']].approvedFlag"
+                                (change)="filteredPendingDocList[row['$$index']].approvedFlag=!filteredPendingDocList[row['$$index']].approvedFlag;onChangePublishData();" />
+                              <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                            </label>
+                          </div>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+
+                      <ngx-datatable-column  name="Id">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong class="fontStyle">{{row['documentCode']}}</strong> </ng-template>
+                      </ngx-datatable-column>
+                      <ngx-datatable-column  name="Document Title">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong class="fontStyle">{{row['documentTitle']}}</strong> </ng-template>
+                      </ngx-datatable-column>
+                      <ngx-datatable-column name="Action">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <ng-template #popContent>
+                            
+                            <div><b>Document Type :</b>&nbsp; {{row['type']}}</div>
+                            <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                            <div><b>Last Modified On : </b>{{row['lastModifiedTime'] | date:'dd-MM-yy hh:mm a'}}</div>
+                          </ng-template>
+                          <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                            (click)="modalOverflow.show();loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info">
+                            <i  class="icofont icofont-info-square"></i>
+                          </a>
+
+
+                          <a class="m-r-15 crm-action-view text-muted text-warning" [routerLink]="[row['url']]"
+                            [queryParams]="{ id: row['documentId'],status:'/newDocumentStatus',exists:true}"
+                            data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                            <i  class="icofont icofont-resize"></i>
+                          </a>
+
+                        </ng-template>
+                      </ngx-datatable-column>
+                    </ngx-datatable>
+                    <br>
+                    <div>
+                      <div>
+                        <div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab title="workflow Document ({{this.filteredCompletedDocList.length}})" id="tab-selectbyid2">
+              <ng-template ngbTabContent>
+                <div class="card">
+                  <div class="card-body user-desc">
+                    <br>
+                    <ngx-datatable #myTable class="data-table dt-chk" [rows]='filteredCompletedDocList' [limit]="10"
+                      [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                      <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+                        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+                          <div class="dt-desc">
+                            <table class="table-striped table-bordered">
+                              <tr>
+                                <th colspan="2"><strong>Document Details</strong></th>
+                              </tr>
+                              <tr>
+                                <td class="fontStyle">Created By</td>
+                                <td class="fontStyle">{{row.createdBy}}</td>
+                              </tr>
+                              <tr>
+                                <td class="fontStyle">Created Date</td>
+                                <td class="fontStyle">{{row.createdTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+                              </tr>
+                              <tr>
+                                <td class="fontStyle">Created Date</td>
+                                <td class="fontStyle">{{row.createdTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+                              </tr>
+                            </table>
+                          </div>
+                        </ng-template>
+                      </ngx-datatable-row-detail>
+                      <ngx-datatable-column name="View" [width]="70" [sortable]="false" [canAutoResize]="false"
+                        [draggable]="false" [resizeable]="false">
+
+                        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                          <a href="javascript:;" [class.datatable-icon-right]="!expanded"
+                            [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+                          </a>
+                        </ng-template>
+                      </ngx-datatable-column>
+
+                      <ngx-datatable-column  name="Document Code">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong class="fontStyle">{{row['documentCode']}}</strong> </ng-template>
+                      </ngx-datatable-column>
+                      <ngx-datatable-column  name="Document Title">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong class="fontStyle">{{row['documentTitle']}}</strong> </ng-template>
+                      </ngx-datatable-column>
+                      <ngx-datatable-column name="Action">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <ng-template #popContent>
+                            <div><b>Document Type :</b>&nbsp; {{row['type']}}</div>
+                            <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                            <div><b>Last Modified On : </b>{{row['lastModifiedTime'] | date:'dd-MM-yy hh:mm a'}}</div>
+                          </ng-template>
+                          <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                            (click)="modalOverflow.show();loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info">
+                            <i  class="icofont icofont-info-square"></i>
+                          </a>
+
+                          <a class="m-r-15 crm-action-view text-muted text-warning" [routerLink]="[row['url']]"
+                            [queryParams]="{ id: row['documentId'],status:'/newDocumentStatus',exists:true}"
+                            data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                            <i  class="icofont icofont-resize"></i>
+                          </a>
+
+                        </ng-template>
+                      </ngx-datatable-column>
+                    </ngx-datatable>
+                    <br>
+                    <div>
+                      <div>
+                        <div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </ngb-tab>
+
+            <ngb-tab title="Documents For Esign ({{documentForEsign.length}})" id="tab-selectbyid3">
+              <ng-template ngbTabContent>
+                <div class="card">
+                  <div class="card-body user-desc">
+                    <br>
+                    <ngx-datatable #myTable class="data-table dt-chk" [rows]='documentForEsign' [limit]="10"
+                      [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                      <ngx-datatable-column [width]="3"  name="Document Type">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong class="fontStyle">{{row['documentName']}}</strong> </ng-template>
+                      </ngx-datatable-column>
+                      <ngx-datatable-column  name="Count">
+                        <ng-template let-row="row" ngx-datatable-cell-template>
+                          <strong class="fontStyle">{{row['documentCount']}}</strong> </ng-template>
+                      </ngx-datatable-column>
+                      <ngx-datatable-column name="Action">
+                          <ng-template let-row="row" ngx-datatable-cell-template>
+                              <div class="container">
+                                  <div class="row">
+                                    <div class="col-sm">
+                                        <a *ngIf='row.permissionFlag && modal.esignButtonFlag' href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                                        (click)="routeToComponent(row)"
+                                        data-ng-open="modalSmall" placement="top" ngbTooltip="E Sign ">
+                                        <i  class="icofont icofont-pencil-alt-3"></i>
+                                        </a>
+                                    </div>
+                                    <!-- <div class="col-sm">
+                                        <a class="m-r-15 crm-action-info text-muted text-primary" placement="right"  href="javascript:;" *ngIf='row.completedFlag ' data-ng-open="modalSmall" placement="top" ngbTooltip="Document Download"
+                                        (click)="downloadPdf(row['documentConstantName'],row['docName'])"  >
+                                         <i  class="ti-cloud-down"></i>
+                                    </a>
+                                    </div> -->
+                                    <div class="col-sm">
+                                        <a  *ngIf=' row.signedList!=null &&  row.signedList.length>0'  href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"   (click)="modalOverflowforesign.show();loadesignDocs(row.signedList)" placement="top" ngbTooltip="Info">
+                                            <i  class="icofont icofont-info-square"></i>
+                                        </a>
+                                    </div>
+                                    <div class="col-sm"></div>
+                                    <div class="col-sm"></div>
+                                  </div>
+                                </div>
+                          </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                    <br>
+                    <div>
+                      <div>
+                        <div></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-template>
+            </ngb-tab>
+          </ngb-tabset>
+        </app-card>
+
+      <div *ngIf="this.tableView==false" >
+           <div class="row">
+             <div  *ngFor="let row of documentForEsign" class="col-md-6 col-xl-6">
+              <div class="card widget-card-1">
+                <div  class="card-block-small  {{row.documentName=='VSR'?'card card-border-primary':''}}">
+
+                  <i *ngIf="row.documentName!='VSR'" class="icofont icofont-meeting-add bg-c-blue card1-icon"></i>
+                  <i *ngIf="row.documentName=='VSR'" class="icofont icofont-star-alt-2 bg-c-blue card1-icon"></i>
+                  <span class="text-c-blue f-w-600">{{row.documentName}}</span>
+                  <h4>{{row.selectedDocuments.length}} documents</h4>
+                  <h4 *ngIf="row.documentName!='VSR'">Batch : {{row.session}}</h4>
+
+                  <div>
+                      <div class="row">
+                          <div class="contact-icon">
+                            <button *ngIf='row.permissionFlag && modal.esignButtonFlag' (click)="routeToComponent(row)" class="btn btn-default" placement="bottom" ngbTooltip="E sign"><i class="icofont icofont icofont-pencil-alt-3 m-r-10"></i></button>
+                            <button *ngIf='row.signedList!=null && row.signedList.length>0'  (click)="modalOverflowforesign.show();loadesignDocs(row.signedList)"class="btn btn-default" placement="bottom" ngbTooltip="info"><i class="icofont icofont-info-square m-0"></i></button>
+                            <!-- <button  *ngIf='row.completedFlag '  (click)="downloadPdf(row['documentConstantName'],row['documentName'])" class="btn btn-default" placement="bottom" ngbTooltip="Download"><i class="icofont icofont-download-alt m-0"></i></button> -->
+
+                        </div>
+
+
+                    </div>
+
+                  </div>
+                </div>
+
+
+              </div>
+            </div>
+            </div>
+
+          <div class="row">
+              <!-- card1 start -->
+
+
+              <ng-container *ngIf="changetoPublished==false">
+        <div *ngFor="let data of filteredPendingDocList"  class="col-sm-6">
+          <!-- Invoice list card start -->
+          <div class="card card-border-primary">
+            <div class="card-header">
+              <h5>{{data.documentCode}}</h5>
+              <!-- <span class="label label-default f-right"> 28 January, 2015 </span> -->
+              <!-- <div ngbDropdown class="dropdown-secondary dropdown f-right">
+                <button ngbDropdownToggle class="btn btn-primary btn-mini dropdown-toggle waves-effect waves-light" type="button" id="dropdown8" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Select</button>
+                <div ngbDropdownMenu class="dropdown-menu" aria-labelledby="dropdown8" data-dropdown-in="fadeIn" data-dropdown-out="fadeOut">
+                  <a class="dropdown-item waves-light waves-effect" href="javascript:;" (click)="data.approvedFlag=true;getdata();modalLarge.show()"><span class="point-marker bg-danger"   ></span>Approve</a>
+                  <a class="dropdown-item waves-light waves-effect" href="javascript:;"(click)="data.approvedFlag=false;getdata();modalLarge.show()"><span class="point-marker bg-warning"></span>Reject</a>
+
+                </div>
+
+                <span class="f-left m-r-5 text-inverse">Action : </span>
+              </div> -->
+
+              <div class="dropdown">
+                  <button class="dropbtn">Action :</button>
+                  <div class="dropdown-content">
+                      <a class="dropdown-item waves-light waves-effect" href="javascript:;" (click)="data.approvedFlag=true;getdata();modalLarge.show()"><span class="point-marker bg-danger"   ></span>Approve</a>
+                      <a class="dropdown-item waves-light waves-effect" href="javascript:;"(click)="data.rejectedFlag=true;getdata();modalLarge.show()"><span class="point-marker bg-warning"></span>Reject</a>
+
+                  </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <ul class="progress-indicator">
+                    <li   class="completed">
+                        <span class="bubble" ></span>
+                        Published <br><small></small>
+                    </li>
+                  <li *ngFor=" let  d of data.documentChildDto;let i = index"  class="{{(d!=undefined)?'completed':''}}">
+
+                    <label *ngIf="d==undefined">
+                        <span  class="bubble"></span>
+                        Level {{i+1}}. <br><small></small>
+                    </label>
+                    <label *ngIf="d!=undefined">
+                        <span  class="bubble"></span>
+                         {{d.levelName}}. <br><small></small>
+                    </label>
+
+                  </li>
+
+              </ul>
+              <div class="row">
+
+                <div class="col-sm-6">
+                  <ul class="list list-unstyled">
+                    <li>Created By: &nbsp;</li>
+                    <li>Created Time: <span class="text-semibold"></span></li>
+                  </ul>
+                </div>
+                <div class="col-sm-6">
+                  <ul class="list text-semibold text-right">
+                    <li>{{data.createdBy}}</li>
+                    <li>{{data.createdTime| date :'dd-MM-yyyy hh:mm a'}}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="card-footer">
+              <div class="task-list-table">
+                <p class="task-due"><strong> DOC : </strong><strong class="label label-primary">{{data.docName}}</strong></p>
+              </div>
+              <div class="task-board m-0">
+                  <a  href="javasript:;"class="m-r-15 crm-action-view text-muted text-warning" [routerLink]="[data['url']]"
+                      [queryParams]="{ id: data['documentId'],status:'/newDocumentStatus',exists:true}"
+                      class="btn btn-info btn-mini b-none" placement="top" ngbTooltip="View">
+                      <i  class="icofont icofont-eye-alt m-0"></i>
+                    </a>
+                <!-- <a href="javasript:;" class="btn btn-info btn-mini b-none"><i class="icofont icofont-eye-alt m-0"></i></a> -->
+                <!-- end of dropdown-secondary -->
+                <div class="dropdown">
+                    <button class="dropbtn"><span class="icofont icofont-navigation-menu"></span></button>
+                    <div class="dropdown-content">
+                        <a class="dropdown-item waves-light waves-effect" href="javascript:;" (click)="modalOverflow.show();loadDocumentCommentLog(data)"><i class="icofont icofont-ui-alarm"></i>Current Workflow Information</a>
+                        <a class="dropdown-item waves-light waves-effect" href="javascript:;" (click)="modalforhistory.show();loadLog(data)"  ><i class="icofont icofont-spinner-alt-5"></i>Workflow history</a>
+
+                    </div>
+                  </div>
+
+
+                <!-- end of seconadary -->
+              </div>
+              <!-- end of pull-right class -->
+            </div>
+            <!-- end of card-footer -->
+          </div>
+          <!-- Invoice list card end -->
+        </div>
+</ng-container>
+
+<ng-container *ngIf="changetoPublished">
+        <div *ngFor="let data of filteredCompletedDocList"  class="col-sm-6">
+            <!-- Invoice list card start -->
+            <div class="card card-border-success">
+              <div class="card-header">
+                <h5>{{data.documentCode}}</h5>
+                <!-- <span class="label label-default f-right"> 28 January, 2015 </span> -->
+              </div>
+              <div class="card-body">
+
+                <div class="row">
+
+                  <div class="col-sm-6">
+                    <ul class="list list-unstyled">
+                      <li>Created By: &nbsp;</li>
+                      <li>Created Time: <span class="text-semibold"></span></li>
+                    </ul>
+                  </div>
+                  <div class="col-sm-6">
+                    <ul class="list text-semibold text-right">
+                      <li>{{data.createdBy}}</li>
+                      <li>{{data.createdTime| date :'dd-MM-yyyy hh:mm a'}}</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="card-footer">
+                <div class="task-list-table">
+                  <p class="task-due"><strong> DOC : </strong><strong class="label label-primary">{{data.docName}}</strong></p>
+                </div>
+                <div class="task-board m-0">
+                    <a  href="javasript:;"class="m-r-15 crm-action-view text-muted text-warning" [routerLink]="[data['url']]"
+                        [queryParams]="{ id: data['documentId'],status:'/newDocumentStatus',exists:true}"
+                        class="btn btn-info btn-mini b-none" placement="top" ngbTooltip="View">
+                        <i  class="icofont icofont-eye-alt m-0"></i>
+                      </a>
+                  <!-- <a href="javasript:;" class="btn btn-info btn-mini b-none"><i class="icofont icofont-eye-alt m-0"></i></a> -->
+                  <!-- end of dropdown-secondary -->
+                  <div class="dropdown">
+                      <button class="dropbtn"><span class="icofont icofont-navigation-menu"></span></button>
+                      <div class="dropdown-content">
+                          <a class="dropdown-item waves-light waves-effect" href="javascript:;" (click)="modalOverflow.show();loadDocumentCommentLog(data)"><i class="icofont icofont-ui-alarm"></i>Current Workflow Information</a>
+                          <a class="dropdown-item waves-light waves-effect" href="javascript:;" (click)="modalforhistory.show();loadLog(data)"  ><i class="icofont icofont-spinner-alt-5"></i>Workflow history</a>
+
+                      </div>
+                    </div>
+                  <!-- end of seconadary -->
+                </div>
+                <!-- end of pull-right class -->
+              </div>
+              <!-- end of card-footer -->
+            </div>
+            <!-- Invoice list card end -->
+          </div>
+</ng-container>
+      </div>
+      <!-- Task board design block end -->
+    </div>
+    <!-- Left column end -->
+  </div>

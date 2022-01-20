@@ -1,0 +1,86 @@
+<app-modal-basic #versionCreationModal [dialogClass]="'modal-lg'" class="modal-dialog">
+        <div class="app-modal-header">
+            <h4 class="modal-title">Create Project Version</h4>
+            <button type="button" class="close basic-close" (click)="close();">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="app-modal-body">
+            <div class="row">
+                <div class="col-sm-12 text-right">
+                    <label>Search:
+                        <input type="search" [(ngModel)]="searchBoxText" class="form-control input-sm full-data-search" placeholder="">
+                    </label>
+                </div>
+                <div style="max-height: 400px;overflow-x: auto; height: 500px;" *ngIf="list.length>0" class="col-sm-12">
+                    <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+                        [rows]='list | lookUpFilter : searchBoxText' [limit]="10" [columnMode]="'force'"
+                        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+                            [draggable]="false" [resizeable]="false">
+                            <ng-template  class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                                let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                                <div *ngIf="!row.disable" class="checkbox-fade fade-in-primary">
+                                    <label     >
+                                        <input type="checkbox" name="{{row['id']}}" [checked]="row.checked"
+                                            (change)="row.checked=!row.checked;checkForUrsAndSpec(row,list);"/>
+                                        <span class="cr"><i
+                                                class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                                    </label>
+                                </div>
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="Document Name" [width]="50">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <strong >{{row.value}}</strong>
+                            </ng-template>
+                        </ngx-datatable-column>
+                        <ngx-datatable-column name="Option" [width]="50">
+                            <ng-template let-row="row" ngx-datatable-cell-template>
+                                <div>
+                                    <label for="ui-switch-with-data-{{row.id}}">
+                                        Without Data<ui-switch  (change)="row.dataFlag=!row.dataFlag;toggleForUrsAndSpec(row,list);" id="ui-switch-with-data-{{row.id}}"
+                                            [checked]="row.dataFlag" class="js-small" color="#3498DB" switchColor="#fff"
+                                            size="small">
+                                        </ui-switch>With Data
+                                    </label>
+                                </div>
+                            </ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                </div>
+            </div>
+        </div>
+        <div class="app-modal-footer">
+            <button [disabled]="!newVersionFlag" type="button" class="btn btn-sm btn-success waves-effect" (click)="confirmAlert(list);">Confirm</button>
+            <button type="button" class="btn btn-sm btn-default waves-effect" (click)="close();">Close</button>
+        </div>
+    </app-modal-basic>
+
+    <app-modal-basic #alertMessageNewVersionCreation [dialogClass]="'modal-md'" class="modal-dialog">
+        <div class="app-modal-header">
+            <h4 class="modal-title">Please check!</h4>
+        </div>
+        <div class="app-modal-body">
+            <label>
+                The below document types has pending documents:
+            </label>
+            <br>
+            <div class="dy-width-300">
+                <div class="row" *ngFor="let row of pendingDocumentList;let i = index">
+                    <div class="col-sm-2">
+                        {{i+1 }} .
+                    </div>
+                    <div class="col-sm-8">
+                        <label class="label label-primary"> {{row}} </label>
+                    </div>
+                </div>
+            </div>
+            <label>
+                Kindly complete and lock the document to proceed further.
+            </label>
+        </div>
+        <div class="app-modal-footer">
+            <button type="button" class="btn btn-default waves-effect " (click)="alertMessage.hide()">OK</button>
+        </div>
+    </app-modal-basic>

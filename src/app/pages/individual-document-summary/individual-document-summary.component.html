@@ -1,0 +1,689 @@
+<br>
+<div>
+  <ng-container *ngIf="documentDetails">
+    <div class="row p-2">
+      <div class="col-sm-12 text-right">
+    
+        <a  *ngIf="this.documentDetails.documentType == this.helper.RISK_ASSESSMENT_VALUE && isUserInWorkFlow" container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+        placement="top" ngbTooltip="Define  Matrix" (click)="loadDefaultMatrix()">
+        <i style="font-size: 16px" class="ti-layout-grid3 summary-icon"></i>
+      </a>
+        <ng-template #popContent>
+          <span class="text-left">
+            <ng-container *ngIf="documentDetails.documentNumber">
+              <div>Document Number:<br>{{documentDetails.documentNumber}}</div><br>
+            </ng-container>
+            <div>Last updated by:<br>{{documentDetails.lastUpdatedBy}}</div><br>
+            <div>Last updated time:<br>{{documentDetails.lastUpdatedTime}}</div>
+          </span>
+        </ng-template>
+        <a container="body" href="javascript:;" class="m-r-15 crm-action-info" placement="right"
+          placement="top" [ngbTooltip]="popContent">
+          <i  class="icofont icofont-info-square summary-icon"></i>
+        </a>
+        <a container="body" href="javascript:;" placement="top" class="m-r-15 crm-action-view"
+          (click)="loadStepperData(this.documentDetails);modalLargeWorkFlowProjectSummary.show();" ngbTooltip="Workflow"> <i
+             class="icofont icofont-chart-flow-alt-1 summary-icon"></i>
+        </a>
+        <a id="document-lock-button" *ngIf="!documentDetails.commonWorkFlow  && isUserInWorkFlow" container="body" href="javascript:;" placement="top"
+          class="m-r-15  crm-action-view" (click)="freezeOrUnFreeze()"
+          ngbTooltip="Document Freeze"> <i  class="{{documentDetails.freezeFlagIcon ? 'icofont summary-icon icofont-unlock':'icofont summary-icon icofont-unlocked'}}"></i>
+        </a>
+    
+      </div>
+    </div>
+    <br>
+    <app-card>
+      <div class="row">
+        <div class="col-sm-12">
+          <div style="display: flex;" *ngIf="!(this.documentDetails.documentType == '108' || this.documentDetails.documentType == '109' || this.documentDetails.documentType == '110' || this.documentDetails.documentType == '207' || this.documentDetails.documentType == '208')">
+            <div class="page-header-title">
+              <div class="d-inline">
+                <h4 class="strong">Status</h4>
+              </div>
+            </div>
+            <div class="dropdown status">
+              <div style="font-size: 60%;">{{this.percentage}}%</div>
+              <div class="progress" style="height: 0.5em !important;">
+                <div class={{this.progressBarColour}} role="progressbar" aria-valuenow=this.percentage aria-valuemin="0"
+                  aria-valuemax="100" [style.width]="this.percentage + '%'"> </div>
+              </div>
+            </div>
+          </div>
+          <div class="table-border-color">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr class="header-bg">
+                    <th>Draft</th>
+                    <th>Published</th>
+                    <ng-container *ngIf="!(this.documentDetails.documentType == '108' || this.documentDetails.documentType == '109' || this.documentDetails.documentType == '110' || this.documentDetails.documentType == '207' || this.documentDetails.documentType == '208')">
+                      <th>In Progress</th>
+                      <th>Completed</th>
+                    </ng-container>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td id="draft-count">
+                      {{this.documentDetails.draft}}
+                    </td>
+                    <td id="published-count">
+                      {{this.documentDetails.published}}
+                    </td>
+                    <ng-container *ngIf="!(this.documentDetails.documentType == '108' || this.documentDetails.documentType == '109' || this.documentDetails.documentType == '110' || this.documentDetails.documentType == '207' || this.documentDetails.documentType == '208')">
+                      <td id="inProgress-count">
+                        {{this.documentDetails.inProgress}}
+                      </td>
+                      <td id="completed-count">
+                        {{this.documentDetails.completed}}
+                      </td>
+                    </ng-container>
+                   
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-card>
+    <div *ngIf="this.documentDetails.documentType == '108' || this.documentDetails.documentType == '109' || this.documentDetails.documentType == '110' || this.documentDetails.documentType == '207' || this.documentDetails.documentType == '208'">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="page-header-title">
+              <div class="d-inline">
+                <h4 class="strong">Test Approach & Conclusion</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6" style="text-align: right;">
+            <a container="body" *ngIf="!this.testApproachviewFlag" href="javascript:;"
+              (click)="this.testApproachviewFlag = !this.testApproachviewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Expand"
+              (click)=" this.loadTestCaseSummary();"><i style="font-size: 25px;color: black;"
+                class="icofont icofont-circled-down"></i>
+            </a>
+            <a container="body" *ngIf="this.testApproachviewFlag" href="javascript:;"
+              (click)="this.testApproachviewFlag = !this.testApproachviewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Hide"><i
+                style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+            </a>
+          </div>
+        </div>
+        <div *ngIf="this.testApproachviewFlag">
+          <div style="float: right;">
+            <a container="body" *ngIf="permissionModal.updateButtonFlag && this.isTestApproach" href="javascript:;" (click)="editTestApproach();" class="m-r-15 crm-action-edit text-muted text-primary"  placement="top" ngbTooltip="Edit">
+              <i  class="icofont icofont-edit edit"></i>
+            </a>
+          </div>
+          <div *ngIf="isTestApproachEdit">
+            <div class="form-group row" >
+              <label class="col-sm-2 col-form-label">Test Approach</label>
+              <div class="col-sm-12">
+                <ui-switch (click)="toggleTestApproach =!toggleTestApproach" [checked]="toggleTestApproach" class="js-small"
+                  color="#3498DB" switchColor="#fff" size="small" id="ui-switch"></ui-switch>
+                <label [class]="toggleTestApproach?'text-danger':'text-success'">Enable Advance Editor</label>
+                <div *ngIf="toggleTestApproach">
+                  <quill-editor [(ngModel)]="testApproach" [options]="this.helper.editQuillOptions"> </quill-editor>
+                </div>
+                <textarea *ngIf="!toggleTestApproach" class="form-control max-textarea" [(ngModel)]="testApproach"
+                  rows="4"></textarea>
+                <br>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">Conclusion</label>
+              <div class="col-sm-12" *ngIf="this.isTestApproachEdit">
+                <ui-switch (click)="toggleConclusion =!toggleConclusion" [checked]="toggleConclusion" class="js-small"
+                  color="#3498DB" switchColor="#fff" size="small" id="ui-switch"></ui-switch>
+                <label [class]="toggleConclusion?'text-danger':'text-success'">Enable Advance Editor</label>
+                <div *ngIf="toggleConclusion">
+                  <quill-editor [(ngModel)]="conclusion" [options]="this.helper.editQuillOptions"> </quill-editor>
+                </div>
+                <textarea *ngIf="!toggleConclusion" class="form-control max-textarea" [(ngModel)]="conclusion"
+                  rows="4"></textarea>
+                <br>
+              </div>
+            </div>
+            <div class="form-group row"  *ngIf="permissionModal.createButtonFlag">
+              <div class="col-sm-12" style="text-align: center;">
+                <button type="button" *ngIf="testApproach !='' || conclusion !=''" class="btn btn-success" (click)="saveTestCaseSummary();"> <i class="icofont icofont-save"></i>Save</button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="this.isTestApproach">
+            <br>
+            <h6 class="strong">Test Approach:</h6>
+            <p [innerHtml]="this.testApproach"></p>
+            <br>
+            <h6 class="strong">Conclusion:</h6>
+            <p [innerHtml]="this.conclusion"></p>
+          </div>
+        </div>
+      </app-card>
+    </div>
+    <div *ngIf="this.documentDetails.documentType == '108' || this.documentDetails.documentType == '109' || this.documentDetails.documentType == '110' || this.documentDetails.documentType == '207' || this.documentDetails.documentType == '208'">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="page-header-title">
+              <div class="d-inline">
+                <h4 class="strong">Published Documents Status</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6" style="text-align: right;">
+            <a container="body" *ngIf="this.viewFlag && this.chartDataList.length>0" href="javascript:;" placement="top"
+              class="m-r-15 crm-action-view text-muted text-warning" (click)="loadWorkflowUsers(this.documentDetails.documentType); shareGraphEmail.show()"
+               ngbTooltip="Share"> <i  class="icofont icofont-share-alt bin"></i>
+            </a>
+            <a container="body" *ngIf="!this.viewFlag" href="javascript:;" (click)="this.viewFlag = !this.viewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Expand"><i
+                style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+            </a>
+            <a container="body" *ngIf="this.viewFlag" href="javascript:;" (click)="this.viewFlag = !this.viewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Hide"><i
+                style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+            </a>
+          </div>
+        </div>
+        <div *ngIf="this.viewFlag">
+          <br>
+          <div class="row">
+            <div class="col-sm-7" *ngIf="this.documentDetails.documentType == '108' || this.documentDetails.documentType == '109' || this.documentDetails.documentType == '110' || this.documentDetails.documentType == '207' || this.documentDetails.documentType == '208'">
+             <ng-container *ngFor="let testCase of this.documentDetails.testCaseCount">
+               <div class="row">
+                 <div class="col-sm-3"><span><strong class="strong">Test Run : </strong> {{testCase.testRunName}} </span></div>
+                 <div class="col-sm-3"><span> <strong class="strong">Total : </strong>{{testCase.total}}</span></div>
+                 <div class="col-sm-3"><span> <strong class="strong">Workflow InProgress : </strong> {{testCase.incompleted}}</span></div>
+                 <div class="col-sm-3"><span><strong class="strong">Workflow Completed : </strong>{{testCase.completed}}</span></div>
+                </div>
+              <br>
+              <div class="table-responsive">
+                <table class="table">
+                  <tr class="header-bg">
+                    <th>No Run</th>
+                    <th>In Progress</th>
+                    <th>Pass</th>
+                    <th>Fail</th>
+                    <th>N/A</th>
+                    <th>DF</th>
+                  </tr>
+                  <tr>
+                    <td>{{testCase.runCount}}</td>
+                    <td>{{testCase.testCaseInProgressCount}}</td>
+                    <td>{{testCase.passCount}}</td>
+                    <td>{{testCase.failCount}}</td>
+                    <td>{{testCase.nACount}}</td>
+                    <td>{{testCase.discrepancyCount}}</td>
+                  </tr>
+                </table>
+              </div>
+            </ng-container>
+            </div>
+            <div class="col-sm-5" *ngIf="this.documentDetails.documentType == '108' || this.documentDetails.documentType == '109' || this.documentDetails.documentType == '110'  || this.documentDetails.documentType == '207' || this.documentDetails.documentType == '208'">
+              <ng-container *ngFor="let chartData of this.chartDataList">
+                <div *ngIf="chartData.length > 0">
+                  <canvas baseChart [data]="chartData" [labels]="this.pieChartLabels"
+                    [options]="this.pieChartOptions" [chartType]="this.pieChartType" [colors]="this.pieChartColors"
+                    (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)">
+                  </canvas>
+                  <br>
+                </div>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <div *ngIf="this.documentDetails.documentType == '113'||this.documentDetails.documentType == '107'">
+        <app-card>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="page-header-title">
+            <div class="d-inline">
+              <h4 *ngIf="this.documentDetails.documentType == '107'" class="strong">URS Matrix</h4>
+              <h4 *ngIf="this.documentDetails.documentType == '113'" class="strong">Risk Criticality Matrix</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6" style="text-align: right;">
+          <a container="body" *ngIf="!this.TableViewFlag" href="javascript:;"
+            (click)="this.TableViewFlag = !this.TableViewFlag"
+            class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Expand">
+            <i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+          </a>
+          <a container="body" *ngIf="this.TableViewFlag" href="javascript:;"
+            (click)="this.TableViewFlag = !this.TableViewFlag"
+            class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Hide"><i
+              style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+          </a>
+        </div>
+      </div>
+      <div *ngIf="this.TableViewFlag">
+          <app-table-report [docId]="this.documentDetails.documentType"></app-table-report>
+      </div>
+    </app-card>
+    </div>
+
+    <div *ngIf="this.documentDetails.projectPlan.length >0">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="page-header-title">
+              <div class="d-inline">
+                <h4 class="strong">Project Plan</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6" style="text-align: right;">
+            <a container="body" *ngIf="!this.projectPlanviewFlag" href="javascript:;"
+              (click)="this.projectPlanviewFlag = !this.projectPlanviewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Expand"><i
+                style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+            </a>
+            <a container="body" *ngIf="this.projectPlanviewFlag" href="javascript:;"
+              (click)="this.projectPlanviewFlag = !this.projectPlanviewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Hide"><i
+                style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+            </a>
+          </div>
+        </div>
+        <div *ngIf="this.projectPlanviewFlag">
+          <div class="row">
+            <div class="col-sm-12">
+              <br>
+              <table  cellpadding="5" class="table">
+                <thead class="strong">
+                    <tr>
+                     <th>Level Name</th>
+                     <th>Target Start Date</th>
+                     <th>Target End Date</th>
+                     <th>Actual Start Date</th>
+                     <th>Actual End Date</th>
+                     <th>AssignedTo</th>
+                    </tr>
+                </thead>
+            <tbody>
+                     <tr  *ngFor="let level of this.documentDetails.projectPlan">
+                       <td>{{level.itemName}}</td>
+                       <td>{{level.startTargetDate}}</td>
+                       <td>{{level.endTargetDate}}</td>
+                       <td>{{level.actualStartTargetDate|date:this.datePipeFormat}}</td>
+                       <td>{{level.actualEndTargetDate|date:this.datePipeFormat}}</td>
+                       <td style="width:max-content ;">
+                        <span *ngFor="let user of level.selectedUsers">{{user.itemName}}<br></span>
+                     </tr>
+            </tbody>
+          </table>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+    <div>
+      <app-card>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="page-header-title">
+              <div class="d-inline">
+                <h4 class="strong">Tasks</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6" style="text-align: right;">
+            <a container="body" *ngIf="!this.projectTaskviewFlag" href="javascript:;"
+              (click)="this.projectTaskviewFlag = !this.projectTaskviewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Expand"
+              (click)="loadTaskData();"><i style="font-size: 25px;color: black;"
+                class="icofont icofont-circled-down"></i>
+            </a>
+            <a container="body" *ngIf="this.projectTaskviewFlag" href="javascript:;"
+              (click)="this.projectTaskviewFlag = !this.projectTaskviewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Hide"><i
+                style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+            </a>
+          </div>
+        </div>
+        <div *ngIf="this.projectTaskviewFlag">
+          <div class="row">
+            <div class="col-sm-12">
+              <br>
+              <div *ngIf="pendingTaskList.length == 0">
+                <strong>&nbsp;&nbsp;No Data</strong>
+              </div>
+              <div class="table-responsive" *ngIf="pendingTaskList.length != 0">
+                <table class="table">
+                  <tr class="header-bg">
+                    <th>Task Id</th>
+                    <th>Priority</th>
+                    <th>Description</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Time Duration</th>
+                    <th>Timer</th>
+                    <th>Assigned To</th>
+                    <th>Action</th>
+                  </tr>
+                  <tr *ngFor="let row of pendingTaskList">
+                    <td>
+                      <a class="link" (click)="redirect(row)">{{row.taskCode}}</a></td>
+                    <td> {{row.priority}}</td>
+                    <td> {{row.taskTitle}}</td>
+                    <td> {{row.dueDate |date:this.datePipeFormat}}</td>
+                    <td> {{row.status}}</td>
+                    <td> {{row.timeDuration}}</td>
+                    <td>
+                      <a *ngIf="row.status != 'Closed' && row.startTimerFlag == 'Y'" container="body"
+                        href="javascript:;" class="crm-action-view text-muted text-warning" (click)="startTime(row);"
+                        data-ng-open="modalSmall" placement="top" ngbTooltip="Start">
+                        <i  class="icofont icofont-wall-clock view"></i></a>
+                      &nbsp;
+                      <a *ngIf="row.status != 'Closed' && row.endTimerFlag == 'Y'" container="body" href="javascript:;"
+                        class="crm-action-view text-muted text-warning" (click)="endTime(row);"
+                        data-ng-open="modalSmall" placement="top" ngbTooltip="Stop">
+                        <i  class="icofont icofont-wall-clock bin"></i></a>
+                    </td>
+                    <td>
+                      <ng-container *ngIf="row.isManualEntry=='T';else else_content">
+                        <label >{{row.selectedUserNames}}</label>
+                      </ng-container>
+                      <ng-template #else_content>
+                        <label *ngIf="taskPermissionFlag && !row.flag" (click)="getLevelUsers(row);selectUserModal.show();" class="text-c-blue">{{row.selectedUserNames}}</label>
+                        <label *ngIf="!taskPermissionFlag || row.flag">{{row.selectedUserNames}}</label>
+                      </ng-template>
+                    </td>
+                    <td> 
+                      <a  *ngIf="taskPermissionFlag"  href="javascript:;" (click)="editTask(row)"
+                        class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+                        <i  class="icofont icofont-edit edit"></i></a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+  </ng-container>
+</div>
+
+<div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic #modalLargeWorkFlowProjectSummary [dialogClass]="'modal-lg'" [hideClickOutSide]="true"
+  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow Configuration of {{docName}}</h4>
+    <button type="button" class="close basic-close" (click)="modalLargeWorkFlowProjectSummary.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body">
+    <div style="max-height: 300px !important;" class="col-sm slimScrollDiv">
+      <div class="dt-desc dy-width-300">
+        <ng-container *ngFor="let loadStepper of this.loadStepperList;">
+          <h4 class="modal-title strong">{{loadStepper.docName}}</h4>
+          <ul class="progress-indicator">
+            <li *ngFor="let data of loadStepper.stepperList;" class="completed">
+              <label>
+                <span style="white-space: pre-line;" class="bubble"></span>
+                <div class="strong"> {{data.levelName}} : {{data.type}}<br>
+                  <span *ngIf="data.allUserApproval">(All User Approval)</span><br>
+                  <div style="text-align: left;"><b class="black"><u>Users</u></b>
+            <li *ngFor="let user of data.userArray;let i = index ">{{i+1}}.{{user}}</li>
+      </div>
+    </div>
+    </label>
+    </li>
+    </ul><br><br>
+    </ng-container>
+  </div>
+  </div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #freezemodal [hideFooter]="true" [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Revision of Document</h4>
+    <button type="button" class="close basic-close-light-box" (click)="freezemodal.hide();loaddata();close();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div *ngIf="this.freezeData"  class="app-modal-body" >
+    <ng-container *ngIf="this.freezeData.newRevisionDocuments.length>0 || this.freezeData.documentLock;else nodata">
+      <div class="row">
+        <div class="col-sm-12" style="text-align: right;">
+          <a *ngIf="this.freezeData.draftList.length>0" href="javascript:" (click)="loadRecordView(this.freezeData.draftList);">
+            View draft
+          </a> &nbsp;&nbsp;&nbsp;
+          <a *ngIf="this.freezeData.newRevisionDocuments.length>0" href="javascript:" (click)="loadRecordView(this.freezeData.newRevisionDocuments);">
+            View completed
+          </a>
+        </div>
+       
+        <div class="col-sm-12">
+          <textarea [(ngModel)]="this.freezeData.documentLockComments" id="documentApprovalComment"
+            placeholder="please enter the comments to lock or un-lock " name="description" class="form-control" rows="3"
+            cols="40"> </textarea>
+        </div>
+        <div class="col-sm-8">
+          <br>
+          <ng-container *ngIf="this.freezeData.documentLock && this.freezeData.documentLockComments">
+            <div class="row">
+              <label class="form-control-label col-sm-12">Select next revision</label>
+              <br>
+              <div class="col-sm-12  pl-5">
+                <label class="radio-inline" *ngIf="this.freezeData.revisionVersionZero">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    [value]="this.freezeData.revisionVersionZero" />{{this.freezeData.revisionVersionZero}}</label> &nbsp; &nbsp;
+                <label class="radio-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    [value]="this.freezeData.revisionVersionTwo" />{{this.freezeData.revisionVersionTwo}}</label> &nbsp; &nbsp;
+                <label class="radio-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    checked
+                    [value]="this.freezeData.revisionVersionOne" />{{this.freezeData.revisionVersionOne}}</label>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div class="col-sm-12 text-center">
+          <button
+            *ngIf="(null!=this.freezeData.selectedVersion || !this.freezeData.documentLock)&& this.freezeData.documentLockComments"
+            (click)="saveDocumentLockAndUnlock()" class="btn btn-primary btn-sm pointer" type="button"><i
+              class="icofont icofont-save"></i>
+            {{this.freezeData.documentLock?'Unlock Document':'Lock Document'}} </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #nodata>
+      <div class="text-center col-sm-12">
+        <h5>No new item created</h5>
+      </div>
+      
+    </ng-template>
+    <hr>
+    <div *ngIf="this.documentlockDataLogs.length>0"  [ngClass]="(this.freezeData.newRevisionDocuments.length>0 || this.freezeData.documentLock)? 'dy-width-300':'dy-width-400'" >
+      <h5>Document Lock Log</h5><br>
+      <div *ngFor="let item of this.documentlockDataLogs">
+        <div><b>Status : {{item.status?'Locked':'Un-Locked'}} </b>&nbsp;</div>
+        <div><b>Revision : {{item.revision}} </b>&nbsp;</div>
+        <div><b> <i class="{{item.status?' fa fa fa-lock ':'fa fa-unlock'}}"></i> By :</b>&nbsp;{{item.userName}} </div>
+        <div><b><i class="{{item.status?' fa fa fa-lock ':'fa fa-unlock'}}"></i> Time :</b>&nbsp; {{item.createdTime}}
+        </div>
+        <div><b>Comments :</b> {{item.comments}} </div>
+        <hr>
+      </div>
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic class="reset-this" #revisionDocs container="body" [hideHeader]="true" [hideFooter]="true"
+  [dialogClass]="'modal-md'">
+  <div *ngIf="null!=this.freezeData" class="app-modal-body" style="height: 300px; overflow-y: scroll;">
+
+    <button type="button" class="close basic-close-light-box" (click)="revisionDocs.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div *ngIf="null!=this.freezeData && this.viewList.length>0" class="overflow-container"
+      slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+      allowPageScroll="false">
+      <h5>View Records</h5><br>
+      <div class="table-responsive" >
+        <table class="table table-framed">
+          <tr>
+            <th>#</th>
+            <th>Document Code </th>
+            <th>Title/Desc(if any) </th>
+          </tr>
+          <tr *ngFor="let n of this.viewList;let c=index">
+            <td>{{c+1}} </td>
+            <td>{{n.documentCode}}</td>
+            <td>{{n.name}} </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic class="modal-lg" #selectUserModal [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Re-Assign Users</strong></h5>
+    <button type="button" class="close basic-close-light-box" (click)="selectUserModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Assigned To<span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <ng-select [disabled]="!this.isUserInWorkFlow" name="users" [ngClass]="'ng-select'" [(ngModel)]="this.assignedUsers" [options]="this.docLevelUserList" [multiple]="true">
+            </ng-select>
+            <div class="messages text-danger" *ngIf="this.assignedUsers.length==0">Assigned to is Required</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf ="!this.isUserInWorkFlow" class="row"><span class="asterisk">&nbsp;&nbsp;&nbsp;*</span>Note: User is not in workflow to Re-assign users</div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button class="btn btn-success" [disabled]="!this.isUserInWorkFlow || this.assignedUsers.length==0" (click)="reAssignUsers();selectUserModal.hide();">Save</button>
+        <button class="btn btn-danger" (click)="selectUserModal.hide();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #shareGraphEmail [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="onClose();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Users <span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <span>
+              <angular2-multiselect name="users" [data]="userList" id="users" required #users="ngModel"
+                [(ngModel)]="selectedUsersForEmail" [settings]="dropdownSettings">
+              </angular2-multiselect>
+              <div class="messages text-danger" *ngIf="isSubmitted && users.errors?.required">Users can't be blank</div>
+            </span>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Remarks</label>
+          <div class="col-sm-10">
+            <span>
+              <textarea style="width:-webkit-fill-available" [(ngModel)]="graphRemarks"
+                 name="remarks" #remarks="ngModel" [attr.rows]="2"></textarea>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button class="btn btn-success" (click)="sendGraphEmail();">Send</button>
+        <button class="btn btn-danger" (click)="onClose();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #createMatrix [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="onClose(); createMatrix.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Select Matrix<span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <span>
+              <select   style=" size: 50px;" class="form-control " id="matrix"
+               required [(ngModel)]="createMarix"  [disabled]="this.count > 0"
+              name="matrixSelect" #matrixSelect="ngModel" (change)="matrix($event.target.value)">
+              <option value="10" selected>10X10</option>
+              <option value="5" selected>5X5</option>
+              <option value="3" selected>3X3</option>
+            </select>
+              <div class="messages text-danger" *ngIf="matrixSelect.touched && matrixSelect.errors?.required">Users can't be blank</div>
+            </span>
+          </div>
+          <div *ngIf="this.matrixList.length >2">
+            <br>
+          <label class="col-sm-8 col-form-label">Priority Range<span class="asterisk required">*</span></label><br>
+         <ng-container *ngFor="let matrix of this.matrixList;let i=index;">
+           <div class="row">
+          <div class="col-sm-4"> 
+         &nbsp;&nbsp;&nbsp;&nbsp;<label>{{matrix.type}}</label>
+         </div>
+         <div class="col-sm-2"> 
+          <input type="number"
+          [(ngModel)]="matrix.min" max="125" style="width: 70px;"  [disabled]="true" />
+          </div>
+          <div class="col-sm-2"> 
+            <input type="number" max="125" min="1" (ngModelChange)="onChangeNumber($event,i,this.matrixList)"
+            [(ngModel)]="matrix.max"  style="width: 70px;" [disabled]="i == this.matrixList.length || matrix.flag" />
+            </div>
+          </div>
+        </ng-container>
+        <div class="col-sm-6 messages text-danger" *ngIf="errorFlag">Please enter valid range</div>
+      </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button *ngIf="this.count == 0 && !errorFlag" class="btn btn-success" (click)="createDefaultMatrix();">Save</button>
+        <button class="btn btn-danger" (click)="createMatrix.hide();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+

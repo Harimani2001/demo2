@@ -1,0 +1,365 @@
+<br>
+<div class="row" *ngIf="!this.viewIndividualData">
+  <div class="col-sm-12">
+      <div class="row">
+        <div class="col-sm-6">
+          <h4>Equipment Register</h4>
+        </div>
+        <div class="col-sm-6">
+          <div class="nav-item nav-grid">
+            <span class="m-r-15">View Mode: </span>
+            <button type="button"
+              class="btn btn-sm {{!tableView?'btn-primary':'btn-danger'}} btn-primary waves-effect waves-light m-r-10"
+              (click)="changeview(true)" data-toggle="tooltip" data-placement="top" title="list view">
+              Table View
+            </button>
+            <button type="button" class="btn btn-sm {{tableView?'btn-primary':'btn-danger'}} waves-effect waves-light"
+              (click)="changeview(false)" data-toggle="tooltip" data-placement="top" title="grid view">
+              Grid View
+            </button>
+          </div>
+        </div>
+      </div>
+      <hr style="margin-top: -1px">
+        <div class="row">
+          <div class="col-sm-2">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Equipment <span class="asterisk required">*</span></label>
+            <div class="col-sm-11">
+              <div class="input-group">
+                  <ng-select   [ngClass]="'ng-select'" [options]="this.equipmentData" aria-placeholder="Select Equipment" name="selectEquipment" id="eqId" #eqId (ngModelChange)="onChangeEquipment(eqId.value)"
+                  [multiple]="false"  [(ngModel)]="formReports.equipmentId" required>
+                </ng-select>
+                <!-- <select name="select" class="form-control" [(ngModel)]="formReports.equipmentId"
+                  (ngModelChange)="onChangeEquipment()">
+                  <option value="" disabled>Select Equipment</option>
+                  <option *ngFor="let equipment of equipmentList" [value]="equipment.id">{{equipment.name}}</option>
+                </select> -->
+                <span *ngIf="formReports.equipmentId !=''" style="padding: 5px;"><i class="icofont icofont-info-square"
+                     (click)="modalLarge.show();loadEquipmentDetails()"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Log Book <span class="asterisk required">*</span></label>
+            <div class="col-sm-11">
+              <div id="inputgroup" class="input-group">
+                <select name="select" class="form-control" [(ngModel)]="formReports.formId"
+                  (ngModelChange)="loadAllFormData()">
+                  <option value="" disabled>Select Log</option>
+                  <option *ngFor="let form of formList;let i =index" [value]="i">{{form.value}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Batch</label>
+            <div class="col-sm-11">
+              <div id="inputgroup" class="input-group">
+                <select name="select" class="form-control" [(ngModel)]="formReports.batchId"
+                  (ngModelChange)="onChangeBatch()">
+                  <option value="">Select Batch</option>
+                  <option *ngFor="let batch of batchList" [ngValue]="batch.key">{{batch.value}}</option>
+                </select>
+                <span *ngIf="formReports.batchId !=''" style="padding: 5px;"><i
+                    class="icofont icofont-info-square" 
+                    (click)="modalLarge1.show();loadBatchDetails()"></i></span>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Shift</label>
+            <div class="col-sm-11">
+              <div  class="input-group">
+                <select name="select" class="form-control" [(ngModel)]="formReports.shiftId"
+                  (ngModelChange)="onChangeShift()">
+                  <option  value="">Select Shift</option>
+                  <option *ngFor="let shift of shiftList" [value]="shift.id">{{shift.name}}</option>
+                </select>
+                <ng-template  #popContent>
+                  <div ><label style="font-size: 14px !important">Shift filter will work with combination of date filter</label></div>
+                </ng-template>
+                <span container="body" style="padding: 5px;"><i class="icofont icofont-info-square" placement="top" [ngbTooltip]="popContent"
+                   ></i></span>
+               
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;From Date</label>
+            <div class="col-sm-11">
+              <!-- <div  class="input-group"> -->
+                
+                <!-- <input class="form-control" name="startDate"  mwlFlatpickr [(ngModel)]="fromDate" readonly="readonly"
+                (ngModelChange)="onChangeFromDate($event)" [altInput]="true" [convertModelValue]="true"
+                [enableTime]="false" dateFormat="Y-m-dTH:i" [maxDate]="today" [altFormat]="this.pattern" placeholder="Start Date" /> -->
+
+                 <my-date-picker (keypress)="$event.preventDefault();"  #date name="startDate" (ngModelChange)="onChangeFromDate($event)" (click)="openBtnClicked(date)"  placeholder="Start Date" [options]="myDatePickerOptions"
+                  [(ngModel)]="fromDate" #dobend="ngModel" required></my-date-picker>
+                <!-- <input class="form-control" placeholder="Start Date" name="startDate" [(ngModel)]="fromDate"
+                  ngbDatepicker #e="ngbDatepicker" (click)="e.toggle();" readonly="readonly" [maxDate]="today"
+                  (ngModelChange)="onChangeFromDate($event)"> -->
+              <!-- </div> -->
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;To Date </label><br>
+            <div class="col-sm-11">
+              <!-- <div id="inputgroup" class="input-group"> -->
+                <!-- <input class="form-control" name="startDate"  mwlFlatpickr [(ngModel)]="toDate" readonly="readonly"
+                (ngModelChange)="onChangeToDate($event)" [altInput]="true" [convertModelValue]="true"
+                [enableTime]="false" dateFormat="Y-m-dTH:i" [maxDate]="today" [altFormat]="this.pattern" placeholder="End Date" /> -->
+               
+                 <my-date-picker (keypress)="$event.preventDefault();"  #date1 name="enddate" (ngModelChange)="onChangeToDate($event)" (click)="openBtnClicked(date1)"  placeholder="End Date" [options]="myDatePickerOptions"
+                [(ngModel)]="toDate" #dobend="ngModel" required></my-date-picker> 
+
+                <!-- <input class="form-control" placeholder=" End Date" name="endDate" [(ngModel)]="toDate" ngbDatepicker
+                  #f="ngbDatepicker" (click)="f.toggle();" readonly="readonly" [maxDate]="today"
+                  (ngModelChange)="onChangeToDate($event)"> -->
+              <!-- </div> -->
+              <div class="messages text-danger" *ngIf="isValidDate">To Date should be less than From Date</div>
+            </div>
+          </div>
+        </div>
+    <app-card *ngIf="tableView">
+      <div class="row">
+        <div class="col-sm-9"></div>
+        <div class="col-sm-2">
+          <label>
+            <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search"
+              placeholder="search">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        </div>
+        <div class="col-sm-1">
+          <button container="body"  *ngIf="this.permissionModal.exportButtonFlag" style="margin-bottom: 10px; padding: 6px 10px !important; border-radius: 2px !important;" ngbTooltip="CSV export"
+            class="btn btn-primary" (click)="excelExport()"> <i class="icofont icofont-download-alt m-0"></i></button>
+        </div>
+      </div>
+      <ngx-datatable #myTable [scrollbarH]="true" class="data-table dt-chk"
+        [rows]='filteredData | FormReportsFilterPipe : filterQuery' [limit]="rowsOnPage" [columnMode]="'force'"
+        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+        <ngx-datatable-column name="Action">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <a container="body" href="javascript:;" class="crm-action-view text-muted text-warning"
+              (click)="viewRowDetails(row,row.commonDocumentStatusValue);" data-ng-open="modalSmall" placement="top"
+              ngbTooltip="View">
+              <i  class="icofont icofont-resize"></i>
+            </a>
+            <ng-template  #popContent>
+              <div ><label style="font-size: 10px !important"><b>Created By:</b> {{row['createdByName']}}</label></div>
+              <div><label style="font-size: 10px !important" ><b>Created Time:</b> {{row['displayCreatedTime'] }}</label></div>
+              <div ><label style="font-size: 10px !important"><b>Updated By:</b> {{row['updatedByName']}}</label></div>
+              <div><label style="font-size: 10px !important" ><b>Updated Time:</b> {{row['displayUpdatedTime'] }}</label></div>
+            </ng-template>
+            <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+              (click)="loadDocumentCommentLog(row)" placement="top" [ngbTooltip]="popContent">
+              <i  class="icofont icofont-info-square"></i>
+            </a>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="ID">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['dynamicFormCode']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Equipment">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['equipmentName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Batch">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['batchName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Product">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['productName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column  style="font-weight: bold;" *ngFor="let col of publishedMandatoryFeildJson.columns; let i = index" [name]="col" flexGrow="1.0">
+            <ng-template ngx-datatable-header-template>
+                <span class="datatable-header-cell-wrapper">
+                    <span class="datatable-header-cell-label draggable"><label [innerHtml]="col"></label></span>			
+                </span>
+              </ng-template>
+            <ng-template let-row="row"  ngx-datatable-cell-template>
+               <strong>{{ publishedMandatoryFeildJson.rows[row['$$index']][i] }}</strong>
+             </ng-template> 
+         </ngx-datatable-column>
+         <!-- <ngx-datatable-column style="font-weight: bold;" name="Status">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['status']}}</strong>
+          </ng-template>
+        </ngx-datatable-column> -->
+       
+        <ngx-datatable-column style="font-weight: bold;" name="Updated By">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['updatedByName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Updated Time">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['displayUpdatedTime'] }}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </app-card>
+    <app-card *ngIf="!tableView">
+      <div>
+        <app-card [title]="'Reports'" [headerContent]="'Form Wise Reports'">
+          <google-chart *ngIf="isShowChart" [data]="comboChartData"></google-chart>
+        </app-card>
+      </div>
+    </app-card>
+  </div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData==true">
+  <div *ngFor="let data of popupdata; let in = index">
+    <div><br>
+      <h4>&nbsp;&nbsp;Details
+        <div style="float: right;">
+          <a style="cursor:pointer;font-weight: bold" *ngIf="routeback==null" class="ti-close"
+            (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a>
+        </div>
+      </h4>
+    </div>
+    <br>
+    <app-stepperprogress></app-stepperprogress>
+    <app-view-form [inputField]='this.popupdata'></app-view-form><br>
+    <ngb-tabset #formDataListTab="ngbTabset" *ngIf="isMapping" class="md-tabs"   (tabChange)="toggle($event.nextId,data)" >
+
+			<ngb-tab *ngFor="let formDatas of data.formDataList; let f = index " id="{{f}}" class="col-md-2">
+				<ng-template ngbTabTitle>
+					<a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary">
+						<h5 class="card-header-text">{{formDatas.formName}}</h5>
+					</a>
+				</ng-template>
+
+				<ng-template ngbTabContent>
+
+					<div class="row">
+						<div class="col-sm-12">
+							<app-view-form [inputField]='formDatas.formDataArray'></app-view-form>
+						</div>
+					</div>
+				</ng-template>
+			</ngb-tab>
+		</ngb-tabset>
+  </div>
+</app-card>
+
+<app-document-status-comment-log #documentcomments></app-document-status-comment-log>
+
+<app-modal-basic #modalLarge [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Equipment Details</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto"
+  size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="dt-desc" style="padding: 0px;">
+      <table class="table-striped table-bordered" style="width: 100%;">
+        <tr>
+          <td width="50%">Equipment Name</td>
+          <td width="50%" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.name}}</td>
+        </tr>
+        <tr>
+          <td>Equipment Code </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.code}}</td>
+        </tr>
+        <tr>
+          <td>Date Of Purchase </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.dateOfPurchase| date:'yyyy-MM-dd'}}</td>
+        </tr>
+        <tr>
+          <td>Make / Manufactured By</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.manufacturer}}</td>
+        </tr>
+        <tr>
+          <td>Supplied / Sold By</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.soldBy}}</td>
+        </tr>
+        <tr>
+          <td>Model</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.model}}
+          </td>
+        </tr>
+        <tr>
+          <td>Total Capacity </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.totalCapacity}}
+          </td>
+        </tr>
+        <tr>
+          <td>Recommended usage Capacity</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.usageCapacity}}
+          </td>
+        </tr>
+        <tr>
+          <td>Initial IQ completion Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.iqCompletionDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr>
+          <td>Initial OQ completion Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.oqCompletionDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalLarge.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalLarge1 [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Batch Details</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge1.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="dt-desc" style="padding: 0px;">
+      <table class="table-striped table-bordered" style="width: 100%;">
+        <tr>
+          <td width="50%">Product Name</td>
+          <td width="50%" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{batchDetails.productName}}</td>
+        </tr>
+        <tr>
+          <td>Batch Number</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{batchDetails.batchNumber}}</td>
+        </tr>
+        <tr>
+          <td>Batch Quantity</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{batchDetails.batchQuantity}}</td>
+        </tr>
+        <tr>
+          <td>Status</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{batchDetails.status}}</td>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalLarge1.hide()">Close</button>
+  </div>
+</app-modal-basic>

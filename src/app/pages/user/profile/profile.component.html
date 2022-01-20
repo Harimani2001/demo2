@@ -1,0 +1,1077 @@
+<div class="row">
+  <div class="col-xl-12">
+    <ngb-tabset>
+      <ngb-tab class="col-md-2" title="Personal Info">
+        <ng-template ngbTabContent>
+          <div class="m-t-15">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-header-text">About Me</h5>&nbsp;&nbsp;&nbsp;
+                <a href="javascript:;" (click)="toggleEditProfile()" placement="top" ngbTooltip="Edit"
+                  class="m-r-15 crm-action-edit text-muted text-primary"><i class="icofont icofont-edit edit"></i>
+                </a>
+              </div>
+              <div class="card-body p-t-0">
+                <div class="view-info" *ngIf="editProfile">
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <div class="general-info">
+                        <div class="row">
+                          <div class="col-lg-12 col-xl-6">
+                            <div class="table-responsive">
+                              <table class="table m-0">
+                                <tbody>
+                                  <tr>
+                                    <th scope="row">UserName</th>
+                                    <td>{{userModel.userName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Role</th>
+                                    <td>{{userModel.roleName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">First Name</th>
+                                    <td>{{userModel.firstName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Organization</th>
+                                    <td>{{userModel.organizationName}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                          <div class="col-lg-12 col-xl-6">
+                            <div class="table-responsive">
+                              <table class="table">
+                                <tbody>
+                                  <tr>
+                                    <th scope="row">Email</th>
+                                    <td>{{userModel.email}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Mobile Number</th>
+                                    <td>{{userModel.phoneNo}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Last Name</th>
+                                    <td>{{userModel.lastName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <th scope="row">Department</th>
+                                    <td>{{userModel.departmentIdName}}</td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="edit-info" *ngIf="!editProfile">
+                  <div class="row">
+                    <div class="col-lg-12">
+                      <div class="general-info">
+                        <div class="row">
+                          <div class="col-lg-6">
+                            <div class="table-responsive">
+                              <table class="table">
+                                <tbody>
+                                  <tr>
+                                    <td>
+                                      <div class="input-group">
+                                        <label class="col-sm-2 col-form-label">First Name<span
+                                            class="asterisk required">*</span></label>
+                                        <input  autofocus="autofocus" type="text"  class="form-control" placeholder="First Name"
+                                          class="form-control" id="firstName" name="firstName" #firstName="ngModel"
+                                          required maxlength="18" [(ngModel)]="user.firstName">
+                                        <div class="messages text-danger"
+                                          *ngIf="(firstName.touched || submitted) && firstName.errors?.required">
+                                          &nbsp;&nbsp;User firstName can't be blank</div>
+                                        <div class="messages text-danger" *ngIf="firstName?.errors?.pattern ">
+                                          &nbsp;&nbsp;Only Alphabets and space allowed</div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td>
+                                      <div class="input-group">
+                                        <label class="col-form-label">Mobile Number&nbsp;</label>
+                                        <input type="text" class="form-control" id="mobile" placeholder="xxx-xx-xxxx"
+                                          name="mobile" [(ngModel)]="user.phoneNo" (keypress)="onlyNumber($event)">
+                                        <!-- <input type="text" class="form-control" id="mobile" placeholder="xxx-xx-xxxx"
+                                            name="mobile" [(ngModel)]="user.phoneNo" minlength="10" maxlength="10"
+                                            #mobile="ngModel" pattern="^[6789]\d{9}$"
+                                            (keypress)="onlyNumber($event)">
+                                          <div class="messages text-danger" *ngIf="mobile.errors?.pattern">Please enter a valid Mobile number</div> -->
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                          <div class="col-lg-6">
+                            <div class="table-responsive">
+                              <table class="table">
+                                <tbody>
+                                  <tr>
+                                    <td>
+                                      <div class="input-group">
+                                        <label class="col-sm-2 col-form-label">Last Name<span
+                                            class="asterisk required">*</span></label>
+                                        <input type="text" class="form-control" placeholder="Last Name"
+                                          class="form-control" id="LastName" name="lastName" #lastName="ngModel"
+                                          required maxlength="18" [(ngModel)]="user.lastName">
+                                        <div class="messages text-danger"
+                                          *ngIf="(lastName.touched || submitted) && lastName.errors?.required">
+                                          &nbsp;&nbsp;User lastName can't be blank</div>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group row">
+                          <label class="col-sm-2 col-form-label">Upload Esign Image
+                          </label>
+                          <label class="switch">
+                            <input type="checkbox" name="activeFlag" (click)="switch()" />
+                            <span class="slider round"></span>
+                          </label>
+                        </div>
+                        <div *ngIf="this.enableEsign">
+                          <div class="row">
+                            <div class="col-md-5">
+                              <input type="file" id="avatar" accept=".png,.jpg,.jpeg" (change)="onFileChange($event)"
+                                #fileInput name="photo" />
+                              <p style="color: red" *ngIf="error != ''">{{error}}</p>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-lg-7">
+                          <div class="table-responsive">
+                            <table class="table">
+                              <tbody>
+                                <tr>
+                                  <td>
+                                    <div class="sig-container" *ngIf="!this.enableEsign">
+                                      <div fxLayout="row">
+                                        <button type="button" class="btn btn-secondary" (click)="clear()">Clear
+                                          Sig</button>
+                                      </div>
+                                      <div fxLayout="row">
+                                        <signature-pad [options]="signaturePadOptions" (onBeginEvent)="drawStart()"
+                                          (onEndEvent)="drawComplete()"></signature-pad>
+                                      </div>
+                                    </div>
+                                    <div *ngIf="this.userSign!=null">
+                                      <h5><b><u>My Signature:</u></b></h5>
+                                      <img [src]="this.userSign" alt="sign" style="max-height: 40%; max-width: 40%;" />
+                                    </div>
+                                    <div *ngIf="this.drawStartFlag && this.mySign!=''">
+                                      <h5><b><u>New Signature:</u></b></h5>
+                                      <img [src]="this.mySign" alt="sign" *ngIf="this.mySign!=''"
+                                        style="max-height: 40%; max-width: 40%;" />&nbsp;&nbsp;
+                                      <a *ngIf="this.enableEsign && this.mySign!='' "
+                                        style="cursor:pointer;font-weight: bold" ngbTooltip="Clear"
+                                        (click)="clearNewSign()"><span class="asterisk ti-close"></span></a>
+                                    </div>
+                                  </td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                        <div class="text-center" *ngIf="this.error == ''">
+                          <button href="javascript:;" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                            (click)="saveAndGoto()">Save</button>
+                          <button href="javascript:;" id="edit-cancel"
+                            class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+                            (click)="cancel();toggleEditProfile()">Cancel</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card" *ngIf="this.userSign!= null && editProfile && this.userSign!= ''">
+            <div class="card-header">
+              <h5 class="card-header-text">Esign</h5>
+              <div class="row">
+                <img [src]="this.userSign" alt="sign" />
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab class="col-md-2" title="Projects">
+        <ng-template ngbTabContent>
+          <div class="m-t-15">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-header-text">Project Settings</h5>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-sm-12 col-md-7"></div>
+                <div class="col-xs-12 col-sm-12 col-md-2">
+                  <div style="text-align: right;padding-right: 10px;">
+                    <angular2-multiselect name="locationName" [data]="this.locationsList" id="locationId"
+                      (ngModelChange)="filterProjectList($event)" [(ngModel)]="this.location" #locationName="ngModel"
+                      required [settings]="locDropdownSettings"></angular2-multiselect>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-3">
+                  <div style="text-align: right;padding-right: 10px;">
+                    <label>Search:
+                      <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                        class="form-control input-sm full-data-search" placeholder="Search">
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <ngx-datatable #myTable class="data-table dt-chk"
+                [rows]='projectDataList | userProfileProjectFilter : filterQuery' [limit]="10" [columnMode]="'force'"
+                [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+                    <div class="dt-desc">
+                      <table class="table-striped table-bordered">
+                        <tr>
+                          <th colspan="2" style="text-align: center;"><strong>Documents Name</strong></th>
+                          <th style="text-align: center;"><strong>Action</strong></th>
+                        </tr>
+                        <tr *ngFor="let project of this.docList ;let in = index">
+                          <td>{{in+1}}</td>
+                          <td class="fontStyle">{{project.label}}</td>
+                          <td style="text-align: center;">
+                            <div class="col-sm-1">
+                              <a container="body" placement="top" triggers="mouseenter:mouseleave"
+                                (click)="loadFlowDatasOfDocument(project)"
+                                ngbTooltip="Workflow Email/Notification Settings">
+                                <i href="javascript:;"> <img class="img-20" placement="top"
+                                    src="assets/icon/png-icons/notification-settings-icon.png" alt="">
+                                </i>
+                              </a>
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                      <br>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-row-detail>
+                <ngx-datatable-column name="Sl No." [width]="100" [resizeable]="true" [sortable]="true"
+                  [draggable]="false" [canAutoResize]="true">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <a href="javascript:;" [class.datatable-icon-right]="!expanded"
+                      [class.datatable-icon-down]="expanded" title="Expand/Collapse Row"
+                      (click)="toggleExpandRowForProduct(row)"> </a>
+                    <strong>{{row['$$index']+1}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Project Code">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['projectCode']?row['projectCode']:'N/A'}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Project Name">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['projectName']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Location">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['locationName']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Start Date">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['startDate']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="End Date">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['endDate']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Default Project">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <label class="profile-radio container">
+                      <input type="radio" name="radio" [(ngModel)]="row['defaultFlag']" [value]="true"
+                        (ngModelChange)="onDefaultProjectChange($event,row);" name="{{row['projectName']}}">
+                      <span class="checkmark"></span>
+                    </label>
+                  </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab class="col-md-2" title="Audit Trail">
+        <ng-template ngbTabContent>
+          <div class="m-t-15">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-header-text">Audit Trail</h5>
+              </div>
+              <div class="col-sm-12">
+                <div class="row">
+                  <div class="col-sm-1-5 pr-0 pl-0">
+                    <label class="col-form-label">&nbsp;&nbsp;From Date</label>
+                    <div class="col-sm-12 pr-0 pl-0">
+                      <my-date-picker (keypress)="$event.preventDefault();" #date name="startDate"
+                        (click)="openBtnClicked(date)" #dobstart="ngModel" placeholder="From Date"
+                        [options]="myDatePickerOptions" [(ngModel)]="startdate1"
+                        (ngModelChange)="startDateChange($event)" required></my-date-picker>
+                    </div>
+                  </div>
+                  <div class="col-sm-1-5 pr-0 pl-0">
+                    <label class="col-form-label">&nbsp;&nbsp;&nbsp;To Date </label>
+                    <div class="col-sm-12 pr-0">
+                      <my-date-picker (keypress)="$event.preventDefault();" #date1 name="endDate"
+                        (click)="openBtnClicked(date1)" placeholder="To Date" [options]="myDatePickerOptions"
+                        [(ngModel)]="Enddate1" #dobend="ngModel" (ngModelChange)="endDateChange($event)" required>
+                      </my-date-picker>
+                    </div>
+                  </div>
+                  <div class="col-sm-1-5 pr-0 pl-0">
+                    <label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Location </label>
+                    <form class="form-inline">
+                      <div class="col-sm-12 pr-0 ">
+                        <div id="inputgroup" class="input-group">
+                          <select name="selectLocation" class="form-control" [(ngModel)]="modal.selectedLocation"
+                            (change)="onChangeLocation($event.srcElement.value)">
+                            <option value="">Select Location</option>
+                            <option *ngFor="let loc of locationsList" [value]="loc.id">{{loc.itemName}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-sm-1-5 pr-0 pl-0">
+                    <label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Project </label>
+                    <form class="form-inline">
+                      <div class="col-sm-12 pr-0 ">
+                        <div id="inputgroup" class="input-group">
+                          <select name="selectproject" class="form-control" [(ngModel)]="modal.selectedProject"
+                            (change)="onChangeProject($event.srcElement.value)">
+                            <option value="">Select Project</option>
+                            <option *ngFor="let project of projectList" [value]="project.id">
+                              {{project.projectName}}</option>
+                          </select>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-sm-2 pr-0 pl-0">
+                    <label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Document </label>
+                    <form class="form-inline">
+                      <div class="col-sm-12 pr-0">
+                        <div id="inputgroup" class="input-group">
+                          <select [disabled]="isDisable" name="selectdocument" class="form-control"
+                            [(ngModel)]="documentSearch" (change)="eventChange()">
+                            <option value="">Select Document</option>
+                            <option *ngFor="let doc of documentList ;let i=index; " [value]="i">
+                              {{doc.value}}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-sm-1-5 pr-0 pl-0">
+                    <label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Event </label>
+                    <form class="form-inline">
+                      <div class="col-sm-12 pr-0 ">
+                        <div id="inputgroup" class="input-group">
+                          <select name="selectevent" class="form-control" [(ngModel)]="eventSearch">
+                            <option value="">Select Event</option>
+                            <option *ngFor="let event of eventList; " [value]="event.key">{{event.value}}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-sm-1-5 pr-0 pl-0" *ngIf="this.auditUser && this.auditUser==='Y'">
+                    <label class="col-form-label">&nbsp;&nbsp;&nbsp;Select User </label>
+                    <form class="form-inline">
+                      <div class="col-sm-12 pr-0">
+                        <div id="inputgroup" class="input-group">
+                          <select name="selectuser" class="form-control" [(ngModel)]="userSearch">
+                            <option value="0">Select User</option>
+                            <option *ngFor="let user of userlist; " [value]="user.key">{{user.value}}
+                            </option>
+                          </select>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="col-sm-1 pr-0 pl-0">
+                    <br>&nbsp;&nbsp;
+                    <button style="float: right; margin-top: 12px;" type="button"
+                      class="btn btn-sm btn-primary waves-effect waves-light"
+                      (click)="loadAuditDateRange()">Search</button>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+                  <div>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-6">
+                  <div style="text-align: right;padding-right: 10px;">
+                    <label>Search:
+                      <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                        class="form-control input-sm full-data-search" placeholder="Search">
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <br>
+              <ngx-datatable [scrollbarH]="true" #myTable class="material data-table"
+                [rows]='data | auditTrailFilter : filterQuery' [limit]="rowsOnPage" [offset]="tableOffset"
+                [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+                    <div class="dt-desc">
+                      <table class="table-striped table-bordered">
+                        <tr>
+                          <th colspan="3">
+                            <strong>System Remarks</strong>
+                          </th>
+                        </tr>
+                        <tr *ngFor="let system of row.systemRemarks ;let in = index">
+                          <td [innerHtml]="in+1"></td>
+                          <td style="white-space: pre-line" class="fontStyle">
+                            <label for="systemRemarks-{{in+1}}">
+                              <pre [innerHtml]="system"></pre>
+                            </label>
+                          </td>
+                        </tr>
+                      </table>
+                      <br>
+                      <table class="table-striped table-bordered">
+                        <tr>
+                          <th colspan="3">Device info</th>
+                        </tr>
+                        <tr>
+                          <td>Browser And Device</td>
+                          <td class="fontStyle">{{row['browser']}}</td>
+                        </tr>
+                      </table>
+                      <br>
+                      <table class="table-striped table-bordered">
+                        <tr>
+                          <th colspan="3">
+                            <strong>User Remarks</strong>
+                          </th>
+                        </tr>
+                        <tr *ngFor="let user of row.userRemarks ;let in = index">
+                          <td [innerHtml]="in+1"></td>
+                          <td style="white-space: pre-line" class="fontStyle">
+                            <label for="userRemmarks-{{in+1}}"><label [innerHtml]="user"></label></label>
+                          </td>
+                        </tr>
+                      </table>
+                      <br>
+                      <table *ngIf="row.tableAudit.length>0" class="table-striped table-bordered">
+                        <tr>
+                          <th colspan="3">
+                            <strong>Table Changes</strong>
+                          </th>
+                        </tr>
+                        <tr *ngFor="let table of row.tableAudit ;let tableIndex = index">
+                          <td>{{tableIndex+1}}</td>
+                          <td>
+                            {{table.name}} <a class="btn btn-link strong" role="button"
+                              (click)="loadTableChanges(table)">Click here!</a>
+                          </td>
+                        </tr>
+
+                      </table>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-row-detail>
+                <ngx-datatable-column [resizeable]="true" [width]="5" [sortable]="false" [draggable]="false"
+                  [canAutoResize]="true">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <a href="javascript:;" [class.datatable-icon-right]="!expanded"
+                      [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+                    </a>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="300" [sortable]="true" name="Event">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['event']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="300" [sortable]="true" name="Project Name">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['projectName']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="250" [sortable]="true" name="Document Type">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['displayOrder']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="250" [sortable]="true" name="Document Id">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['uniqueDocCode']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="230" [sortable]="true" name="IP Address">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['ipAddress']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="230" [sortable]="true" name="CreatedTime" [width]="150">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['createdTime']}}</ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab class="col-md-2" title="Email Settings">
+        <ng-template ngbTabContent>
+          <div class="m-t-15">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-header-text">EMAIL RULE SETTINGS</h5>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+                  <div>
+                  </div>
+                </div>
+                <!-- <div class="col-xs-12 col-sm-12 col-md-6">
+                        <div style="text-align: right;padding-right: 10px;">
+                          <label>Search:
+                            <input type="search" [(ngModel)]="filterQuery" class="form-control input-sm full-data-search" placeholder="Search">
+                          </label>
+                        </div>
+                      </div> -->
+              </div>
+              <br>
+              <ngx-datatable [scrollbarH]="true" #myTable class="material data-table" [columnMode]="'force'"
+                [rows]='userEmailSettingList | auditFilter : filterQuery' [limit]="rowsOnPage" [headerHeight]="50"
+                [footerHeight]="50" [rowHeight]="'auto'">
+                <ngx-datatable-column [resizeable]="true" [width]="5" [sortable]="false" [draggable]="false"
+                  [canAutoResize]="true">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['$$index']+1}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="300" [resizeable]="true" [sortable]="true" name="Project Name">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['projectName']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="300" [sortable]="true" name="Rule Name">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['ruleName']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="200" [sortable]="true" name="Action Type">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['actionType']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="200" [sortable]="true" name="Frequency Type">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['frequencyType']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [width]="280" [sortable]="true" name="Active">
+                  <ng-template let-row="row" ngx-datatable-cell-template> <label class="switch"><input type="checkbox"
+                        name="activeFlag" id="module.activeFlag" [checked]="row['status']"
+                        (change)="row['status']=!row['status'];saveChanges(row)"><span
+                        class="slider round"></span></label> </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-tab>
+      <ngb-tab class="col-md-2" title="Equipment Settings">
+        <ng-template ngbTabContent>
+          <div class="m-t-15">
+            <div class="card">
+              <div class="card-header">
+                <h5 class="card-header-text">Equipment Email Settings</h5>
+              </div>
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+                  <div>
+                  </div>
+                </div>
+              </div>
+              <br>
+              <ngx-datatable [scrollbarH]="true" #myTable class="material data-table" [columnMode]="'force'"
+                [rows]='equipmentMailingListOfUser | auditFilter : filterQuery' [limit]="rowsOnPage" [headerHeight]="50"
+                [footerHeight]="50" [rowHeight]="'auto'">
+                <ngx-datatable-column [resizeable]="true" [width]="5" [sortable]="false" [draggable]="false"
+                  [canAutoResize]="true">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['$$index']+1}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [resizeable]="true" [sortable]="true" name="Equipment Name">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['equipmentName']}}</ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column [sortable]="true" name="Active">
+                  <ng-template let-row="row" ngx-datatable-cell-template> <label class="switch"><input type="checkbox"
+                        name="emailFlag" id="emailFlag" [checked]="row['emailFlag']"
+                        (change)="row['emailFlag']=!row['emailFlag'];saveChangesEquipmentMailing(row)"><span
+                        class="slider round"></span></label> </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab class="col-md-2" title="User Shortcuts">
+        <ng-template ngbTabContent>
+          <div class="row">
+            <div class="col-sm-12">
+              <app-card>
+                <div class="row p-l-10">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input value="userShortcutsDTO.userDocuments" name="userDocuments"
+                        [(ngModel)]="userShortcutsDTO.userDocuments" type="checkbox" class="form-control">
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                      <span>Recent Activities of Documents</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="row p-l-10">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input value="userShortcutsDTO.userApprovalCount" name="userApprovalCount"
+                        [(ngModel)]="userShortcutsDTO.userApprovalCount" type="checkbox" class="form-control">
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                      <span>Pending for Approval</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="row p-l-10">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input value="userShortcutsDTO.allTask" name="allTasks" [(ngModel)]="userShortcutsDTO.allTask"
+                        type="checkbox" class="form-control">
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                      <span>All Project Tasks</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="row p-l-10">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input value="userShortcutsDTO.tasks" name="tasks" [(ngModel)]="userShortcutsDTO.tasks"
+                        type="checkbox" class="form-control">
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                      <span>Upcoming Tasks</span>
+                    </label>
+                  </div>
+                </div>
+                <div class="row p-l-10">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input value="userShortcutsDTO.equipments" name="equipments"
+                        [(ngModel)]="userShortcutsDTO.equipments" type="checkbox" class="form-control">
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                      <span>Equipment Events </span>
+                    </label>
+                  </div>
+                </div>
+                <div class="row p-l-10">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input value="userShortcutsDTO.summary" name="summary" [(ngModel)]="userShortcutsDTO.summary"
+                        type="checkbox" class="form-control">
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                      <span>Document Summary</span>
+                    </label>
+                  </div>
+                </div>
+                <!-- <div class="row p-l-10">
+                    <div class="checkbox-fade fade-in-primary">
+                      <label>
+                        <input value="userShortcutsDTO.testCases" name="testCases" [(ngModel)]="userShortcutsDTO.testCases"
+                          type="checkbox" class="form-control">
+                        <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                        <span>Test Case status</span>
+                      </label>
+                    </div>
+                  </div> -->
+                <div class="form-group row" *ngFor="let module of moduleList">
+                  <label class="col-sm-8 col-form-label">{{module.moduleType}}
+                  </label>
+                  <div class="col-sm-8">
+                    <angular2-multiselect [data]="module.modulesList" [(ngModel)]="module.selectedItems"
+                      [settings]="module.settings">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+                <div style="text-align: center;">
+                  <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                    (click)="saveUserShortcuts()">Save</button>
+                </div>
+                <!-- <br>
+                  <div class="row" style="padding-left: 30px;">
+                    <div class="col-md-3" *ngFor="let module of userShortcutsDTO.modulesList">
+                      <h3>{{module.moduleType}} </h3>
+                      <hr>
+                      <div class="row" *ngFor="let row of module.modulesList;let i=index">
+                        <div class="checkbox-fade fade-in-primary">
+                          <label>
+                            <input value="{{row['selected']}}" name="{{row['key']}}" [(ngModel)]="row.selected" type="checkbox"
+                              class="form-control">
+                            <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                            <span>{{row['value']}}</span>
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+                  </div> -->
+              </app-card>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab class="col-md-2" title="User Access">
+        <ng-template ngbTabContent>
+          <div class="m-t-15">
+            <div class="card" *ngIf="this.permission && this.mapData">
+              <div class="card-header row">
+                <div class="col-sm-7">
+                  <h5 class="card-header-text">permission info</h5>
+                </div>
+                <div class="col-sm-2">
+                  <select class="form-control" name="selectCategory" [(ngModel)]="this.category"
+                    (change)="onChangeCategory($event.srcElement.value)">
+                    <option disabled value="">Select Category</option>
+                    <option *ngFor="let cat of categoryList" [value]="cat.id">{{cat.code}}</option>
+                  </select>
+                </div>
+                <div class="col-sm-3">
+                  <button style="float: right;" type="button" class="btn btn-primary p-b-5" (click)="sendReminder()">
+                    <i style="font-size: 20px" class="icofont icofont-send-mail"></i>Request Permission
+                  </button>
+                </div>
+              </div>
+              <br>
+              <table class="projectPlanTable" cellpadding="6" border="1">
+                <thead>
+                  <tr>
+                    <th>Sl No</th>
+                    <th>Category</th>
+                    <th>Document List</th>
+                    <th>View</th>
+                    <th>Create</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                    <th>Import data</th>
+                    <th>Export data</th>
+                    <th>Workflow</th>
+                    <th>Publish</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let data of this.permission;let i=index;">
+                    <td>{{i+1}}</td>
+                    <td><strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{data['groupCategoryName']}}</strong>
+                    </td>
+                    <td><strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{data['permissionTitle']}}</strong>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[0]=='N'">
+                        <i *ngIf="data.viewButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.viewButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[0]=='Y'">
+                        N/A
+                      </span>
+                      <span *ngIf=" data.groupCategoryId === 7 || data.groupCategoryId ===8">
+                        <i *ngIf="data.viewButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.viewButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[1]=='N'">
+                        <i *ngIf="data.createButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.createButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[1]=='Y'">
+                        N/A
+                      </span>
+                      <span *ngIf=" data.groupCategoryId === 7 || data.groupCategoryId ===8">
+                        <i *ngIf="data.createButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.createButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        *ngIf="data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[2]=='N'">
+                        <i *ngIf="data.updateButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.updateButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[2]=='Y'">
+                        N/A
+                      </span>
+                      <span *ngIf=" data.groupCategoryId === 7 || data.groupCategoryId ===8">
+                        <i *ngIf="data.updateButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.updateButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        *ngIf="data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[3]=='N'">
+                        <i *ngIf="data.deleteButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.deleteButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[3]=='Y'">
+                        N/A
+                      </span>
+                      <span *ngIf=" data.groupCategoryId === 7 || data.groupCategoryId ===8">
+                        <i *ngIf="data.deleteButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.deleteButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        *ngIf="data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[4]=='N'">
+                        <i *ngIf="data.importButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.importButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[4]=='Y'">
+                        N/A
+                      </span>
+                      <span *ngIf=" data.groupCategoryId === 7 || data.groupCategoryId ===8">
+                        <i *ngIf="data.importButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.importButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        *ngIf="data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[5]=='N'">
+                        <i *ngIf="data.exportButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.exportButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[5]=='Y'">
+                        N/A
+                      </span>
+                      <span *ngIf=" data.groupCategoryId === 7 || data.groupCategoryId ===8">
+                        <i *ngIf="data.exportButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.exportButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        *ngIf="data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[6]=='N'">
+                        <i *ngIf="data.workFlowButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.workFlowButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[6]=='Y'">
+                        N/A
+                      </span>
+                      <span *ngIf=" data.groupCategoryId === 7 || data.groupCategoryId ===8">
+                        <i *ngIf="data.workFlowButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.workFlowButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                    </td>
+                    <td class="text-center">
+                      <span
+                        *ngIf="data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[7]=='N'">
+                        <i *ngIf="data.publishButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.publishButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                      <span
+                        *ngIf=" data.groupCategoryId != 7   &&   data.groupCategoryId !=8  && this.mapData.get(data.permissionValue) && this.mapData.get(data.permissionValue)[7]=='Y'">
+                        N/A
+                      </span>
+                      <span *ngIf=" data.groupCategoryId === 7 || data.groupCategoryId ===8">
+                        <i *ngIf="data.publishButtonFlag" class="icofont icofont-check-circled green"></i>
+                        <i *ngIf="!data.publishButtonFlag" class="icofont icofont-close-circled red"></i>
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab class="col-md-2" title="Support">
+        <ng-template ngbTabContent>
+          <app-support></app-support>
+        </ng-template>
+      </ngb-tab>
+    </ngb-tabset>
+  </div>
+</div>
+
+<app-modal-basic #emailNotificationSetting [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Email Notification Settings</h4>
+    <button type="button" class="close basic-close" (click)="emailNotificationSetting.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <app-card [classHeader]="true" [blockClass]="'table-border-style'">
+      <div class="table-responsive">
+        <table class="table table-framed">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Workflow Level</th>
+              <th style="text-align: center;">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of notificationModalList;let i = index">
+              <td>{{i+1}}</td>
+              <td>{{item.userName}}</td>
+              <td style="text-align: center;">
+                <div class="border-checkbox-section">
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox" (change)="item.notification=!item.notification"
+                      [checked]="item.notification" id="checkbox0{{i}}">
+                    <label class="border-checkbox-label" for="checkbox0{{i}}">Notification</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox" (change)="item.email=!item.email"
+                      [checked]="item.email" id="checkbox1{{i}}">
+                    <label class="border-checkbox-label" for="checkbox1{{i}}">Email</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox" type="checkbox" (change)="item.followUp=!item.followUp"
+                      [checked]="item.followUp" id="checkbox2{{i}}">
+                    <label class="border-checkbox-label" for="checkbox2{{i}}">Email follow-up</label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  </div>
+  <div class="app-modal-footer" style="text-align: center;" class="col-sm-12">
+    <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+      (click)="saveNotificationDetails()">save</button>
+    <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+      (click)="emailNotificationSetting.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #auditForTable [dialogClass]="'modal-lg'" class="modal-dialog">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Table Changes</h4>
+    <button type="button" class="close basic-close" (click)="auditForTable.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 500px !important;overflow: scroll;" class="app-modal-body">
+    <div class="dt-desc" style="padding: 0px;">
+      <div class="row">
+        <div class="col-sm-6">
+          <table class="table-responsive" id="oldTableId">
+            <thead>
+              <tr>
+                <th *ngFor="let col of this.oldTable.column">{{col}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of this.oldTable.rows ; let i=index;">
+                <td id="oldtd_{{i}}_{{j}}" *ngFor="let rowData of row; let j=index">{{rowData}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-6">
+          <table class="table-responsive" id="newTableId">
+            <thead>
+              <tr>
+                <th *ngFor="let col of this.oldTable.column">{{col}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of this.newTable.rows ; let i=index;">
+                <td id="newtd-{{i}}" *ngFor="let rowData of row">{{rowData}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer container">
+    <label><i style="color: #FBE870" class="icofont icofont-info-circle"></i>-&nbsp;Added</label>&nbsp;&nbsp;
+    <label><i style="color: #F08080" class="icofont icofont-info-circle"></i>-&nbsp;Old value</label>&nbsp;&nbsp;
+    <label><i style="color: #90EE90" class="icofont icofont-info-circle"></i>-&nbsp;Updated</label>
+    <button type="button" class="btn btn-default waves-effect float-right" (click)="auditForTable.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic id="modal-lg-50" #sendMailRequest [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Request Permission</strong></h5>
+  </div>
+  <div class="app-modal-body" style="max-height:483px !important;">
+    <form #formId="ngForm">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="row">
+            <label class="col-sm-12 col-form-label p-b-0">Users <span class="asterisk required">*</span></label>
+            <div class="col-sm-12">
+              <span>
+                <ng-select [ngClass]="'ng-select'" [options]="userList" [(ngModel)]="selectedUsersForEmail"
+                  [multiple]="true" name="users" required #users="ngModel">
+                </ng-select>
+                <div class="messages text-danger" *ngIf="(users.touched || errorFlag) && users.errors?.required">Users
+                  can't be blank</div>
+              </span>
+            </div>
+          </div>
+          <div class="row">
+            <label class="col-sm-12 col-form-label">Remarks</label>
+            <div class="col-sm-12">
+              <span>
+                <textarea style="width: 100%;" rows="3" name="remarks" required [(ngModel)]="remarksForEmail" #remarks="ngModel" ></textarea>
+                <!-- <ckeditor [config]="this.configService.helper.editConfigOfCkEditior" name="remarks" required
+                  [(ngModel)]="remarksForEmail" #remarks="ngModel" [attr.rows]="3" style="width:-webkit-fill-available">
+                </ckeditor> -->
+                <div class="messages text-danger" *ngIf="errorFlag && remarks.errors?.required">Remarks
+                  can't be blank</div>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div style="width: 100%;padding-top: 0%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button class="btn btn-sm btn-success" (click)="$event.preventDefault();sendEmail(formId)">Send</button>
+        <button class="btn btn-sm btn-danger" (click)="cancelEmail(formId);">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

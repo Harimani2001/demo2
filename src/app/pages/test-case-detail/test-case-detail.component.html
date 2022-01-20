@@ -1,0 +1,745 @@
+<ng-container *ngFor="let data of testCaseDetail; let in = index">
+    <app-card id="individual-header-card">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <h4>{{categoryName}}</h4>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="row">
+                            <div class="col-sm-1"></div>
+                            <div class="col-sm-1"><a class="crm-action-view text-muted text-warning"
+                                    (click)="onclickFirst(data);" placement="top" ngbTooltip="First">
+                                    <i style="font-size: 30px" class="icofont icofont-rounded-double-left"></i></a>
+                            </div>
+                            <div class="col-sm-2"><a class="crm-action-view text-muted text-warning"
+                                    (click)="onclickPrevious(data);" placement="top" ngbTooltip="Previous">
+                                    <i style="font-size: 30px" class="icofont icofont-caret-left"></i></a></div>
+                            <div class="col-sm-3" style="text-align: center;"><a
+                                    class="crm-action-view text-muted text-warning"
+                                    style="font-size: 22px">{{this.currentDoc}}/{{this.totalSize}}</a></div>
+                            <div class="col-sm-1"><a class="crm-action-view text-muted text-warning"
+                                    (click)="onclickNext(data);" placement="top" ngbTooltip="Next">
+                                    <i style="font-size: 30px" class="icofont icofont-caret-right"></i></a></div>
+                            <div class="col-sm-2"><a class="crm-action-view text-muted text-warning"
+                                    (click)="onclickLast(data);" placement="top" ngbTooltip="Last">
+                                    <i style="font-size: 30px" class="icofont icofont-rounded-double-right"></i></a>
+                            </div>
+                            <div class="col-sm-2"></div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <app-stepperprogress *ngIf="data.publishedflag" [isIcon]="true"></app-stepperprogress>
+                    </div>
+                    <div class="col-sm-3 text-right">
+                        <span *ngIf="data.documentPreviewFlag"><i (click)="documentPreview(false,'pdf',data);"
+                                placement="top" container="body" ngbTooltip="Download Pdf File"
+                                class=" font-size-30px  text-danger  icofont icofont-file-pdf"
+                                title="Download Pdf File"></i></span>&nbsp;&nbsp;
+                        <span *ngIf="data.documentPreviewFlag"><i (click)="documentPreview(false,'docx',data);"
+                                placement="top" container="body" ngbTooltip="Download Doc File"
+                                class="font-size-30px  text-primary icofont icofont-file-word"
+                                title="Download Doc File"></i></span>
+                        <button type="submit"
+                            *ngIf="!data.masterFlag && (this.model.updateButtonFlag && !data.publishedflag && (data.status != 'Fail')) && data.canExecute"
+                            (click)="edit(data)" class="btn btn-sm btn-success waves-effect waves-light">Edit</button>
+                        <button type="submit"
+                            *ngIf="!data.masterFlag && model.publishButtonFlag  && !isWorkflowDocumentOrderSequence && !data.publishedflag && !data.executionFlag && data.canPublish"
+                            (click)="publishOrSubmitForApprove(data)"
+                            class="btn btn-sm btn-warning waves-effect waves-light">Publish</button>
+
+                        <button type="submit" *ngIf="!data.masterFlag && model.publishButtonFlag && isSelectedPublishData && !isWorkflowDocumentOrderSequence &&
+                             !this.freeze && !this.freezeSFAbutton" (click)="publishOrSubmitForApprove(data)"
+                            class="btn btn-sm btn-primary waves-effect waves-light">Submit For
+                            Approval</button>
+                        <button type="submit"
+                            *ngIf="!data.masterFlag && this.model.deleteButtonFlag && !data.publishedflag && !data.executionFlag"
+                            (click)="openSuccessCancelSwal(data,in)"
+                            class="btn btn-sm btn-danger waves-effect waves-light">Delete</button>
+                        <button  type="button" class="btn btn-sm btn-danger  waves-effect waves-light m-r-10"
+                            (click)="onClickClose()">Cancel</button>
+                        
+                    </div>
+                </div>
+            
+    </app-card>
+    <div class="row ">
+        <div class="col-sm-12">
+            <label><strong class="strong">URS : </strong>
+                <ng-container *ngFor="let urs of data.ursList; let i = index;">
+                    <a (click)="urlRedirection(urs.id, data.id)"><u
+                            class="black pointer text-primary">{{urs.ursCode}}<label
+                                *ngIf="data.ursList.length!=(i+1)">,</label></u></a>
+                </ng-container>
+                <span class="pointer" (click)="this.ursDetailedView = !this.ursDetailedView">&nbsp;<i
+                        [ngClass]="this.ursDetailedView?'fa-minus-square text-danger':'fa-plus-square text-success'"
+                        class="fa" aria-hidden="true"></i></span>
+            </label>
+        </div>
+        <div class="col-sm-12" *ngIf="this.ursDetailedView">
+            <app-urs-spec-risk-view [dataList]="this.selectedUrsDetails" [constant]="data.constant" [id]="data.id" [backUrl]="backUrl"></app-urs-spec-risk-view>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <table id="testcase-table-detail" class="table w-100">
+                <tbody *ngIf="!data.executionFlag">
+                    <tr>
+                        <td>
+                            <div><strong class="strong">Test ID : </strong>{{data.testCaseCode}} {{data.revisionNumber}}
+                            </div>
+                        </td>
+                        <td>
+                            <div><strong class="strong">Test Case Created By : </strong>{{data.createdBy}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div><strong class="strong">Document status : </strong>{{data.approvedStatus}}</div>
+                        </td>
+                        <td>
+                            <div><strong class="strong">Test Case Created Time : </strong>{{data.displayCreatedTime}}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div><strong class="strong">Test Description :</strong> {{data.description}}</div>
+                        </td>
+                        <td>
+                            <div><strong class="strong">Environment : </strong>{{data.environment}}</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                <p class="fs-15 text-justify text-break"><strong class="strong">Acceptance Criteria :
+                                    </strong>{{data.acceptanceCriteria}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <p class="fs-15 text-justify text-break"><strong class="strong">Pre Requisites :
+                                    </strong>{{data.preRequisites}}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <div>
+                                <p class="fs-15 text-justify text-break"><strong class="strong">Expected Result :
+                                    </strong>{{data.expectedResult}}</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tbody *ngIf="data.executionFlag">
+                    <tr *ngIf="testRunCompareJson && testRunCompareJson.id!=data.id ">
+                        <td colspan="2">
+                            <div><strong class="strong">Current Test Run :</strong>{{data.testRunName}}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <label><strong class="strong">Test ID :
+                                </strong>{{data.testCaseCode}} {{data.revisionNumber}}</label> </td>
+                        <td>
+                            <div><strong class="strong">Test Run :</strong>
+                                <ng-container *ngIf="testRunList.length>1">
+                                    <select name="select" [(ngModel)]="testRunId"
+                                    (change)="getDataForTestCaseOfTestRun(data.masterId,testRunId)">
+                                    <ng-container *ngFor="let t of testRunList">
+                                        <option [value]="t.key">{{t.value}}</option>
+                                    </ng-container>
+                                </select>
+                                </ng-container>
+                                <ng-container *ngIf="testRunList.length==1 || testRunList.length==0">
+                                    {{data.testRunName}}
+                                </ng-container>
+                               
+                            </div>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div><strong class="strong">Test Case Created By : </strong>
+                                <ng-container *ngIf="!testRunCompareJson">{{data.createdBy}}</ng-container>
+                                <ng-container *ngIf="testRunCompareJson">{{testRunCompareJson.createdBy}}</ng-container>
+                            </div>
+                        </td>
+                        <td>
+                            <div><strong class="strong">Test Case Executed By : </strong>
+                                <ng-container *ngIf="!testRunCompareJson">{{data.executedByName}}</ng-container>
+                                <ng-container *ngIf="testRunCompareJson">{{testRunCompareJson.executedByName}}
+                                </ng-container>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div><strong class="strong">Test Case Created Time : </strong>
+                                <ng-container *ngIf="!testRunCompareJson">{{data.displayCreatedTime}}</ng-container>
+                                <ng-container *ngIf="testRunCompareJson">{{testRunCompareJson.displayCreatedTime}}
+                                </ng-container>
+                            </div>
+                        </td>
+                        <td>
+                            <div><strong class="strong">Test Case Executed Time : </strong>
+                                <ng-container *ngIf="!testRunCompareJson">{{data.executedTime}}</ng-container>
+                                <ng-container *ngIf="testRunCompareJson">{{testRunCompareJson.executedTime}}
+                                </ng-container>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div><strong class="strong">Document status : </strong>
+                                <ng-container *ngIf="!testRunCompareJson">{{data.approvedStatus}}</ng-container>
+                                <ng-container *ngIf="testRunCompareJson">{{testRunCompareJson.approvedStatus}}
+                                </ng-container>
+                            </div>
+                        </td>
+
+                        <td>
+                            <div><strong class="strong">Environment : </strong>
+                                <ng-container *ngIf="!testRunCompareJson">{{data.environment}}</ng-container>
+                                <ng-container *ngIf="testRunCompareJson">{{testRunCompareJson.environment}}
+                                </ng-container>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div><strong class="strong">Test Description : </strong>{{data.description}}</div>
+                        </td>
+                        <td>
+                            <div><strong class="strong">Status :
+                                    <ng-container *ngIf="!testRunCompareJson"> <span
+                                            [ngStyle]="{'color': this.permissionService.helper.getTestCaseStatusColors(data.status) }">
+                                            {{data.status?data.status:'No Run'}}</span></ng-container>
+                                    <ng-container *ngIf="testRunCompareJson"> <span
+                                            [ngStyle]="{'color': this.permissionService.helper.getTestCaseStatusColors(testRunCompareJson.status) }">
+                                            {{testRunCompareJson.status?testRunCompareJson.status:'No Run'}}</span>
+                                    </ng-container>
+                                </strong></div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                <p class="fs-15 text-justify text-break"><strong class="strong">Acceptance Criteria :
+                                    </strong>{{data.acceptanceCriteria}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <p class="fs-15 text-justify text-break"><strong class="strong">Pre Requisites :
+                                    </strong>{{data.preRequisites}}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div>
+                                <p class="fs-15 text-justify text-break"><strong class="strong">Expected Result :
+                                    </strong>{{data.expectedResult}}</p>
+                            </div>
+                        </td>
+                        <td>
+                            <div>
+                                <p class="fs-15 text-justify text-break"><strong class="strong">Actual Result :
+                                    </strong>
+                                    <ng-container *ngIf="!testRunCompareJson">{{data.actualResult}}</ng-container>
+                                    <ng-container *ngIf="testRunCompareJson">{{testRunCompareJson.actualResult}}
+                                    </ng-container>
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <ng-container *ngIf="!testRunCompareJson">
+        <div *ngIf="!data.executionFlag && data.checklist && data.checklist.length != 0" class="row ">
+            <div class="col-sm-12"><strong class="strong">Test Steps</strong></div>
+            <div class="col-sm-12">
+                <table id="testcase-table-checkList" class="table">
+                    <tr *ngFor="let item of data.checklist; let i = index">
+                        <td>
+                            <div class="row ">
+                                <div class="col-sm-12 ">
+                                    <label *ngIf="item.completedFlag">
+                                        <i class="text-success fa fa-check" aria-hidden="true"></i>
+                                    </label>
+                                    <strong>{{i+1}}.</strong>
+                                    <strong class="form-contol-label">{{item.checklistName}}</strong>
+                                </div>
+                                <div class="col-sm-12 ">
+                                    <p class="text-break text-justify"> <strong class="strong">Expected Result :
+                                        </strong>{{item.expectedResult}}
+                                    </p>
+                                </div>
+                                <br>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div *ngIf="data.executionFlag && data.teststepsExists">
+            <app-card>
+                <div class="row">
+                  <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Test Steps</strong></div>
+                  <div class="col-sm-6" style="text-align: right;">
+                    <a container="body" *ngIf="!this.stepViewFlag" href="javascript:;" (click)="this.stepViewFlag = !this.stepViewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+                      placement="top" ngbTooltip="Expand" (click)="loadData(data,'testSteps')"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+                    </a>
+                    <a container="body" *ngIf="this.stepViewFlag" href="javascript:;" (click)="this.stepViewFlag = !this.stepViewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+                     placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div *ngIf="this.stepViewFlag">
+                    <ng-container *ngFor="let item of data.checklist; let i = index">
+                        <table id="testcase-table-checkList" class="table">
+                            <tr>
+                                <td style="width: 30%;">
+                                    <div>
+                                        <div class="row ">
+                                            <div class="col-sm-12 ">
+                                                <label *ngIf="item.completedFlag">
+                                                    <i class="text-success fa fa-check" aria-hidden="true"></i>
+                                                </label>
+                                                <strong>{{i+1}}.</strong>
+                                                <strong class="form-contol-label">{{item.checklistName}}</strong>
+                                            </div>
+                                            <br>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12 ">
+                                                <p class="text-break text-justify"> <strong class="strong">Status :<span
+                                                            [ngStyle]="{'color': this.permissionService.helper.getTestCaseStatusColors(item.status) }">
+                                                            {{item.status}}</span> </strong></p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12 ">
+                                                <p class="text-break text-justify"> <strong class="strong">Expected Result :
+                                                    </strong>{{item.expectedResult}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12 ">
+                                                <p class="text-break text-justify"> <strong class="strong">Actual Result :
+                                                    </strong>{{item.actualResult}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12 ">
+                                                <p class="text-break text-justify"> <strong class="strong">Remarks :
+                                                    </strong>{{item.remarks}}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td style="width: 70%;">
+                                    <div>
+                                        <div *ngIf="item.files.length >0 " class="row">
+                                            <div class="col-sm-1 pr-5 text-right">
+                                                <a class="arrow-button" role="button"
+                                                    (click)="plusChecklistSlides(-1,item.files)">&#10094;</a>
+                                            </div>
+                                            <div class="col-sm-10" width="100%">
+                                                <ng-container *ngFor="let file of item.files;let in = index">
+                                                    <img *ngIf="file.visible == true" src="{{file.imageDataUrl}}"
+                                                        width="100%" height="300" alt="No Image" />
+                                                </ng-container>
+                                            </div>
+                                            <div class="col-sm-1 text-left">
+                                                <a class="arrow-button" role="button"
+                                                    (click)="plusChecklistSlides(1,item.files)">&#10095;</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                    </ng-container>
+                </div>
+              </app-card>       
+        </div>
+        <div *ngIf="data.screenshotsExists">
+            <app-card>
+                <div class="row">
+                  <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Screenshot Image</strong></div>
+                  <div class="col-sm-6" style="text-align: right;">
+                    <a container="body" *ngIf="!this.screenshotViewFlag" href="javascript:;" (click)="this.screenshotViewFlag = !this.screenshotViewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+                      placement="top" ngbTooltip="Expand" (click)="loadData(data,'screenshots')"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+                    </a>
+                    <a container="body" *ngIf="this.screenshotViewFlag" href="javascript:;" (click)="this.screenshotViewFlag = !this.screenshotViewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+                     placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div *ngIf="this.screenshotViewFlag">
+                    <div class="dt-desc" style="padding: 0px;padding-left: 1%; overflow-x:auto;">
+                        <div class="dt-desc dy-ui">
+                            <table class="table-striped table-bordered" style="width: 100%;">
+                                <thead>
+                                    <th>Sl. No</th>
+                                    <th>File Name</th>
+                                    <th>Action</th>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let file of data.imageList ; let i = index ">
+                                        <td>{{i+1}}</td>
+                                        <td><label>{{file.fileName}}</label></td>
+                                        <td>
+                                            <a container="body" href="javascript:;"
+                                                class="crm-action-view text-muted text-warning"
+                                                (click)="view(file.filePath,true)" data-ng-open="modalSmall" placement="top"
+                                                ngbTooltip="View">
+                                                <i style="font-size: 20px" class="icofont icofont-eye-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+              </app-card>
+        </div>
+        <div *ngIf="data.videosExists">
+            <app-card>
+                <div class="row">
+                  <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Recorded Video</strong></div>
+                  <div class="col-sm-6" style="text-align: right;">
+                    <a container="body" *ngIf="!this.videoViewFlag" href="javascript:;" (click)="this.videoViewFlag = !this.videoViewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+                      placement="top" ngbTooltip="Expand" (click)="loadData(data,'videos')"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+                    </a>
+                    <a container="body" *ngIf="this.videoViewFlag" href="javascript:;" (click)="this.videoViewFlag = !this.videoViewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+                     placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div *ngIf="this.videoViewFlag">
+                    <table id="testcase-table-urlList" class="table">
+                        <thead class="panel-heading">
+                            <tr class="w-100">
+                                <td class="w-10"><label class="strong">Sl. No</label></td>
+                                <td class="w-40"><label class="strong">File Name</label></td>
+                                <td class="w-40"><label class="strong">Action</label></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let file of data.videoList ; let i = index ">
+                                <td class="w-10">{{i+1}}</td>
+                                <td class="w-40"><label>{{file.fileName}}</label></td>
+                                <td class="w-40">
+                                    <a container="body" href="javascript:;" class="crm-action-view text-muted text-warning"
+                                        (click)="view(file.filePath,false)" data-ng-open="modalSmall" placement="top"
+                                        ngbTooltip="View">
+                                        <i style="font-size: 20px" class="icofont icofont-eye-alt"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+              </app-card>
+        </div>
+        <div *ngIf="data.referenceExists">
+            <app-card>
+                <div class="row">
+                  <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Reference</strong></div>
+                  <div class="col-sm-6" style="text-align: right;">
+                    <a container="body" *ngIf="!this.referenceViewFlag" href="javascript:;" (click)="this.referenceViewFlag = !this.referenceViewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+                      placement="top" ngbTooltip="Expand" (click)="loadData(data,'urlChecklist')"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+                    </a>
+                    <a container="body" *ngIf="this.referenceViewFlag" href="javascript:;" (click)="this.referenceViewFlag = !this.referenceViewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+                     placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div *ngIf="this.referenceViewFlag">
+                    <table id="testcase-table-urlList" class="table">
+                        <thead class="panel-heading">
+                            <tr class="w-100">
+                                <td class="w-10"><label class="strong">Sl. No</label></td>
+                                <td class="w-40"><label class="strong">Title</label></td>
+                                <td class="w-40"><label class="strong">URL</label></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of data.urlChecklist; let i = index">
+                                <td class="w-10">{{i+1}}</td>
+                                <td class="w-40">{{item.title}}</td>
+                                <td class="w-40"><a class="pointer btn-link text-primary" (click)="this.helper.navigateExternalURL(item.url)">{{item.url}}</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+              </app-card>
+        </div>
+
+
+        <div *ngIf="data.fileCountFlag">
+            <app-card>
+                <div class="row">
+                  <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;View Uploaded Files</strong></div>
+                  <div class="col-sm-6" style="text-align: right;">
+                    <a container="body" *ngIf="!this.filesViewFlag" href="javascript:;" (click)="this.filesViewFlag = !this.filesViewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+                      placement="top" ngbTooltip="Expand"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+                    </a>
+                    <a container="body" *ngIf="this.filesViewFlag" href="javascript:;" (click)="this.filesViewFlag = !this.filesViewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+                     placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div *ngIf="this.filesViewFlag">
+                    <app-file-upload-for-doc #fileupload [multiple]=false [uniqueCodeForAudit]="data.testCaseCode"
+                    [onlyView]=true [documentCode]="category">
+                </app-file-upload-for-doc>
+                </div>
+              </app-card>
+        </div>
+        <div *ngIf="data.imagesExists">
+            <app-card>
+                <div class="row">
+                  <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Uploaded Image</strong></div>
+                  <div class="col-sm-6" style="text-align: right;">
+                    <a container="body" *ngIf="!this.imagesViewFlag" href="javascript:;" (click)="this.imagesViewFlag = !this.imagesViewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+                      placement="top" ngbTooltip="Expand" (click)="loadData(data,'images')"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+                    </a>
+                    <a container="body" *ngIf="this.imagesViewFlag" href="javascript:;" (click)="this.imagesViewFlag = !this.imagesViewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+                     placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+                    </a>
+                  </div>
+                </div>
+                <br>
+                <div *ngIf="this.imagesViewFlag">
+                    <div *ngIf="data.files.length >0 " class="row">
+                        <div class="col-sm-2 pr-5 text-right">
+                            <a class="arrow-button" role="button" (click)="plusSlides(-1,data.files)">&#10094;</a>
+                        </div>
+                        <div class="col-sm-8">
+                            <ng-container *ngFor="let file of data.files;let in = index">
+                                <img *ngIf="file.visible == true" src="{{file.imageDataUrl}}"
+                                width="100%" height="300" alt="No Image" />
+                            </ng-container>
+                        </div>
+                        <div class="col-sm-2 text-left">
+                            <a class="arrow-button" role="button" (click)="plusSlides(1,data.files)">&#10095;</a>
+                        </div>
+                    </div>
+                </div>
+              </app-card>
+        </div>
+    </ng-container>
+    <ng-container *ngIf="testRunCompareJson">
+        <div *ngIf="!testRunCompareJson.executionFlag && testRunCompareJson.checklist && testRunCompareJson.checklist.length != 0"
+            class="row ">
+            <div class="col-sm-12"><strong class="strong">Test Steps</strong></div>
+            <div class="col-sm-12">
+                <table id="testcase-table-checkList" class="table">
+                    <tr *ngFor="let item of testRunCompareJson.checklist; let i = index">
+                        <td>
+                            <div class="row ">
+                                <div class="col-sm-12 ">
+                                    <label *ngIf="item.completedFlag">
+                                        <i class="text-success fa fa-check" aria-hidden="true"></i>
+                                    </label>
+                                    <strong>{{i+1}}.</strong>
+                                    <strong class="form-contol-label">{{item.checklistName}}</strong>
+                                </div>
+                                <br>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div *ngIf="testRunCompareJson.executionFlag && testRunCompareJson.checklist && testRunCompareJson.checklist.length != 0"
+            class="row ">
+            <div class="col-sm-12"><strong class="strong">Test Steps</strong></div>
+            <div class="col-sm-12" *ngIf="testRunCompareJson.checklist && testRunCompareJson.checklist.length != 0">
+                <ng-container *ngFor="let item of testRunCompareJson.checklist; let i = index">
+                    <table id="testcase-table-checkList" class="table">
+                        <tr>
+                            <td style="width: 30%;">
+                                <div>
+                                    <div class="row ">
+                                        <div class="col-sm-12 ">
+                                            <label *ngIf="item.completedFlag">
+                                                <i class="text-success fa fa-check" aria-hidden="true"></i>
+                                            </label>
+                                            <strong>{{i+1}}.</strong>
+                                            <strong class="form-contol-label">{{item.checklistName}}</strong>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12 ">
+                                            <strong class="strong">Status :<span
+                                                    [ngStyle]="{'color': this.permissionService.helper.getTestCaseStatusColors(item.status) }">
+                                                    {{item.status}}</span> </strong>
+                                        </div>
+                                        <br>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12 ">
+                                            <p class="text-break text-justify"> <strong class="strong">Remarks :
+                                                </strong>{{item.remarks}}</p>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="width: 70%;">
+                                <div>
+                                    <div *ngIf="item.files.length >0 " class="row">
+                                        <div class="col-sm-1 pr-5 text-right">
+                                            <a class="arrow-button" role="button"
+                                                (click)="plusChecklistSlides(-1,item.files)">&#10094;</a>
+                                        </div>
+                                        <div class="col-sm-10" width="100%">
+                                            <ng-container *ngFor="let file of item.files;let in = index">
+                                                <img *ngIf="file.visible == true" src="{{file.imageDataUrl}}"
+                                                    width="100%" height="300" alt="No Image" />
+                                            </ng-container>
+                                        </div>
+                                        <div class="col-sm-1 text-left">
+                                            <a class="arrow-button" role="button"
+                                                (click)="plusChecklistSlides(1,item.files)">&#10095;</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </ng-container>
+            </div>
+        </div>
+        <div class="row " *ngIf="testRunCompareJson.imageList && testRunCompareJson.imageList.length > 0">
+            <div class="col-sm-12"> <strong class="strong">Screenshot Image</strong></div>
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div *ngIf="testRunCompareJson.imageList.length > 0">
+                            <div class="dt-desc" style="padding: 0px;padding-left: 1%; overflow-x:auto;">
+                                <div class="dt-desc dy-ui">
+                                    <table class="table-striped table-bordered" style="width: 100%;">
+                                        <thead>
+                                            <th>Sl. No</th>
+                                            <th>File Name</th>
+                                            <th>Action</th>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let file of testRunCompareJson.imageList ; let i = index ">
+                                                <td>{{i+1}}</td>
+                                                <td><label>{{file.fileName}}</label></td>
+                                                <td>
+                                                    <a container="body" href="javascript:;"
+                                                        class="crm-action-view text-muted text-warning"
+                                                        (click)="view(file.filePath,true)" data-ng-open="modalSmall"
+                                                        placement="top" ngbTooltip="View">
+                                                        <i style="font-size: 20px" class="icofont icofont-eye-alt"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row " *ngIf="testRunCompareJson.videoList && testRunCompareJson.videoList.length > 0">
+            <div class="col-sm-12"><strong class="strong">Recorded Video</strong></div>
+            <div class="col-sm-12">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div *ngIf="testRunCompareJson.videoList.length > 0">
+                            <table id="testcase-table-urlList" class="table">
+                                <thead class="panel-heading">
+                                    <tr class="w-100">
+                                        <td class="w-10"><label class="strong">Sl. No</label></td>
+                                        <td class="w-40"><label class="strong">File Name</label></td>
+                                        <td class="w-40"><label class="strong">Action</label></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let file of testRunCompareJson.videoList ; let i = index ">
+                                        <td class="w-10">{{i+1}}</td>
+                                        <td class="w-40"><label>{{file.fileName}}</label></td>
+                                        <td class="w-40">
+                                            <a container="body" href="javascript:;"
+                                                class="crm-action-view text-muted text-warning"
+                                                (click)="view(file.filePath,false)" data-ng-open="modalSmall"
+                                                placement="top" ngbTooltip="View">
+                                                <i style="font-size: 20px" class="icofont icofont-eye-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row " *ngIf="testRunCompareJson.fileCountFlag">
+            <div class="col-sm-12"> <strong class="strong">View Uploaded Files</strong></div>
+            <div class="col-sm-12 p-0">
+                <app-file-upload-for-doc #fileupload [multiple]=false
+                    [uniqueCodeForAudit]="testRunCompareJson.testCaseCode" [onlyView]=true [documentCode]="category">
+                </app-file-upload-for-doc>
+            </div>
+        </div>
+        <div *ngIf="testRunCompareJson.files  && testRunCompareJson.files.length>0" class="row ">
+            <div class="col-sm-12"><strong class="strong">Uploaded Image</strong></div>
+            <div class="col-sm-12  text-center">
+                <div *ngIf="testRunCompareJson.files.length >0 " class="row">
+                    <div class="col-sm-2 pr-5 text-right">
+                        <a class="arrow-button" role="button"
+                            (click)="plusSlides(-1,testRunCompareJson.files)">&#10094;</a>
+                    </div>
+                    <div class="col-sm-8">
+                        <ng-container *ngFor="let file of testRunCompareJson.files;let in = index">
+                            <img class="img-thumbnail" *ngIf="file.visible == true" src="{{file.imageDataUrl}}"
+                                height="300" alt="No Image" />
+                        </ng-container>
+                    </div>
+                    <div class="col-sm-2 text-left">
+                        <a class="arrow-button" role="button"
+                            (click)="plusSlides(1,testRunCompareJson.files)">&#10095;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-container>
+    <div class="row">
+        <div class="col-sm-12">
+            <app-view-form [inputField]='this.testCaseDetail'></app-view-form>
+        </div>
+        <div class="col-sm-12">
+            <app-individual-audit-trail [permission]="category" [id]="id"></app-individual-audit-trail>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-sm-12">
+            <app-document-forum [constant]="category" [id]="id"></app-document-forum>
+        </div>
+    </div>
+
+</ng-container>

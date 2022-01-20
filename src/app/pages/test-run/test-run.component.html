@@ -1,0 +1,318 @@
+<div *ngIf="!viewTestRunFlag" class="col-sm-12">
+  <div class="col-sm-12">
+    <form-wizard id="test-run-form-wizard" #formWizard (onStepChanged)="onStepChange($event.title)">
+      <wizard-step [hidden]="this.onlyView" [title]="!this.model.id?'Create Test Run':'Edit Test Run'" id="create"
+        [isValid]="this.model.id!=0">
+        <br>
+        <form *ngIf="this.title=='Create Test Run' || this.title=='Edit Test Run'" [formGroup]="testRunGroup">
+          <div class="row">
+            <label class="col-sm-12" for="testRunNameId">Test Run Name<span class="asterisk required">*</span></label>
+            <div class="col-sm-12">
+              <input type="text" formControlName="testRunName" class="form-control"
+                (blur)="checkTestRunName(testRunGroup.get('testRunName').value)" name="testRunNameName"
+                id="testRunNameId" maxlength="249" placeholder="Test run name" required>
+              <div class="messages text-danger"
+                *ngIf="(testRunGroup.get('testRunName').touched || submitted) && testRunGroup.get('testRunName').hasError('required')">
+                Please enter Test run name</div>
+              <div class="messages text-danger" *ngIf="this.testRunNameMessage">
+                {{testRunNameMessage}}</div>
+            </div>
+          </div><br>
+          <div class="row">
+            <label class="col-sm-12" for="descriptionId">Test Run Description
+              <ui-switch ng-model="all" (click)="this.toggle= !this.toggle;" id="ui-switch" [checked]="toggle"
+                class="js-small" color="#3498DB" switchColor="#fff" size="small">
+              </ui-switch>
+              <label [class]="toggle?'text-danger':'text-success'">Enable Advance
+                Editor</label>
+            </label>
+            <div class="col-sm-12">
+              <div *ngIf="toggle">
+                <ckeditor [config]="this.configService.helper.editConfigOfCkEditior"
+                  [disabled]="model.preApprovalFlag?this.model.workFlowCompletionFlag:false" name="description"
+                  id="descriptionId" formControlName="testRunDescription">
+                </ckeditor>
+              </div>
+              <textarea *ngIf="!toggle" class="form-control max-textarea"
+                [disabled]="model.preApprovalFlag?this.model.publishFlag:false" formControlName="testRunDescription"
+                id="descriptionId" rows="10" name="description"></textarea>
+            </div>
+          </div><br>
+          <div class="row">
+            <label class="col-sm-12" for="usersId">Assigned To<span class="asterisk required">*</span></label>
+            <div class="col-sm-12">
+              <angular2-multiselect name="usersData" [data]="userList" id="usersId" formControlName="users" required
+                [settings]="dropdownSettings">
+              </angular2-multiselect>
+              <div class="messages text-danger"
+                *ngIf="(testRunGroup.get('users').touched && (!testRunGroup.get('users').value || testRunGroup.get('users').value.length==0 )|| submitted && (!testRunGroup.get('users').value || testRunGroup.get('users').value.length==0 ) )">
+                Please select users</div>
+            </div>
+          </div><br>
+          <div class="row">
+            <label class="col-sm-12" for="">Target Date<span class="asterisk required">*</span></label>
+            <div class="col-sm-12">
+              <my-date-picker (keypress)="$event.preventDefault();" name="targetDate" formControlName="targetDate" #date
+                (click)="openBtnClicked()" placeholder="Target Date" [options]="myDatePickerOptions" required>
+              </my-date-picker>
+              <div class="messages text-danger"
+                *ngIf="(testRunGroup.get('targetDate').touched || submitted) && testRunGroup.get('targetDate').hasError('required')">
+                Please select target date</div>
+            </div>
+          </div><br>
+          <div class="row">
+            <label class="col-sm-12 form-control-label" for="ui-switch-execution">Execution Mode :
+              Parallel
+              <ui-switch ng-model="all"
+                (click)="testRunGroup.get('documentSequence').value= !testRunGroup.get('documentSequence').value;"
+                id="ui-switch-execution" formControlName="documentSequence"
+                [disabled]="model.preApprovalFlag?this.model.publishFlag:false"
+                [checked]="testRunGroup.get('documentSequence').value" class="js-small" color="#3498DB"
+                switchColor="#fff" size="small">
+              </ui-switch> Sequential
+            </label>
+          </div><br>
+          <div class="row">
+            <label class="col-sm-12 form-control-label" for="ui-switch-execution">Is Pre Approval
+              required :
+              <ui-switch ng-model="all"
+                (click)="testRunGroup.get('preApprovalFlag').value= !testRunGroup.get('preApprovalFlag').value;"
+                id="ui-switch-preApprovalFlag" formControlName="preApprovalFlag" [disabled]="this.model.buttonDisable"
+                [checked]="testRunGroup.get('preApprovalFlag').value" class="js-small" color="#3498DB"
+                switchColor="#fff" size="small">
+              </ui-switch>
+            </label>
+          </div><br>
+          <div class="row">
+            <label class="col-sm-12">Active Flag
+              <ui-switch ng-model="all"
+                (click)="testRunGroup.get('activeFlag').value= !testRunGroup.get('activeFlag').value;" id="ui-switch"
+                formControlName="activeFlag" [checked]="testRunGroup.get('activeFlag').value" class="js-small"
+                color="#3498DB" switchColor="#fff" size="small">
+              </ui-switch>
+            </label>
+          </div>
+        </form>
+      </wizard-step>
+
+      <wizard-step [hidden]="this.onlyView" [title]="'Select Test Case'" id="testCase" [isValid]="this.showPublish">
+        <br>
+        <div class="row">
+          <div class="col-sm-12">
+            <label> Search Test Case : <input type="search" [(ngModel)]="filterQueryTestRun" name="search"
+                (blur)="this.selectAll=false;" (ngModelChange)="onSearch();"
+                class="form-control input-sm full-data-search" placeholder="Search"></label>
+            <strong class="strong float-right">
+              <label class="m-r-20">Test Run Name : {{this.model.testRunName}}</label>|<label class="m-l-20">Total
+                Selected : {{totalSelected}}</label>
+            </strong>
+          </div>
+          <div class="col-sm-12 m-t-10">
+            <div class="row">
+              <div class="col-sm-6">
+                <div class="row m-b-10">
+                  <div class="col-sm-6">
+                    <strong class="strong">All Test Cases</strong>
+                  </div>
+                  <div class="col-sm-6">
+                    <button type="button" (click)="selectTestCases(true);"
+                      class="btn btn-xs btn-warning waves-effect waves-light">Select All</button>
+                  </div>
+                </div>
+                <div class="list-area">
+                  <ng-container *ngFor="let item of unSelectedTestCaseList; let i = index;">
+                    <ul class="testCase-item" (click)="selectTestCase(item);">
+                      {{item.testCaseCode}} | {{item.description}}</ul>
+                    <hr class="dotted-hr-line">
+                  </ng-container>
+                </div>
+              </div>
+              <div class="col-sm-6">
+                <div class="row m-b-10">
+                  <div class="col-sm-6">
+                    <strong class="strong">Selected Test Cases</strong>
+                  </div>
+                  <div class="col-sm-6">
+                    <button type="button" (click)="selectTestCases(false);"
+                      class="btn btn-xs btn-warning waves-effect waves-light">Deselect All</button>
+                  </div>
+                </div>
+                <div class="panel panel-default list-area" dnd-sortable-container [sortableData]="selectedTestCaseList"
+                  droppable [dropScope]="[]">
+                  <div class="panel-body">
+                    <ul id="drag-drop-test-run-id">
+                      <ng-container *ngFor="let item of selectedTestCaseList; let i = index;">
+                        <li [draggable] dnd-sortable [sortableIndex]="i" [dragData]="item"
+                          [class]="!item.canRemove?'testCase-item text-muted':'testCase-item'"
+                          (click)="selectTestCase(item);" (onDrag)="resetTheView();"
+                          [dragEnabled]="item.checked && item.canRemove && this.model.documentSequence"
+                          (onDropSuccess)="onDropSuccess(selectedTestCaseList);">
+                          {{item.testCaseCode}} | {{item.description}}
+                        </li>
+                        <hr class="dotted-hr-line">
+                      </ng-container>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </wizard-step>
+
+      <wizard-step [title]="'Summary'" id="summary" (onComplete)="viewTestRun()">
+        <ng-container *ngIf=" this.title=='Summary' && this.model.publishFlag && !this.model.workFlowCompletionFlag">
+          <app-individual-document-workflow [permissionConstant]="this.model.testRunType"
+            [documentPrimaryKey]="this.model.id" (onRejectDocument)="reload();" (onClose)="reload();">
+          </app-individual-document-workflow>
+        </ng-container>
+        <br>
+        <div *ngIf="(!this.model.publishFlag || (this.model.publishFlag && this.model.workFlowCompletionFlag))"
+          class="container">
+          <br>
+          <button id="publish-test-case-id" class="btn  btn-sm btn-warning float-right"
+            *ngIf="showPublish && !this.model.publishFlag && permission.userInWorkFlow &&(permission.publishButtonFlag || permission.publishButtonFlag)&& this.model.preApprovalFlag"
+            (click)="publish(this.model.id,'Summary')">Publish</button>
+          <div class="row">
+            <strong class="col-sm-12 strong">Test Run Name</strong>
+            <div class="col-sm-12">{{this.model.testRunName}}</div>
+          </div><br>
+          <hr>
+          <div class="row">
+            <strong class="col-sm-12 strong">Test Run Description</strong>
+            <div class="col-sm-12">
+              <ckeditor *ngIf="this.model.testRunDescription" [config]="this.configService.helper.viewConfigOfCkEditior"
+                name="description" [(ngModel)]="this.model.testRunDescription"></ckeditor>
+            </div>
+          </div><br>
+          <hr>
+          <div class="row">
+            <strong class="col-sm-12 strong">Assigned To</strong>
+            <div class="col-sm-12">
+              <ng-container *ngFor="let data of this.model.users; let in=index">
+                {{data.itemName}}<span *ngIf="!(in+1==this.model.users.length)">,</span>
+              </ng-container>
+            </div>
+          </div><br>
+          <hr>
+          <div class="row">
+            <strong class="col-sm-12 strong">Target Date</strong>
+            <div class="col-sm-12">{{this.model.targetDateView}}</div>
+          </div><br>
+          <hr>
+          <div class="row">
+            <strong class="col-sm-12 strong">Total Test Case</strong>
+            <div class="col-sm-12">
+              {{this.totalSelected}}
+            </div>
+          </div><br>
+          <hr>
+          <div class="row">
+            <strong class="col-sm-12 strong">Execution Mode</strong>
+            <div class="col-sm-12">
+              {{this.model.documentSequence?'Sequential':'Parallel'}}
+            </div>
+          </div><br>
+          <hr>
+          <div class="row">
+            <strong class="col-sm-12 strong">Is Pre Approval required</strong>
+            <div class="col-sm-12">
+              {{this.model.preApprovalFlag?'Yes':'No'}}
+            </div>
+          </div><br>
+          <hr>
+          <div class="row">
+            <strong class="col-sm-12 strong">Test Cases</strong>
+            <div class="col-sm-12">
+              <ng-container *ngFor="let data of this.testCaseMasterList; let in=index">
+                <label *ngIf="data.checked"><span
+                    class="badge badge-pill badge-primary">{{data.testCaseCode}}</span></label>
+              </ng-container>
+            </div>
+          </div><br>
+        </div>
+      </wizard-step>
+    </form-wizard>
+  </div>
+</div>
+
+<div *ngIf="viewTestRunFlag" class="col-sm-12">
+  <div class="row">
+    <div class="col-sm-12">
+      <label class="col-form-label float-right">Search
+        <input type="search" [(ngModel)]="filterQueryTestRun"
+          (ngModelChange)="this.configService.helper.setPaginator(table)" class="form-control input-sm full-data-search"
+          placeholder="search"></label>
+    </div>
+    <div class="col-sm-12">
+      <ngx-datatable #testRunTable class="data-table dt-chk" [rows]='testRunList | testRunFilter : filterQueryTestRun'
+        [limit]="30" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]='"auto"'
+        [loadingIndicator]='loading' [scrollbarH]="true">
+        <ngx-datatable-column style="font-weight: bold;" name="Test Run Name">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['testRunName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Total Number of Test Case">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['totalNumberOfTestCase']}} </strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Target date">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['targetDateView']}} </strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Execution Mode">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['documentSequence']?'Sequential':'Parallel'}} </strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Is Pre Approval required">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['preApprovalFlag']?'Yes':'No'}} </strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Document Status">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['approvalStatus']}} </strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Assigned To">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>
+              <ng-container *ngFor="let data of row.users;let tableIndex = index">
+                {{data.itemName}}<span *ngIf="tableIndex!=row.users.length-1">,</span>
+              </ng-container>
+            </strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Action">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <a container="body" role="button" href="javascript:;" class="crm-action-view text-muted text-warning"
+              data-ng-open="modalSmall" placement="top" (click)="editTestRun(row.id,false,'Edit Test Run')"
+              ngbTooltip="Edit">
+              <i class="icofont icofont-edit edit"></i>
+            </a> &nbsp;
+            <a container="body" href="javascript:;" class="crm-action-edit text-muted text-primary"
+              *ngIf="permission.userInWorkFlow && permission.createButtonFlag" placement="top" ngbTooltip="Copy"
+              (click)="cloneSwalForTestRun(row.id)">
+              <i class="icofont icofont-copy copy"></i>
+            </a> &nbsp;
+            <a container="body" role="button" href="javascript:;" class="crm-action-view text-muted text-warning"
+              data-ng-open="modalSmall" placement="top"
+              (click)="editTestRun(row.id,true,'Summary');showPublish=row.totalNumberOfTestCase>0" ngbTooltip="View">
+              <i class="icofont icofont-resize view"></i>
+            </a> &nbsp;
+            <a container="body" *ngIf="row.preApprovalFlag && row.workFlowCompletionFlag" href="javascript:;"
+              class="crm-action-success text-muted text-success" (click)="downloadFile(row);" placement="top"
+              ngbTooltip="Pdf Download">
+              <i class="fa fa-file-pdf-o" style="color: red;font-size: 17px;"></i></a>&nbsp;
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="testRunSpinnerFlag" class="loading">Loading&#8230;</div>

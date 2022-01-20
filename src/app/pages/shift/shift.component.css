@@ -1,0 +1,8 @@
+table#shift-add-table tbody th,
+table#shift-add-table tbody td {
+  white-space: unset;
+  width: 33%;
+}
+table#shift-add-table,table#shift-add-table td{
+    border: 1px solid black;
+}

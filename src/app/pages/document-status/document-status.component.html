@@ -1,0 +1,874 @@
+<!--<div>
+    <app-card [title]="''">
+        <div >
+            <div>
+              <div></div>
+            </div>
+            <div >
+              <div style="text-align: right;">
+                <label>Search: 
+                  <select name="select" class="form-control input-sm full-data-search" id="apiConfigurationId"
+                  required [(ngModel)]="Title" name="Title" #role="ngModel" (ngModelChange)="onChange(Title)">
+                  <option value="0"  selected>Select Document</option>
+                  <option *ngFor="let doc of docItemList" [ngValue]="doc">{{doc.name}}</option>
+                </select>
+                </label>
+              </div>
+            </div>
+          </div>
+      <br>
+        <ngb-tabset #t="ngbTabset">
+        <ngb-tab title="Pending Documents" id="tab-selectbyid1">                 
+        <ng-template ngbTabContent>
+           info card start 
+          <div class="card">
+            <div class="card-body user-desc">
+             <div style="text-align: Right;" *ngIf="this.pendingDocList!=''">
+                <button *ngIf=" this.model.workFlowButtonFlag" type="button" class=" m-r-15 btn btn-success"  (click)="onSelect($event,this.helper.ReviewPending);">
+                  <i class="icofont icofont-plus-circle"></i> Review All
+                </button>
+                <button *ngIf=" this.model.workFlowButtonFlag" type="button" class="btn btn-primary"  (click)="onSelect($event,this.helper.ReviewCompeletedOrApprovePending);">
+                  <i class="icofont icofont-plus-circle"></i> Approve All
+                </button>
+              </div>
+              <br>
+              <ngx-datatable #myTable class="data-table dt-chk"
+                [rows]='pendingDocList'
+                [limit]="rowsOnPage" [headerHeight]="50" [footerHeight]="50"
+                [rowHeight]="'auto'">  Row Detail Template 
+              <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+              <ng-template let-row="row" let-expanded="expanded"
+                ngx-datatable-row-detail-template>
+              <div class="dt-desc">
+                <table class="table-striped table-bordered">
+                    <tr>
+                      <th colspan="2"><strong>Document Details</strong></th>     
+                    </tr>
+                    <tr>
+                      <td class="fontStyle">Document Type </td>
+                      <td class="fontStyle">{{row.type}}</td>
+                    </tr>
+                    <tr>
+                        <td class="fontStyle">Created By</td>
+                        <td class="fontStyle">{{row.createdBy}}</td>
+                      </tr>
+                      <tr>
+                          <td class="fontStyle">Last Modified Date</td>
+                          <td class="fontStyle">{{row.lastUpdatedTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+                        </tr>
+                      <tr *ngIf='row.reviewdBy!=""'>
+                          <td class="fontStyle">Reviewed By</td>
+                          <td class="fontStyle">{{row.reviewdBy}}</td>
+                        </tr>
+                        <tr *ngIf="row.reviewdDate!=null">
+                            <td class="fontStyle">Reviewed Date</td>
+                            <td class="fontStyle">{{row.reviewdDate | date :'dd-MM-yyyy hh:mm a'}}</td>
+                          </tr>                    
+                  </table> 
+              </div>
+              </ng-template> </ngx-datatable-row-detail> <ngx-datatable-column [width]="100" [resizeable]="false"
+                [sortable]="false" [resizeable]="false" [sortable]="false"
+                [draggable]="false" [canAutoResize]="true">
+              <ng-template let-row="row" let-expanded="expanded"
+                ngx-datatable-cell-template> <a href="javascript:;"
+                [class.datatable-icon-right]="!expanded"
+                [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" 
+                (click)="toggleExpandRow(row)"> </a> </ng-template> </ngx-datatable-column> 
+                 <ngx-datatable-column
+                [resizeable]="true" [sortable]="true" name="Id">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['code']}}</strong> </ng-template> </ngx-datatable-column> <ngx-datatable-column
+                [resizeable]="true" [sortable]="true" name="Document Title">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['name']}}</strong> </ng-template> </ngx-datatable-column> <ngx-datatable-column
+                [width]="3" [resizeable]="true" [sortable]="true" name="Status">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['status']}}</strong> </ng-template> </ngx-datatable-column>             
+              <ngx-datatable-column
+              name="Action"> <ng-template let-row="row"
+              ngx-datatable-cell-template>
+              <ng-template #popContent>
+                <div><b>Document Type :</b>&nbsp; {{row['type']}}</div>
+                <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                <div><b>Last Modified On : </b>{{row['lastUpdatedTime'] | date:'dd-MM-yy hh:mm a'}}</div>
+                </ng-template>  
+                <a  href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"  (click)="modalOverflow.show();loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info" >
+                  <i  class="icofont icofont-info-square"></i>
+                </a>
+              <a *ngIf="model.viewButtonFlag" href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" (click)="viewRowDetails(row.type,row.id);" data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                <i  class="icofont icofont-resize"></i>
+              </a>
+           
+            </ng-template> </ngx-datatable-column>
+               </ngx-datatable>
+              <br>
+                    <div>
+                      <div>
+                        <div></div>
+                      </div>
+                      <div>
+                        <div style="text-align: right;">
+                          <label><button *ngIf="approvedFlag" (click)="downloadFile('approved')"
+                              class="btn btn-primary">Export to excel</button> </label>
+                        </div>
+                      </div>
+                    </div>
+            </div>
+          </div>       
+        </ng-template> </ngb-tab>
+
+            <!-- <ngb-tab title="Pending Documents" id="tab-selectbyid1"> <ng-template
+              ngbTabContent>
+            <div class="m-t-15">
+        
+              <div class="card">
+            <ngx-datatable #myTable
+            class="data-table expandable "
+            [rows]="pendingDocList"
+            [columnMode]="'force'"
+            [headerHeight]="50"
+            [footerHeight]="50"
+            [rowHeight]="'auto'"
+            [limit]="10"
+            >
+            <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>                   
+                <ng-template let-row="row" let-expanded="expanded"
+                  ngx-datatable-row-detail-template>
+                <div class="dt-desc">
+                  <table class="table-striped table-bordered">
+                    <tr>
+                      <th colspan="2"><strong>Document Details</strong></th>     
+                    </tr>
+                    <tr>
+                      <td class="fontStyle">Document Type </td>
+                      <td class="fontStyle">{{row.type}}</td>
+                    </tr>
+                    <tr>
+                        <td class="fontStyle">Created By</td>
+                        <td class="fontStyle">{{row.createdBy}}</td>
+                      </tr>
+                      <tr>
+                          <td class="fontStyle">Last Modified Date</td>
+                          <td class="fontStyle">{{row.lastUpdatedTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+                        </tr>
+                      <tr *ngIf='row.reviewdBy!=""'>
+                          <td class="fontStyle">Reviewed By</td>
+                          <td class="fontStyle">{{row.reviewdBy}}</td>
+                        </tr>
+                        <tr *ngIf="row.reviewdDate!=null">
+                            <td class="fontStyle">Reviewed Date</td>
+                            <td class="fontStyle">{{row.reviewdDate | date :'dd-MM-yyyy hh:mm a'}}</td>
+                          </tr>                    
+                  </table>       
+                </div>
+                </ng-template> </ngx-datatable-row-detail><ngx-datatable-column [width]="100" [resizeable]="false"
+                [sortable]="false" [resizeable]="false" [sortable]="false"
+                [draggable]="false" [canAutoResize]="true">
+              <ng-template let-row="row" let-expanded="expanded"
+                ngx-datatable-cell-template> <a href="javascript:;"
+                [class.datatable-icon-right]="!expanded"
+                [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" 
+                (click)="toggleExpandRow(row)"> </a> </ng-template> </ngx-datatable-column> 
+
+            <ngx-datatable-column
+                    [resizeable]="true" [sortable]="true" name="Id">
+                  <ng-template let-row="row"  ngx-datatable-cell-template>
+                      
+                  <strong class="fontStyle">{{row['code']}}</strong> </ng-template> </ngx-datatable-column>
+                  <ngx-datatable-column
+                  [resizeable]="true" [sortable]="true" name="Document Title">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                {{row['name']}}</ng-template> </ngx-datatable-column>
+            <ngx-datatable-column
+                    [width]="3" [resizeable]="true" [sortable]="true" name="Status">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong class="fontStyle">{{row['status']}}</strong> </ng-template> </ngx-datatable-column>
+
+                  <ngx-datatable-column
+                    name="Action"> <ng-template let-row="row"
+                    ngx-datatable-cell-template>
+                    <a *ngIf="model.viewButtonFlag" href="javascript:;" class="crm-action-view text-muted text-warning" (click)="viewRowDetails(row.type,row.id);" data-ng-open="modalSmall">
+                      <i  class="icofont icofont-resize"></i>
+                    </a>
+                  </ng-template> </ngx-datatable-column>
+          </ngx-datatable>
+              </div>
+            </div>
+            </ng-template> </ngb-tab>  
+
+          <ngb-tab title="Approved Documents" id="tab-selectbyid2">
+        <ng-template ngbTabContent>
+        <div class="m-t-15">
+        
+          <div class="card">
+            <div class="card-body user-desc">
+              <ngx-datatable #myTable class="data-table dt-chk"
+                [rows]='approvedDocList'
+                [limit]="rowsOnPage" [headerHeight]="50" [footerHeight]="50"
+                [rowHeight]="'auto'"> 
+              <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+              <ng-template let-row="row" let-expanded="expanded"
+                ngx-datatable-row-detail-template>
+              <div class="dt-desc">
+                <table class="table-striped table-bordered">
+                  <tr>
+                    <th colspan="2"><strong>Document Details</strong></th>
+                  </tr>                      
+                      <tr>
+                          <td class="fontStyle">Document Type </td>
+                          <td class="fontStyle">{{row.type}}</td>
+                        </tr>
+                        <tr>
+                            <td class="fontStyle">Created By</td>
+                            <td class="fontStyle">{{row.createdBy}}</td>
+                          </tr>
+                          <tr>
+                              <td class="fontStyle">Last Modified Date</td>
+                              <td class="fontStyle">{{row.lastUpdatedTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+                            </tr>
+                          <tr *ngIf="row.reviewdBy!=''">
+                              <td class="fontStyle">Reviewed By</td>
+                              <td class="fontStyle">{{row.reviewdBy}}</td>
+                            </tr>
+                            <tr *ngIf="row.reviewdDate!=null">
+                                <td class="fontStyle">Reviewed Date</td>
+                                <td class="fontStyle">{{row.reviewdDate | date :'dd-MM-yyyy hh:mm a'}}</td>
+                              </tr>                        
+                            <tr *ngIf="row.approvedBy!=''"> 
+                                <td class="fontStyle">Approved By</td>
+                                <td class="fontStyle">{{row.approvedBy}}</td>
+                              </tr>
+                              <tr *ngIf="row.approvedDate!=null && row.approvedDate!= ''">
+                                  <td class="fontStyle">Approved Date</td>
+                                  <td class="fontStyle">{{row.approvedDate | date :'dd-MM-yyyy hh:mm a'}}</td>
+                                </tr>
+                </table>
+              </div>
+              </ng-template> </ngx-datatable-row-detail> <ngx-datatable-column [width]="100" [resizeable]="false"
+                [sortable]="false" [resizeable]="false" [sortable]="false"
+                [draggable]="false" [canAutoResize]="true">
+              <ng-template let-row="row" let-expanded="expanded"
+                ngx-datatable-cell-template> <a href="javascript:;"
+                [class.datatable-icon-right]="!expanded"
+                [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" 
+                (click)="toggleExpandRow(row)"> </a> </ng-template> </ngx-datatable-column> 
+                 <ngx-datatable-column
+                [resizeable]="true" [sortable]="true" name="Id">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['code']}}</strong> </ng-template> </ngx-datatable-column> <ngx-datatable-column
+                [resizeable]="true" [sortable]="true" name="Document Title">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['name']}}</strong> </ng-template> </ngx-datatable-column> <ngx-datatable-column
+                [width]="3" [resizeable]="true" [sortable]="true" name="Status">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['status']}}</strong> </ng-template> </ngx-datatable-column>
+             
+              <ngx-datatable-column
+              name="Action"> <ng-template let-row="row"
+              ngx-datatable-cell-template>
+              <ng-template #popContent>
+                <div><b>Document Type :</b>&nbsp; {{row['type']}}</div>
+                <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                <div><b>Last Modified On : </b>{{row['lastUpdatedTime'] | date:'dd-MM-yy hh:mm a'}}</div>
+                </ng-template>  
+                <a  href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"  (click)="modalOverflow.show();loadDocumentCommentLog(row)"placement="top" ngbTooltip="Info"  >
+                  <i  class="icofont icofont-info-square"></i>
+                </a>
+              <a *ngIf="model.viewButtonFlag" href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" (click)="viewRowDetails(row.type,row.id);" data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                <i  class="icofont icofont-resize"></i>
+              </a>
+        
+            </ng-template> </ngx-datatable-column>
+               </ngx-datatable>
+              <br>
+                    <div>
+                      <div>
+                        <div></div>
+                      </div>
+                      <div>
+                        <div style="text-align: right;">
+                          <label><button *ngIf="approvedFlag" (click)="downloadFile('approved')"
+                              class="btn btn-primary">Export to excel</button> </label>
+                        </div>
+                      </div>
+                    </div>
+            </div>
+          </div>
+        </div>
+        </ng-template> </ngb-tab>
+         <ngb-tab title="Declined Documents" id="tab-selectbyid3"> <ng-template
+          ngbTabContent>
+        <div class="m-t-15">       
+          <div class="card">
+            <div class="card-body user-desc">
+              <ngx-datatable #myTable class="data-table expandable"
+                [rows]='declinedDoclist'
+                [limit]="rowsOnPage" [headerHeight]="50" [footerHeight]="50"
+                [rowHeight]="'auto'"> 
+              <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+              <ng-template let-row="row" let-expanded="expanded"
+                ngx-datatable-row-detail-template>
+              <div class="dt-desc">
+                <table class="table-striped table-bordered">
+                  <tr>
+                    <th colspan="2"><strong>Document Details</strong></th>
+                  </tr>
+                  <tr>
+                      <td class="fontStyle">Document Type </td>
+                      <td class="fontStyle">{{row.type}}</td>
+                    </tr>
+                    <tr>
+                        <td class="fontStyle">Created By</td>
+                        <td class="fontStyle">{{row.createdBy}}</td>
+                      </tr>
+                      <tr>
+                          <td class="fontStyle">Last Modified Date</td>
+                          <td class="fontStyle">{{row.lastUpdatedTime| date :'dd-MM-yyyy hh:mm a'}}</td>
+                        </tr>
+                      <tr>
+                          <td class="fontStyle">Reviewed By</td>
+                          <td class="fontStyle">{{row.reviewdBy}}</td>
+                        </tr>
+                        <tr>
+                            <td class="fontStyle">Reviewed Date</td>
+                            <td class="fontStyle">{{row.reviewdDate | date :'dd-MM-yyyy hh:mm a'}}</td>
+                          </tr>                        
+                        <tr *ngIf="row.approvedBy!=''"> 
+                            <td class="fontStyle">Declined By</td>
+                            <td class="fontStyle">{{row.approvedBy}}</td>
+                          </tr>
+                          <tr *ngIf="row.approvedDate!=''">
+                              <td class="fontStyle">Declined Date</td>
+                              <td class="fontStyle">{{row.approvedDate | date :'dd-MM-yyyy hh:mm a'}}</td>
+                            </tr>             
+                </table>
+              </div>
+              </ng-template> </ngx-datatable-row-detail> <ngx-datatable-column [width]="100" [resizeable]="false"
+                [sortable]="false" [resizeable]="false" [sortable]="false"
+                [draggable]="false" [canAutoResize]="true">
+              <ng-template let-row="row" let-expanded="expanded"
+                ngx-datatable-cell-template> <a href="javascript:;"
+                [class.datatable-icon-right]="!expanded"
+                [class.datatable-icon-down]="expanded" title="Expand/Collapse Row"
+                (click)="toggleExpandRow(row)"> </a> </ng-template> </ngx-datatable-column> 
+                 <ngx-datatable-column
+                [resizeable]="true" [sortable]="true" name="Code">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['code']}}</strong> </ng-template> </ngx-datatable-column> <ngx-datatable-column
+                [resizeable]="true" [sortable]="true" name="Name">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['name']}}</strong> </ng-template> </ngx-datatable-column> <ngx-datatable-column
+                [width]="3" [resizeable]="true" [sortable]="true" name="Status">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['status']}}</strong> </ng-template> </ngx-datatable-column> 
+              <ngx-datatable-column
+              name="Action"> <ng-template let-row="row"
+              ngx-datatable-cell-template>
+              <a  *ngIf="model.viewButtonFlag" href="javascript:;" class="crm-action-view text-muted text-warning" (click)="viewRowDetails(row.type,row.id);" data-ng-open="modalSmall">
+                <i  class="icofont icofont-resize"></i>
+              </a>     
+            </ng-template> </ngx-datatable-column> </ngx-datatable>
+              <br>
+                    <div>
+                      <div>
+                        <div></div>
+                      </div>
+                      <div>
+                        <div style="text-align: right;">
+                          <label><button *ngIf="declinedFlag" (click)="downloadFile('declined')"
+                              class="btn btn-primary">Export to excel</button> </label>
+                        </div>
+                      </div>
+                    </div>
+            </div>
+          </div>   
+        </div>
+        </ng-template> </ngb-tab> 
+      </ngb-tabset> 
+    </app-card>
+</div>
+
+<app-card *ngIf="(this.viewIndividualData==true && (this.docType =='IQTC'||this.docType =='OQTC'||this.docType =='PQTC'))" [blockClass]="'accordion-block scale-accordion'">
+    <div><br><h4>&nbsp;&nbsp;Test Case Details
+        <div style="float: right;" *ngIf="(popupdata[0].reviewFlag  && this.StatusValue==1)"  >
+            <button   *ngIf="popupdata[0].reviewFlag" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'2')">Review</button>
+          &nbsp;&nbsp;<button  *ngIf="popupdata[0].reviewFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'4')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </div>&nbsp;&nbsp;
+        <div style="float: right;" *ngIf="(popupdata[0].approveFlag && this.StatusValue==2 &&  this.hideButtonFlag)"  >
+            <button *ngIf="popupdata[0].approveFlag" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'3')">Approve</button>
+          &nbsp;&nbsp;	<button *ngIf="popupdata[0].approveFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'5')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+            </div>&nbsp;&nbsp;
+            <a *ngIf="((this.StatusValue==2 || this.StatusValue==3 || this.StatusValue==4)&& !this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+            <a *ngIf="((this.StatusValue==3 || this.StatusValue==4)&& this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </h4>
+        </div> 
+    <br>
+    <squeezebox [multiple]="true" *ngFor="let data of popupdata">  
+        <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-heading accordion-msg">Document Status</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <p><span style="background-color:	#FFFF00">{{data.commonDocumentStatus}}</span></p>
+              </div>
+            </sb-item-body>
+          </sb-item>   
+      <sb-item [collapsed]="false" class="accordion-panel">
+        <sb-item-head class="accordion-msg">Test Id</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p>{{data.testCaseCode}}</p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item [collapsed]="false" class="accordion-panel">
+          <sb-item-head class="accordion-msg">Test Description</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+              <p>{{data.description}}</p>
+            </div>
+          </sb-item-body>
+        </sb-item>
+        <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-msg">URS</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                  <p>{{data.ursNameList}}</p>
+              </div>
+            </sb-item-body>
+          </sb-item>
+        <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-msg">Expected Result</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                  <div class="htmldata" [innerHtml]="data.expectedResult"></div>
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">Actual Result</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                    <div class="htmldata" [innerHtml]="data.actualResult"></div>
+                </div>
+              </sb-item-body>
+            </sb-item>
+        <sb-item class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-msg">Status</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+              <p>{{data.status}}</p>
+            </div>
+          </sb-item-body>
+        </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">Selected Image</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <app-card class="center" style="width:800px;height:500px" *ngIf="data.files != ''">
+            <div style="overflow-y: auto;overflow-x: auto;" *ngFor="let item of data.files;let in = index"> 
+                <a class="prev" (click)="plusSlides(-1)">&#10094;</a>
+              <img  *ngIf="item.visible == true" 
+                src="{{item.imageDataUrl}}" height="500" width="100%" alt=""/>    
+                <a class="next" (click)="plusSlides(1)">&#10095;</a>
+            </div>
+            </app-card>
+                </div>
+              </sb-item-body>
+            </sb-item>
+    </squeezebox>
+    <br><br>
+  </app-card>
+
+<app-card  [blockClass]="'accordion-block scale-accordion'" *ngIf="(this.viewIndividualData==true && this.docType=='riskAssessmentTemplate')">
+    <div><br><h4>&nbsp;&nbsp;Risk Assessment Template Details
+        <div style="float: right;" *ngIf="(model.workFlowButtonFlag  && this.StatusValue==1)"  >
+            <button   *ngIf="model.workFlowButtonFlag" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'2')">Review</button>
+          &nbsp;&nbsp;<button  *ngIf="model.deleteButtonFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'4')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </div>&nbsp;&nbsp;
+        <div style="float: right;" *ngIf="(model.workFlowButtonFlag && this.StatusValue==2 &&  this.hideButtonFlag)"  >
+            <button *ngIf="model.workFlowButtonFlag" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'3')">Approve</button>
+          &nbsp;&nbsp;	<button *ngIf="model.deleteButtonFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'5')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+            </div>&nbsp;&nbsp;
+            <a *ngIf="((this.StatusValue==2 || this.StatusValue==3 || this.StatusValue==4)&& !this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+            <a *ngIf="((this.StatusValue==3 || this.StatusValue==4)&& this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </h4>
+        </div>
+    <br>
+    <squeezebox [multiple]="true" > 
+        <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-heading accordion-msg">Document Status</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                  <p><span style="background-color:	#FFFF00">{{assessmentTemplateModal.commonDocumentStatus}}</span></p>  
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-heading accordion-msg">Title</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                    <p><span >{{assessmentTemplateModal.titledata}}</span></p>  
+                </div>
+              </sb-item-body>
+            </sb-item>
+            <sb-item class="accordion-panel" [collapsed]="false">
+                <sb-item-head class="accordion-heading accordion-msg">Body</sb-item-head>
+                <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                      <div class="htmldata" [innerHtml]="this.assessmentTemplateModal.bodydata" contenteditable="true"></div>
+                  </div>
+                </sb-item-body>
+              </sb-item>
+    </squeezebox>
+  </app-card>
+
+<app-card  [blockClass]="'accordion-block scale-accordion'" *ngIf="(this.viewIndividualData==true && this.docType=='riskAssessment')">
+    <div><br><h4>&nbsp;&nbsp;Risk Assessment Details
+        <div style="float: right;" *ngIf="(model.workFlowButtonFlag  && this.StatusValue==1)"  >
+            <button   *ngIf="model.workFlowButtonFlag" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'2')">Review</button>
+          &nbsp;&nbsp;<button  *ngIf="model.workFlowButtonFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'4')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </div>&nbsp;&nbsp;
+        <div style="float: right;" *ngIf="(model.workFlowButtonFlag && this.StatusValue==2 &&  this.hideButtonFlag)"  >
+            <button *ngIf="model.workFlowButtonFlag" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'3')">Approve</button>
+          &nbsp;&nbsp;	<button *ngIf="model.workFlowButtonFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'5')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+            <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+            </div>&nbsp;&nbsp;
+            <a *ngIf="((this.StatusValue==2 || this.StatusValue==3 || this.StatusValue==4)&& !this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+            <a *ngIf="((this.StatusValue==3 || this.StatusValue==4)&& this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </h4>
+        </div>
+    <br>
+    <squeezebox [multiple]="true" *ngFor="let data of riskAssesmentData">    
+       <sb-item class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg">Document Status</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+                <p><span style="background-color:	#FFFF00">{{data.commonDocumentStatus}}</span></p>  
+            </div>
+          </sb-item-body>
+        </sb-item>
+      <sb-item class="accordion-panel" [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg">Risk Assessment Id</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p>{{data.assessmentCode}}</p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-msg">Risk Factor</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+                <p>{{data.riskFactor}}</p>
+            </div>
+          </sb-item-body>
+        </sb-item>
+        <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-msg">Risk Scenario</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <p>{{data.riskScenario}}</p>
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">URS</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <p>{{data.ursListCommaSeparatedValue}}</p>
+                </div>
+              </sb-item-body>
+            </sb-item>
+      <sb-item [collapsed]="false" class="accordion-panel">
+        <sb-item-head class="accordion-msg">Probable Cause of Risk</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p>{{data.probableCauseOfRisk}}</p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item [collapsed]="false" class="accordion-panel">
+          <sb-item-head class="accordion-msg">Probability Of Occurance</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+              <p>{{data.probabilityOfOccuranceName}}</p>
+            </div>
+          </sb-item-body>
+        </sb-item>
+        <sb-item [collapsed]="false" class="accordion-panel">
+            <sb-item-head class="accordion-msg">Severity</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <p>{{data.severityName}}</p>
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <sb-item [collapsed]="false" class="accordion-panel">
+              <sb-item-head class="accordion-msg">Risk class</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <p>{{data.riskclass}}</p>
+                </div>
+              </sb-item-body>
+            </sb-item>
+            <sb-item [collapsed]="false" class="accordion-panel">
+                <sb-item-head class="accordion-msg">Detectability</sb-item-head>
+                <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                    <p>{{data.detectabilityName}}</p>
+                  </div>
+                </sb-item-body>
+              </sb-item>
+              <sb-item [collapsed]="false" class="accordion-panel">
+                  <sb-item-head class="accordion-msg">Priority</sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <p>{{data.priorityName}}</p>
+                    </div>
+                  </sb-item-body>
+                </sb-item>
+                <sb-item class="accordion-panel" [collapsed]="false">
+                    <sb-item-head class="accordion-msg">Proposed Mitigation</sb-item-head>
+                    <sb-item-body class="accordion-content">
+                      <div class="accordion-desc">
+                          <div class="htmldata" [innerHtml]="data.proposedMitigation"></div>
+                      </div>
+                    </sb-item-body>
+                  </sb-item>
+    </squeezebox>
+  </app-card>
+
+
+<app-card  [blockClass]="'accordion-block scale-accordion'" *ngIf="(this.viewIndividualData==true && this.docType=='URS')">
+  <div><br><h4>&nbsp;&nbsp;User Requirement Specification Details
+      <div style="float: right;" *ngIf="(popupdata[0].reviewFlag  && this.StatusValue==1)"  >
+          <button   *ngIf="popupdata[0].reviewFlag " type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'2')">Review</button>
+          &nbsp;&nbsp;	<button  *ngIf="popupdata[0].reviewFlag " type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'4')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+      <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+      </div>&nbsp;&nbsp;
+      <div style="float: right;" *ngIf="(popupdata[0].approveFlag && this.StatusValue==2 && this.hideButtonFlag)"  >
+          <button *ngIf="popupdata[0].approveFlag" type="submit" class="btn btn-outline-success btn-success btn-round" (click)="changeStatus(!this.approveOrDeclineFlag,'3')">Approve</button>
+          &nbsp;&nbsp;	<button *ngIf="popupdata[0].approveFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'5')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+          <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+          </div>&nbsp;&nbsp; 
+          <a *ngIf="((this.StatusValue==2 || this.StatusValue==3 || this.StatusValue==4)&& !this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+          <a *ngIf="((this.StatusValue==3 || this.StatusValue==4)&& this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </h4>
+      </div>
+  <br>
+  <squeezebox [multiple]="true" *ngFor="let data of popupdata"> 
+    	<sb-item class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-msg">Document Status</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+                <p><span style="background-color:	#FFFF00">{{data.commonDocumentStatus}}</span></p>
+            </div>
+          </sb-item-body>
+        </sb-item>     
+    <sb-item [collapsed]="false" class="accordion-panel">
+      <sb-item-head class="accordion-heading accordion-msg">Id</sb-item-head>
+      <sb-item-body  class="accordion-content">
+        <div class="accordion-desc">
+          <p>{{data.ursCode}}</p>
+        </div>
+      </sb-item-body>
+    </sb-item>
+    <sb-item [collapsed]="false" class="accordion-panel">
+      <sb-item-head class="accordion-msg">Requirement</sb-item-head>
+      <sb-item-body class="accordion-content">
+        <div class="accordion-desc">
+          <p>{{data.ursName}}</p>
+        </div>
+      </sb-item-body>
+    </sb-item>
+    <sb-item [collapsed]="false" class="accordion-panel">
+        <sb-item-head class="accordion-msg">Description</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+              <div class="htmldata" [innerHtml]="data.description"></div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+    <sb-item [collapsed]="false" class="accordion-panel">
+      <sb-item-head class="accordion-msg">Category Name</sb-item-head>
+      <sb-item-body class="accordion-content">
+        <div class="accordion-desc">
+          <p>{{data.categoryName}}</p>
+        </div>
+      </sb-item-body>
+    </sb-item>
+      <sb-item [collapsed]="false" class="accordion-panel">
+          <sb-item-head class="accordion-msg">Priority Name</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+              <p>{{data.priorityName}}</p>
+            </div>
+          </sb-item-body>
+        </sb-item>
+  </squeezebox>
+</app-card>
+
+
+<app-card  [blockClass]="'accordion-block scale-accordion'" *ngIf="(this.viewIndividualData==true && this.docType=='vendorValidation')">
+  <div><br><h4>&nbsp;&nbsp;Vendor Validation Details
+      <div style="float: right;" *ngIf="(model.workFlowButtonFlag  && this.StatusValue==1)"  >
+          <button   *ngIf="model.workFlowButtonFlag" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'2')">Review</button>
+          &nbsp;&nbsp;	<button  *ngIf="model.deleteButtonFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'4')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+      <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+      </div>&nbsp;&nbsp;
+      <div style="float: right;" *ngIf="(model.workFlowButtonFlag && this.StatusValue==2 &&  this.hideButtonFlag)"  >
+          <button *ngIf="model.workFlowButtonFlag" type="submit" class="btn btn-outline-success btn-success btn-round" (click)="changeStatus(!this.approveOrDeclineFlag,'3')">Approve</button>
+          &nbsp;&nbsp;	<button *ngIf="model.deleteButtonFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'5')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+          <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+          </div>&nbsp;&nbsp; 
+          <a *ngIf="((this.StatusValue==2 || this.StatusValue==3 || this.StatusValue==4)&& !this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+          <a *ngIf="((this.StatusValue==3 || this.StatusValue==4)&& this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </h4>
+      </div>
+  <br>
+  <squeezebox [multiple]="true" *ngFor="let data of popupdata"> 
+    	<sb-item class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-msg">Document Status</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+                <p><span style="background-color:	#FFFF00">{{data.commonDocumentStatus}}</span></p>
+            </div>
+          </sb-item-body>
+        </sb-item>   
+    <sb-item [collapsed]="false" class="accordion-panel">
+      <sb-item-head class="accordion-heading accordion-msg">Vendor Validation Id</sb-item-head>
+      <sb-item-body  class="accordion-content">
+        <div class="accordion-desc">
+          <p>{{data.vendorCode}}</p>
+        </div>
+      </sb-item-body>
+    </sb-item>
+    <sb-item [collapsed]="false" class="accordion-panel">
+      <sb-item-head class="accordion-msg">Document Title</sb-item-head>
+      <sb-item-body class="accordion-content">
+        <div class="accordion-desc">
+          <p>{{data.documentName}}</p>
+        </div>
+      </sb-item-body>
+    </sb-item>
+    
+    <sb-item [collapsed]="false" class="accordion-panel">
+        <sb-item-head class="accordion-msg">PDF view</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div  style="background-color: #616161;" *ngIf="this.pdfSrc!=undefined||this.pdfSrc!=null">
+            <br>
+            <div >&nbsp;
+              <button class="btn btn-default btn-outline-default btn-icon" value="Full Screen" appToggleFullscreen><i class="ti-fullscreen"></i></button>&nbsp;
+              <button class="btn btn-default btn-outline-default btn-icon" value="Zoom In" (click)="zoomInPDF(zoom)"><i class="ti-plus"></i></button>&nbsp;
+              <button class="btn btn-default btn-outline-default btn-icon"  value="Zoom Out" (click)="zoomOutPDF(zoom)"><i class="ti-minus"></i></button>&nbsp;
+              <button class="btn btn-default btn-outline-default btn-icon"  value="Reset" (click)="this.originalSize=!this.originalSize; this.showAll=true;"><i class="ti-reload"></i></button>&nbsp;
+              <h5  style="border:0px;float: right;color: white"> Pages:<input size="1"  (ngModelChange)="gotoPage(pdfPage)" type="number" min="1" max="{{totalNumberOfPdfPages}}"  value="pdfPage"  [(ngModel)]="pdfPage"/>/{{totalNumberOfPdfPages}}</h5>&nbsp;&nbsp;&nbsp;
+           </div>
+           <br>
+              <pdf-viewer style="overflow-y: auto;"  (after-load-complete)="callBackFn($event)" [show-all]="showAll"  [src]="pdfSrc" [zoom]="zoom" [original-size]="originalSize" [page]="pdfPage"></pdf-viewer>
+        </div>
+        </sb-item-body>
+      </sb-item> 
+  </squeezebox>
+</app-card>
+
+
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="(this.viewIndividualData  && this.docType=='dynamicTemplate')">
+  <div>
+    <div><br><h4>&nbsp;&nbsp;Template Details
+      <div style="float: right;" *ngIf="(model.workFlowButtonFlag  && this.StatusValue==1)"  >
+          <button   *ngIf="model.workFlowButtonFlag" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(!this.approveOrDeclineFlag,'2')">Review</button>
+          &nbsp;&nbsp;	<button  *ngIf="model.deleteButtonFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'4')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+      <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+      </div>&nbsp;&nbsp;
+      <div style="float: right;" *ngIf="(model.workFlowButtonFlag && this.StatusValue==2 &&  this.hideButtonFlag)"  >
+          <button *ngIf="model.workFlowButtonFlag" type="submit" class="btn btn-outline-success btn-success btn-round" (click)="changeStatus(!this.approveOrDeclineFlag,'3')">Approve</button>
+          &nbsp;&nbsp;	<button *ngIf="model.deleteButtonFlag" type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.approveOrDeclineFlag==false,'5')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+          <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+          </div>&nbsp;&nbsp; 
+          <a *ngIf="((this.StatusValue==2 || this.StatusValue==3 || this.StatusValue==4)&& !this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+          <a *ngIf="((this.StatusValue==3 || this.StatusValue==4)&& this.hideButtonFlag)"  style=" float: right;cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a> 
+        </h4>
+      </div>
+    <br>
+
+    <squeezebox [multiple]="true">
+      <sb-item class="accordion-panel" [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg">Document Status</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p>
+              <span style="background-color:	#FFFF00">{{dynamicTemplateModel.commonDocumentStatus}}</span>
+            </p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item class="accordion-panel" [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg">Title</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p>{{dynamicTemplateModel.tittle}}</p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item [collapsed]="false" class="accordion-panel">
+        <sb-item-head class="accordion-msg">Body</sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <div class="htmldata" [innerHtml]="dynamicTemplateModel.body" contenteditable="true"></div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+    </squeezebox>
+    <br>
+    <br>
+    <br>
+  </div>
+</app-card>
+<app-modal-basic #modalOverflow [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="modalOverflow.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Document Current Status</h5><br>
+    <div ><br>
+      <div><b>Document Type :</b>&nbsp;{{currentDocType}}</div>
+      <div><b>Document Status :</b>&nbsp;<span style="background-color:	#FFFF00">{{currentDocStatus}}</span></div>
+      <div><b>Created By :</b>&nbsp; {{currentCreatedBy}}</div>
+      <div><b>Last Modified On : </b>{{currentModifiedDate | date:'dd-MM-yy hh:mm a'}}</div>
+    </div>
+    <hr>
+    <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+     
+      <h5>Document  Status Log</h5><br>
+     
+      <div *ngFor="let log of statusLog ;let in = index">
+        <div>{{in+1}}</div>
+        <div><b>Document Status :</b>&nbsp;{{log.commonDocumentStatus}}</div>
+        <div><b>Document Comments :</b>{{log.comments}}</div>
+        <div><b>Commented By :</b>&nbsp; {{log.createdBy}}</div>
+        <div><b>Commented On :</b>{{log.createdTime | date:'dd-MM-yy hh:mm a'}}</div>
+        <hr>
+
+      </div> <div *ngIf="this.modalSpinner" class="loader"></div>
+    </div>
+  </div>
+</app-modal-basic>
+<div *ngIf="isFlag" class="loading">Loading&#8230;</div>-->
+
+
+
+
+
+
+
+
+
+
+
+

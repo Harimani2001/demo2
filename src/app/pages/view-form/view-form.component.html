@@ -1,0 +1,806 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div *ngFor='let data of inputField'>
+      <squeezebox #squeezebox >
+        <sb-item *ngIf="data.equipmentName" class="accordion-panel" [collapsed]="false">
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc row col-sm-12">
+              <p *ngIf ="data.projectName!=''" class="col-sm-3"><b><span>Project: </span></b>{{data.projectName}}</p>
+              <p *ngIf ="data.cleanRoomName!=''" class="col-sm-3"><b><span>Cleanroom: </span></b>{{data.cleanRoomName}}</p>
+              <p *ngIf="data.equipmentName" class="col-sm-3"><b><span>Equipment: </span></b>{{data.equipmentName}}</p>
+              <p *ngIf="data.equipmentName && data.batchName" class="col-sm-3"><b><span>Batch: </span></b>{{data.batchName}}</p>
+            </div>
+          </sb-item-body>
+        </sb-item>
+        
+    <sb-item *ngIf="data.reportNumber" class="accordion-panel" [collapsed]="false">
+      <sb-item-head class="accordion-heading accordion-msg">Report Number</sb-item-head>
+      <sb-item-body class="accordion-content">
+        <div class="accordion-desc">
+          <p>{{data.reportNumber}}</p>
+        </div>
+      </sb-item-body>
+    </sb-item>
+
+      <sb-item *ngIf="data.productName" class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg">Product</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+              <p>{{data.productName}}</p>
+            </div>
+          </sb-item-body>
+        </sb-item>
+			<sb-item *ngIf="this.dynamicJsonTableView.length"  class="accordion-panel" [collapsed]="false">
+				<sb-item-head class="accordion-heading accordion-msg">Form Reference</sb-item-head>
+				<sb-item-body class="accordion-content">
+					<div class="accordion-desc">
+						<p> <ng-container class="well well-lg" *ngFor="let table of this.dynamicJsonTableView; let i=index"><br>
+              <div class="row">
+                <label class="col-sm-12">
+                  <h4 class="strong">{{table.masterName}}</h4>
+                </label>
+              </div>
+              <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+                [rows]='table.tableData.rows | textPipeFilter : table.filterQuery' [limit]="10" [columnMode]="'force'"
+                [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" >
+                <ng-container *ngFor="let col of table.tableData.columns; let i = index">
+                  <ngx-datatable-column sortable *ngIf="i>1" style="font-weight: bold;" [name]="col" flexGrow="1.0">
+                    <ng-template ngx-datatable-header-template>
+                      <span class="datatable-header-cell-wrapper">
+                        <span class="datatable-header-cell-label draggable"><label [innerHtml]="col"></label></span>
+                      </span>
+                    </ng-template>
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong><label [innerHtml]="row[i]"></label></strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                </ng-container>
+              </ngx-datatable>
+            </ng-container></p>
+					</div>
+				</sb-item-body>
+			</sb-item>
+      <div  *ngFor='let input of data.formData;let i = index'>
+        <div *ngIf="(input.type==='section')">
+          <app-card>
+            <div class="row">
+              <div class="col-sm-6">
+                <h4>{{input.label}}</h4>
+              </div>
+              <div class="col-sm-6" style="text-align: right;">
+                <a container="body" *ngIf="!input.viewSectionFlag" href="javascript:;"
+                  (click)="input.viewSectionFlag = !input.viewSectionFlag"
+                  class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Expand"
+                  (click)="loadTaskData();"><i style="font-size: 25px;color: black;"
+                    class="icofont icofont-circled-down"></i>
+                </a>
+                <a container="body" *ngIf="input.viewSectionFlag" href="javascript:;"
+                  (click)="input.viewSectionFlag = !input.viewSectionFlag"
+                  class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Hide"><i
+                    style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+                </a>
+              </div>
+            </div>
+            <div *ngIf="input.viewSectionFlag">
+              <div  *ngFor='let sectionField of input.childFields;'>
+      
+                <sb-item *ngIf="(sectionField.type==='time') || (sectionField.type==='number' || sectionField.type==='text') && (sectionField.value)" class="accordion-panel" 
+                  [collapsed]="false">
+                  <sb-item-head class="accordion-heading accordion-msg" ><label   [innerHtml]="sectionField.label"></label></sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <p [ngStyle]="{'background-color': !sectionField.color? 'white' : sectionField.color}" >{{sectionField.value}}</p>
+                    </div>
+                  </sb-item-body>
+                </sb-item>
+                
+                <sb-item *ngIf="(sectionField.type==='date') && (sectionField.value)" class="accordion-panel" 
+                [collapsed]="false">
+                <sb-item-head class="accordion-heading accordion-msg"  >
+                  <label  [innerHtml]="sectionField.label"></label>
+                  <button style="pointer-events: visible;" *ngIf="sectionField.addTask" type="submit" class="btn btn-link m-r-10 p-0"
+                   (click)="clickCreateTask(input)">
+                    <p class="strong font-italic"><i class="icofont icofont-tasks"></i>Create Task</p>
+                  </button>
+                </sb-item-head>
+                <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                      <p>{{sectionField.value | date:'dd-MM-yyyy '}} </p>
+                  </div>
+                </sb-item-body>
+              </sb-item>
+                <sb-item *ngIf=" sectionField.type==='datetime-local' && (sectionField.value)" class="accordion-panel"
+                  [collapsed]="false">
+                  <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="sectionField.label"></label>
+                    <button *ngIf="sectionField.addTask" type="submit" class="btn btn-link m-r-10 p-0" (click)="clickCreateTask(input)">
+                      <p class="strong font-italic"><i class="icofont icofont-tasks"></i>Create Task</p>
+                    </button>
+                  </sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <p>{{sectionField.value | date:'dd-MM-yy hh:mm a'}} </p>
+                    </div>
+                  </sb-item-body>
+                </sb-item>
+                
+                <sb-item *ngIf="(sectionField.type==='file') && (sectionField.values!=undefined && sectionField.values.length>0)" class="accordion-panel" [collapsed]="false">
+                  <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="sectionField.label"></label></sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div id="{{sectionField.name}}" class="accordion-desc ">
+                      <div class="col-form-label"  *ngIf='sectionField.values!=undefined && sectionField.values.length>0'>
+                        <div class="dt-desc dy-ui">
+                          <table class="table-striped table-bordered">
+                            <thead><th>Sl. No</th><th>File Name</th><th>Date</th><th>Action</th></thead>
+                            <tbody>
+                            <tr *ngFor="let file of sectionField.values ; let fileIndex=index ">
+                              <td>{{fileIndex+1}}</td>
+                              <td><label>{{file.fileName}}</label></td>
+                              <td><label>{{file.displayDate}}</label></td>
+                              
+                              <td><a style="cursor:pointer;font-weight: bold" class="icofont icofont-eye-alt" placement="top" container="body"
+                                ngbTooltip="view" (click)="downloadFileOrView(file.fileName,file.path,true,sectionField.name)"></a>&nbsp;&nbsp;
+                                <a style="cursor:pointer;font-weight: bold" class="icofont icofont-download" placement="top" container="body"
+                                 ngbTooltip="Download" (click)="downloadFileOrView(file.fileName,file.path,false,sectionField.name)"></a>&nbsp;&nbsp;
+                              </td>
+                            </tr>
+                          </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </sb-item-body>
+                </sb-item>
+          
+                <sb-item *ngIf="(sectionField.type==='textarea') && (sectionField.value)" class="accordion-panel" [collapsed]="false">
+                    <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="sectionField.label"></label></sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                    <quill-editor *ngIf="(sectionField.subtype==='quill')" style="pointer-events: none;" [name]='sectionField.name'
+                      [(ngModel)]='sectionField.value' [maxlength]="sectionField.maxlength" #quill="ngModel">
+                    </quill-editor>
+                    <ckeditor *ngIf="(sectionField.subtype==='ckeditor')" [config]="configOfCkEditior" name="sectionField.name"
+                      [required]="sectionField.required" [(ngModel)]="sectionField.value" #ckeditor="ngModel"></ckeditor>
+                    </div>
+                  </sb-item-body>
+                </sb-item>
+          
+                <sb-item *ngIf="(sectionField.type==='checkbox-group')" class="accordion-panel" [collapsed]="false">
+                    <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="sectionField.label"></label></sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <label *ngFor="let cheboxvalue of sectionField.values">
+                        <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}},</label>
+                      </label>
+                      <label *ngIf="sectionField.otherSelected">{{sectionField.otherValue}}</label>
+                    </div>
+                
+                  </sb-item-body>
+                </sb-item>
+                <sb-item *ngIf="(sectionField.type==='radio-group')" class="accordion-panel" [collapsed]="false">
+                    <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="sectionField.label"></label></sb-item-head>
+                  <sb-item-body class="accordion-content">
+                    <div class="accordion-desc">
+                      <label *ngFor="let cheboxvalue of sectionField.values">
+                        <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}}</label>
+                      </label>
+                      <label *ngIf="sectionField.otherSelected">{{sectionField.otherValue}}</label>
+                    </div>
+                  </sb-item-body>
+                </sb-item>
+                <sb-item *ngIf="(sectionField.type==='select')" class="accordion-panel" [collapsed]="false">
+                    <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="sectionField.label"></label></sb-item-head>
+                    <sb-item-body class="accordion-content">
+                      <div *ngIf="sectionField.value!='govalOther'" class="accordion-desc">
+                        <label  *ngFor="let optionList of sectionField.values">
+                          <label *ngIf="sectionField.value==optionList.value">{{optionList.label}}</label>
+                        </label>
+                      </div>
+                      <div *ngIf="sectionField.value=='govalOther'" class="accordion-desc">
+                        <label >{{sectionField.otherValue}}</label>
+                      </div>
+                  
+                    </sb-item-body>
+                </sb-item>
+                <div  class="table-responsive col-sm-12">
+                    <!-- <app-card  *ngIf="sectionField.type=='table'"> -->
+                    <div *ngIf="sectionField.type=='table'">
+                      <h4 style="text-align: center;" class="sm-12" [innerHtml]='sectionField.name'> </h4>
+                      <table id="tableIdDivRefresh" #tableIdDivRefresh class="table table-striped table-bordered ">
+                      <thead>
+                        <tr>
+                          <th><label >Sl. No</label></th> <ng-container *ngFor="let column of sectionField.columns">
+                            <th *ngIf="column.type!='hidden'"><label [innerHtml]='column.label'></label><span *ngIf="column.required!=undefined" class="asterisk">*</span>
+                          <a *ngIf="column.description!=undefined" href="javascript:;"
+                          class="m-r-15 crm-action-info text-muted text-primary" placement="top"
+                          [ngbTooltip]="column.description">
+                          <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+                        </a></th></ng-container>
+                        
+                        </tr>
+                      </thead>
+                      <tbody style="pointer-events: none;" *ngFor="let row of sectionField.rows ; let i = index" [attr.data-index]="i">
+                        
+                        <tr>
+                          <td><label >{{i+1}} </label></td><ng-container *ngFor="let column of sectionField.columns ; let j = index" [attr.data-index]="j">
+                            <td  *ngIf="column.type!='hidden'" >
+                           
+                          <label *ngIf="(column.subtype=='Text')" [ngStyle]="{'background-color': !row.row[j].color? '' : row.row[j].color}" >
+                            {{row.row[j].value}}
+                            </label>
+                            <label *ngIf="(column.subtype=='Email')">
+                              {{row.row[j].value}}
+                            </label>
+                            <label *ngIf="(column.subtype=='Mobile')">
+                                {{row.row[j].value}}
+                            </label>
+                          
+                            <label *ngIf="(column.type==='number')" [ngStyle]="{'background-color': !row.row[j].color? '' : row.row[j].color}" >
+                            {{row.row[j].value}}
+                            </label>
+                            <label *ngIf="(column.type==='date')">
+                                {{row.row[j].value | date:'dd-MM-yyyy '}}
+                            </label>
+                            <label *ngIf="(column.type==='textarea')">
+                            {{row.row[j].value}}
+                            </label>
+                          
+                            <div *ngIf="(column.type==='select')">
+                              <label *ngIf="!column.multiple">
+                                <label *ngFor='let optionList of column.values'>
+                                  <label *ngIf="optionList.value==row.row[j].value">{{optionList.label}}</label>
+                                </label>
+                              </label>
+                              <div style="width: 400px;" *ngIf="column.multiple">
+                                <div style="width:100%">
+                                  <textarea class="multiple-textarea" [rows]="(row.row[j].value.length/50)+1"
+                                    [innerHtml]="row.row[j].value"></textarea>
+                                </div>
+                              </div>
+                            </div>
+                            <label *ngIf="(column.type==='checkbox-group')">
+                            <div *ngFor="let cheboxvalue of row.row[j].values ; let lengthIndex=index;" >
+                                <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}}</label>
+                            </div>
+                            </label>
+                          
+                            <label *ngIf="(column.type==='radio-group')">
+                            <div *ngFor="let radioButtonValue of row.row[j].values">
+                              <label *ngIf="radioButtonValue.selected">{{radioButtonValue.label}}</label>
+                              </div>
+                            </label>
+                            <label *ngIf="(column.type==='datetime-local')">
+                                {{row.row[j].value | date:'dd-MM-yy hh:mm a'}}
+                            </label>
+                            <label *ngIf="(column.type==='time')">
+                                {{row.row[j].value}}
+                            </label>
+                            <label *ngIf="(column.type==='file')" id="{{column.name}}">
+                              <div *ngIf='row.row[j].values!=undefined && row.row[j].values.length >0'>
+                                <div class="dt-desc dy-ui">
+                                  <table class="table-striped table-bordered">
+                                    <thead>
+                                      <th>Sl. No</th>
+                                      <th>File Name</th>
+                                      <th>Date</th>
+                                      <th>Action</th>
+                                    </thead>
+                                    <tbody>
+                                      <tr *ngFor="let file of row.row[j].values ; let fileIndex=index ">
+                                        <td>{{fileIndex+1}}</td>
+                                        <td><label>{{file.fileName}}</label></td>
+                                        <td><label>{{file.displayDate}}</label></td>
+                                        <td>
+                                          <a style="cursor:pointer;font-weight: bold;pointer-events: all;" class="icofont icofont-download" placement="top"
+                                            container="body" ngbTooltip="Download"
+                                            (click)="downloadFileOrView(file.fileName,file.path,false,column.name)"></a>&nbsp;&nbsp;
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </div>
+                              </div>
+                            </label>
+                        </td></ng-container>
+                       
+                         
+                        </tr>
+                      
+                      </tbody>
+                      </table>
+                      <br><br>
+                    <!-- </app-card> -->
+                    </div>
+                    </div>
+              </div>
+            </div>
+          </app-card>
+          </div>
+
+      <sb-item *ngIf="(input.type==='time') || (input.type==='number' || input.type==='text') && (input.value)" class="accordion-panel" 
+        [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg" ><label   [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p [ngStyle]="{'background-color': !input.color? 'white' : input.color}" >{{input.value}}</p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      
+      <sb-item *ngIf="(input.type==='date') && (input.value)" class="accordion-panel" 
+      [collapsed]="false">
+      <sb-item-head class="accordion-heading accordion-msg"  >
+        <label  [innerHtml]="input.label"></label>
+        <button style="pointer-events: visible;" *ngIf="input.addTask" type="submit" class="btn btn-link m-r-10 p-0"
+         (click)="clickCreateTask(input)">
+          <p class="strong font-italic"><i class="icofont icofont-tasks"></i>Create Task</p>
+        </button>
+      </sb-item-head>
+      <sb-item-body class="accordion-content">
+        <div class="accordion-desc">
+            <p>{{input.value | date:'dd-MM-yyyy '}} </p>
+        </div>
+      </sb-item-body>
+    </sb-item>
+      <sb-item *ngIf=" input.type==='datetime-local' && (input.value)" class="accordion-panel"
+        [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label>
+          <button *ngIf="input.addTask" type="submit" class="btn btn-link m-r-10 p-0" (click)="clickCreateTask(input)">
+            <p class="strong font-italic"><i class="icofont icofont-tasks"></i>Create Task</p>
+          </button>
+        </sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p>{{input.value | date:'dd-MM-yy hh:mm a'}} </p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      
+      <sb-item *ngIf="(input.type==='file') && (input.values!=undefined && input.values.length>0)" class="accordion-panel" [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div id="{{input.name}}" class="accordion-desc ">
+            <div class="col-form-label"  *ngIf='input.values!=undefined && input.values.length>0'>
+              <div class="dt-desc dy-ui">
+                <table class="table-striped table-bordered">
+                  <thead><th>Sl. No</th><th>File Name</th><th>Date</th><th>Action</th></thead>
+                  <tbody>
+                  <tr *ngFor="let file of input.values ; let fileIndex=index ">
+                    <td>{{fileIndex+1}}</td>
+                    <td><label>{{file.fileName}}</label></td>
+                    <td><label>{{file.displayDate}}</label></td>
+                    
+                    <td><a style="cursor:pointer;font-weight: bold" class="icofont icofont-eye-alt" placement="top" container="body"
+                      ngbTooltip="view" (click)="downloadFileOrView(file.fileName,file.path,true,input.name)"></a>&nbsp;&nbsp;
+                      <a style="cursor:pointer;font-weight: bold" class="icofont icofont-download" placement="top" container="body"
+                       ngbTooltip="Download" (click)="downloadFileOrView(file.fileName,file.path,false,input.name)"></a>&nbsp;&nbsp;
+                    </td>
+                  </tr>
+                </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+
+      <sb-item *ngIf="(input.type==='textarea') && (input.value)" class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+          <quill-editor *ngIf="(input.subtype==='quill')" style="pointer-events: none;" [name]='input.name'
+            [(ngModel)]='input.value' [maxlength]="input.maxlength" #quill="ngModel">
+          </quill-editor>
+          <ckeditor *ngIf="(input.subtype==='ckeditor')" [config]="configOfCkEditior" name="input.name"
+            [required]="input.required" [(ngModel)]="input.value" #ckeditor="ngModel"></ckeditor>
+          </div>
+        </sb-item-body>
+      </sb-item>
+
+      <sb-item *ngIf="(input.type==='checkbox-group')" class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <label *ngFor="let cheboxvalue of input.values">
+              <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}},</label>
+            </label>
+            <label *ngIf="input.otherSelected">{{input.otherValue}}</label>
+          </div>
+      
+        </sb-item-body>
+      </sb-item>
+      <sb-item *ngIf="(input.type==='radio-group')" class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <label *ngFor="let cheboxvalue of input.values">
+              <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}}</label>
+            </label>
+            <label *ngIf="input.otherSelected">{{input.otherValue}}</label>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item *ngIf="(input.type==='select')" class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div *ngIf="input.value!='govalOther'" class="accordion-desc">
+              <label  *ngFor="let optionList of input.values">
+                <label *ngIf="input.value==optionList.value">{{optionList.label}}</label>
+              </label>
+            </div>
+            <div *ngIf="input.value=='govalOther'" class="accordion-desc">
+              <label >{{input.otherValue}}</label>
+            </div>
+        
+          </sb-item-body>
+      </sb-item>
+      <div  class="table-responsive col-sm-12">
+          <!-- <app-card  *ngIf="input.type=='table'"> -->
+          <div *ngIf="input.type=='table'">
+            <h4 style="text-align: center;" class="sm-12" [innerHtml]='input.name'> </h4>
+            <table id="tableIdDivRefresh" #tableIdDivRefresh class="table table-striped table-bordered ">
+            <thead>
+              <tr>
+                <th><label >Sl. No</label></th> <ng-container *ngFor="let column of input.columns">
+                  <th *ngIf="column.type!='hidden'"><label [innerHtml]='column.label'></label><span *ngIf="column.required!=undefined" class="asterisk">*</span>
+                <a *ngIf="column.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top"
+                [ngbTooltip]="column.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></th></ng-container>
+             
+              </tr>
+            </thead>
+            <tbody style="pointer-events: none;" *ngFor="let row of input.rows ; let i = index" [attr.data-index]="i">
+              
+              <tr>
+                <td><label >{{i+1}} </label></td><ng-container *ngFor="let column of input.columns ; let j = index" [attr.data-index]="j">
+                  <td  *ngIf="column.type!='hidden'" >
+                 
+                <label *ngIf="(column.subtype=='Text')" [ngStyle]="{'background-color': !row.row[j].color? '' : row.row[j].color}" >
+                  {{row.row[j].value}}
+                  </label>
+                  <label *ngIf="(column.subtype=='Email')">
+                    {{row.row[j].value}}
+                  </label>
+                  <label *ngIf="(column.subtype=='Mobile')">
+                      {{row.row[j].value}}
+                  </label>
+                
+                  <label *ngIf="(column.type==='number')" [ngStyle]="{'background-color': !row.row[j].color? '' : row.row[j].color}" >
+                  {{row.row[j].value}}
+                  </label>
+                  <label *ngIf="(column.type==='date')">
+                      {{row.row[j].value | date:'dd-MM-yyyy '}}
+                  </label>
+                  <label *ngIf="(column.type==='textarea')">
+                  {{row.row[j].value}}
+                  </label>
+                
+                  <div *ngIf="(column.type==='select')">
+                    <label *ngIf="!column.multiple">
+                      <label *ngFor='let optionList of column.values'>
+                        <label *ngIf="optionList.value==row.row[j].value">{{optionList.label}}</label>
+                      </label>
+                    </label>
+                    <div style="width: 400px;" *ngIf="column.multiple">
+                      <div style="width:100%">
+                        <textarea class="multiple-textarea" [rows]="(row.row[j].value.length/50)+1"
+                          [innerHtml]="row.row[j].value"></textarea>
+                      </div>
+                    </div>
+                  </div>
+                  <label *ngIf="(column.type==='checkbox-group')">
+                  <div *ngFor="let cheboxvalue of row.row[j].values ; let lengthIndex=index;" >
+                      <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}}</label>
+                  </div>
+                  </label>
+                
+                  <label *ngIf="(column.type==='radio-group')">
+                  <div *ngFor="let radioButtonValue of row.row[j].values">
+                    <label *ngIf="radioButtonValue.selected">{{radioButtonValue.label}}</label>
+                    </div>
+                  </label>
+                  <label *ngIf="(column.type==='datetime-local')">
+                      {{row.row[j].value | date:'dd-MM-yy hh:mm a'}}
+                  </label>
+                  <label *ngIf="(column.type==='time')">
+                      {{row.row[j].value}}
+                  </label>
+                  <label *ngIf="(column.type==='file')" id="{{column.name}}">
+                    <div *ngIf='row.row[j].values!=undefined && row.row[j].values.length >0'>
+                      <div class="dt-desc dy-ui">
+                        <table class="table-striped table-bordered">
+                          <thead>
+                            <th>Sl. No</th>
+                            <th>File Name</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                          </thead>
+                          <tbody>
+                            <tr *ngFor="let file of row.row[j].values ; let fileIndex=index ">
+                              <td>{{fileIndex+1}}</td>
+                              <td><label>{{file.fileName}}</label></td>
+                              <td><label>{{file.displayDate}}</label></td>
+                              <td>
+                                <a style="cursor:pointer;font-weight: bold;pointer-events: all;" class="icofont icofont-download" placement="top"
+                                  container="body" ngbTooltip="Download"
+                                  (click)="downloadFileOrView(file.fileName,file.path,false,column.name)"></a>&nbsp;&nbsp;
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </label>
+              </td></ng-container>
+             
+               
+              </tr>
+            
+            </tbody>
+            </table>
+            <br><br>
+          <!-- </app-card> -->
+          </div>
+          </div>
+    </div>
+      <div *ngIf="data.documentFormData"><h3 style="text-align: center;">Document Form</h3></div>
+    <div  *ngFor='let input of data.documentFormData'>
+
+      <sb-item *ngIf="input.type==='header'" class="accordion-panel" [collapsed]="false">
+      <sb-item-body class="accordion-content">
+        <div class="accordion-desc">
+          <div *ngIf="(input.subtype==='h1')">
+            <h1 [innerHtml]="input.label"></h1>
+          </div>
+          <div *ngIf="(input.subtype==='h2')">
+            <h2 [innerHtml]="input.label"></h2>
+          </div>
+          <div *ngIf="(input.subtype==='h3')">
+            <h3 [innerHtml]="input.label"></h3>
+          </div>
+        </div>
+      </sb-item-body>
+    </sb-item>
+
+      <sb-item *ngIf="(input.type==='time') || (input.type==='number' || input.type==='text')" class="accordion-panel"
+        [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p>{{input.value}}</p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item *ngIf="(input.type==='date') " class="accordion-panel"
+      [collapsed]="false">
+      <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label>
+        <button *ngIf="input.addTask" type="submit" class="btn btn-link m-r-10 p-0" (click)="clickCreateTask(input)">
+          <p class="strong font-italic"><i class="icofont icofont-tasks"></i>Create Task</p>
+        </button></sb-item-head>
+      <sb-item-body class="accordion-content">
+        <div class="accordion-desc">
+            <p>{{input.value | date:'dd-MM-yyyy '}} </p>
+        </div>
+      </sb-item-body>
+    </sb-item>
+      <sb-item *ngIf=" input.type==='datetime-local' " class="accordion-panel"
+        [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label>
+          <button *ngIf="input.addTask" type="submit" class="btn btn-link m-r-10 p-0" (click)="clickCreateTask(input)">
+            <p class="strong font-italic"><i class="icofont icofont-tasks"></i>Create Task</p>
+          </button>
+        </sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <p>{{input.value | date:'dd-MM-yy hh:mm a'}} </p>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      
+      <sb-item *ngIf="(input.type==='file')" class="accordion-panel" [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div id="{{input.name}}" class="accordion-desc ">
+            <div class="col-form-label"  *ngIf='input.values!=undefined && input.values.length>0'>
+              <div class="dt-desc dy-ui">
+                <table class="table-striped table-bordered">
+                  <thead><th>Sl. No</th><th>File Name</th><th>Date</th><th>Action</th></thead>
+                  <tbody>
+                  <tr *ngFor="let file of input.values ; let fileIndex=index ">
+                    <td>{{fileIndex+1}}</td>
+                    <td><label>{{file.fileName}}</label></td>
+                    <td><label>{{file.displayDate}}</label></td>
+                    
+                    <td><a style="cursor:pointer;font-weight: bold" class="icofont icofont-eye-alt" placement="top" container="body"
+                      ngbTooltip="view" (click)="downloadFileOrView(file.fileName,file.path,true,input.name)"></a>&nbsp;&nbsp;
+                      <a style="cursor:pointer;font-weight: bold" class="icofont icofont-download" placement="top" container="body"
+                       ngbTooltip="Download" (click)="downloadFileOrView(file.fileName,file.path,false,input.name)"></a>&nbsp;&nbsp;
+                    </td>
+                  </tr>
+                </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </sb-item-body>
+      </sb-item>
+
+      <sb-item *ngIf="(input.type==='textarea')" class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+          <quill-editor *ngIf="(input.subtype==='quill')" style="pointer-events: none;" [name]='input.name'
+            [(ngModel)]='input.value' [maxlength]="input.maxlength" #quill="ngModel">
+          </quill-editor>
+          <ckeditor *ngIf="(input.subtype==='ckeditor')" [config]="configOfCkEditior" name="input.name"
+            [required]="input.required" [(ngModel)]="input.value" #ckeditor="ngModel"></ckeditor>
+          </div>
+        </sb-item-body>
+      </sb-item>
+      <sb-item *ngIf="(input.type==='checkbox-group')" class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <label *ngFor="let cheboxvalue of input.values">
+              <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}},</label>
+            </label>
+          </div>
+      
+        </sb-item-body>
+      </sb-item>
+      <sb-item *ngIf="(input.type==='radio-group')" class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div class="accordion-desc">
+            <label *ngFor="let cheboxvalue of input.values">
+              <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}}</label>
+            </label>
+          </div>
+      
+        </sb-item-body>
+      </sb-item>
+      <sb-item *ngIf="(input.type==='select')" class="accordion-panel" [collapsed]="false">
+        <sb-item-head class="accordion-heading accordion-msg" ><label  [innerHtml]="input.label"></label></sb-item-head>
+        <sb-item-body class="accordion-content">
+          <div *ngIf="input.value!='govalOther'" class="accordion-desc">
+            <label  *ngFor="let optionList of input.values">
+              <label *ngIf="input.value==optionList.value">{{optionList.label}}</label>
+            </label>
+          </div>
+          <div *ngIf="input.value=='govalOther'" class="accordion-desc">
+            <label >{{input.otherValue}}</label>
+          </div>
+      
+        </sb-item-body>
+    </sb-item>
+      <div  class="table-responsive col-sm-12">
+          <!-- <app-card  *ngIf="input.type=='table'"> -->
+            <div *ngIf="input.type=='table'">
+              <h4 style="text-align: center;" class="sm-12" [innerHtml]='input.name'> </h4>
+              <table id="tableIdDivRefresh" #tableIdDivRefresh class="table table-striped table-bordered ">
+              <thead>
+                <tr>
+                  <th><label >Sl. No</label></th>
+                  <ng-container *ngFor="let column of input.columns">
+                    <th *ngIf="column.type!='hidden'"><label [innerHtml]='column.label'></label><span *ngIf="column.required!=undefined" class="asterisk">*</span>
+                  <a *ngIf="column.description!=undefined" href="javascript:;"
+                  class="m-r-15 crm-action-info text-muted text-primary" placement="top"
+                  [ngbTooltip]="column.description">
+                  <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+                </a></th>
+                  </ng-container>
+                
+                </tr>
+              </thead>
+              <tbody style="pointer-events: none;" *ngFor="let row of input.rows ; let i = index" [attr.data-index]="i">
+                
+                <tr>
+                  <td>{{i+1}}</td> <ng-container *ngFor="let column of input.columns ; let j = index" [attr.data-index]="j">
+                    <td  *ngIf="column.type!='hidden'"  >
+                   
+                  <label *ngIf="(column.subtype=='Text')" [ngStyle]="{'background-color': !row.row[j].color? '' : row.row[j].color}" >
+                    {{row.row[j].value}}
+                    </label>
+                    <label *ngIf="(column.subtype=='Email')">
+                      {{row.row[j].value}}
+                    </label>
+                    <label *ngIf="(column.subtype=='Mobile')">
+                        {{row.row[j].value}}
+                    </label>
+                  
+                    <label *ngIf="(column.type==='number')" [ngStyle]="{'background-color': !row.row[j].color? '' : row.row[j].color}" >
+                    {{row.row[j].value}}
+                    </label>
+                    <label *ngIf="(column.type==='date')">
+                        {{row.row[j].value | date:'dd-MM-yyyy '}}
+                    </label>
+                    <label *ngIf="(column.type==='textarea')">
+                    {{row.row[j].value}}
+                    </label>
+                    <div *ngIf="(column.type==='select')">
+                      <label *ngIf="!column.multiple">
+                        <label *ngFor='let optionList of column.values'>
+                          <label *ngIf="optionList.value==row.row[j].value">{{optionList.label}}</label>
+                        </label>
+                      </label>
+                      <div style="width: 400px;" *ngIf="column.multiple">
+                        <div style="width:100%">
+                          <textarea class="multiple-textarea" [rows]="(row.row[j].value.length/50)+1"
+                            [innerHtml]="row.row[j].value"></textarea>
+                        </div>
+                      </div>
+                    </div>
+                    <label *ngIf="(column.type==='checkbox-group')">
+                    <div *ngFor="let cheboxvalue of row.row[j].values ; let lengthIndex=index;" >
+                        <label *ngIf="cheboxvalue.selected">{{cheboxvalue.label}}</label>
+                    </div>
+                    </label>
+                  
+                    <label *ngIf="(column.type==='radio-group')">
+                    <div *ngFor="let radioButtonValue of row.row[j].values">
+                      <label *ngIf="radioButtonValue.selected">{{radioButtonValue.label}}</label>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='datetime-local')">
+                        {{row.row[j].value | date:'dd-MM-yy hh:mm a'}}
+                    </label>
+                    <label *ngIf="(column.type==='time')">
+                        {{row.row[j].value}}
+                    </label>
+                    <label *ngIf="(column.type==='file')" id="{{column.name}}">
+                      <div *ngIf='row.row[j].values!=undefined && row.row[j].values.length >0'>
+                        <div class="dt-desc dy-ui">
+                          <table class="table-striped table-bordered">
+                            <thead>
+                              <th>Sl. No</th>
+                              <th>File Name</th>
+                              <th>Date</th>
+                              <th>Action</th>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let file of row.row[j].values ; let fileIndex=index ">
+                                <td>{{fileIndex+1}}</td>
+                                <td><label>{{file.fileName}}</label></td>
+                                <td><label>{{file.displayDate}}</label></td>
+                                <td>
+                                  <a style="cursor:pointer;font-weight: bold;pointer-events: all;" class="icofont icofont-download" placement="top"
+                                    container="body" ngbTooltip="Download"
+                                    (click)="downloadFileOrView(file.fileName,file.path,false,column.name)"></a>&nbsp;&nbsp;
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </label>
+                </td></ng-container>
+               
+                
+                </tr>
+              
+              </tbody>
+              </table>
+              <br><br>
+            <!-- </app-card> -->
+            </div>
+          </div>
+    </div>
+  </squeezebox>
+  </div>
+  <br><br>
+</div>
+</div>
+<div *ngIf="flagSpinner" class="loading">Loading&#8230;</div>
+
+<app-modal-basic class="reset-this" #ShowImageModal container="body" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Uploaded Image</h4>
+    <button type="button" class="close basic-close" (click)="ShowImageModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" style="height: 600px; overflow-y: scroll;">
+    <img [src]="imageurl" width="100%" style="height: 75%;">
+  </div>
+</app-modal-basic>

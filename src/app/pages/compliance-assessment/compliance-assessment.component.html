@@ -1,0 +1,151 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <form [formGroup]="complianceAssessmentForm">
+        <table id="shift-add-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <strong class="strong">Category<span class="asterisk required">*</span>:</strong>
+                  </div>
+                  <div class="col-sm-8">
+                    <select #categoryName name="Category" class="form-control" formControlName="category">
+                      <option value="">Select Category</option>
+                      <option *ngFor="let category of equipmentCategoryList" [value]="category.key">{{category.value}}
+                      </option>
+                    </select>
+                    <div class="messages text-danger"
+                      *ngIf="complianceAssessmentForm.get('category').touched && complianceAssessmentForm.get('category').hasError('required')">
+                      {{complianceAssessmentErrorTypes.categoryValidation}}</div>
+                    </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <strong class="strong">Description<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-8">
+                    <textarea class="form-control max-textarea" formControlName="description" rows="2"
+                    name="description" placeholder="Description"></textarea>
+                    <div class="messages text-danger"
+                      *ngIf="complianceAssessmentForm.get('description').touched && complianceAssessmentForm.get('description').hasError('required')">
+                      {{complianceAssessmentErrorTypes.descriptionValidation}}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <strong class="strong">Reference<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-8">
+                    <textarea class="form-control max-textarea" formControlName="reference" rows="2"
+                      name="reference" placeholder="Reference"></textarea>
+                      <div class="messages text-danger"
+                      *ngIf="complianceAssessmentForm.get('reference').touched && complianceAssessmentForm.get('reference').hasError('required')">
+                      {{complianceAssessmentErrorTypes.referenceValidation}}</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="form-group row">
+          <strong class="col-sm-2 strong col-form-label">&nbsp;&nbsp;&nbsp;Active Flag :
+          </strong>
+          <label class="switch">
+            <input type="checkbox" name="activeFlag" formControlName="active" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-sm-12 text-center">
+            <button type="button" *ngIf="isUpdate && permissionModal.updateButtonFlag" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="onClickSave();">Update</button>
+            <button type="button" *ngIf="!isUpdate && permissionModal.createButtonFlag" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="onClickSave();">Save</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="onClickCancel()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <div style="text-align: right;">
+            <label>Search:
+              <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                class="form-control input-sm full-data-search" name=search placeholder="Search">
+            </label>
+          </div>
+        </div>
+      </div>
+      <ngx-datatable #myTable class="data-table dt-chk" [rows]='data | ComplianceAssessmentFilterPipe : filterQuery' [count]="page.totalElements"
+      [externalPaging]="true" [offset]="page.pageNumber" [limit]="page.size" (page)="setPage($event)" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+      [rowHeight]="'auto'">
+        <ngx-datatable-column [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false" name="Sl No.">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong>{{row['$$index']+1}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column [width]="250" style="font-weight: bold;" name="Category" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+        [resizeable]="false" >
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong class="fontStyle">{{row['category']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Description">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong class="fontStyle">{{row['description']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column [width]="230" style="font-weight: bold;" name="Reference" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+        [resizeable]="false" >
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong class="fontStyle">{{row['reference']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column [width]="120" style="font-weight: bold;" name="Status" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+        [resizeable]="false" >
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong class="fontStyle">{{row['status']}}</strong>
+            <span *ngIf="row['statusFlag']" class="dot user-active"></span>
+            <span *ngIf="!row['statusFlag']" class="dot user-in-active"></span>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column [width]="100" name="Action" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+        [resizeable]="false" >
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <a href="javascript:;" *ngIf="permissionModal.updateButtonFlag" (click)="editData(row)"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+              <i class="icofont icofont-edit edit"></i>
+            </a>
+            <a href="javascript:;" *ngIf="permissionModal.deleteButtonFlag"
+              class="crm-action-delete text-muted text-danger"
+              (click)="openSuccessCancelSwal(row);" placement="top" ngbTooltip="Delete">
+              <i class="icofont icofont-bin bin"></i>
+            </a>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </app-card>
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

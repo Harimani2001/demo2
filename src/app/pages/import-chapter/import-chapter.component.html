@@ -1,0 +1,159 @@
+<app-modal-basic #importChapterModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+	<div class="app-modal-header" style="width: 100%;">
+		<div class="row">
+			<div class="col-sm-2">
+				<h4 class="modal-title">Upload Template</h4>
+			</div>
+			<div class="col-sm-8">
+				<ul class="progress-indicator">
+					<li *ngFor="let data of this.stepperList;let i = index " class="{{ data.thisIsCurrent?'current':data.completed?'completed':'pending'}}">
+					  <label>
+						<span style="white-space: pre-line;" placement="bottom" container="body"
+						(click)="getdata(data.errorList,data)" triggers="mouseenter:mouseleave" class="bubble pointer">
+					  </span>
+							{{data.stepName}}
+					</label>
+					</li>
+				  </ul>
+			</div>
+			<div class="col-sm-2 text-right">
+				<button *ngIf="!importSuccess" type="button" class="btn btn-sm btn-success"
+					(click)="import();">Import</button>
+				<button type="button" class="btn btn-sm btn-danger"
+					(click)="importChapterModal.hide();onCloseModal();">Close</button>
+			</div>
+		</div>
+		<div class="row" *ngIf="importValidationMessage !=''">
+			<div class="col-sm-12 text-right">
+				<span class="asterisk required">{{importValidationMessage}}</span>
+			</div>
+		</div>
+	</div>
+	<div class="app-modal-body">
+		<div class="row" *ngIf="!importSuccess">
+            <div class="col-sm-12">
+                <label class="col-form-label">Upload File<span class="asterisk required">*</span></label>
+                <input type="file" multiple="false" accept=".docx" name="file" required (change)="extractFile($event);" />
+                <span class="asterisk required" *ngIf="validationMessage">{{validationMessage}}</span>
+            </div>
+		</div><br>
+		<div class="row" *ngIf="isImported">
+			<div class="col-sm-12" style="text-align: center;">
+				<h4 style="color: green;" *ngIf="importSuccess">Successfully Imported</h4>
+				<h4  style="color: red;" *ngIf="!importSuccess">Error Occured</h4>
+			</div>
+            <div class="col-sm-12" style="text-align: center;">
+				<span>Total Sections : <strong>{{importsectionscount}}</strong></span>
+				&nbsp;&nbsp;&nbsp;&nbsp;
+				<span>Total items in table :<strong>{{importDataCount}}</strong></span>
+			</div>
+		</div><br>
+		<div class="row" *ngIf="this.chapterList.length > 0">
+			<div class="col-sm-12">
+				<div class="table-responsive">
+				  <table id="chapter-table" class="table table-framed">
+					<tr>
+					  <th>
+						<div class="checkbox-fade fade-in-primary" style="display: inline-flex;">
+							<label>
+								<input type="checkbox" [checked]="selectAll" (click)="selectAllData($event)" />
+								<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+										title="Select All"></i></span>
+							</label>
+							Section/Table
+						</div>
+					  </th>
+					  <th>Section</th>
+					  <th>Content</th>
+					</tr>
+					<tr *ngFor="let chapter of this.chapterList;let c=index">
+					  <td>
+						<div class="checkbox-fade fade-in-primary" style="display: inline-flex;">
+							<label>
+								<input type="checkbox" [checked]="chapter.selectedForImport"
+									(change)="chapter.selectedForImport=!chapter.selectedForImport;" />
+								<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+										title="Select for Import"></i></span>
+							</label>
+							<label *ngIf="chapter.type ==='table'">
+								<input type="checkbox" [checked]="chapter.selectedForDocumentData"
+									(change)="chapter.selectedForDocumentData=!chapter.selectedForDocumentData; onChangeDocumentData(chapter);" />
+								<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+										title="Document Data"></i></span>
+							</label>
+							<a *ngIf="!chapter.selectedForEdit" container="body" href="javascript:;"  (click)="onClickEdit(chapter)"
+								class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+						   		<i class="icofont icofont-edit edit"></i>
+							 </a>
+
+							 <a *ngIf="chapter.selectedForEdit" container="body" href="javascript:;"  (click)="chapter.selectedForEdit = !chapter.selectedForEdit"
+								class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+						   		<i class="icofont icofont-save"></i>
+							 </a>
+							 <a *ngIf="chapter.oldChapterContent" container="body" href="javascript:;"  (click)="chapter.viewModifiedData = !chapter.viewModifiedData"
+								class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="View Modified Data">
+						   		<i class="icofont icofont-law-document"></i>
+							 </a>
+						</div>
+					  </td>
+					  <td [style.background]=chapter.backgroundColor>
+						<label *ngIf="!chapter.selectedForEdit"> {{chapter.chapterName}}</label>
+						<textarea autofocus="autofocus" *ngIf="chapter.selectedForEdit" name="chapterName" [(ngModel)]="chapter.chapterName" #chapterName="ngModel"
+						rows="2" (ngModelChange)="onChangeMappingField(chapter)"></textarea>
+						</td>
+					  <td>
+						<div *ngIf="chapter.type ==='content'">
+							<label *ngIf="!chapter.selectedForEdit" [innerHtml]="chapter.chapterContent"></label>
+							<div *ngIf="chapter.viewModifiedData && !chapter.selectedForEdit">
+								<label><strong>Old Content : </strong></label>
+								<label [innerHtml]="chapter.oldChapterContent"></label>
+							</div>
+							<ckeditor *ngIf="chapter.selectedForEdit" [config]="this.configService.helper.editConfigOfCkEditior" name="chapterContent"
+                             required [(ngModel)]="chapter.chapterContent" #ckeditor="ngModel"   ></ckeditor>
+						</div>
+						<div *ngIf="chapter.type ==='table'">
+							<div class="table-responsive">
+								<table id="chapter-table" class="table table-framed">
+									<thead>
+										<tr>
+											<th  *ngFor="let column of chapter.tableData.columns;"  [style.background]=column.backgroundColor>
+												{{column.label}}
+												<select *ngIf="chapter.selectedForDocumentData" [(ngModel)]="column.mappingField"
+												(change)="onChangeMappingField(column)" class="form-control">
+												<option value="" disabled>Select Mapping field</option>
+												<option *ngFor="let item of constantsList" [value]="item.key">{{item.value}}
+												</option>
+											  </select>
+											</th>
+										</tr>
+									</thead>
+									<tbody *ngFor="let row of chapter.tableData.rows ; let i = index" [attr.data-index]="i">
+										<tr>
+										   <ng-container *ngFor="let column of chapter.tableData.columns ; let j = index" [attr.data-index]="j">
+										  <td [style.background]=row.row[j].backgroundColor>
+											<label *ngIf="!chapter.selectedForEdit" [innerHtml]="row.row[j].value"></label>
+											<br>
+											<div *ngIf="chapter.viewModifiedData && !chapter.selectedForEdit && row.row[j].oldValue">
+												<label><strong>Old Content : </strong></label>
+												<label *ngIf="!chapter.selectedForEdit && row.row[j].oldValue" [innerHtml]="row.row[j].oldValue"></label>
+											</div>
+
+											<textarea *ngIf="chapter.selectedForEdit" class="form-control max-textarea"[name]='row.row[j].name' [(ngModel)]='row.row[j].value' #textContent="ngModel"
+											rows="2"></textarea>
+										  </td>
+										</ng-container>
+										</tr>
+									  </tbody>
+								</table>
+							</div>
+						</div>
+					  </td>
+					</tr>
+				  </table>
+				</div>
+				<br>
+			</div>
+		</div>
+		<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+	</div>
+</app-modal-basic>

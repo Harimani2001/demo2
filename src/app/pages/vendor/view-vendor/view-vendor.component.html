@@ -1,0 +1,628 @@
+<div class="row" *ngIf="!this.viewIndividualDataFlag">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-6">
+          <h4 class="f-w-600 strong">Vendor Documents</h4>
+        </div>
+        <div class="col-sm-6 text-right">
+            <a *ngIf="isSelectedPublishData && this.modal.publishButtonFlag" href="javascript:" class="m-r-15"><img
+              class="image-radius rounded-0 img-25" src="assets/icon/png-icons/published.png" alt="Publish"
+              placement="bottom" ngbTooltip="Publish" (click)="publishData()"></a>
+            <a *ngIf="this.search" href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                src="assets/icon/png-icons/search.png" alt="Search" placement="bottom" ngbTooltip="Search"
+                (click)="this.showSearch=!this.showSearch"></a>
+            <input *ngIf="this.search && this.showSearch" type="search" [(ngModel)]="filterQuery"
+              (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search m-r-15"
+              placeholder="Search">
+  
+            <a href="javascript:"><img class="image-radius rounded-0 img-27"
+                src="assets/icon/png-icons/addDoc.png" alt="Add Vendor Document" placement="bottom"
+                ngbTooltip="Add Vendor Document" (click)="createVendor()"></a>
+        </div>
+      </div>
+      <br>
+      <ngb-tabset #vendorTab="ngbTabset" (tabChange)="tabChange($event.nextId);">
+        <ngb-tab id="summary" title="Summary">
+					<ng-template ngbTabContent>
+            <div>
+              <br>
+              <ng-container *ngIf="documentDetails">
+                <div class="row p-2">
+                  <div class="page-header-title  col-sm-7">
+                    <div class="d-inline">
+                      <span>
+                        <label>Last updated by:&nbsp;{{this.documentDetails.lastUpdatedBy}}</label>&nbsp;||
+                        <label>Last updated time:&nbsp;{{this.documentDetails.lastUpdatedTime}}</label>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <br>
+                <app-card>
+                  <div class="row">
+                    <div class="col-sm-6">
+                      <div class="table-border-color">
+                        <div class="table-responsive">
+                          <table class="table">
+                            <thead>
+                              <tr class="header-bg">
+                                <th>Draft</th>
+                                <th>Published</th>
+                                <th>Completed</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td>
+                                  {{this.documentDetails.draft}}
+                                </td>
+                                <td>
+                                  {{this.documentDetails.published}}
+                                </td>
+                                <td>
+                                  {{this.documentDetails.completed}}
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </app-card>
+                <br>
+                
+                </ng-container>
+              </div>
+					</ng-template>
+				</ngb-tab>
+        <ngb-tab title="Draft" id="draft">
+          <ng-template ngbTabContent>
+            <ngx-datatable [scrollbarH]="true" #Table class="data-table dt-chk"
+              [rows]='draftData | VendorValidationFilterPipe : filterQuery' [columnMode]="'force'"
+              [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [externalPaging]="true"
+              [count]="page.totalElements"
+              [offset]="page.pageNumber"
+              [limit]="page.size"
+              (page)="setPage($event)">
+              <ngx-datatable-column *ngIf="modal.publishButtonFlag" name="Select" [width]="70" [sortable]="false"
+                [canAutoResize]="false" [draggable]="false" [resizeable]="false">
+
+                <ng-template  class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+                  <div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+                    <label *ngIf="filterQuery=='' && draftData.length !=0 " container="body" placement="right" triggers="mouseenter:mouseleave" ngbPopover="Select All">
+                    <input type="checkbox" [checked]="selectAll" (click)="selectAllData($event);loadSelectAllDataForPublish($event)"/>
+                    <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                  </ng-template>
+
+                <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                  let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input type="checkbox" name="{{row['vendorCode']}}" [checked]="row.publishedflag"
+                        (change)="row.publishedflag=!row.publishedflag;onChangePublishData();" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column style="font-weight: bold;" name="Document Id">
+
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong>{{row['vendorCode']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column style="font-weight: bold;" name="Title ">
+
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{row['documentName']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Document Status">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-template #popContent>
+                    <span class="text-left">
+                      <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                      <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                      <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                      <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                    </span>
+                  </ng-template>
+                  <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+                    placement="right" placement="top" [ngbTooltip]="popContent">
+                    <i class="icofont icofont-info-square info"></i>
+                  </a>
+                  <a container="body" *ngIf="this.modal.updateButtonFlag"
+                    href="javascript:;" class="m-r-15 crm-action-edit text-muted text-primary" (click)="toEdit(row.id)"
+                    placement="top" ngbTooltip="Edit">
+                    <i  class="icofont icofont-edit edit"></i>
+                  </a>
+                  <a container="body" *ngIf="this.modal.deleteButtonFlag"
+                    href="javascript:;" class="m-r-15 crm-action-delete text-muted text-danger"
+                    (click)="openSuccessCancelSwal(row , row['$$index'] );" placement="top" ngbTooltip="Delete">
+                    <i  class="icofont icofont-bin bin"></i>
+                  </a>
+                  <a container="body" *ngIf="this.modal.viewButtonFlag" href="javascript:;"
+                    class="crm-action-view text-muted text-warning"
+                    (click)="viewRowDetails(row.id);this.viewIndividualDataFlag=true;"
+                    data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                    <i  class="icofont icofont-resize view"></i>
+                  </a>&nbsp;
+                  <a container="body" *ngIf="this.modal.exportButtonFlag" href="javascript:;"
+                    class="crm-action-success text-muted text-success"
+                    (click)="downloadFileOrView(row,false);" placement="top" ngbTooltip="Download">
+                    <i  class="icofont icofont-download"></i></a>&nbsp;
+                  <a container="body" role="button" href="javascript:;" class="text-warning"
+                    (click)="openIndividualWorkflowSetup(row)" data-ng-open="modalSmall" placement="top"
+                    ngbTooltip="Workflow">
+                    <i class="icofont icofont-chart-flow-alt-1"></i>
+                  </a>
+                </ng-template>
+              </ngx-datatable-column>
+
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab title="Published" id="published">
+          <ng-template ngbTabContent>
+            <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+              [rows]='publishedData | VendorValidationFilterPipe : filterQuery'
+              [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'"[externalPaging]="true"
+              [count]="page.totalElements"
+              [offset]="page.pageNumber"
+              [limit]="page.size"
+              (page)="setPage($event)">
+
+              <ngx-datatable-column style="font-weight: bold;" name="Document Id">
+
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong>{{row['vendorCode']}} {{row['revisionNumber']}} </strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column style="font-weight: bold;" name="Title ">
+
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{row['documentName']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Document Status">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-template #popContent>
+                    <span class="text-left">
+                      <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                      <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                      <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                      <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                    </span>
+                  </ng-template>
+                  <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+                    placement="right" placement="top" [ngbTooltip]="popContent">
+                    <i class="icofont icofont-info-square info"></i>
+                  </a>
+                  <a container="body" *ngIf="this.modal.viewButtonFlag" href="javascript:;"
+                    class="m-r-15 crm-action-success text-muted text-success"
+                    (click)="viewRowDetails(row.id);this.viewIndividualDataFlag=true;"
+                    data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                    <i  class="icofont icofont-resize view"></i>
+                  </a>&nbsp;
+                  <a container="body" *ngIf="this.modal.exportButtonFlag" href="javascript:;"
+                    class="crm-action-success text-muted text-success"
+                    (click)="downloadFileOrView(row,false);" placement="top" ngbTooltip="Download">
+                    <i  class="icofont icofont-download"></i></a>
+                </ng-template>
+              </ngx-datatable-column>
+
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab id="feedback" title="Feedback">
+					<ng-template ngbTabContent>
+						<br>
+            <app-document-forum #forumView [constant]="this.helper.VENDOR_VALIDATION_VALUE"></app-document-forum>
+					</ng-template>
+				</ngb-tab>
+        <ngb-tab id="audit" title="Audit Trail">
+					<ng-template ngbTabContent>
+						<app-audit-trail-view #auditView [permission]="this.helper.VENDOR_VALIDATION_VALUE"></app-audit-trail-view>
+					</ng-template>
+        </ngb-tab>
+        
+      </ngb-tabset>
+
+    </app-card>
+  </div>
+</div>
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualDataFlag">
+  <div *ngFor="let data of popupdata">
+    <div class="col-sm-12" id="float-action">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-4 d-inline">
+            <h5 class="strong">{{data.documentName}} : </h5>
+            <span>{{data.vendorCode}}</span>
+          </div>
+          <div class="col-sm-8" style="text-align: right;">
+            <a role="button" *ngIf="data.publishedflag && this.selectedDataForWorkflow" ><img class="image-radius rounded-0 img-25 m-r-20"
+              src="assets/icon/png-icons/esign.png" alt="Forum" placement="bottom" ngbTooltip="Approve"
+              (click)="openMyModal('effect-1')"></a>
+            <a *ngIf="data.publishedflag && this.selectedDataForWorkflow" role="button"><img class="image-radius rounded-0 img-25 m-r-20"
+                src="assets/icon/png-icons/export.png" alt="Forum" placement="bottom" ngbTooltip="External Approval"
+                (click)="externalApprovalmodal.show();onClickExternalApproval(this.selectedDataForWorkflow)"></a>
+            <a *ngIf="data.publishedflag && this.selectedDataForWorkflow" role="button"><img class="image-radius rounded-0 img-25 m-r-20"
+                  src="assets/icon/png-icons/workflow-new.png" alt="Forum" placement="bottom" ngbTooltip="Workflow"
+                  (click)="loadStepperData(); modalLargeWorkFlowProjectSummary.show();"></a>
+            <button *ngIf="!data.publishedflag && modal.updateButtonFlag"
+              type="submit" (click)="toEdit(data.id)"
+              class="btn btn-sm btn-primary  waves-effect waves-light m-r-10">Edit</button>
+            <button
+              *ngIf=" !data.publishedflag && this.modal.publishButtonFlag"
+              type="submit" class="btn btn-sm btn-warning  waves-effect waves-light m-r-10"
+              (click)="singlepublishData(data)">Publish
+            </button>
+            <button
+              *ngIf="(this.modal.deleteButtonFlag && !data.publishedflag)"
+              type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="openSuccessCancelSwal(data)">Delete &nbsp;&nbsp;</button>
+            
+              <img class="image-radius rounded-0 img-25 m-r-20" src="assets/icon/png-icons/forum.png" (click)="commentsSwitch=!commentsSwitch">
+
+              <button *ngIf="routeback!=null" type="button"
+              class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              [routerLink]="[this.routeback]">Cancel</button>
+              
+              <button *ngIf="routeback==null" type="button" class="btn btn-sm btn-danger  waves-effect waves-light"
+              (click)="onClickClose()">Cancel</button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <br><br><br>
+
+  <div class="row">
+    <div [ngClass]="(commentsSwitch)?'col-sm-9':'col-sm-12'">
+      <pdf-viewer style="display: block;" #ApprovalPDFViewerComponent [src]="pdfURL" [page]="pageVariable"
+        [show-all]="showAll" (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom"
+        [stick-to-page]="true" (error)="onError($event)"></pdf-viewer>
+    </div>
+    <div *ngIf="commentsSwitch" class="col-sm-3">
+      <app-document-forum [chapter]="this.outLineList" [documentList]="this.commentsDocumentsList"
+        [isDocumentWorkFlow]="true"></app-document-forum>
+    </div>
+  </div>
+
+  <ng-container *ngIf="this.popupdata && this.popupdata.length >0 && !disableFormOnUpdate">
+  <app-view-form [inputField]='this.popupdata'></app-view-form><br>
+   </ng-container>
+  <app-individual-audit-trail [permission]="this.helper.VENDOR_VALIDATION_VALUE" [id]="data.id"></app-individual-audit-trail>
+  <hr>
+</div>
+</app-card>
+
+<app-modal-basic #externalApprovalmodal [dialogClass]="'modal-md'" [hideHeader]="false" [hideFooter]="false">
+  <div class="app-modal-header">
+    <h4 class="modal-title">External Approval</h4>
+    <button type="button" class="close basic-close" (click)="externalApprovalmodal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <form [formGroup]="onExternalApprovalForm">
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Name
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="name" id="nameId" class="form-control" placeholder="name" formControlName="name" maxlength="50"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('name').touched && onExternalApprovalForm.get('name').hasError('required')">{{externalApprovalErrorTypes.nameValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Email
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="code" id="emailId" class="form-control" placeholder="email" formControlName="email" maxlength="50"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('email').touched && onExternalApprovalForm.get('email').hasError('required')">{{externalApprovalErrorTypes.emailValidation}}</div>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('email').hasError('pattern')">{{externalApprovalErrorTypes.emailPatternValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Validity (Days)
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" formControlName="validity"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('validity').touched && onExternalApprovalForm.get('validity').hasError('required')">{{externalApprovalErrorTypes.validityValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Remarks
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+            <textarea rows="3" class="form-control" formControlName="remarks"></textarea>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('remarks').touched && onExternalApprovalForm.get('remarks').hasError('required')">{{externalApprovalErrorTypes.remarksValidation}}</div>
+            </div>
+          </div>
+          <br>
+          <div class="form-group row">
+            <div class="col-sm-12 text-center">
+              <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="onClickSave();">Submit for Approval</button>
+              <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="externalApprovalmodal.hide();">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<!-- <app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData">
+  <div><br>
+    <h4>&nbsp;&nbsp;Revision Form Document
+      <div style="float: right;">
+        <a style="cursor:pointer;font-weight: bold" class="ti-close"
+          (click)="onClickViewClose();">&nbsp;&nbsp;</a>
+      </div>
+    </h4>
+  </div>
+  <div><br>
+    <div class="table-group row col-sm-12">
+      <label class="col-sm-2">Source File
+        <span class="asterisk">*</span>
+      </label>
+      <div class="col-sm-4">
+        <select name="select" class="form-control" required [(ngModel)]="sourceFile" name="sourceFile" (change)="getFileNameForRevisionRight($event)"
+          #sourceFileModel="ngModel">
+          <option value="">Select Document</option>
+          <option *ngFor="let left of leftRevisionArray ; let lindex = index" [value]="left.filePath">
+            R-{{lindex+1}}&nbsp;{{left.fileName}}</option>
+        </select>
+      </div>
+
+      <label class="col-sm-2 col-form-label">Compare File
+        <span class="asterisk">*</span>
+      </label>
+
+      <div class="col-sm-4">
+        <select name="select" class="form-control" required [(ngModel)]="compareFile" name="compareFile" (change)="getFileNameForRevisionLeft($event)"
+          #compareFileModel="ngModel">
+          <option value="">Select Document</option>
+          <option *ngFor="let right of rightRevisionArray ; let rindex=index" [value]="right.filePath">
+            R-{{rindex+1}}&nbsp;{{right.fileName}}</option>
+        </select>
+      </div>
+    </div><br>
+    <div class="form-group row col-sm-12" style="text-align: center;">
+      <button type="button" class="btn btn-primary" (click)="$event.preventDefault();compareTwoFile()"><span>
+          <i *ngIf="modalSpinner" class="spinner-border spinner-border-sm"></i>Compare</span>&nbsp; </button>
+      <div class="messages text-danger" *ngIf="sourceFile === '' || compareFile === '' ">{{this.revisionValidationMessage}}
+      </div>
+      <div *ngIf="modalSpinner" class="loading">Loading&#8230;</div>
+    </div>
+  </div>
+  <hr>
+  <div id="overflowCompareId" class="overflow-container" style="visibility: hidden !important" slimScroll
+    railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+    allowPageScroll="false">
+
+    <div style="text-align:center" class="table-group">
+      <iframe width="600px" height="800px" id="sourceFileId"></iframe>
+      <iframe width="600px" height="800px" id="compareFileId"></iframe>
+    </div>
+
+  </div>
+  &nbsp;&nbsp;<br><br><br>
+</app-card>
+
+<app-modal-basic #modalRevision [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+<div class="app-modal-body">
+<button type="button" class="close basic-close-light-box" (click)="modalRevision.hide()">
+  <span aria-hidden="true">&times;</span>
+</button>
+<h5>Revision Form Document</h5><br>
+<div><br>
+  <div class="table-group row col-sm-12">
+    <label class="col-sm-2">Source File
+      <span class="asterisk">*</span>
+    </label>
+    <div class="col-sm-4">
+      <select name="select" class="form-control" required [(ngModel)]="sourceFile" name="sourceFile"
+        #sourceFileModel="ngModel">
+        <option *ngFor="let left of leftRevisionArray ; let lindex = index" [value]="left.filePath">
+          R-{{lindex+1}}&nbsp;{{left.fileName}}</option>
+      </select>
+    </div>
+
+    <label class="col-sm-2 col-form-label">Compare File
+      <span class="asterisk">*</span>
+    </label>
+
+    <div class="col-sm-4">
+      <select name="select" class="form-control" required [(ngModel)]="compareFile" name="compareFile"
+        #compareFileModel="ngModel">
+        <option *ngFor="let right of rightRevisionArray ; let rindex=index" [value]="right.filePath">
+          R-{{rindex+1}}&nbsp;{{right.fileName}}</option>
+      </select>
+    </div>
+  </div><br>
+  <div class="form-group row col-sm-12" style="text-align: center;">
+    <button type="button" class="btn btn-primary" (click)="$event.preventDefault();compareTwoFile()"><span>
+        <i *ngIf="modalSpinner" class="spinner-border spinner-border-sm"></i>Compare</span>&nbsp; </button>
+    <div class="messages text-danger" *ngIf="sourceFile=='' || compareFile=='' ">{{this.revisionValidationMessage}}
+    </div>
+    <div *ngIf="modalSpinner" class="loading">Loading&#8230;</div>
+  </div>
+</div>
+<hr>
+<div id="overflowCompareId" class="overflow-container" style="visibility: hidden !important" slimScroll
+  railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+  allowPageScroll="false">
+
+  <h5>Compare View</h5><br>
+
+  <div style="text-align:center" class="table-group">
+    <iframe width="600px" height="800px" id="sourceFileId"></iframe>
+    <iframe width="600px" height="800px" id="compareFileId"></iframe>
+  </div>
+
+</div>
+</div>
+</app-modal-basic> -->
+
+<app-document-status-comment-log #documentcomments></app-document-status-comment-log>
+
+<app-individual-document-item-workflow [permissionConstant]="this.helper.VENDOR_VALIDATION_VALUE"
+  #individualDocumentItemWorkflow></app-individual-document-item-workflow>
+
+  <app-modal-animation #documentEsign class="p-20" container="body" [modalID]="'effect-1'" [modalClass]="'md-effect-1'">
+    <h3 class="pt-2 pb-1">Electronic Signature</h3>
+    <form style="background: white !important;border: none;" class="well well-lg pt-1" [formGroup]="esignForm"
+      (ngSubmit)="onSubmit(esignForm)">
+      <div class="row">
+        <label class="col-sm-6 pt-4">Please enter your Comments</label>
+        <div class="col-sm-6">
+          <textarea class="form-control" id="unscriptedVerificationComments" placeholder="Comments"
+            formControlName="comments" name="description" maxlength="250" cols="50" rows="3"> </textarea>
+        </div>
+      </div>
+      <div class="row">
+        <strong class="col-sm-12 strong">This verification requires your electronic signature. </strong>
+      </div>
+      <hr class="m-2">
+      <div class="row">
+        <div class="col-sm-2">
+          <input type="checkbox" [checked]="this.agreementCheck" name="check" (change)="onclickAccept()"> I Accept
+        </div>
+        <div class="col-sm-10">
+          <h6>{{this.esignAgreementMessage.agreementMessage}}</h6>
+        </div>
+      </div>
+      <div class="row pt-1" *ngIf="this.agreementCheck">
+        <label class="col-sm-6">Please enter your Email Id or User Name</label>
+        <div class="col-sm-6">
+          <input class="form-control" size="49" formControlName="userName" type="email" autocomplete="new-password"
+            placeholder="Email Id or User Name" name="userName" required />
+        </div>
+      </div>
+      <div class="row pt-1" *ngIf="this.agreementCheck">
+        <label class="col-sm-6"> Please enter your Password</label>
+        <div class="col-sm-6">
+          <input class="form-control" size="49" formControlName="password" type="password" placeholder="password"
+            name="password" autocomplete="new-password" required />
+        </div>
+      </div>
+      <div class="row pt-1" *ngIf="this.agreementCheck">
+        <div class="col-sm-6 pt-5"><label for="viewSignatureId"><input type="checkbox" [checked]="viewSignature"
+              id="viewSignatureId"
+              (click)="viewSignature=!viewSignature;viewSignature?clearSignature():'';" />&nbsp;Enable Signature
+            Pad</label></div>
+        <div *ngIf="viewSignature" class="col-sm-6">
+          <div class="well well-sm mb-0">
+            <signature-pad [options]="signaturePadOptions" (onEndEvent)="signatureComplete()">
+            </signature-pad>
+          </div>
+          <button type="button" *ngIf="esignForm.get('signature').value"
+            class="mr-0 btn btn-sm btn-link waves-effect waves-light" (click)="clearSignature()">Clear</button>
+        </div>
+      </div>
+      <div class="row">
+        <p *ngFor="let item of errorList" class="text-danger">{{item}}</p>
+        <p class="text-danger p-0" *ngIf="(this.submitted) && esignForm.get('userName').hasError('required')">
+          <span>{{errorMessageHelper.usernameValidation}}</span>
+        </p>
+        &nbsp;&nbsp;<p class="text-danger p-0" *ngIf="(this.submitted) && esignForm.get('password').hasError('required')">
+          <span>{{errorMessageHelper.passwordValidaiton}}</span>
+        </p>
+        &nbsp;&nbsp;<p class="text-danger p-0" *ngIf="(this.submitted) && esignForm.get('comments').hasError('required')">
+          <span>{{errorMessageHelper.commentsValidation}}</span>
+        </p>
+      </div>
+      <br>
+      <button style="text-align: center;" *ngIf="this.agreementCheck" type="submit"
+        class="btn btn-danger waves-effect waves-light ">ESign</button>
+    </form>
+    <button (click)="closeMyModal($event)" aria-label="Close" class="md-close-btn"><i
+        class="icofont icofont-ui-close"></i></button>
+  </app-modal-animation>
+
+  <app-modal-basic #modalLargeWorkFlowProjectSummary [dialogClass]="'modal-lg'" [hideClickOutSide]="true"
+  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow Configuration</h4>
+    <button type="button" class="close basic-close" (click)="modalLargeWorkFlowProjectSummary.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body">
+    <div style="max-height: 300px !important;" class="col-sm slimScrollDiv">
+      <div class="dt-desc dy-width-300">
+          <ul class="progress-indicator">
+            <li *ngFor="let data of this.getStatus;" class="completed">
+              <label>
+                <span style="white-space: pre-line;" class="bubble"></span>
+                <div  style="text-align: left;" class="strong"><a role="button" *ngIf="data.workFlowCompleted"><img style="width: 25px; height: 25px;" class="image-radius rounded-0 img-30 m-r-10"
+                  src="assets/icon/png-icons/checked.png" alt="Forum" placement="bottom" ngbTooltip="External Approval"></a> {{data.levelName}} : {{data.type}}<br>
+                  <span *ngIf="data.allUserApproval">(All User Approval)</span><br>
+                  <div><b class="black"><u>Users</u></b>
+                    <div *ngIf="data.allUserApproval">
+                      <li *ngFor="let user of data.userApprovalList;let i = index ">
+                        {{i+1}}.{{user.user}}
+                        <div *ngIf="user.comments" class="black"><b>Comments : </b> {{user.comments}}</div>
+                        <div *ngIf="user.dateTime" class="black"><b>Date : </b> {{user.dateTime}}</div>
+                      </li>
+                    </div>
+                    <div *ngIf="!data.allUserApproval">
+                      <li *ngFor="let user of data.userArray;let i = index ">{{i+1}}.{{user}}</li>
+                      <div *ngIf="data.workFlowCompleted" class="black"><b>Comments : </b> {{data.comments}}</div>
+                      <div *ngIf="data.workFlowCompleted" class="black"><b>Date : </b> {{data.createdTime}}</div>
+                    </div>
+                  </div>
+                  <div *ngIf="data.externalApprovalList.length >0">
+                    <b class="black"><u>External Approval</u></b>
+                    <li *ngFor="let user of data.externalApprovalList;let i = index ">
+                      {{i+1}}.{{user.user}}
+                      <div *ngIf="user.comments" class="black"><b>Comments : </b> {{user.comments}}</div>
+                      <div *ngIf="user.dateTime" class="black"><b>Date : </b> {{user.dateTime}}</div>
+                    </li>
+                  </div><br>
+                  
+                 
+    </div>
+    </label>
+    </li>
+    </ul><br><br>
+  </div>
+  </div>
+  <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>

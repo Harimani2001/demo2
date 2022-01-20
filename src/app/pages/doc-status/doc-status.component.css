@@ -1,0 +1,154 @@
+
+
+@media handheld, screen and (max-width: 400px) {
+  .container {
+      margin: 0;
+      width: 100%;
+  }
+  .progress-indicator.stacked {
+      display: block;
+      width: 100%;
+  }
+  .progress-indicator.stacked > li {
+      height: 80px;
+  }
+}
+
+.flexer,.progress-indicator {
+display: -webkit-box;
+display: -moz-box;
+display: -ms-flexbox;
+display: -webkit-flex;
+display: flex
+}
+
+
+.flexer-element,.progress-indicator>li {
+-ms-flex: 1;
+-webkit-flex: 1;
+-moz-flex: 1;
+flex: 1
+}
+
+.progress-indicator>li {
+list-style: none;
+text-align: center;
+width: auto;
+padding: 0;
+margin: 0;
+position: relative;
+text-overflow: ellipsis;
+color: #bbb;
+display: block
+}
+
+.progress-indicator>li.completed,.progress-indicator>li.completed .bubble {
+color: #65d074
+}
+
+.progress-indicator>li .bubble {
+border-radius: 1000px;
+width: 20px;
+height: 20px;
+background-color: #bbb;
+display: block;
+margin: 0 auto .5em;
+border-bottom: 1px solid #888
+}
+
+.progress-indicator>li .bubble:after,.progress-indicator>li .bubble:before {
+display: block;
+position: absolute;
+top: 9px;
+width: 100%;
+height: 3px;
+content: '';
+background-color: #bbb
+}
+
+.progress-indicator>li.completed .bubble,.progress-indicator>li.completed .bubble:after,.progress-indicator>li.completed .bubble:before {
+background-color: #65d074;
+border-color: #247830
+}
+
+.progress-indicator>li .bubble:before {
+left: 0
+}
+
+.progress-indicator>li .bubble:after {
+right: 0
+}
+
+.progress-indicator>li:first-child .bubble:after,.progress-indicator>li:first-child .bubble:before {
+width: 50%;
+margin-left: 50%
+}
+
+.progress-indicator>li:last-child .bubble:after,.progress-indicator>li:last-child .bubble:before {
+width: 50%;
+margin-right: 50%
+}
+
+.progress-indicator>li.active,.progress-indicator>li.active .bubble {
+color: #337AB7
+}
+
+.progress-indicator>li.active .bubble,.progress-indicator>li.active .bubble:after,.progress-indicator>li.active .bubble:before {
+background-color: #337AB7;
+border-color: #122a3f
+}
+
+
+@media handheld,screen and (max-width: 400px) {
+.progress-indicator {
+  font-size:60%
+}
+}
+
+.squeezebox .sb-item {
+  overflow: hidden;
+}
+
+.squeezebox .sb-item .sb-item-body {
+  height: 0;
+  overflow: hidden;
+  transition: 0.5s height;
+}
+
+.dropbtn {
+  background-color: #4680ff;
+  color: white;
+  padding: 5px 10px;
+    line-height: 14px;
+    font-size: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+

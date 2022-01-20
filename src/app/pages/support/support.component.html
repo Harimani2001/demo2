@@ -1,0 +1,96 @@
+
+  <app-card cardClass="support-bg-color">
+    <div class="row">
+      <div class="col-sm-6 text-center mt-5 p-5">
+        <h1 class="text-white">Welcome to our</h1>
+        <h3 class="text-white">Support Page</h3>
+      </div>
+      <div class="col-sm-6 pr-5 pt-5">
+        <div class="card ">
+          <div class="card-header pb-2 text-dark  text-uppercase"><strong>Quick Links</strong></div>
+          <div class="card-body text-white support-bg-color">
+            <!--<div class="row">
+              <div class="col-sm-4">
+                For support queries:
+              </div>
+              <div class="col-sm-8">
+                <a href="https://www.govalidation.com/user" target="_blank" class="text-white card-link">
+                  https://www.govalidation.com/user</a>
+              </div>
+            </div>-->
+            <div class="row">
+              <div class="col-sm-4">
+                To know About us:
+              </div>
+              <div class="col-sm-8">
+                <a href="https://www.adventsys.in" target="_blank" class="text-white card-link ">
+                  https://www.adventsys.in</a>
+              </div>
+            </div>
+            <!--<div class="row">
+              <div class="col-sm-4">
+                To contact us :
+              </div>
+              <div class="col-sm-8">
+                <a href="https://www.govalidation.com/contact-us" target="_blank" class="text-white card-link">
+                  https://www.govalidation.com/contact-us</a>
+              </div>
+            </div>-->
+            <div class="row">
+              <div class="col-sm-4">
+                Email :
+              </div>
+              <div class="col-sm-8">
+                <a href="mailto: info@govalidation.com" target="_blank" class="text-white card-link">info@govalidation.com</a>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4">
+               
+              </div>
+              <div class="col-sm-8">
+                <a href="https://www.govalidation.com/eula-terms-and-condition/" target="_blank" class="text-white card-link"><u>Terms & Condition</u> </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </app-card>
+
+  <div class="row  simple-cards users-card">
+    <ng-container *ngFor="let level of this.data; let i= index;">
+      <div class="col-sm-4">
+        <div>
+          <div class="card user-card" [ngStyle]="{'background-color': level.color }">
+            <div class="card-header-img">
+              <i style="font-size: 50px;color: white;" [class]="level.icon"></i>
+            </div>
+            <div class="card-body text-white">
+              <h4>{{level.title}}</h4>
+              <span [innerHTML]="level.description"></span>
+            </div>
+            <div>
+              <a *ngIf="level.url" [href]="level.url" target="_blank" class="text-white card-link"><u>Click Here</u> </a> &nbsp;&nbsp;
+              <!-- <button *ngIf="level.url" type="button" (click)="copyText(level.url)"
+                class="border-white btn btn-sm btn-link waves-effect waves-light text-white m-r-10">
+                <span><i class="icofont icofont-ui-copy m-r-5"></i>Copy URL</span>
+              </button> -->
+              <button *ngIf="level.downloadName" type="button" (click)="download(level)"
+                class="border-white btn btn-sm btn-link waves-effect waves-light text-white">
+                <span><i class="icofont icofont-download m-r-5"></i>Download</span>
+              </button>
+            </div>
+          </div>
+          <div class="link">
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+
+
+
+ 

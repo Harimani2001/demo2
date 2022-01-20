@@ -1,0 +1,1172 @@
+<div style="padding:0px 20px">
+  <div class="row seven-cols" *ngIf="permissionData && permissionData.length>0">
+    <div class="col-sm-1">
+    <div class="showMyCard" (click)="showSubCard('myTask');">
+        <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/tasks.png"><br>
+          <p class="show-text"style="font-weight:bold">My Task</p>
+          <div class="bottomBorder" [style.border-bottom]="showTask? '3px solid darkblue':'none'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-1 boxBorder" >
+      <div class="showMyCard " (click)="showSubCard('projectSetUp');">
+        <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/valProjectSetUp.png"><br>
+          <p class="show-text"style="font-weight:bold">Validation Project</p>
+          <div class="bottomBorder" [style.border-bottom]="showValProjectSetUp? '3px solid darkblue':'none'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-1 boxBorder">
+      <div class="showMyCard " (click)="showSubCard('equipment')" >
+        <div href="javascript:"><img class="image-radius rounded-0 img-25"
+            src="assets/icon/png-icons/equipment.png"><br>
+          <p class="show-text"style="font-weight:bold">Equipment</p>
+          <div class="bottomBorder" [style.border-bottom]="showEquipment? '3px solid darkblue':'none'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-1 boxBorder">
+      <div class="showMyCard " (click)="showSubCard('forms')" >
+        <div href="javascript:"><img class="image-radius rounded-0 img-25"
+            src="assets/icon/png-icons/form1.png"><br>
+          <p class="show-text" style="font-weight:bold">Forms</p>
+          <div class="bottomBorder" [style.border-bottom]="showForms? '3px solid darkblue':'none'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-1 boxBorder" >
+      <div class="showMyCard " (click)="showSubCard('qms')" >
+        <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/qms.png"><br>
+          <p class="show-text" style="font-weight:bold">QMS</p>
+          <div class="bottomBorder" [style.border-bottom]="showQms? '3px solid darkblue':'none'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-1 boxBorder" >
+      <div class="showMyCard " (click)="showSubCard('masterData')" >
+        <div href="javascript:"><img class="image-radius rounded-0 img-25" 
+            src="assets/icon/png-icons/masterData.png"><br>
+          <p class="show-text" style="font-weight:bold">Master Data</p>
+          <div class="bottomBorder" [style.border-bottom]="showMaster? '3px solid darkblue':'none'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-1 boxBorder" >
+      <div class="showMyCard " (click)="showSubCard('reports')" >
+        <div href="javascript:"><img class="image-radius rounded-0 img-25"
+            src="assets/icon/png-icons/dashBoard.png"><br>
+          <p class="show-text" style="font-weight:bold">Reports</p>
+          <div class="bottomBorder" [style.border-bottom]="showReport? '3px solid darkblue':'none'"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-1 boxBorder">
+      <div class="showMyCard " (click)="showSubCard('settings')">
+        <div href="javascript:"><img class="image-radius rounded-0 img-25"
+            src="assets/icon/png-icons/priority.png"><br>
+          <p class="show-text" style="font-weight:bold">Settings</p>
+          <div class="bottomBorder" [style.border-bottom]="showSetting? '3px solid darkblue':'none'"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+<hr  *ngIf="permissionData && permissionData.length>0">
+
+<div  *ngIf="permissionData && permissionData.length>0">
+  <div *ngIf="showTask">
+     <div class="row">
+      <div class="col-sm-4">
+        <div class="page-header-title">
+          <div class="d-inline">
+            
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-8">
+        <div class="nav-item nav-grid">
+          <a *ngIf="!tableView" href="javascript:" class="m-r-20"><img class="image-radius rounded-0 img-25"
+              src="assets/icon/png-icons/tableView.png" alt="Table View" placement="top" ngbTooltip="Table view"
+              (click)="changeview(true)"></a>
+          <a *ngIf="tableView" href="javascript:" class="m-r-20"><img class="image-radius rounded-0 img-30"
+              src="assets/icon/png-icons/cardView.png" alt="Card View" placement="top" ngbTooltip="Card View"
+              (click)="changeview(false)"></a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="table-responsive" *ngIf="tableView">
+    <h5>Project Tasks</h5>
+    <table id="dtBasicExample" class="table table-bordered">
+      <tbody>
+          <ng-container *ngFor="let m of filterData; let i = index;">
+          <tr>
+            <th colspan="5">{{m.name}}</th>
+          </tr>
+          <tr class="lightGary" width="100%">
+            <th>Task Id</th>
+            <th>Title</th>
+            <th>Created Date</th>
+            <th>Due Date</th>
+            <th>Remaining</th>
+          </tr>
+          <tr *ngFor="let row of m.dto ; let i=index;">
+            <td>{{row['taskCode']}}</td>
+            <td>
+              <label class="text-c-blue" style="cursor: pointer !important;" (click)="routeView(row);">
+                <a href="javascript:"></a>{{row['title']}}
+              </label>
+            </td>
+            <td>{{row['updatedDate']}}</td>
+            <td>{{row['dueDate']}}</td>
+            <td>{{row['remaingDays']}}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="col-sm-12"  *ngIf="!tableView">
+    <h5>Project Tasks</h5>
+    <div style="display: flex;overflow: auto;">
+      <div *ngFor="let project of filterData">
+        <div class="card list-wrapper">
+          <div class="card-block list">
+            <h4 class="card-main-menu-title " style="margin-bottom: 9px!important;">{{project.name}}
+              <span class="badge-tasks">
+                <img class="image-radius rounded-0" src="assets/icon/png-icons/tickBox.png"
+                height="17" style="padding-bottom: 2px;">
+                {{project.completedCount}}/{{project.totalCount}}
+              </span>
+            </h4>
+            <div class="row" style="margin-bottom: 9px!important;">
+              <div class="col-menu-sm-2">
+                <span class="font-11">{{project.completedWidth}}%</span>
+              </div>
+              <div class="col-menu-sm-10">
+                <div class="progress progress-main-menu">
+                  <div class="progress-bar bg-primary progress-bar-main-menu" ngbTooltip="Closed Tasks : {{project.completedCount}}" [style.width.%]="project.completedWidth"></div>
+                  <div class="progress-bar bg-white progress-bar-main-menu" *ngIf="project.completedCount!=0" ngbTooltip="Open Tasks : {{project.openCount}}" [style.width.%]="project.openWidth"></div>
+                  <div class="progress-bar bg-white progress-bar-main-menu" style="color: black;" *ngIf="project.completedCount==0" ngbTooltip="Open Tasks : {{project.openCount}}" [style.width.%]="project.openWidth"></div>
+                </div>
+              </div>
+            </div>
+            <div class="list-cards" style="max-height:380px">
+              <div *ngFor="let dto of project.dto" style="margin-top: -20px;">
+                <expansion-panels-container>
+                  <app-card>
+                    <expansion-panel-title style="width: 290px;">
+                      <span style="text-overflow: ellipsis;
+                      display: -webkit-box;
+                      -webkit-line-clamp: 2;
+                      overflow: hidden !important;
+                      -webkit-box-orient: vertical;">
+                        <span *ngIf="dto.priority === 'High'" class="text-danger"><i class="fa fa-circle"></i></span>
+                        <span *ngIf="dto.priority === 'Medium'" class="text-warning"><i class="fa fa-circle"></i></span>
+                        <span *ngIf="dto.priority === 'Low'" class="text-info"><i class="fa fa-circle"></i></span>
+                        {{dto.taskCode}} : <span class="font-13">{{dto.title}}</span>
+                      </span>
+                      <hr class="horzontal_line">
+                      <span class="font-13">
+                        <strong>Due Date</strong> : <span>{{dto.dueDate}}</span>
+                        |
+                        <strong>Created Date</strong> : {{dto.updatedDate}}</span>
+                      <hr class="horzontal_line">
+                      <span class="font-13">
+                        <strong>Remaining</strong> : {{dto.remaingDays}}
+                      </span>
+                      <div class="font-13" style="text-align: right;">
+                        <span class="text-c-blue" style="cursor: pointer;" (click)="routeView(dto);">View More</span>
+                      </div>
+                    </expansion-panel-title>
+                  </app-card>
+                </expansion-panels-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!---->
+<br>
+
+<app-card [cardClass]="'card-current-prog'" *ngIf="this.enableData.summary && filteredDocumentSummaryList.length>0">
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="page-header-title">
+        <div class="d-inline">
+          <h5>Document Summary</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row col-sm-12" style="overflow: auto;">
+    <ng-container *ngFor="let doc of filteredDocumentSummaryList; let k=index">
+      <div class="list-wrapper-custom-css">
+        <div class="card-block">
+          <h4 class="card-title"><strong class="strong">{{doc.documentName}}</strong></h4>
+          <div class="list-cards">
+            <div class="row card-body p-t-0">
+              <ng-container
+                *ngIf="(doc.documentCategory == 'Document' || doc.documentCategory == 'Link' )&& doc.documentType !='108' && doc.documentType !='109' && doc.documentType != '110' && doc.documentType != '207' && doc.documentType !='208' ">
+                <div [ngStyle]="{'width':'350px,height:150px'}">
+                  <canvas baseChart [data]="pieChartView(doc)" [labels]="pieChartLabels(doc)" [legend]="true"
+                    [options]="this.pieChartOptions" [chartType]="this.pieChartType" [colors]="this.pieChartColors">
+                  </canvas>
+                </div>
+              </ng-container>
+              <ng-container
+                *ngIf="doc.documentCategory == 'Document' && doc.documentType =='108' || doc.documentType =='109' || doc.documentType == '110' || doc.documentType == '207' || doc.documentType =='208' ">
+                <span><strong class="strong">Test Run: &nbsp;</strong>
+                  {{doc['testRunName']}} </span>
+                <canvas baseChart [data]="pieChartViewTestCase(doc)" [labels]="donaltChartLabel(doc)" [legend]="true"
+                  [options]="this.pieChartOptions" [chartType]="this.doughnutChartType"
+                  [colors]="this.pieChartColorsForTestCase">
+                </canvas>
+              </ng-container>
+              <ng-container
+                *ngIf="doc.documentCategory == 'Form' ||  doc.documentCategory == 'Template' ||  doc.documentCategory == 'Form_Group'">
+                <google-chart [data]="doc['comboChartData']"></google-chart>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</app-card>
+
+<!---->
+
+
+<div class="row">
+  <div class="col-md-12 col-xl-8">
+    <app-card [title]="'Tasks'" [cardClass]="'card-current-prog'" *ngIf="taskList.length > 0">
+      <div *ngFor="let task of taskList" (click)="taskDetails(task)">
+        <div class="row">
+          <div class="col-sm-1 card-img">
+            <a href="javascript:"><img class="image-radius img-40" src="assets/images/homePage/Task.jpg" alt=""></a>
+          </div>
+          <div class="col-sm-6 card-contain">
+            <label class="f-w-600" style="display: inline;">{{task.taskTitle}}</label><br>
+            <p class="text-muted">Status : {{task.status}}</p>
+          </div>
+          <div class="col-sm-2">
+            <label>
+              Priority : <span
+                [ngStyle]="{'color': task.priority == 'High' ? '#FF5050' : '#1A1110'}">{{task.priority}}</span>
+            </label>
+          </div>
+          <div class="col-sm-3">
+            <label><span> <i class="icofont icofont-ui-clock text-muted mr-0"></i>
+                Due Date : <span class="text-muted">{{task.dueDate}}</span></span></label>
+          </div>
+        </div>
+        <hr class="horzontal_line">
+      </div>
+    </app-card>
+    <app-card *ngIf="equipmentList.length > 0" [title]="'Equipment Report'" [cardClass]="'review-project'"
+      [blockClass]="'p-t-0 p-b-0 w-100'">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th style="text-align: center;">Name</th>
+              &nbsp;<th>Status</th>
+              <th>From Date</th>
+              <th>To Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let equipment of equipmentList" (click)="eqDetails()">
+              <td>
+                <a href="javascript:"><img class="image-radius img-50" src="assets/images/homePage/tool.png"
+                    alt="chat-user"></a>
+                <div class="project-contain">
+                  <h6>{{equipment.equipmentName}}</h6>
+                  <p class="text-muted">Batch : {{equipment.batchName}}</p>
+                </div>
+              </td>
+              <td>
+                <span class="pie_1" style="display: none;">1/5</span>
+              </td>
+              <td>
+                {{equipment.statusDesc}}
+              </td>
+              <td>
+                {{equipment.displayFromDate}}
+              </td>
+              <td>
+                {{equipment.displayToDate}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  </div>
+  <div class="col-md-12 col-xl-4">
+    <div *ngIf="spinning" class="loading">Loading&#8230;</div>
+    <app-card [title]="'Recent Activites'" [blockClass]="'p-t-20'" *ngIf="recentActivites.length > 0">
+      <div class="card-notification" *ngFor="let activites of recentActivites">
+        <div class="card-noti-conatin" (click)="activitesData(activites.url)">
+          <small>{{activites.lastDuration}}</small>
+          <p class="text-muted m-b-30">{{activites.documentName}}
+            &nbsp;&nbsp;|&nbsp;&nbsp;{{activites.documentCode}}&nbsp;&nbsp;|&nbsp;&nbsp;{{activites.displayUpdatedTime}}
+          </p>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="col-md-12 col-xl-4" *ngFor="let count of approvalCount">
+    <div class="{{count.cssClass}}">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-sm-2">
+            <i class="icofont icofont-social-dribbble"></i>
+          </div>
+          <div class="col-sm-10">
+            <div class="d-inline-block">
+              <h5>{{count.documentName}}</h5>
+              <span> Item(s) pending for Approval/Esign </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-block text-center">
+        <div class="row">
+          <div class="col-6 b-r-default" *ngFor="let list of count.list; let i = index">
+            <h2>{{list.count}}</h2>
+            <p class="text-muted">{{list.levelName}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngFor="let module of modulesList">
+  <div *ngIf="module.moduleType === 'Master Data setup'">
+    <p class="module-heading"><strong>{{module.moduleType}}</strong></p>
+    <div class="row">
+      <div class="col-md-12 col-xl-3" *ngFor="let child of module.modulesList">
+        <div class="card widget-statstic-card" (click)="urlRedirect(child)">
+          <div class="card-header">
+            <div class="card-header-left">
+              <p class="f-w-600 f-16 m-b-0" style="color: blueviolet;">{{child.value}}</p>
+            </div>
+          </div>
+          <div class="card-block">
+            <i class="icofont icofont-chart-line st-icon bg-c-yellow"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="module.moduleType === 'Project Setup'">
+    <p class="module-heading"><strong>{{module.moduleType}}</strong> </p>
+    <div class="row">
+      <div class="col-md-12 col-xl-3" *ngFor="let child of module.modulesList">
+        <div class="card widget-statstic-card" (click)="urlRedirect(child)">
+          <div class="card-header">
+            <div class="card-header-left">
+              <p class="f-w-600 f-16 m-b-0" style="color: #2E5894;">{{child.value}}</p>
+            </div>
+          </div>
+          <div class="card-block">
+            <i class="icofont icofont-presentation-alt st-icon bg-c-blue"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="module.moduleType === 'Equipment'">
+    <p class="module-heading"><strong>{{module.moduleType}}</strong> </p>
+    <div class="row">
+      <div class="col-md-12 col-xl-3" *ngFor="let child of module.modulesList">
+        <div class="card widget-statstic-card" (click)="urlRedirect(child)">
+          <div class="card-header">
+            <div class="card-header-left">
+              <p class="f-w-600 f-16 m-b-0" style="color: #45A27D;">{{child.value}}</p>
+            </div>
+          </div>
+          <div class="card-block">
+            <i class="icofont icofont-dashboard-web st-icon bg-c-pink txt-lite-color"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="module.moduleType === 'Common Modules'">
+    <p class="module-heading"><strong> {{module.moduleType}}</strong></p>
+    <div class="row">
+      <div class="col-md-12 col-xl-3" *ngFor="let child of module.modulesList">
+        <div class="card widget-statstic-card" (click)="urlRedirect(child)">
+          <div class="card-header">
+            <div class="card-header-left">
+              <p class="f-w-600 f-16 m-b-0">{{child.value}}</p>
+            </div>
+          </div>
+          <div class="card-block">
+            <i class="icofont icofont-ui-home st-icon bg-c-green"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  </div>
+
+
+  <div *ngIf="showValProjectSetUp">
+    <div class="card-notification m-t-10" *ngIf="individualPermissionsResult('205') || individualPermissionsResult('100') 
+       || gxpFormExists || individualPermissionsResult('128') || individualPermissionsResult('181')">
+     <div class="card-noti-conatin">
+       <p class="darkblue">Prepare</p>
+       <div class="row m-l-10">
+         <div class="col-sm-2" *ngIf="this.currentUser.projectId && individualPermissionsResult('205')">
+           <div class="showMyInnerCard" (click)="navigateToModule('205')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/requirementSummary.png"><br>
+               <p class="show-text">Requirement Summary</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('100')">
+           <div class="showMyInnerCard" routerLinkActive="active" (click)="navigateToProjectTab('');">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/equipment.png"><br>
+               <p class="show-text">Project Setup</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2"
+           *ngIf="this.currentUser.projectId && individualPermissionsResult('100') && gxpFormExists">
+           <div class="showMyInnerCard" routerLinkActive="active" (click)="navigateToProjectTab('gxp');">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/gxpAss.png"><br>
+               <p class="show-text">GxP Assessment</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="this.currentUser.projectId && individualPermissionsResult('100')">
+           <div class="showMyInnerCard" routerLinkActive="active" (click)="navigateToProjectTab('workflow');">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/docWorkFlow.png"><br>
+               <p class="show-text">Document Workflow</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="this.currentUser.projectId && individualPermissionsResult('128')">
+           <div class="showMyInnerCard" (click)="navigateToModule('128')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/vendorDoc.png"><br>
+               <p class="show-text">Vendor Documents</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="this.currentUser.projectId && individualPermissionsResult('181')">
+           <div class="showMyInnerCard" (click)="navigateToModule('181')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/digital-signature.png"><br>
+               <p class="show-text">eSign</p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="card-notification m-t-10"
+     *ngIf="this.currentUser.projectId && (individualPermissionsResult('116') || (individualPermissionsResult('107') && checkProjectDocument('107'))
+       || (individualPermissionsResult('200') && checkProjectDocument('200')) || (individualPermissionsResult('113') && checkProjectDocument('113')))">
+     <div class="card-noti-conatin">
+       <p class="darkblue">Plan</p>
+       <div class="row m-l-10">
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('116')">
+           <div class="showMyInnerCard" (click)="navigateToModule('116')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/plan.png"><br>
+               <p class="show-text">Project Plan</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('107') && checkProjectDocument('107')">
+           <div class="showMyInnerCard" (click)="navigateToModule('107')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/masterData.png"><br>
+               <p class="show-text">User Requirement</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('200') && checkProjectDocument('200')">
+           <div class="showMyInnerCard" (click)="navigateToModule('200')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/spec.png"><br>
+               <p class="show-text">Specification</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('113') && checkProjectDocument('113')">
+           <div class="showMyInnerCard" (click)="navigateToModule('113')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/risk.png"><br>
+               <p class="show-text">Risk Assessment</p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="card-notification m-t-10" *ngIf="this.currentUser.projectId && (individualPermissionsResult('190') || individualPermissionsResult('167')
+     || individualPermissionsResult('135') || individualPermissionsResult('202'))">
+     <div class="card-noti-conatin">
+       <p class="darkblue">Configure</p>
+       <div class="row m-l-10">
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('190')">
+           <div class="showMyInnerCard" (click)="navigateToModule('190')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/taskCreation.png"><br>
+               <p class="show-text">Tasks</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('167')">
+           <div class="showMyInnerCard" (click)="navigateToModule('167')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/eqpDashBoard.png"><br>
+               <p class="show-text">Project Summary</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('135')">
+           <div class="showMyInnerCard" (click)="navigateToModule('135')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/bulkUpload.png"><br>
+               <p class="show-text">Bulk Upload</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('202')">
+           <div class="showMyInnerCard" (click)="navigateToModule('202')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/pdfSetting.png"><br>
+               <p class="show-text">Table of Content</p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="card-notification m-t-10" *ngIf="this.currentUser.projectId && ((individualPermissionsResult('150') && (individualPermissionsResult('108') && checkProjectDocument('108'))
+     || (individualPermissionsResult('109') && checkProjectDocument('109')) || (individualPermissionsResult('110') && checkProjectDocument('110'))
+     || (individualPermissionsResult('207') && checkProjectDocument('207')) || (individualPermissionsResult('208') && checkProjectDocument('208')))
+     || (individualPermissionsResult('201') && checkProjectDocument('201')) || individualPermissionsResult('134'))">
+     <div class="card-noti-conatin">
+       <p class="darkblue">Execute</p>
+       <div class="row m-l-10">
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('150') && (checkProjectDocument('108') || checkProjectDocument('109') 
+         || checkProjectDocument('110') || checkProjectDocument('207') || checkProjectDocument('208'))">
+           <div class="showMyInnerCard" (click)="navigateToModule('150')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/testCase.png"><br>
+               <p class="show-text">Test Case Creation</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="(individualPermissionsResult('108') && checkProjectDocument('108')) || (individualPermissionsResult('109') && checkProjectDocument('109'))
+           || (individualPermissionsResult('110') && checkProjectDocument('110')) || (individualPermissionsResult('207') && checkProjectDocument('207')) 
+           || (individualPermissionsResult('208') && checkProjectDocument('208'))">
+           <div class="showMyInnerCard" [routerLink]="['/tc-execution']">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/testCaseExe.png"><br>
+               <p class="show-text">Test Case Execution</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('201') && checkProjectDocument('201')">
+           <div class="showMyInnerCard" (click)="navigateToModule('201')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/unScriptedTest.png"><br>
+               <p class="show-text">Unscripted Testing</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('134')">
+           <div class="showMyInnerCard" (click)="navigateToModule('134')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/df.png"><br>
+               <p class="show-text">Discrepancy</p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="card-notification m-t-10" *ngIf="this.currentUser.projectId && formsForMainMenu.length>0">
+     <div class="card-noti-conatin">
+       <p class="darkblue">Forms</p>
+       <div *ngIf="formsForMainMenu.length>0" class="row m-l-10">
+         <ng-container *ngFor="let form of this.formsForMainMenu; let i = index;">
+           <div class="col-sm-2">
+             <div class="showMyInnerCard" (click)="redirect(form.url);">
+               <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                   src="assets/icon/png-icons/formMenu.png"><br>
+                 <p class="show-text">{{form.moduleName}}</p>
+               </div>
+             </div>
+           </div>
+           <div *ngIf="(i+1)%6==0"></div>
+         </ng-container>
+       </div>
+     </div>
+   </div>
+   <div class="card-notification m-t-10" *ngIf="this.currentUser.projectId && templatesForMainMenu.length>0">
+     <div class="card-noti-conatin">
+       <p class="darkblue">Templates</p>
+       <div *ngIf="templatesForMainMenu.length>0" class="row m-l-10">
+         <ng-container *ngFor="let template of this.templatesForMainMenu; let i = index;">
+           <div class="col-sm-2">
+             <div class="showMyInnerCard" (click)="redirect(template.url);">
+               <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                   src="assets/icon/png-icons/templateMenu.png"><br>
+                 <p class="show-text">{{template.moduleName}}</p>
+               </div>
+             </div>
+           </div>
+           <div *ngIf="(i+1)%6==0"></div>
+         </ng-container>
+       </div>
+     </div>
+   </div>
+   <div class="card-notification m-t-10"
+     *ngIf="this.currentUser.projectId && (individualPermissionsResult('129') || (individualPermissionsResult('137') && checkProjectDocument('137'))
+       || individualPermissionsResult('203') || individualPermissionsResult('136') || individualPermissionsResult('206'))">
+     <div class="card-noti-conatin">
+       <p class="darkblue">Conclusion</p>
+       <div class="row m-l-10">
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('129')">
+           <div class="showMyInnerCard" (click)="navigateToModule('129')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/traceability.png"><br>
+               <p class="show-text">Traceability Matrix</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('137') && checkProjectDocument('137')">
+           <div class="showMyInnerCard" (click)="navigateToModule('137')">
+             <div href="javascript:">
+               <img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/vsrReport.png"><br>
+               <p class="show-text">VSR</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('203')">
+           <div class="showMyInnerCard" (click)="navigateToModule('203')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/projInventory.png"><br>
+               <p class="show-text">Inventory</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('233')">
+          <div class="showMyInnerCard" (click)="navigateToModule('233')">
+            <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                src="assets/icon/png-icons/Compliance_report.png"><br>
+              <p class="show-text">Compliance Report</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2" *ngIf="individualPermissionsResult('235')">
+          <div class="showMyInnerCard" (click)="navigateToModule('235')">
+            <div href="javascript:"><img class="image-radius rounded-0 img-27"
+                src="assets/icon/png-icons/system_certificate.png"><br>
+              <p class="show-text">System Release</p>
+            </div>
+          </div>
+        </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('136')">
+           <div class="showMyInnerCard" (click)="navigateToModule('136')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/equipment.png"><br>
+               <p class="show-text">DMS</p>
+             </div>
+           </div>
+         </div>
+         <div class="col-sm-2" *ngIf="individualPermissionsResult('206')">
+           <div class="showMyInnerCard" (click)="navigateToModule('206')">
+             <div href="javascript:"><img class="image-radius rounded-0 img-25"
+                 src="assets/icon/png-icons/userAcceptance.png"><br>
+               <p class="show-text">User Acceptance</p>
+             </div>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div *ngIf="showEquipment">
+   <div class="row m-t-10"
+     *ngIf="individualPermissionsResult('163') || individualPermissionsResult('168') || individualPermissionsResult('141')
+    || individualPermissionsResult('166') || individualPermissionsResult('162') || individualPermissionsResult('178')">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('163')">
+       <div class="showMyInnerCard" (click)="navigateToModule('163')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/eqpBatch.png"><br>
+           <p class="show-text">Batch & Product</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('168')">
+       <div class="showMyInnerCard" (click)="navigateToModule('168')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/eqpLog.png"><br>
+           <p class="show-text">Log Mapping</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('141')">
+       <div class="showMyInnerCard" (click)="navigateToModule('141')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/eqpInventory.png"><br>
+           <p class="show-text">Equipment Inventory</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('166')">
+       <div class="showMyInnerCard" (click)="navigateToModule('166')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/eqpStatus.png"><br>
+           <p class="show-text">Batch Status Update</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('162')">
+       <div class="showMyInnerCard" (click)="navigateToModule('162')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/eqpRegister.png"><br>
+           <p class="show-text">Register & Logs</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('178')">
+       <div class="showMyInnerCard" (click)="navigateToModule('178')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/eqpDashBoard.png"><br>
+           <p class="show-text">Equipment Dashboard</p>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="row m-t-20" *ngIf="individualPermissionsResult('165') || individualPermissionsResult('179')
+   || individualPermissionsResult('170') || individualPermissionsResult('219') || individualPermissionsResult('220')">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('165')">
+       <div class="showMyInnerCard" (click)="navigateToModule('165')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/eqpSummary.png"><br>
+           <p class="show-text">Equipment Summary</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('179')">
+       <div class="showMyInnerCard" (click)="navigateToModule('179')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/eqpCalender.png"><br>
+           <p class="show-text">Upcoming Events</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('170')">
+       <div class="showMyInnerCard" (click)="navigateToModule('170')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/eqpInfo.png"><br>
+           <p class="show-text">Equipment Information</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('219')">
+       <div class="showMyInnerCard" (click)="navigateToModule('219')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/cleanRoom.png"><br>
+           <p class="show-text">Cleanroom</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('220')">
+       <div class="showMyInnerCard" (click)="navigateToModule('220')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/spc.png"><br>
+           <p class="show-text">Statistical Process Control</p>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div *ngIf="showForms && this.orgFormsForMainMenu.length>0">
+   <div class="row m-t-0">
+     <ng-container *ngFor="let orgForm of this.orgFormsForMainMenu; let i = index;">
+       <div class="col-sm-2">
+         <div class="showMyInnerCard" (click)="redirect(orgForm.url);">
+           <div href="javascript:"><img class="image-radius rounded-0 img-25"
+               src="assets/icon/png-icons/orgForms.png"><br>
+             <p class="show-text">{{orgForm.title}}</p>
+           </div>
+         </div>
+       </div>
+       <div *ngIf="(i+1)%6==0"></div>
+     </ng-container>
+   </div>
+ </div>
+
+ <div *ngIf="showQms">
+   <div class="row m-t-10">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('191')">
+       <div class="showMyInnerCard" (click)="navigateToModule('191')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/changeControl.png"><br>
+           <p class="show-text">Change Control</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('224')">
+       <div class="showMyInnerCard" (click)="navigateToModule('224')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/capa.png"><br>
+           <p class="show-text">CAPA</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('225')" >
+       <div class="showMyInnerCard" (click)="navigateToModule('225')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/digital-signature.png"><br>
+           <p class="show-text">Electronic Signature</p>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+
+
+ <div *ngIf="showMaster">
+   <div class="row m-t-10" *ngIf="individualPermissionsResult('140') || individualPermissionsResult('142') || individualPermissionsResult('143')
+   || individualPermissionsResult('199') || individualPermissionsResult('104') || individualPermissionsResult('105')">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('140')">
+       <div class="showMyInnerCard" (click)="navigateToModule('140')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/location.png"><br>
+           <p class="show-text">Location</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('142')">
+       <div class="showMyInnerCard" (click)="navigateToModule('142')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/facility.png"><br>
+           <p class="show-text">Facilty</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('143')">
+       <div class="showMyInnerCard" (click)="navigateToModule('143')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/shift.png"><br>
+           <p class="show-text">Shift</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('199')">
+       <div class="showMyInnerCard" (click)="navigateToModule('199')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/vendor.png"><br>
+           <p class="show-text">Vendor</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('104')">
+       <div class="showMyInnerCard" (click)="navigateToModule('104')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/category.png"><br>
+           <p class="show-text">Category</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('105')">
+       <div class="showMyInnerCard" (click)="navigateToModule('105')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/priority.png"><br>
+           <p class="show-text">Priority</p>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="row m-t-20" *ngIf="individualPermissionsResult('139') || individualPermissionsResult('138') 
+   || individualPermissionsResult('176') || individualPermissionsResult('222')">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('139')">
+       <div class="showMyInnerCard" (click)="navigateToModule('139')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/forms.png"><br>
+           <p class="show-text">Forms</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('138')">
+       <div class="showMyInnerCard" (click)="navigateToModule('138')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/vendorDoc.png"><br>
+           <p class="show-text">Templates</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('176')">
+       <div class="showMyInnerCard" (click)="navigateToModule('176')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/device.png"><br>
+           <p class="show-text">Device</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('222')">
+       <div class="showMyInnerCard" (click)="navigateToModule('222')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/workflow1.png"><br>
+           <p class="show-text">Workflow Setup</p>
+         </div>
+       </div>
+     </div>
+
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('231')">
+       <div class="showMyInnerCard" (click)="navigateToModule('231')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/complianceAssessment.png"><br>
+           <p class="show-text">Compliance Assessment </p>
+         </div>
+       </div>
+     </div>
+
+   </div>
+ </div>
+ 
+ <div *ngIf="showReport">
+   <div class="row m-t-10" *ngIf="individualPermissionsResult('203') || individualPermissionsResult('194') || individualPermissionsResult('150')
+   || individualPermissionsResult('101') || individualPermissionsResult('195') || individualPermissionsResult('197')">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('203')">
+       <div class="showMyInnerCard" (click)="navigateToModule('203')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/projInventory.png"><br>
+           <p class="show-text">Inventory</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('194')">
+       <div class="showMyInnerCard" (click)="navigateToModule('194')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/taskReports.png"><br>
+           <p class="show-text">Task Reports</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('150')">
+       <div class="showMyInnerCard" (click)="navigateToTestExecutionReport();">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/dashBoard.png"><br>
+           <p class="show-text">Test Execution Reports</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('101')">
+       <div class="showMyInnerCard" (click)="navigateToModule('101')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/dashboardView.png"><br>
+           <p class="show-text">Dashboard</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('195')">
+       <div class="showMyInnerCard" (click)="navigateToModule('195')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/tasks.png"><br>
+           <p class="show-text">My Tasks</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('197')">
+       <div class="showMyInnerCard" (click)="navigateToModule('197')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/timeline.png"><br>
+           <p class="show-text">Project Timeline</p>
+         </div>
+       </div>
+     </div>
+  </div>
+
+    <div class="row m-t-20" *ngIf="individualPermissionsResult('217') || individualPermissionsResult('218') || individualPermissionsResult('232')">
+    <div class="col-sm-2" *ngIf="individualPermissionsResult('232')">
+      <div class="showMyInnerCard" (click)="navigateToModule('232')">
+        <div href="javascript:"><img class="image-radius rounded-0 img-30"
+            src="assets/icon/png-icons/annualPeriodicReview.png"><br>
+          <p class="show-text">Perodic Review</p>
+        </div>
+      </div>
+    </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('217')">
+       <div class="showMyInnerCard" (click)="navigateToModule('217')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/timeSheet.png"><br>
+           <p class="show-text">Timesheet Report</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('218')">
+       <div class="showMyInnerCard" (click)="navigateToModule('218')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/taskStatistics.png"><br>
+           <p class="show-text">Task Statistics</p>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+
+ <div *ngIf="showSetting">
+   <div class="row m-t-10">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('103')">
+       <div class="showMyInnerCard" (click)="navigateToModule('103')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/department.png"><br>
+           <p class="show-text">Department</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('112')">
+       <div class="showMyInnerCard" (click)="navigateToModule('112')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/userManagement.png"><br>
+           <p class="show-text">User Management</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('125')">
+       <div class="showMyInnerCard" (click)="navigateToModule('125')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/roleManagement.png"><br>
+           <p class="show-text">Role Management</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2">
+       <div class="showMyInnerCard" [routerLink]="['/notification']">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/emailAndNotify.png"><br>
+           <p class="show-text">Notification & Email Alerts</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('157')">
+       <div class="showMyInnerCard" (click)="navigateToModule('157')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/ldap.png"><br>
+           <p class="show-text">LDAP</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('171')">
+       <div class="showMyInnerCard" (click)="navigateToModule('171')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/smtp.png"><br>
+           <p class="show-text">SMTP</p>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="row m-t-20" *ngIf="individualPermissionsResult('189') || individualPermissionsResult('106') || individualPermissionsResult('196')
+   || individualPermissionsResult('177') || individualPermissionsResult('174') || individualPermissionsResult('127')">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('189')">
+       <div class="showMyInnerCard" (click)="navigateToModule('189')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/dateAndTime.png"><br>
+           <p class="show-text">Date Time Format</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('106')">
+       <div class="showMyInnerCard" (click)="navigateToModule('106')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/docNumbering.png"><br>
+           <p class="show-text">Document Number Format</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('196')">
+       <div class="showMyInnerCard" (click)="navigateToModule('196')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/apiConfig.png"><br>
+           <p class="show-text">API Configuration</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('177')">
+       <div class="showMyInnerCard" (click)="navigateToModule('177')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/templateBuilder.png"><br>
+           <p class="show-text">Template Builder</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('174')">
+       <div class="showMyInnerCard" (click)="navigateToModule('174')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/emailRule.png"><br>
+           <p class="show-text">Email Rule</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('127')">
+       <div class="showMyInnerCard" (click)="navigateToModule('127')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/masterControl.png"><br>
+           <p class="show-text">Master Control</p>
+         </div>
+       </div>
+     </div>
+   </div>
+   <div class="row m-t-20">
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('153')">
+       <div class="showMyInnerCard" (click)="navigateToModule('153')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/vendorDoc.png"><br>
+           <p class="show-text">PDF Settings</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2">
+       <div class="showMyInnerCard" [routerLink]="['/search']">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/searchDoc.png"><br>
+           <p class="show-text">Search</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('211')">
+       <div class="showMyInnerCard" (click)="navigateToModule('211')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/sftp.png"><br>
+           <p class="show-text">SFTP</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('102')">
+       <div class="showMyInnerCard" (click)="navigateToModule('102')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/dashBoard.png"><br>
+           <p class="show-text">Audit trail</p>
+         </div>
+       </div>
+     </div>
+     <div class="col-sm-2" *ngIf="individualPermissionsResult('161')">
+       <div class="showMyInnerCard" (click)="navigateToModule('161')">
+         <div href="javascript:"><img class="image-radius rounded-0 img-25"
+             src="assets/icon/png-icons/knowledeBase.png"><br>
+           <p class="show-text">Knowledge Base</p>
+         </div>
+       </div>
+     </div>
+   </div>
+ </div>
+</div>
+</div>

@@ -1,0 +1,632 @@
+<div class="row" *ngIf="!this.viewIndividualDataFlag">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-6">
+          <h4 class="f-w-600 strong">Esign Documents</h4>
+        </div>
+        <div class="col-sm-6 text-right">
+          <a *ngIf="isSelectedPublishData && this.modal.publishButtonFlag" href="javascript:" class="m-r-15"><img
+              class="image-radius rounded-0 img-25" src="assets/icon/png-icons/published.png" alt="Publish"
+              placement="bottom" ngbTooltip="Publish" (click)="publishData()"></a>
+
+          <a *ngIf="this.search" href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+              src="assets/icon/png-icons/search.png" alt="Search" placement="bottom" ngbTooltip="Search"
+              (click)="onClickSearch()"></a>
+
+          <input id="searchBox" *ngIf="this.search && this.showSearch" type="search" [(ngModel)]="filterQuery"
+            (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search m-r-15"
+            placeholder="Search">
+
+          <a href="javascript:"><img class="image-radius rounded-0 img-27" src="assets/icon/png-icons/addDoc.png"
+              alt="Add Esign Document" placement="bottom" ngbTooltip="Add Esign Document" (click)="createVendor()"></a>
+        </div>
+      </div>
+      <br>
+      <ngb-tabset #vendorTab="ngbTabset" (tabChange)="tabChange($event.nextId);">
+        <ngb-tab id="summary" title="Summary">
+          <ng-template ngbTabContent>
+            <br>
+            <div class="table-responsive">
+              <table id="dtBasicExample" class="table table-bordered" [mfData]="summaryData" #mf="mfDataTable"
+                [mfRowsOnPage]="2">
+                <tbody>
+                  <ng-container *ngFor="let item of mf.data;">
+                    <tr style="background-color: #e4f6fc;">
+                      <th colspan="2">{{item.value}}</th>
+                    </tr>
+                    <tr class="lightGary">
+                      <th>Document</th>
+                      <th>Count</th>
+                    </tr>
+                    <tr *ngFor="let row of item.child;">
+                      <td>
+                        <div style="cursor: pointer;" (click)="navigateToDocumentStatus(item, row);">{{row.value}}</div>
+                      </td>
+                      <td>
+                        <label>{{row.order}}</label>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td colspan="2">
+                      <mfBootstrapPaginator></mfBootstrapPaginator>
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab title="Draft" id="draft">
+          <ng-template ngbTabContent>
+            <ngx-datatable [scrollbarH]="true" #Table class="data-table dt-chk"
+              [rows]='draftData | ESignFilterPipe : filterQuery' [columnMode]="'force'" [headerHeight]="50"
+              [footerHeight]="50" [rowHeight]="'auto'" [externalPaging]="true" [count]="page.totalElements"
+              [offset]="page.pageNumber" [limit]="page.size" (page)="setPage($event)">
+              <ngx-datatable-column *ngIf="modal.publishButtonFlag" name="Select" [width]="70" [sortable]="false"
+                [canAutoResize]="false" [draggable]="false" [resizeable]="false">
+
+                <ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+                  <div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+                    <label *ngIf="filterQuery=='' && draftData.length !=0 " container="body" placement="right"
+                      triggers="mouseenter:mouseleave" ngbPopover="Select All">
+                      <input type="checkbox" [checked]="selectAll" (click)="selectAllData($event)" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                </ng-template>
+
+                <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                  let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label>
+                      <input type="checkbox" name="{{row['vendorCode']}}" [checked]="row.publishedflag"
+                        (change)="row.publishedflag=!row.publishedflag;onChangePublishData();" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                </ng-template>
+              </ngx-datatable-column>
+              <!-- <ngx-datatable-column style="font-weight: bold;" name="Document Id" let i=index>
+
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong>{{row['vendorCode']}} {{row['revisionNumber']}}</strong>
+                </ng-template>
+              </ngx-datatable-column> -->
+              <ngx-datatable-column style="font-weight: bold;" name="Title ">
+
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{row['documentName']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Document Status">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-template #popContent>
+                    <span class="text-left">
+                      <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                      <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                      <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                      <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                    </span>
+                  </ng-template>
+
+                  <a container="body" href="javascript:;" class="m-r-10 crm-action-info text-muted text-primary"
+                    placement="right" placement="top" [ngbTooltip]="popContent">
+                    <i class="icofont icofont-info-square info"></i>
+                  </a>
+
+
+                  <a container="body" *ngIf="this.modal.updateButtonFlag" href="javascript:;"
+                    class="m-r-10 crm-action-edit text-muted text-primary" (click)="toEdit(row.id)" placement="top"
+                    ngbTooltip="Edit">
+                    <i class="icofont icofont-edit edit"></i>
+                  </a>
+
+                  <a container="body" role="button" href="javascript:;" class="text-warning"
+                    (click)="openIndividualWorkflowSetup(row)" data-ng-open="modalSmall" placement="top"
+                    ngbTooltip="Workflow"><i class="icofont icofont-chart-flow-alt-1"></i>
+                  </a>&nbsp;
+
+                  <a container="body" *ngIf="this.modal.viewButtonFlag" href="javascript:;"
+                    class="crm-action-view text-muted text-warning"
+                    (click)="viewRowDetails(row.id);this.viewIndividualDataFlag=true;" data-ng-open="modalSmall"
+                    placement="top" ngbTooltip="View">
+                    <i class="icofont icofont-resize view"></i>
+                  </a>&nbsp;
+
+                  <a container="body" *ngIf="this.modal.deleteButtonFlag" href="javascript:;"
+                    class="m-r-5 crm-action-delete text-muted text-danger"
+                    (click)="openSuccessCancelSwal(row , row['$$index'] );" placement="top" ngbTooltip="Delete">
+                    <i class="icofont icofont-bin bin"></i>
+                  </a>
+
+                  <a container="body" *ngIf="this.modal.exportButtonFlag" href="javascript:;"
+                    class="crm-action-success text-muted text-success" (click)="downloadFileOrView(row,false);"
+                    placement="top" ngbTooltip="Download">
+                    <i class="icofont icofont-download"></i></a>
+
+
+                  <!-- Missed Function onClickExternalApproval(this.selectedDataForWorkflow)-->
+                  <!-- <a container="body" role="button" href="javascript:;" class="text-warning"
+                  (click)="externalApprovalmodal.show();onClickExternalApproval(this.selectedDataForWorkflow)" data-ng-open="modalSmall" placement="top"
+                  ngbTooltip="External Approval">
+                  <i class="icofont icofont-external-link"></i>
+
+                  </a>&nbsp;  -->
+
+                </ng-template>
+              </ngx-datatable-column>
+
+            </ngx-datatable>
+          </ng-template>
+
+        </ngb-tab>
+        <ngb-tab title="Published" id="published">
+          <ng-template ngbTabContent>
+            <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+              [rows]='publishedData | ESignFilterPipe : filterQuery' [columnMode]="'force'" [headerHeight]="50"
+              [footerHeight]="50" [rowHeight]="'auto'" [externalPaging]="true" [count]="page.totalElements"
+              [offset]="page.pageNumber" [limit]="page.size" (page)="setPage($event)">
+
+              <!-- <ngx-datatable-column style="font-weight: bold;" name="Document Id">
+
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong>{{row['vendorCode']}} {{row['revisionNumber']}}</strong>
+                </ng-template>
+              </ngx-datatable-column> -->
+              <ngx-datatable-column style="font-weight: bold;" name="Title ">
+
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                    {{row['documentName']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Document Status">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Assigned To">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['assignedTo']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-template #popContent>
+                    <span class="text-left">
+                      <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                      <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                      <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                      <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                    </span>
+                  </ng-template>
+                  <a container="body" href="javascript:;" class="m-r-10 crm-action-info text-muted text-primary"
+                    placement="right" placement="top" [ngbTooltip]="popContent">
+                    <i class="icofont icofont-info-square info"></i>
+                  </a>
+                  <a container="body" *ngIf="this.modal.viewButtonFlag" href="javascript:;"
+                    class="m-r-10 crm-action-success text-muted text-success"
+                    (click)="viewRowDetails(row.id);this.viewIndividualDataFlag=true;" data-ng-open="modalSmall"
+                    placement="top" ngbTooltip="View">
+                    <i class="icofont icofont-resize view"></i>
+                  </a>
+                  <a container="body" role="button" href="javascript:;" class="m-r-10 crm-action-success text-warning"
+                    (click)="openIndividualWorkflowSetup(row)" data-ng-open="modalSmall" placement="top"
+                    ngbTooltip="Workflow">
+                    <i class="icofont icofont-chart-flow-alt-1"></i>
+                  </a>
+
+                  <a container="body" href="javascript:;" class="m-r-5 crm-action-success text-warning"
+                    (click)="downloadCertificate(row.id,row.documentName);" placement="top"
+                    ngbTooltip="Certificate Download">
+                    <img class="image-radius rounded-0" src="assets/icon/png-icons/certificates.png" alt="Forum"
+                      placement="bottom" width="25" height="22">
+                  </a>
+
+                  <a container="body" *ngIf="this.modal.exportButtonFlag" href="javascript:;"
+                    class="crm-action-success text-muted text-success" (click)="downloadFileOrView(row,false);"
+                    placement="top" ngbTooltip="Download">
+                    <i class="icofont icofont-download"></i>
+                  </a>
+                </ng-template>
+              </ngx-datatable-column>
+
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab id="feedback" title="Feedback">
+          <ng-template ngbTabContent>
+            <br>
+            <app-document-forum #forumView [constant]="this.helper.E_SIGNATURE_VALUE"></app-document-forum>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab id="audit" title="Audit Trail">
+          <ng-template ngbTabContent>
+            <app-audit-trail-view #auditView [permission]="this.helper.E_SIGNATURE_VALUE"></app-audit-trail-view>
+          </ng-template>
+        </ngb-tab>
+
+      </ngb-tabset>
+
+    </app-card>
+  </div>
+</div>
+
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualDataFlag">
+  <div *ngFor="let data of popupdata">
+    <div class="col-sm-12" id="float-action">
+      <app-card>
+        <div class="row">
+
+          <div class="col-sm-4 d-inline">
+            <h5 class="strong">Document Name :</h5><span>{{data.documentName}}</span>
+            <span *ngIf="routeback==null&&!data.publishedflag && this.modal.publishButtonFlag"> (Draft)</span>
+            <span *ngIf="data.publishedflag"> (Published)</span>
+          </div>
+
+          <div class="col-sm-8" style="text-align: right;">
+            <!--button start-->
+            <a *ngIf="data.publishedflag" role="button"><img class="image-radius rounded-0 img-27 m-r-5"
+                src="assets/icon/png-icons/workflow1.png" alt="Forum" placement="bottom" ngbTooltip="Workflow"
+                (click)="openIndividualWorkflowSetup(data)"></a>
+
+
+            <a *ngIf="!data.publishedflag && modal.updateButtonFlag" role="button"><img
+                class="image-radius rounded-0 img-25 m-r-15" src="assets/icon/png-icons/esign-edit.png"
+                style="color: darkblue;" alt="Forum" placement="bottom" ngbTooltip="Edit"
+                (click)="toEdit(data.id);"></a>
+
+            <a *ngIf="!data.publishedflag" role="button"><img class="image-radius rounded-0 img-25 m-r-15"
+                src="assets/icon/png-icons/workflow1.png" alt="Forum" placement="bottom" ngbTooltip="Workflow"
+                (click)="openIndividualWorkflowSetup(data)">
+            </a>
+
+            <a *ngIf="!data.publishedflag && this.modal.publishButtonFlag" role="button"><img
+                class="image-radius rounded-0 img-25 m-r-15" src="assets/icon/png-icons/published.png"
+                style="color: blue;" alt="Forum" placement="bottom" ngbTooltip="Publish"
+                (click)="singlepublishData(data)"></a>
+
+            <a *ngIf="(this.modal.deleteButtonFlag && !data.publishedflag)" role="button"><img
+                class="image-radius rounded-0 img-25 m-r-15" src="assets/icon/png-icons/delete.png" alt="Forum"
+                placement="bottom" ngbTooltip="Delete" (click)="openSuccessCancelSwal(data)"></a>
+
+            <a *ngIf="data.publishedflag" role="button"><img class="image-radius rounded-0 m-r-10"
+                src="assets/icon/png-icons/certificates.png" alt="Forum" placement="bottom"
+                ngbTooltip="Download Certificate" (click)="downloadCertificate(data.id,data.documentName)" width="30"
+                height="26"></a>
+
+
+
+            <img class="image-radius rounded-0 img-25 m-r-15" src="assets/icon/png-icons/forum.png" placement="bottom"
+              ngbTooltip="Forum" (click)="commentsSwitch=!commentsSwitch">
+
+
+
+            <a *ngIf="routeback==null&&!data.publishedflag && this.modal.publishButtonFlag" role="button"><img
+                class="image-radius rounded-0 img-25 m-r-15" src="assets/icon/png-icons/close.png" alt="Forum"
+                placement="bottom" ngbTooltip="Cancel" (click)="onClickClose()">
+            </a>
+
+
+
+            <a *ngIf="data.publishedflag" role="button"><img class="image-radius rounded-0 img-25 m-r-15"
+                src="assets/icon/png-icons/close.png" alt="Forum" placement="bottom" ngbTooltip="Cancel"
+                (click)="onClickClose()">
+            </a>
+
+
+          </div>
+        </div>
+      </app-card>
+    </div>
+    <br><br><br>
+
+    <div class="row">
+      <div [ngClass]="(commentsSwitch)?'col-sm-9':'col-sm-12'">
+        <pdf-viewer style="display: block;" #ApprovalPDFViewerComponent [src]="pdfURL" [page]="pageVariable"
+          [show-all]="showAll" (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom" [stick-to-page]="true"
+          (error)="onError($event)"></pdf-viewer>
+      </div>
+      <div *ngIf="commentsSwitch" class="col-sm-3">
+        <app-document-forum [chapter]="this.outLineList" [documentList]="this.commentsDocumentsList"
+          [isDocumentWorkFlow]="true"></app-document-forum>
+      </div>
+    </div>
+
+    <ng-container *ngIf="this.popupdata && this.popupdata.length >0 && !disableFormOnUpdate">
+      <app-view-form [inputField]='this.popupdata'></app-view-form><br>
+    </ng-container>
+    <app-individual-audit-trail [permission]="this.helper.E_SIGNATURE_VALUE" [id]="data.id">
+    </app-individual-audit-trail>
+    <hr>
+  </div>
+</app-card>
+
+<app-modal-basic #externalApprovalmodal [dialogClass]="'modal-md'" [hideHeader]="false" [hideFooter]="false"
+  style="width:70%;">
+  <div class="app-modal-header">
+    <h4 class="modal-title">External_Approval</h4>
+    <button type="button" class="close basic-close" (click)="externalApprovalmodal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!--External Approval -->
+
+  <div class="app-modal-body">
+
+    <div class="row">
+      <div class="col-sm-12">
+        <form [formGroup]=" onExternalApprovalForm">
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Name:
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="name" id="nameId" class="form-control" placeholder="name" formControlName="name"
+                maxlength="50" />
+              <div class="messages text-danger"
+                *ngIf=" onExternalApprovalForm.get('name').touched &&  onExternalApprovalForm.get('name').hasError('required')">
+                {{externalApprovalErrorTypes.nameValidation}}</div>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Email:
+              <span class="asterisk required">*</span>
+            </label>
+
+            <div class="col-sm-10">
+              <input type="text" name="code" id="emailId" class="form-control" placeholder="email"
+                formControlName="email" maxlength="50" />
+              <div class="messages text-danger"
+                *ngIf=" onExternalApprovalForm.get('email').touched &&  onExternalApprovalForm.get('email').hasError('required')">
+                {{externalApprovalErrorTypes.emailValidation}}</div>
+              <div class="messages text-danger" *ngIf=" onExternalApprovalForm.get('email').hasError('pattern')">
+                {{externalApprovalErrorTypes.emailPatternValidation}}</div>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Remarks:
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <textarea rows="3" class="form-control" formControlName="remarks"></textarea>
+              <div class="messages text-danger"
+                *ngIf=" onExternalApprovalForm.get('remarks').touched &&  onExternalApprovalForm.get('remarks').hasError('required')">
+                {{externalApprovalErrorTypes.remarksValidation}}</div>
+            </div>
+          </div>
+
+          <br>
+          <div class="form-group row">
+            <div class="col-sm-12 text-center">
+              <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                (click)="onClickSave(data); onClickExternalApproval(this.selectedDataForWorkflow);">Submit</button>
+
+              <a href="javascript:"><img class="image-radius rounded-0 img-27"
+                  src="assets/icon/png-icons/addWorkflow.png" alt="Add User" placement="bottom" ngbTooltip="Add User"
+                  (click)="onClickReset()"></a>&nbsp;
+
+              <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+                (click)="externalApprovalmodal.hide();">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>
+
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+
+
+
+
+
+
+
+<!--<div class="btncenter">
+        <button  [disabled]="!this.agreementCheck" style="text-align: center;" type="submit" (click)="onSave()" class="btn btn-danger waves-effect waves-light">Esign</button>&nbsp;
+        <button style="text-align: center;"  type="submit" (click)="closeForm()" class="btn btn-danger waves-effect waves-light">Cancel</button>&nbsp;
+</div>-->
+
+
+
+
+<!-- <app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData">
+  <div><br>
+    <h4>&nbsp;&nbsp;Revision Form Document
+      <div style="float: right;">
+        <a style="cursor:pointer;font-weight: bold" class="ti-close"
+          (click)="onClickViewClose();">&nbsp;&nbsp;</a>
+      </div>
+    </h4>
+  </div>
+  <div><br>
+    <div class="table-group row col-sm-12">
+      <label class="col-sm-2">Source File
+        <span class="asterisk">*</span>
+      </label>
+      <div class="col-sm-4">
+        <select name="select" class="form-control" required [(ngModel)]="sourceFile" name="sourceFile" (change)="getFileNameForRevisionRight($event)"
+          #sourceFileModel="ngModel">
+          <option value="">Select Document</option>
+          <option *ngFor="let left of leftRevisionArray ; let lindex = index" [value]="left.filePath">
+            R-{{lindex+1}}&nbsp;{{left.fileName}}</option>
+        </select>
+      </div>
+
+      <label class="col-sm-2 col-form-label">Compare File
+        <span class="asterisk">*</span>
+      </label>
+
+      <div class="col-sm-4">
+        <select name="select" class="form-control" required [(ngModel)]="compareFile" name="compareFile" (change)="getFileNameForRevisionLeft($event)"
+          #compareFileModel="ngModel">
+          <option value="">Select Document</option>
+          <option *ngFor="let right of rightRevisionArray ; let rindex=index" [value]="right.filePath">
+            R-{{rindex+1}}&nbsp;{{right.fileName}}</option>
+        </select>
+      </div>
+    </div><br>
+    <div class="form-group row col-sm-12" style="text-align: center;">
+      <button type="button" class="btn btn-primary" (click)="$event.preventDefault();compareTwoFile()"><span>
+          <i *ngIf="modalSpinner" class="spinner-border spinner-border-sm"></i>Compare</span>&nbsp; </button>
+      <div class="messages text-danger" *ngIf="sourceFile === '' || compareFile === '' ">{{this.revisionValidationMessage}}
+      </div>
+      <div *ngIf="modalSpinner" class="loading">Loading&#8230;</div>
+    </div>
+  </div>
+  <hr>
+  <div id="overflowCompareId" class="overflow-container" style="visibility: hidden !important" slimScroll
+    railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+    allowPageScroll="false">
+
+    <div style="text-align:center" class="table-group">
+      <iframe width="600px" height="800px" id="sourceFileId"></iframe>
+      <iframe width="600px" height="800px" id="compareFileId"></iframe>
+    </div>
+
+  </div>
+  &nbsp;&nbsp;<br><br><br>
+</app-card>
+
+<app-modal-basic #modalRevision [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+<div class="app-modal-body">
+<button type="button" class="close basic-close-light-box" (click)="modalRevision.hide()">
+  <span aria-hidden="true">&times;</span>
+</button>
+<h5>Revision Form Document</h5><br>
+<div><br>
+  <div class="table-group row col-sm-12">
+    <label class="col-sm-2">Source File
+      <span class="asterisk">*</span>
+    </label>
+    <div class="col-sm-4">
+      <select name="select" class="form-control" required [(ngModel)]="sourceFile" name="sourceFile"
+        #sourceFileModel="ngModel">
+        <option *ngFor="let left of leftRevisionArray ; let lindex = index" [value]="left.filePath">
+          R-{{lindex+1}}&nbsp;{{left.fileName}}</option>
+      </select>
+    </div>
+
+    <label class="col-sm-2 col-form-label">Compare File
+      <span class="asterisk">*</span>
+    </label>
+
+    <div class="col-sm-4">
+      <select name="select" class="form-control" required [(ngModel)]="compareFile" name="compareFile"
+        #compareFileModel="ngModel">
+        <option *ngFor="let right of rightRevisionArray ; let rindex=index" [value]="right.filePath">
+          R-{{rindex+1}}&nbsp;{{right.fileName}}</option>
+      </select>
+    </div>
+  </div><br>
+  <div class="form-group row col-sm-12" style="text-align: center;">
+    <button type="button" class="btn btn-primary" (click)="$event.preventDefault();compareTwoFile()"><span>
+        <i *ngIf="modalSpinner" class="spinner-border spinner-border-sm"></i>Compare</span>&nbsp; </button>
+    <div class="messages text-danger" *ngIf="sourceFile=='' || compareFile=='' ">{{this.revisionValidationMessage}}
+    </div>
+    <div *ngIf="modalSpinner" class="loading">Loading&#8230;</div>
+  </div>
+</div>
+<hr>
+<div id="overflowCompareId" class="overflow-container" style="visibility: hidden !important" slimScroll
+  railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+  allowPageScroll="false">
+
+  <h5>Compare View</h5><br>
+
+  <div style="text-align:center" class="table-group">
+    <iframe width="600px" height="800px" id="sourceFileId"></iframe>
+    <iframe width="600px" height="800px" id="compareFileId"></iframe>
+  </div>
+
+</div>
+</div>
+</app-modal-basic> -->
+
+<app-document-status-comment-log #documentcomments></app-document-status-comment-log>
+
+<app-esign-individual-document-item-workflow [permissionConstant]="this.helper.E_SIGNATURE_VALUE"
+  #individualDocumentItemWorkflow></app-esign-individual-document-item-workflow>
+
+
+
+
+<app-modal-basic #modalLargeWorkFlowProjectSummary [dialogClass]="'modal-lg'" [hideClickOutSide]="true"
+  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow Configuration</h4>
+    <button type="button" class="close basic-close" (click)="modalLargeWorkFlowProjectSummary.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body">
+    <div style="max-height: 300px !important;" class="col-sm slimScrollDiv">
+      <div class="dt-desc dy-width-300">
+        <ul class="progress-indicator">
+          <li *ngFor="let data of this.getStatus;" class="completed">
+            <label>
+              <span style="white-space: pre-line;" class="bubble"></span>
+              <div style="text-align: left;" class="strong"><a role="button" *ngIf="data.workFlowCompleted">
+                  <img style="width: 25px; height: 25px;" class="image-radius rounded-0 img-30 m-r-10"
+                    src="assets/icon/png-icons/checked.png" alt="Forum" placement="bottom"
+                    ngbTooltip="External Approval">
+                </a> {{data.levelName}} : {{data.type}}<br>
+                <span *ngIf="data.allUserApproval">(All User Approval)</span><br>
+                <div><b class="black"><u>Users</u></b>
+                  <div *ngIf="data.allUserApproval">
+          <li *ngFor="let user of data.userApprovalList;let i = index ">
+            {{i+1}}.{{user.user}}
+            <div *ngIf="user.comments" class="black"><b>Comments : </b> {{user.comments}}</div>
+            <div *ngIf="user.dateTime" class="black"><b>Date : </b> {{user.dateTime}}</div>
+          </li>
+      </div>
+      <div *ngIf="!data.allUserApproval">
+        <li *ngFor="let user of data.userArray;let i = index ">{{i+1}}.{{user}}</li>
+        <div *ngIf="data.workFlowCompleted" class="black"><b>Comments : </b> {{data.comments}}</div>
+        <div *ngIf="data.workFlowCompleted" class="black"><b>Date : </b> {{data.createdTime}}</div>
+      </div>
+    </div>
+    <div *ngIf="data.externalApprovalList.length >0">
+      <b class="black"><u>External Approval</u></b>
+      <li *ngFor="let user of data.externalApprovalList;let i = index ">
+        {{i+1}}.{{user.user}}
+        <div *ngIf="user.comments" class="black"><b>Comments : </b> {{user.comments}}</div>
+        <div *ngIf="user.dateTime" class="black"><b>Date : </b> {{user.dateTime}}</div>
+      </li>
+    </div><br>
+  </div>
+  </label>
+  </li>
+  </ul><br><br>
+  </div>
+  </div>
+  <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>

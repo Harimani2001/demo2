@@ -1,0 +1,71 @@
+<app-modal-animation #formVerification class="p-20" container="body" id="form-verify-effect-1" [modalID]="'effect-1'"
+  [modalClass]="'md-effect-1'">
+  <h3 class="pt-2 pb-1">Verification</h3>
+  <form style="background: white !important;border: none;" class="well well-lg pt-1"
+    [formGroup]="verificationFormBuilder" (ngSubmit)="onSubmit(verificationFormBuilder.valid)">
+    <div class="row">
+      <label class="col-sm-6 pt-4">Please enter your Comments</label>
+      <div class="col-sm-6">
+        <textarea class="form-control" id="formVerificationComments" placeholder="Comments" formControlName="comments"
+          name="comments" maxlength="250" cols="50" rows="3"> </textarea>
+      </div>
+    </div>
+    <div class="row">
+      <strong class="col-sm-12 strong">This verification requires your electronic signature. </strong>
+    </div>
+    <hr class="m-2">
+    <div class="row">
+      <div class="col-sm-2">
+        <input type="checkbox" id="acceptCheckBox" name="check" (change)="this.agreementCheck=!this.agreementCheck"> I
+        Accept
+      </div>
+      <div class="col-sm-10">
+        <h6>{{this.esignAgreementMessage.agreementMessage}}</h6>
+      </div>
+    </div>
+    <div class="row pt-1" *ngIf="this.agreementCheck">
+      <label class="col-sm-6">Please enter your Email Id or User Name</label>
+      <div class="col-sm-6">
+        <input class="form-control" size="49" formControlName="emailOrUserName" type="email" autocomplete="new-password"
+          placeholder="Email Id Or User Name" required />
+      </div>
+    </div>
+    <div class="row pt-1" *ngIf="this.agreementCheck">
+      <label class="col-sm-6"> Please enter your Password</label>
+      <div class="col-sm-6">
+        <input class="form-control" size="49" formControlName="password" type="password" placeholder="password"
+          name="password" autocomplete="new-password" required />
+      </div>
+    </div>
+    <div class="row pt-1" *ngIf="this.agreementCheck">
+      <div class="col-sm-6 pt-5"><label for="viewSignatureId"><input type="checkbox" [checked]="viewSignature"
+            id="viewSignatureId"
+            (click)="viewSignature=!viewSignature;viewSignature?clearSignature():'';" />&nbsp;Enable Signature
+          Pad</label> </div>
+      <div *ngIf="viewSignature" class="col-sm-6">
+        <div class="well well-sm mb-0">
+          <signature-pad [options]="signaturePadOptions" (onEndEvent)="signatureComplete()">
+          </signature-pad>
+        </div>
+        <button type="button" *ngIf="verificationFormBuilder.get('signature').value"
+          class="mr-0 btn btn-sm btn-link waves-effect waves-light" (click)="clearSignature()">Clear</button>
+      </div>
+    </div>
+    <div class="row col-sm-12" *ngIf="this.agreementCheck">
+      <div class="col-sm-6">
+        <label class="text-danger" style="display: flex;">
+          <span
+            *ngIf="(verificationFormBuilder.get('emailOrUserName').touched || this.submitted) && verificationFormBuilder.get('emailOrUserName').hasError('required')">{{errorMessageHelper.IncorrectUsernameOrEmail}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          <span
+            *ngIf="(verificationFormBuilder.get('password').touched || this.submitted) && verificationFormBuilder.get('password').hasError('required')">{{errorMessageHelper.passwordValidaiton}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          <span>{{errorMessage}}</span>
+        </label>
+      </div>
+      <div class="col-sm-6">
+        <button type="submit" style="float: left;" class="btn btn-danger waves-effect waves-light ">Verify</button>
+      </div>
+    </div>
+  </form>
+
+  <button (click)="closeMyModal()" aria-label="Close" class="md-close-btn"><i class="icofont icofont-ui-close"></i></button>
+</app-modal-animation>

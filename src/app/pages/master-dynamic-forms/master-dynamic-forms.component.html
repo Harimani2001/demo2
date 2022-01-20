@@ -1,0 +1,974 @@
+<div class="row ">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-4">
+          <i class="icofont icofont-file-document bg-c-blue"></i>
+          <div class="d-inline">
+            <h5 *ngIf="masterDynamicForm.templateName!=''" class="strong">{{masterDynamicForm.templateName}}</h5> 
+            <h5 *ngIf="masterDynamicForm.templateName==''"class="strong">Master Dynamic Form</h5>
+          </div>
+        </div>
+        <div class="col-sm-8 text-right">
+          <div *ngIf="!masterDynamicForm.publishedFlag">
+            <button *ngIf="buttonFlag" type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();saveData();">{{this.buttonValue}}</button>
+            <button *ngIf="masterDynamicForm.id!=0" type="button"
+              class="btn btn-sm btn-warning waves-effect waves-light m-r-10"
+              (click)="deleteTemplateSwal(masterDynamicForm.id);">Delete</button>
+            <button *ngIf="buttonFlag" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="hideNewTemplateForm()">Cancel</button>
+          </div>
+          <button *ngIf="masterDynamicForm.publishedFlag" type="button"
+            class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+            (click)="hideNewTemplateForm()">Cancel</button>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<div class="row">
+  <app-card class="w-100">
+    <table id="add-table" class="table w-100">
+      <tbody>
+        <tr>
+          <td colspan="2">
+            <div class="row">
+              <div class="col-sm-2" style="margin-right: -55px;">
+                <strong class="strong">Form Name<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-10">
+                <input type="text" autofocus class="form-control" id="templateNameId" name="templateName"
+                  [(ngModel)]="masterDynamicForm.templateName" (ngModelChange)="showNext()" #templateName="ngModel"
+                  maxlength="50" required>
+                <div class="messages text-danger"
+                  *ngIf="(templateName.touched || submitted) && templateName.errors?.required">Form Name can't be blank
+                </div>
+                <div class="messages text-danger" *ngIf="this.validationMessage!=''">{{this.validationMessage}}</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Form Type:</strong>
+              </div>
+              <div class="col-sm-9">
+                <select name="formType" class="form-control" style="display: inline-block;" required
+                  [(ngModel)]="masterDynamicForm.formType" #formType="ngModel">
+                  <option value="Project Specific">Project</option>
+                  <option value="Organization Specific">Organization</option>
+                  <option value="Document Specific">Document</option>
+                </select>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Entries:
+                  <ng-template #popContentEntry>
+                    <div><i>If it's enable, Then form <b>{{masterDynamicForm.templateName}}</b> will have multiple data
+                        entry</i>
+                    </div>
+                  </ng-template>
+                  <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                    placement="top" [ngbTooltip]="popContentEntry">
+                    <i style="font-size: 20px" class="icofont icofont-info-circle"></i>
+                  </a>
+                </strong>
+              </div>
+              <div class="col-sm-9">
+                <ui-switch ng-model="all" [(ngModel)]="masterDynamicForm.multipleEntryFlag"
+                  (change)="masterDynamicForm.multipleEntryFlag=!masterDynamicForm.multipleEntryFlag" class="js-small"
+                  color="#3498DB" switchColor="#fff" size="small" unchecked>
+                </ui-switch>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">
+                  <!-- For Document Code :
+                  <ng-template #popContentCode>
+                    <div>Example: [<i>Prefix</i>]-00-[<i>Suffix</i>] <i>DF-01-CR</i></div>
+                  </ng-template>
+                  <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                    placement="top" [ngbTooltip]="popContentCode">
+                    <i style="font-size: 20px" class="icofont icofont-info-circle"></i>
+                  </a> -->
+                  Prefix For Item Id:
+                </strong>
+              </div>
+              <div class="col-sm-9">
+                <input type="text" id="prefixId" class="w-100" name="prefix" [(ngModel)]="masterDynamicForm.prefix"
+                  #prefix="ngModel" maxlength="49">
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Suffix For Item Id:</strong>
+              </div>
+              <div class="col-sm-9">
+                <input type="text" id="suffixId" class="w-100" name="suffix" [(ngModel)]="masterDynamicForm.suffix"
+                  #suffix="ngModel" maxlength="49">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Department<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-9">
+                <ng-select [ngClass]="'ng-select'" #departmentSelect [options]="simpleOptionDepartment"
+                  [multiple]="true" [(ngModel)]="masterDynamicForm.departments" name="department" #department="ngModel"
+                  (ngModelChange)="onChangeDept($event,true)">
+                </ng-select>
+                <div class="messages text-danger"
+                  *ngIf="(department.touched || submitted)  && masterDynamicForm.departments.length==0">Please select
+                  department</div>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Owner<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-9">
+                <select name="templateOwner" class="form-control" required
+                  [(ngModel)]="masterDynamicForm.templateOwnerId" #templateOwner="ngModel">
+                  <option disabled [value]="0">Choose Owner</option>
+                  <option *ngFor="let owner of templateOwnerList" [value]="owner.key">{{owner.value}}</option>
+                </select>
+                <div class="messages text-danger"
+                  *ngIf="(templateOwner.touched || submitted) && masterDynamicForm.templateOwnerId == 0">Please select
+                  the Owner</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Effective Date:</strong>
+              </div>
+              <div class="col-sm-9">
+                <my-date-picker (keypress)="$event.preventDefault();" #date name="effectiveDate"
+                  (click)="openBtnClicked()" placeholder="Select Effective Date" [options]="myDatePickerOptions"
+                  [(ngModel)]="masterDynamicForm.effectiveDate" #effectiveDate="ngModel">
+                </my-date-picker>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Next Review Date:</strong>
+              </div>
+              <div class="col-sm-9">
+                <my-date-picker (keypress)="$event.preventDefault();" #date1 name="nextReviewDate"
+                  (click)="openBtnClicked()" placeholder="Select Next Review Date" [options]="myDatePickerOptions"
+                  [(ngModel)]="masterDynamicForm.nextReviewDate" #nextReviewDate="ngModel">
+                </my-date-picker>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Select No. Of Levels<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-9">
+                <ng-select [ngClass]="'ng-select'" [options]="workFlowOptions" [multiple]="true"
+                  [(ngModel)]="masterDynamicForm.workFlowLevels" #workFlowLevels="ngModel"></ng-select>
+                <div class="messages text-danger"
+                  *ngIf="(workFlowLevels.touched || submitted)  && masterDynamicForm.workFlowLevels.length==0">Levels
+                  For Workflow cannot be empty</div>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="row">
+              <div class="col-sm-3">
+                <strong class="strong">Version:</strong>
+              </div>
+              <div class="col-sm-9">
+                <input type="text" [(ngModel)]="masterDynamicForm.version" class="form-control" name="version"
+                  maxlength="49" placeholder="Version" #version="ngModel">
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <tr>
+
+          <td>
+            <div class="row">
+              <div class="col-sm-2">
+                <strong class="strong">QR code:</strong>
+              </div>
+              <div class="col-sm-2">
+                <ui-switch ng-model="all" [(ngModel)]="masterDynamicForm.qrCodeFlag"
+                (change)="masterDynamicForm.qrCodeFlag=!masterDynamicForm.qrCodeFlag" class="js-small"
+                color="#3498DB" switchColor="#fff" size="small" unchecked>
+              </ui-switch>
+              </div>
+              <div *ngIf="masterDynamicForm.formType == 'Organization Specific'" class="col-sm-2">
+                <strong class="strong">Project :</strong>
+              </div>
+              <div *ngIf="masterDynamicForm.formType == 'Organization Specific'" class="col-sm-2">
+                <ui-switch ng-model="all" [(ngModel)]="masterDynamicForm.projectFlag"
+                (change)="masterDynamicForm.projectFlag=!masterDynamicForm.projectFlag" class="js-small"
+                color="#3498DB" switchColor="#fff" size="small" unchecked>
+              </ui-switch>
+              </div>
+
+              <div class="col-sm-3">
+                <strong class="strong">Equipment :</strong>
+              </div>
+              <div class="col-sm-1">
+                <ui-switch ng-model="all" [(ngModel)]="masterDynamicForm.equipmentFlag"
+                (change)="masterDynamicForm.equipmentFlag=!masterDynamicForm.equipmentFlag" class="js-small"
+                color="#3498DB" switchColor="#fff" size="small" unchecked>
+              </ui-switch>
+              </div>
+            </div>
+          </td>
+
+          <td>
+            <div class="row">
+              
+              <div class="col-sm-3">
+                <strong class="strong">CleanRoom :</strong>
+              </div>
+              <div class="col-sm-1">
+                <ui-switch ng-model="all" [(ngModel)]="masterDynamicForm.cleanRoomFlag"
+                (change)="masterDynamicForm.cleanRoomFlag=!masterDynamicForm.cleanRoomFlag" class="js-small"
+                color="#3498DB" switchColor="#fff" size="small" unchecked>
+              </ui-switch>
+              </div>
+
+              <div class="col-sm-3">
+                <strong class="strong">Product/Batch :</strong>
+              </div>
+              <div class="col-sm-1">
+                <ui-switch ng-model="all" [(ngModel)]="masterDynamicForm.productOrBatchFlag"
+                (change)="masterDynamicForm.productOrBatchFlag=!masterDynamicForm.productOrBatchFlag" class="js-small"
+                color="#3498DB" switchColor="#fff" size="small" unchecked>
+              </ui-switch>
+              </div>
+
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="form-group row">
+      <strong class="col-sm-2 strong col-form-label">&nbsp;&nbsp;&nbsp;Active :
+      </strong>
+      <ui-switch ng-model="all" [(ngModel)]="masterDynamicForm.activeFlag"
+        (change)="masterDynamicForm.activeFlag=!masterDynamicForm.activeFlag" class="js-small" color="#3498DB"
+        switchColor="#fff" size="small">
+      </ui-switch>
+    </div>
+
+  </app-card>
+
+  <div class="col-sm-12">
+    <div class="well well-lg" id="build-wrap" style="padding: 10px;">
+      <div class="build-wrap"></div>
+      <br><br>
+      <div class="col-sm-12" #tableViewId></div>
+      <br><br>
+      <div *ngIf="expressionBuilder.length>0" class="form-group row">
+        <div class="col-sm-12">
+          <app-card title="Expression">
+            <form class="table-responsive" #expressionBuilderId="ngForm">
+              <div class="row">
+                <label class="col-sm-3">First Operand</label>
+                <label class="col-sm-2">Operator</label>
+                <label class="col-sm-3">Second Operand</label>
+                <label class="col-sm-2">To Be Saved In</label>
+                <label class="col-sm-2"></label>
+              </div>
+              <ng-container *ngFor='let expression of expressionBuilder ; let i=index'>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <select class="form-control" [(ngModel)]="expression.operandOneId" id="expression-{{expression.id}}"
+                      name="expression-{{expression.id}}" #operandOneId="ngModel">
+                      <option *ngFor="let option of expressionDropDownFirst" [value]="option.key"><label
+                          [innerHtml]="option.value"></label></option>
+                    </select>
+                  </div>
+                  <div class="col-sm-2">
+                    <select class="form-control" [(ngModel)]="expression.operator" name="operatorName-{{expression.id}}"
+                      #operatorId="ngModel">
+                      <option value="addition">Addition</option>
+                      <option value="subtraction">Subtraction</option>
+                      <option value="multiplication">Multiplication</option>
+                      <option value="division">Division</option>
+                      <option value="percentage">Percentage</option>
+                    </select>
+                  </div>
+                  <div class="col-sm-3">
+                    <div *ngIf="expression.operandTwoId!='constant'" class="row">
+                      <select class="form-control" [(ngModel)]="expression.operandTwoId"
+                        name="operandTwoName-{{expression.id}}" #operandTwoId="ngModel">
+                        <option value="constant">Constant Value</option>
+                        <option *ngFor="let option of expressionDropDownSecond" [value]="option.key"><label
+                            [innerHtml]="option.value"></label></option>
+                      </select>
+                    </div>
+                    <div *ngIf="expression.operandTwoId=='constant'" class="row">
+                      <div class="col-sm-6"><select class="form-control" [(ngModel)]="expression.operandTwoId"
+                          name="operandTwoName-{{expression.id}}" #operandTwoId="ngModel">
+                          <option value="constant">Constant Value</option>
+                          <option *ngFor="let option of expressionDropDownSecond" [value]="option.key"><label
+                              [innerHtml]="option.value"></label></option>
+                        </select></div>
+                      <div class="col-sm-6">
+                        <input class="form-control" type="number" placeholder="ex-5" (keypress)="onlyNumber($event)"
+                          [(ngModel)]="expression.operandTwoConstant" name="operandTwoConstantName-{{expression.id}}"
+                          id="operandTwoConstantId-{{expression.id}}" #operandTwoId="ngModel" />
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <select class="form-control" [(ngModel)]="expression.finalResultId"
+                      name="finalResultName-{{expression.id}}" #finalResultId="ngModel">
+                      <option *ngFor="let option of expressionDropDownThird" [value]="option.key"><label
+                          [innerHtml]="option.value"></label></option>
+                    </select>
+                  </div>
+                  <div class="col-sm-2">
+                    <a class="m-r-15 crm-action-view text-muted text-warning"
+                      (click)="$event.preventDefault();deleteExpression(i)" placement="top" ngbTooltip="Delete">
+                      <i style="font-size: 25px;color: red;" class="icofont icofont-close"></i>
+                    </a>
+                  </div>
+                </div>
+                <br>
+              </ng-container>
+            </form>
+          </app-card>
+        </div>
+      </div>
+      <div class="col-sm-12" #tableViewId></div>
+      <div *ngIf="referenceBuilder.length>0" class="form-group row">
+        <div class="col-sm-12">
+          <app-card title="column Reference">
+            <form #referenceBuilderId="ngForm">
+              <div class="row">
+                <label class="col-sm-2">Column</label>
+                <label class="col-sm-3">Reference Filed</label>
+                <label class="col-sm-2">Type</label>
+                <label class="col-sm-2">In Between</label>
+              </div>
+              <ng-container *ngFor='let reference of referenceBuilder ; let i=index'>
+                <div class="row">
+                  <div class="col-sm-2">
+                    <select class="form-control" [(ngModel)]="reference.columnId" name="columnId-{{reference.id}}"
+                      #typeId="ngModel">
+                      <option *ngFor="let option of referenceDropDownFirst" [value]="option.key">
+                        <label [innerHtml]="option.value"></label>
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-sm-3">
+                    <ng-select [ngClass]="'ng-select'" [options]="referenceDropDownSecond" [multiple]="true"
+                      [(ngModel)]="reference.referenceId" id="reference-{{reference.id}}"
+                      name="reference-{{reference.id}}" #referenceId="ngModel" rounds="ngModel"
+                      (ngModelChange)="onChangeReferenceIds($event,reference)">
+                    </ng-select>
+                  </div>
+                  <div class="col-sm-2">
+                    <select class="form-control" [(ngModel)]="reference.referenceType" name="type-{{reference.id}}"
+                      #typeId="ngModel">
+                      <option *ngFor="let option of referenceDropDownThird" [value]="option.key">
+                        <label [innerHtml]="option.value"></label>
+                      </option>
+                    </select>
+                  </div>
+                  <div class="col-sm-2">
+                    <div *ngIf="reference.enableInBetween">
+                      <input type="text" [(ngModel)]="reference.inBetween" name="inBetween-{{reference.id}}"
+                        #inBetweenId="ngModel">
+                    </div>
+                  </div>
+                  <div class="col-sm-2">
+                    <a class="m-r-15 crm-action-view text-muted text-warning"
+                      (click)="$event.preventDefault();deleteReference(i)" placement="top" ngbTooltip="Delete">
+                      <i style="font-size: 25px;color: red;" class="icofont icofont-close"></i>
+                    </a>
+                  </div>
+                </div>
+                <br>
+              </ng-container>
+            </form>
+          </app-card>
+        </div>
+      </div>
+      <div *ngIf="conditionBuilder.length>0" class="form-group row">
+        <div class="col-sm-12">
+          <app-card title="Condition">
+            <form #conditionBuilderId="ngForm">
+              <div class="row well well-lg" *ngFor='let condition of conditionBuilder ; let i=index'>
+                <div class="col-sm-12">
+                  <div class="row">
+                    <div class="col-sm-4">
+                      <div class="row">
+                        <label class="col-sm-6">Condition Name</label>
+                        <div class="col-sm-6">
+                          <input class="form-control" type="text" maxlength="49" id="conditionName-{{condition.id}}"
+                            name="conditionName-{{condition.id}}" [(ngModel)]="condition.name"
+                            #conditionName="ngModel" />
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="row">
+                        <label class="col-sm-6">Condition Type </label>
+                        <div class="col-sm-6">
+                          <select class="form-control" [(ngModel)]="condition.type" name="type-{{condition.id}}"
+                            (change)="onConditionTypeChange(condition)" #conditionTypeNgModel="ngModel">
+                            <option value="range">Range</option>
+                            <option value="comparator">Comparator</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div *ngIf="condition.type=='comparator'" class="col-sm-3">
+                      <label for="caseSensitive-{{condition.id}}">
+                        <input type="checkbox" name="caseSensitive-{{condition.id}}" [checked]="condition.caseSensitive"
+                          (change)="condition.caseSensitive=!condition.caseSensitive" /> Case
+                        Sensitive</label>
+                    </div>
+                    <div *ngIf="condition.type=='range'" class="col-sm-3">
+                      <div class="row">
+                        <div class="col-sm-2">
+                          <a class="m-r-15 crm-action-view text-muted text-warning"
+                            (click)="$event.preventDefault();conditionChildCreate(condition.conditionChild)"
+                            placement="top" ngbTooltip="Add Condition">
+                            <i style="font-size: 15px;color: #4680ff;" class="icofont icofont-plus"></i>
+                          </a>
+                        </div>
+                        <div class="col-sm-10">
+                          <div class="row">
+                            <div class="col-sm-10">
+                              <input class="form-control" maxlength="49" placeholder="Default Value" type="text"
+                                [(ngModel)]="condition.defaultValue" name="defaultValue-{{condition.id}}"
+                                id="defaultValue-{{condition.id}}" #defaultValue="ngModel" />
+                            </div>
+                            <div class="col-sm-2 pl-0">
+                              <input type="color" id="defaultColor-{{condition.id}}"
+                                name="defaultColor-{{condition.id}}" [(ngModel)]="condition.defaultColor"
+                                #defaultColor="ngModel" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-1">
+                      <a class="m-r-15 crm-action-view text-muted text-warning"
+                        (click)="$event.preventDefault();deleteCondition(i)" placement="top" ngbTooltip="Delete">
+                        <i style="font-size: 25px;color: red;" class="icofont icofont-close"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-12"><br></div>
+                <div *ngIf="condition.type" class="col-sm-12">
+                  <div *ngIf="condition.type=='comparator'">
+                    <div class="row">
+                      <div class="col-sm-2">Operand One</div>
+                      <div class="col-sm-1 p-0">Comparator</div>
+                      <div class="col-sm-3">Operand Two</div>
+                      <div class="col-sm-2">Assigned To</div>
+                      <div class="col-sm-4">Output Message</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-2">
+                        <select class="form-control" [(ngModel)]="condition.operandOneId"
+                          name="operandOneName-{{condition.id}}" #operandOneIdNgModel="ngModel">
+                          <option *ngFor="let option of condition.comparatorDropDownFirst" [value]="option.key"><label
+                              [innerHtml]="option.value"></label></option>
+                        </select>
+                      </div>
+                      <div class="col-sm-1 p-0">
+                        <select class="form-control" [(ngModel)]="condition.operator" name="operator-{{condition.id}}"
+                          #operatorNgModel="ngModel">
+                          <option value="equals">Equals</option>
+                          <option value="notEqualTo">Not Equal To</option>
+                          <option value="greaterThan">Greater Than</option>
+                          <option value="greaterThanEqual">Greater than equals</option>
+                          <option value="lessThan">Less Than</option>
+                          <option value="lessThanEqual">Less than equals</option>
+                        </select>
+                      </div>
+                      <div class="col-sm-3">
+                        <div *ngIf="condition.operandTwoId=='constant'" class="row">
+                          <div class="col-sm-6">
+                            <select class="form-control" [(ngModel)]="condition.operandTwoId"
+                              name="operandTwoId-{{condition.id}}" #rangeValueNgModel="ngModel">
+                              <option value="constant">Constant Value</option>
+                              <option *ngFor="let option of condition.comparatorDropDownSecond" [value]="option.key">
+                                <label [innerHtml]="option.value"></label>
+                              </option>
+                            </select>
+                          </div>
+                          <div class="col-sm-6">
+                            <input class="form-control" type="number" placeholder="ex-5"
+                              [(ngModel)]="condition.constantValue" name="constantValueName-{{condition.id}}"
+                              id="constant-{{condition.id}}" #constantValueNgModel="ngModel" />
+                          </div>
+                        </div>
+                        <div *ngIf="condition.operandTwoId!='constant'" class="row">
+                          <div class="col-sm-12">
+                            <select class="form-control" [(ngModel)]="condition.operandTwoId"
+                              name="operandTwoId-{{condition.id}}" #rangeValueNgModel="ngModel">
+                              <option value="constant">Constant Value</option>
+                              <option *ngFor="let option of condition.comparatorDropDownSecond" [value]="option.key">
+                                <label [innerHtml]="option.value"></label>
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-sm-2">
+                        <select class="form-control" [(ngModel)]="condition.resultOperandId"
+                          name="resultOperandId-{{condition.id}}" #resultOperandIdNgModel="ngModel">
+                          <option *ngFor="let option of condition.comparatorDropDownThird" [value]="option.key"><label
+                              [innerHtml]="option.value"></label></option>
+                        </select>
+                      </div>
+                      <div class="col-sm-4">
+                        <div class="row">
+                          <div class="col-sm-5">
+                            <input class="form-control" maxlength="49" placeholder="Output Value" type="text"
+                              [(ngModel)]="condition.outPutValue" name="outPutValue-{{condition.id}}"
+                              id="outPutValue-{{condition.id}}" #outPutValue="ngModel" />
+                          </div>
+                          <div class="col-sm-1 pl-0">
+                            <input type="color" id="colorId-{{condition.id}}" name="color-{{condition.id}}"
+                              [(ngModel)]="condition.color" #colorId="ngModel" />
+                          </div>
+                          <div class="col-sm-5">
+                            <input class="form-control" maxlength="49" placeholder="Default Value" type="text"
+                              [(ngModel)]="condition.defaultValue" name="defaultValue-{{condition.id}}"
+                              id="defaultValue-{{condition.id}}" #defaultValue="ngModel" />
+                          </div>
+                          <div class="col-sm-1 pl-0">
+                            <input type="color" id="defaultColor-{{condition.id}}" name="defaultColor-{{condition.id}}"
+                              [(ngModel)]="condition.defaultColor" #defaultColor="ngModel" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <ng-container *ngIf="condition.type=='range'" class="table-responsive">
+                    <div class="row">
+                      <div class="col-sm-1 pl-0">First Operand</div>
+                      <div class="col-sm-10 ">
+                        <div class="row">
+                          <div class="col-sm-1 pl-0">Lower Limit</div>
+                          <div class="col-sm-3">Lower Limit Value </div>
+                          <div class="col-sm-1">Upper Limit </div>
+                          <div class="col-sm-3">Upper Limit Value </div>
+                          <div class="col-sm-2">Output</div>
+                        </div>
+                      </div>
+                      <div class="col-sm-1 pr-0">Assigned To</div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-1 pt-5 pl-0">
+                        <select class="form-control" [(ngModel)]="condition.operandOneId"
+                          name="operandOneName-{{condition.id}}" #operandOneIdNgModel="ngModel">
+                          <option *ngFor="let option of condition.conditionDropDownFirst" [value]="option.key"><label
+                              [innerHtml]="option.value"></label></option>
+                        </select>
+                      </div>
+                      <div class="well well-lg col-sm-10">
+                        <ng-container *ngFor="let cc of condition.conditionChild ; let j=index">
+                          <div class="row">
+                            <div class="col-sm-1 pl-0">
+                              <select class="form-control" [(ngModel)]="cc.lowerLimitCondition"
+                                name="lowerLimitCondition-{{condition.id}}-{{cc.id}}" placement="top"
+                                [ngbTooltip]="cc.lowerLimitCondition" #lowerLimitConditionNgModel="ngModel">
+                                <option value="greaterThan">Greater Than</option>
+                                <option value="greaterThanEqual">Greater than equals</option>
+                              </select>
+                            </div>
+                            <div class="col-sm-3">
+                              <div *ngIf="cc.lowerLimitValue!='constant'" class="row">
+                                <select class="form-control" [(ngModel)]="cc.lowerLimitValue"
+                                  name="lowerLimitValue-{{condition.id}}-{{cc.id}}" #lowerLimitValueNgModel="ngModel">
+                                  <option value="constant">Constant Value</option>
+                                  <option *ngFor="let option of condition.conditionDropDownSecond" [value]="option.key">
+                                    <label [innerHtml]="option.value"></label>
+                                  </option>
+                                </select>
+                              </div>
+                              <div *ngIf="cc.lowerLimitValue == 'constant' " class="row">
+                                <div class="col-sm-6 pl-0">
+                                  <select class="form-control" [(ngModel)]="cc.lowerLimitValue"
+                                    name="lowerLimitValue-{{condition.id}}-{{cc.id}}" #lowerLimitValueNgModel="ngModel">
+                                    <option value="constant">Constant Value</option>
+                                    <option *ngFor="let option of condition.conditionDropDownSecond"
+                                      [value]="option.key"><label [innerHtml]="option.value"></label></option>
+                                  </select>
+                                </div>
+                                <div class="col-sm-6 p-0">
+                                  <input class="form-control" type="number" placeholder="ex-5"
+                                    [(ngModel)]="cc.lowerConstantValue"
+                                    name="lowerConstantValue-{{condition.id}}-{{cc.id}}"
+                                    id="lowerConstantValue-{{condition.id}}-{{cc.id}}" #operandTwoId="ngModel" />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-sm-1">
+                              <select class="form-control" [(ngModel)]="cc.upperLimitCondition"
+                                name="upperLimitCondition-{{condition.id}}-{{cc.id}}" placement="top"
+                                [ngbTooltip]="cc.upperLimitCondition" #lowerConstantValue="ngModel">
+                                <option value="lessThan">Less Than</option>
+                                <option value="lessThanEqual">Less than equals</option>
+                              </select>
+                            </div>
+                            <div class="col-sm-3">
+                              <div *ngIf="cc.upperLimitValue!='constant'" class="row">
+                                <select class="form-control" [(ngModel)]="cc.upperLimitValue"
+                                  name="upperLimitValue-{{condition.id}}-{{cc.id}}" #upperLimitValueNgModel="ngModel">
+                                  <option value="constant">Constant Value</option>
+                                  <option *ngFor="let option of condition.conditionDropDownSecond" [value]="option.key">
+                                    <label [innerHtml]="option.value"></label>
+                                  </option>
+                                </select>
+                              </div>
+                              <div *ngIf="cc.upperLimitValue == 'constant' " class="row">
+                                <div class="col-sm-6 pl-0">
+                                  <select class="form-control" [(ngModel)]="cc.upperLimitValue"
+                                    name="upperLimitValue-{{condition.id}}-{{cc.id}}" #lowerLimitValueNgModel="ngModel">
+                                    <option value="constant">Constant Value</option>
+                                    <option *ngFor="let option of condition.conditionDropDownSecond"
+                                      [value]="option.key"><label [innerHtml]="option.value"></label></option>
+                                  </select>
+                                </div>
+                                <div class="col-sm-6 p-0">
+                                  <input class="form-control" type="number" placeholder="ex-5"
+                                    [(ngModel)]="cc.upperConstantValue"
+                                    name="upperConstantValue-{{condition.id}}-{{cc.id}}"
+                                    id="upperConstantValue-{{condition.id}}-{{cc.id}}" #upperConstantValue="ngModel" />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-sm-4">
+                              <div class="row">
+                                <div class="col-sm-8">
+                                  <input class="form-control" type="text" maxlength="49" [(ngModel)]="cc.outPutValue"
+                                    name="outPutValue-{{condition.id}}-{{cc.id}}"
+                                    id="outPutValue-{{condition.id}}-{{cc.id}}" #outPutValueNgModel="ngModel" />
+                                </div>
+                                <div class="col-sm-2">
+                                  <input type="color" id="colorId-{{condition.id}}-{{cc.id}}"
+                                    name="color-{{condition.id}}-{{cc.id}}" [(ngModel)]="cc.color" #colorId="ngModel" />
+                                </div>
+                                <div class="col-sm-2">
+                                  <a class="m-r-15 crm-action-view text-muted text-warning"
+                                    (click)="$event.preventDefault();deleteChildCondition(condition.conditionChild,j)"
+                                    placement="top" ngbTooltip="Delete Condition">
+                                    <i style="font-size: 15px;color: red;" class="icofont icofont-close"></i>
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </ng-container>
+                      </div>
+                      <div class="col-sm-1 pt-5 pr-0">
+                        <select class="form-control" [(ngModel)]="condition.resultOperandId"
+                          name="resultOperandId-{{condition.id}}" #resultOperandIdNgModel="ngModel">
+                          <option *ngFor="let option of condition.conditionDropDownThird" [value]="option.key"><label
+                              [innerHtml]="option.value"></label></option>
+                        </select>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </form>
+          </app-card>
+        </div>
+      </div>
+
+      
+      <div *ngIf="addFormulaFlag" class="form-group row">
+        <div class="col-sm-12">
+          <app-card title="Add Formula" [classHeader]="true">
+            <form #formulaBuilderId="ngForm">
+              <div class="row well well-lg">
+                <div class="col-sm-12">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <div class="row">
+                        <label class="col-sm-6">Formula For</label>
+                        <div class="col-sm-6">
+
+                          <select class="form-control" [(ngModel)]="formulaBuilder.toBePlaced"
+                            name="toBePlaced-{{formulaBuilder?.id}}" #TobeplacedNgModel="ngModel">
+                            <option *ngFor="let option of tableColumnsDropDown" [value]="option.value"><label
+                                [innerHtml]="option.label"></label></option>
+                          </select>
+
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-3">
+                      <div class="row">
+                        <label class="col-sm-6">Formula Type </label>
+                        <div class="col-sm-6">
+                          <select class="form-control" [(ngModel)]="formulaBuilder.type" name="type-{{formulaBuilder?.id}}"
+                            (change)="onConditionTypeChange(formulaBuilder)" #formulaTypeNgModel="ngModel">
+                            <option value="summation">Summation</option>
+                            <option value="others">Others</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="col-sm-3">
+                      <div class="row">
+                        <label class="col-sm-6">Decimal</label>
+                        <div class="col-sm-6">
+                          <select class="form-control" [(ngModel)]="formulaBuilder.mathOperation" name="type-{{formulaBuilder?.id}}"
+                            (change)="onConditionTypeChange(formulaBuilder)" #formulaTypeNgModel="ngModel">
+                            <option value="round">Round</option>
+                            <option value="trunc">Truncate</option>
+                            <option value="fixedDecimal">Fixed Decimal</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div *ngIf="formulaBuilder.mathOperation === 'fixedDecimal'" class="col-sm-2">
+                      <input class="form-control" type="number" id="formuladecimal" [(ngModel)]='formulaBuilder.decimalPlaces' name="decimal" placeholder="ex:-5" #decimalValue="ngModel"/>
+                      <!-- <i style="margin-top: 5px;font-size: 20px;color: green;"
+                      class="fa fa-check" aria-hidden="true" (click)="addElement(formulaBuilder.constant);"></i> -->
+                    </div>
+
+                    <div class="col-sm-1">
+                      <a class="m-r-15 crm-action-view text-muted text-warning"
+                        (click)="$event.preventDefault();deleteFormula()" placement="top" ngbTooltip="Delete">
+                        <i style="font-size: 25px;color: red;" class="icofont icofont-close"></i>
+                      </a>
+                    </div>
+
+                  </div>
+                </div>
+
+                <div class="row col-sm-12" style="display: flex;justify-content: center;"><br></div>
+
+                <div></div>
+                <div  class=" well well-lg col-sm-9 "
+                  style='margin:20px;background-color:white;justify-content: center;'>
+                  <div class="row" style="justify-content: center;" #div></div>
+
+                </div>
+                <div id="{{formulaBuilder?.id}}"  class="col-sm-2" style="margin-top: 30px;">
+                  <button type="button" (click)="saveFormula(formulaBuilder?.id)">Save</button>
+                  <button type="button"(click)="cancelFormula(formulaBuilder?.id)" >Cancel</button>
+                </div>
+
+                <div class="col-sm-12"><br></div>
+                <div id="field-{{formulaBuilder?.id}}"  class="col-sm-12"
+                  style="display: flex;justify-content: center;">
+                  <div >
+                    <div class="row">
+                      <div class="col-sm-3">Operator</div>
+                      <div *ngIf='showConstanField' class="col-sm-3"> Constant</div>
+                      <div *ngIf='!showConstanField' class="col-sm-3">Fields</div>
+                    </div>
+
+                    <div class="row">
+                      <div class="col-md-3">
+
+                        <select #select class="form-control" [(ngModel)]='operator' name="operator-{{formulaBuilder.id}}"
+                          #formulaOperatorNgModel="ngModel" (ngModelChange)="addElement(select,$event)">
+                          <!-- <option value="sss">Select</option> -->
+                          <option disabled [value]="sss">--Select--</option>
+                          <option *ngFor="let option of opeartorArr" [value]="option.value" >{{option.name}}</option>
+                          <!-- <option value="constant">Constant Value</option>
+                          <option value="&#8721;">Summation - &sum;</option>
+                          <option value="+">Addition </option>
+                          <option value="-">Subtraction</option>
+                          <option value="*">Multiplication</option>
+                          <option value="/">Division</option> -->
+                        </select>
+                      </div>
+                      <div *ngIf='showConstanField' class="col-md-3">
+                        <input class="form-control" type="number" id="formulaConstant" [(ngModel)]='formulaBuilder.constant' name="color" placeholder="ex:-5" #constantValue="ngModel"/>
+                      </div>
+                      <div class="col-md-3">
+                        <select *ngIf='!showConstanField' class="form-control" [(ngModel)]="formulaBuilder.field"
+                          name="operandOneName-{{formulaBuilder.id}}" #operandOneIdNgModel="ngModel"
+                          (ngModelChange)="addElement(null,$event)">
+                          <option *ngFor="let option of originalDropdown" [value]="option.label"><label
+                              [innerHtml]="option.label"></label></option>
+                        </select>
+                        <i *ngIf='showConstanField' style="margin-top: 5px;font-size: 20px;color: green;"
+                          class="fa fa-check" aria-hidden="true" (click)="addElement(null,formulaBuilder.constant);"></i>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </form>
+          </app-card>
+
+          <!-- <app-dynamic-form></app-dynamic-form> -->
+
+          <!-- <app-form-extended #formExtendedId [(inputField)]='inputField'></app-form-extended> -->
+        </div>
+      </div>
+      <div>
+        <app-card title="View Formula">
+          <div class="row">
+            <div class="col-md-11" #formula></div>
+            <div class="col-md-1"></div>
+          </div>
+        </app-card>
+      </div>
+
+
+      <input type="button" class="btn btn-primary" (click)="addTable()" value="Add Table" />
+      <input type="button" class="btn btn-primary" (click)="newExpression(expressionBuilder.length)"
+        value="Add Expression" />
+      <input type="button" class="btn btn-primary" (click)="newCondition(conditionBuilder.length)"
+        value="Add Condition" />
+      <input type="button" class="btn btn-primary" (click)="newReference()" value="Add Column Reference" />
+      <input type="button" class="btn btn-primary" (click)="preViewData();" value="Pre-view Form" />
+      <input *ngIf="conditionBuilder.length>0" type="button" class="btn btn-primary"
+        (click)="testCondition(conditionBuilder);" value="Test Condition" />
+      <input type="button" class="btn btn-primary" (click)="addFormula()" value="Add Formula" />
+    </div>
+  </div>
+
+  <div class=" col-sm-12 messages text-danger" *ngIf="this.validationMessageForForm!=''">
+    &nbsp;{{this.validationMessageForForm}}</div>
+
+  <div class="col-sm-12 text-center">
+    <div *ngIf="!masterDynamicForm.publishedFlag">
+      <button *ngIf="buttonFlag" type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+        (click)="$event.preventDefault();saveData();">{{this.buttonValue}}</button>
+      <button *ngIf="masterDynamicForm.id!=0" type="button"
+        class="btn btn-sm btn-warning waves-effect waves-light m-r-10"
+        (click)="deleteTemplateSwal(masterDynamicForm.id);">Delete</button>
+      <button *ngIf="buttonFlag" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+        (click)="hideNewTemplateForm()">Cancel</button>
+    </div>
+    <button *ngIf="masterDynamicForm.publishedFlag" type="button"
+      class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="hideNewTemplateForm()">Cancel</button>
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic #modal [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5>Form Preview</h5>
+    <button type="button" class="close basic-close-light-box" (click)="modal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button><br>
+  </div>
+  <div style="max-height: 500px !important;" class="app-modal-body">
+    <div style="max-height: 500px !important;" slimScroll railVisible="true" railColor="#004a6d" width="100%"
+      height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+      <app-form-preview [inputField]='inputField'></app-form-preview>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #ConditionCheck [dialogClass]="'modal-lg'" [hideFooter]="true" class="modal-dialog ">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Test Condition</h4>
+    <button type="button" class="close basic-close" (click)="ConditionCheck.hide()">
+      <i class="fa fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div style="height: 500px !important;padding: 0px;" class="app-modal-body">
+    <div class="dt-desc dy-width-500">
+      <select class="form-control" [(ngModel)]="testConditionValue" name="testConditionValue"
+        (change)="testConditionOnValueChange(testConditionValue)" #conditionTypeNgModel="ngModel">
+        <option *ngFor=" let test of this.testConditionDropDown" [ngValue]="test.key">{{test.value}}</option>
+      </select>
+      <ng-container *ngIf="testConditionValue">
+        <div *ngFor='let input of testInputField'>
+          <div class="form-group row" *ngIf="(input.subtype==='Text')">
+            <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                  *ngIf="input.required!=undefined" class="asterisk">*</span>
+                <a *ngIf="input.description!=undefined" href="javascript:;"
+                  class="m-r-15 crm-action-info text-muted text-primary" placement="top"
+                  [ngbTooltip]="input.description">
+                  <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+                </a></label></b>
+            <div class="col-sm-10">
+              <input class="form-control col-sm-5" [ngStyle]="{'background-color': !input.color? 'white' : input.color}"
+                type='text' [name]='input.name' [(ngModel)]='input.value'
+                (ngModelChange)="conditionCheck(testConditionValue,input.name,testInputField)" #text="ngModel">
+            </div>
+          </div>
+          <div class="form-group row" *ngIf="(input.type==='hidden')">
+            <b><label class="col-sm-12 col-form-label" [for]='input.name'><label
+                  [innerHtml]="input.label"></label></label></b>
+            <div class="col-sm-10">
+              <input class="form-control col-sm-5" type='text' [name]='input.name' [(ngModel)]='input.value'
+                (ngModelChange)="conditionCheck(testConditionValue,input.name,testInputField)" #hidden="ngModel">
+            </div>
+          </div>
+          <div class="form-group row" *ngIf="(input.type==='number')">
+            <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                  *ngIf="input.required!=undefined" class="asterisk">*</span>
+                <a *ngIf="input.description!=undefined" href="javascript:;"
+                  class="m-r-15 crm-action-info text-muted text-primary" placement="top"
+                  [ngbTooltip]="input.description">
+                  <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+                </a></label></b>
+            <div class="col-sm-12">
+              <input class="form-control col-sm-2" [type]='input.type' [name]='input.name' [(ngModel)]='input.value'
+                [minlength]="input.minlength" [maxlength]="input.maxlength" [required]="input.required"
+                (ngModelChange)="conditionCheck(testConditionValue,input.name,testInputField)" #number="ngModel">
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="ConditionCheck.hide()">Close</button>
+  </div>
+</app-modal-basic>

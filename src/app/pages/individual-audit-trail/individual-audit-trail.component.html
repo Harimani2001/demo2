@@ -1,0 +1,153 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Audit Trail</strong></div>
+        <div class="col-sm-6" style="text-align: right;">
+          <a container="body" *ngIf="!this.viewFlag" href="javascript:;" (click)="this.viewFlag = !this.viewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+            placement="top" ngbTooltip="Expand" (click)="loadData(this.permission,this.id)"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+          </a>
+          <a container="body" *ngIf="this.viewFlag" href="javascript:;" (click)="this.viewFlag = !this.viewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+           placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+          </a>
+        </div>
+      </div>
+      <br>
+      <div *ngIf="this.viewFlag">
+        <div *ngIf="data.length == 0" class="lightBlue">
+          <strong>&nbsp;&nbsp;No Data</strong>
+        </div>
+        <div *ngIf="data.length > 0">
+          <div *ngFor="let d of data">
+            <div class="lightBlue">&nbsp;&nbsp;<Strong>{{d.date}}</Strong></div><br>
+            <div class="card-notification" *ngFor="let v of d.value">
+              <div class="card-noti-conatin">
+                <div class="row">
+                  <div class="col-sm-6">
+                    <Strong>Event : </Strong><label name="auditEvent">{{v.event}}</label>
+                  </div>
+                  <div class="col-sm-6">
+                    <Strong>IP Address : </Strong><label name="auditIpAddress">{{v.ipAddress}}</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <Strong>Action Taken By : </Strong><label name="auditLoginUserName">{{v.loginUserName}}</label>
+                  </div>
+                  <div class="col-sm-6">
+                    <Strong>Browser And Device : </Strong><label name="auditBrowser">{{v.browser}}</label>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <Strong>Action Taken On : </Strong><label name="auditCreatedTime">{{v.createdTime}}</label>
+                  </div>
+                  <div class="col-sm-6">
+                    <Strong>User Remarks : </Strong>
+                    <ul name="auditUserRemarks" *ngFor="let user of v.userRemarks">
+                      <li [innerHtml]="user"></li>
+                    </ul>
+                  </div>
+                </div>
+                <!-- <div class="row"> -->
+                  <label>
+                    <Strong>System Remarks : </Strong>
+                  </label>
+                  <div class="dt-desc col-sm-12" style="padding: 0px; overflow-x:auto;">
+                    <div class="dt-desc dy-ui" style="padding-left: 0px !important;">
+                      <table class="table-striped table-bordered" style="width: 100%;">
+                        <thead>
+                          <th style="width: 5%;">Sl. No</th>
+                          <th style="text-align: left !important;">Remarks</th>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let remark of v.systemRemarks ; let i = index ">
+                            <td>{{i+1}}</td>
+                            <td style="text-align: left !important;" id="remarks-{{i}}"><label for="remarks-{{i}}" [innerHtml]="remark"></label></td>
+                          </tr>
+                        </tbody>
+                      </table>
+
+
+                    </div>
+                  </div>
+                  <br>
+                  <div class="col-sm-12">
+                    <table *ngIf="v.tableAudit.length>0" class="table-striped table-bordered">
+                      <tr>
+                        <th colspan="3">
+                          <strong>Table Changes</strong>
+                        </th>
+                      </tr>
+                      <tr *ngFor="let table of v.tableAudit ;let tableIndex = index">
+                        <td>{{tableIndex+1}}</td>
+                        <td >
+                          {{table.name}} <a class="btn btn-link strong" role="button" (click)="loadTableChanges(table)">Click here!</a>
+                        </td>
+                      </tr>
+                    
+                    </table>
+                  </div>
+                <!-- </div> -->
+                <!-- <div><Strong>Event : </Strong><label>{{v.event}}</label></div>
+                <div><Strong>Action Taken By : </Strong><label>{{v.loginUserName}} <Strong> at </Strong> {{v.createdTime}}</label></div>
+                <div><Strong>Ip Address : </Strong><label>{{v.ipAddress}}</label></div>
+                <div><Strong>Browser And Device : </Strong><label>{{v.browser}}</label></div> -->
+                <!-- <div><Strong>System Remarks :  </Strong><label>{{v.}}</label></div>
+                <div><Strong>User Remarks :  </Strong><label>{{v.}}</label></div> -->
+              </div><br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+<app-modal-basic #auditForTable [dialogClass]="'modal-lg'" class="modal-dialog">
+	<div class="app-modal-header">
+		<h4 class="modal-title">Table Changes</h4>
+		<button type="button" class="close basic-close" (click)="auditForTable.hide()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div style="max-height: 500px !important;overflow: scroll;" class="app-modal-body" >
+		<div class="dt-desc" style="padding: 0px;">
+			<div class="row">
+				<div class="col-sm-6">
+					<table class="table-responsive" id="oldTableId">
+						<thead>
+							<tr>
+								<th *ngFor="let col of this.oldTable.column">{{col}}</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr *ngFor="let row of this.oldTable.rows ; let i=index;">
+								<td id="oldtd_{{i}}_{{j}}" *ngFor="let rowData of row; let j=index">{{rowData}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="col-sm-6">
+					<table class="table-responsive" id="newTableId">
+						<thead>
+							<tr>
+								<th *ngFor="let col of this.oldTable.column">{{col}}</th>
+							</tr>
+						</thead>
+						<tbody >
+							<tr *ngFor="let row of this.newTable.rows ; let i=index;">
+								<td id="newtd-{{i}}" *ngFor="let rowData of row">{{rowData}}</td>
+							</tr>
+						  </tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+  <div class="app-modal-footer container">
+		<label><i style="color: #FBE870" class="icofont icofont-info-circle"></i>-&nbsp;Added</label>&nbsp;&nbsp;
+		<label><i style="color: #F08080" class="icofont icofont-info-circle"></i>-&nbsp;Old value</label>&nbsp;&nbsp;
+		<label><i style="color: #90EE90" class="icofont icofont-info-circle"></i>-&nbsp;Updated</label>
+		<button type="button" class="btn btn-default waves-effect float-right" (click)="auditForTable.hide()">Close</button>
+	</div>
+</app-modal-basic>

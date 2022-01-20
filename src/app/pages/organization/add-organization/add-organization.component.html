@@ -1,0 +1,388 @@
+<div class="row">
+	<div class="col-sm-12">
+		<!-- Basic Inputs Validation start -->
+		<app-card [title]="'Add Organization'">
+		<div *ngIf="this.isUpdate && this.isExhausted" class="asterisk">
+			<h4>You have exceeded the maximum number of users Creation.
+				Please Update</h4>
+		</div>
+		<form #companyForm="ngForm" novalidate>
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Organization Name<span
+					class="asterisk">*</span></label>
+				<div class="col-sm-10">
+					<input [disabled]="this.isUpdate" type="text" class="form-control" id="companyName"
+						name="companyName" placeholder="ex- company123"
+						[(ngModel)]="organizationModel.organizationName"
+						#cmpCompanyName="ngModel" minlength="8" maxlength="100" required (ngModelChange)="orgNameExist()" onkeypress="return /[a-z- ]/i.test(event.key)">
+						<div *ngIf="error != ''">
+							<p class="messages text-danger">{{error}}</p>
+						</div>
+						<div class="messages text-danger"
+						*ngIf="(cmpCompanyName.touched || submitted) && cmpCompanyName.errors?.required">Organization
+						Name can't be blank</div>
+					<div class="messages text-danger"
+						*ngIf="cmpCompanyName?.errors?.minlength">Alphanumeric of
+						size 8 to 15 characters allowed</div>
+				</div>
+			</div>
+			<!-- <div *ngIf="this.isUpdate" class="form-group row">
+				<label class="col-sm-2 col-form-label">Organization Name<span
+					class="asterisk">*</span></label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="companyName"
+						name="companyName" placeholder="ex- company123"
+						[(ngModel)]="organizationModel.organizationName"
+						#cmpCompanyName="ngModel" minlength="8" maxlength="15" required
+						readonly="readonly">
+					<div class="messages text-danger"
+						*ngIf="(cmpCompanyName.touched || submitted) && cmpCompanyName.errors?.required">Organization
+						Name can't be blank</div>
+					<div class="messages text-danger"
+						*ngIf="cmpCompanyName?.errors?.minlength">Alphanumeric of
+						size 8 to 15 characters allowed</div>
+				</div>
+			</div> -->
+			 <div class="form-group row">
+				<label class="col-sm-2 col-form-label">Total Number Of Users Allowed<span class="asterisk">*</span>
+				</label>
+				<div class="col-sm-10">
+					<input type="number" class="form-control" id="comapnyLicense"
+						name="comapnyLicense" placeholder="XX"
+						[(ngModel)]="organizationModel.organizationLicense"
+						#cmpCompanyLicense="ngModel" required
+						(keypress)="onlyNumber($event)" maxlength="4">
+					<div class="messages text-danger"
+						*ngIf="(cmpCompanyLicense.touched || submitted) && cmpCompanyLicense.errors?.required">Organization
+						License can't be blank</div>
+					  <div class="messages text-danger" *ngIf="cmpCompanyLicense?.errors?.pattern ">Only Alphanumeric is allowed of size 10 characters</div> 
+				</div>
+			</div> 
+			<div class="form-group row">
+				<label class="col-sm-3 col-form-label">Number Of Concurrent Sessions
+					<span class="asterisk">*</span>
+				</label>
+				<div class="col-sm-10">
+					<input type="number" class="form-control" id="userSessions"
+						name="userSessions" placeholder="XX"
+						[(ngModel)]="organizationModel.activeUserSessions"
+						#NoOfuserSessions="ngModel" required
+						(keypress)="onlyNumber($event)" maxlength="4">
+					<div class="messages text-danger"
+						*ngIf="(NoOfuserSessions.touched || submitted) && NoOfuserSessions.errors?.required">Number Of Concurrent Sessions can't be blank</div>
+					<div class="messages text-danger"
+						*ngIf="organizationModel.activeUserSessions > organizationModel.organizationLicense">Number Of Concurrent Sessions can't Exceed Total Number Of Users</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Licenses Valid Till<span class="asterisk">*</span>
+				</label>
+				<div class="col-sm-10">
+					<input class="form-control" placeholder="Licenses Valid Up-to"
+								name="comapnyLicenseValidTill" [(ngModel)]="organizationModel.comapnyLicenseValidTill" ngbDatepicker
+								#f="ngbDatepicker" #comapnyLicenseValidTill="ngModel" required (click)="f.toggle();" readonly="readonly" [minDate]="today">
+					<!--   <div class="messages txt-danger" *ngIf="cmpCompanyLicense?.errors?.pattern ">Only Alphanumeric is allowed of size 10 characters</div>  -->
+					<span *ngIf="licenseExpired"  class="messages text-danger"> Please Renew Your License </span>
+					<div class="messages text-danger"
+						*ngIf="(comapnyLicenseValidTill.touched || submitted) && comapnyLicenseValidTill.errors?.required">Date
+						can't be blank</div>
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Organization Email <span
+					class="asterisk">*</span></label>
+				<div class="col-sm-10">
+					<input [disabled]="this.isUpdate" type="text" class="form-control" id="comapnyEmail"
+						placeholder="ex- abc@abc.com" name="comapnyEmail"
+						[(ngModel)]="organizationModel.organizationEmail"
+						#cmpEmail="ngModel" required [pattern]="helper.email_pattern"
+						(ngModelChange)="showNext()">
+					<div *ngIf="valadationMessage != ''">
+						<p class="messages text-danger">{{valadationMessage}}</p>
+					</div>
+					<div class="messages text-danger"
+						*ngIf="(cmpEmail.touched || submitted) && cmpEmail.errors?.required">Email
+						can't be blank</div>
+					<div class="messages text-danger" *ngIf="cmpEmail.errors?.pattern">Please
+						enter a valid Email Id</div>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Storage space(GB)</label>
+				<div class="col-sm-10">
+					<input type="number" class="form-control" id="storageId"
+						name="storage" [(ngModel)]="organizationModel.storageSpace"
+						#storageSpace="ngModel">
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Country</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="countryId"
+						name="country" [(ngModel)]="organizationModel.country"
+						#cmpCountry="ngModel">
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">State</label>
+
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="stateId"
+						name="StateName" [(ngModel)]="organizationModel.state"
+						maxlength="15" #cmpState="ngModel">
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">District</label>
+
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="districtId"
+						name="district" [(ngModel)]="organizationModel.district"
+						maxlength="15" #cmpDistrict="ngModel">
+				</div>
+			</div>
+			<div class="form-group row ">
+				<label class="col-sm-2 col-form-label">Street</label>
+				<div class="col-sm-10 max-textarea ">
+					<textarea class="form-control max-textarea" maxlength="255"
+						rows="4" name="street" [(ngModel)]="organizationModel.street"
+						#cmpStreet="ngModel"></textarea>
+				</div>
+			</div>
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Pincode</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="mobile" name="pincode"
+						[(ngModel)]="organizationModel.pincode" #cmpPincode="ngModel"
+						minlength="06" maxlength="06"
+						(keypress)="onlyNumber($event)">
+					<div class="messages text-danger"
+						*ngIf="cmpPincode.errors?.minlength && cmpPincode.touched">Pincode is invalid</div>
+				</div>
+			</div>
+			<div class="form-group row ">
+				<label class="col-sm-2 col-form-label">Terms and Conditions</label>
+				<div class="col-sm-10 max-textarea ">
+					<textarea class="form-control max-textarea" maxlength="255"
+						rows="4" name="terms"
+						[(ngModel)]="organizationModel.termsAndConditions"
+						#Terms="ngModel"></textarea>
+				</div>
+			</div>
+			<div class="form-group row ">
+				<label class="col-sm-2 col-form-label">Select TimeZone <span
+					class="asterisk">*</span></label>
+				<div class="col-sm-10">
+				  <ng-select [ngClass]="'ng-select'" [options]="timeZoneList" [multiple]="false"
+					[(ngModel)]="organizationModel.timeZone" name="timeZone" rounds="ngModel" required #timeZone="ngModel">
+				  </ng-select>
+				  <div class="messages text-danger" *ngIf="(timeZone.touched || submitted) && timeZone.errors?.required">
+					TimeZone can't be blank
+				  </div>
+				</div>
+			  </div>
+			  <div class="form-group row ">
+				<label class="col-sm-2 col-form-label">Select Date Format<span
+					class="asterisk">*</span></label>
+				<div class="col-sm-10">
+					<select name="dateFormat" class="form-control" required [(ngModel)]="organizationModel.dateFormat" #dateFormat="ngModel">
+					<option value="" disabled>Select Date Format</option>
+					<option *ngFor="let format of dateFormatList" [ngValue]="format.value">{{format.value}}</option>
+				  </select>
+				  <div class="messages text-danger" *ngIf="(dateFormat.touched || submitted) && dateFormat.errors?.required">
+						Date Format can't be blank
+				  </div>
+				</div>
+			  </div>
+			<div class="col-sm-12">
+				<div class="alert alert-success" *ngIf="successMessage != ''">
+					<p>{{successMessage}}</p>
+				</div>
+				<div class="alert alert-success" *ngIf="errorMessage != ''">
+					<p>{{errorMessage}}</p>
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label class="col-sm-2 col-form-label">Project Creation Restriction</label>
+				<div class="col-sm-10">
+					<input type="text" class="form-control" id="projectCount" name="projectCount" min="2" (keypress)="onlyNumber($event)" maxlength="3"
+						[(ngModel)]="organizationModel.projectCount" #projectCount="ngModel">
+				</div>
+			</div>
+
+			<div class="form-group row">
+				<label class="col-sm-3 col-form-label">Periodic Review Duration
+					<span class="asterisk">*</span>
+				</label>
+				<div class="col-sm-10">
+					<input type="number" class="form-control" id="periodicDuration"
+						name="periodicDuration" placeholder="XX"
+						[(ngModel)]="organizationModel.periodicDuration"
+						#NoperiodicDuration="ngModel" required
+						(keypress)="onlyNumber($event)" maxlength="2">
+					<div class="messages text-danger"
+						*ngIf="(NoperiodicDuration.touched || submitted) && NoperiodicDuration.errors?.required">Periodic Review Duration can't be blank</div>
+				</div>
+			</div>
+
+			<div class="form-group row ">
+				<label class="col-sm-2 col-form-label">Installation Plan<span
+					class="asterisk">*</span></label>
+				<div class="col-sm-10">
+					<select name="installationPlan" class="form-control" required [(ngModel)]="organizationModel.installationPlan" #installationPlan="ngModel">
+					<option value="" disabled>Select Installation Plan</option>
+					<option *ngFor="let plan of installationPlans" [ngValue]="plan.key">{{plan.key}}</option>
+				  </select>
+				  <div class="messages text-danger" *ngIf="(installationPlan.touched || submitted) && installationPlan.errors?.required">
+						Date Format can't be blank
+				  </div>
+				</div>
+			  </div>
+
+			<label class="col-sm-5">Select modules for the organization</label>
+          <ngx-datatable #mydatatable class="material data-table" [headerHeight]="50" [columnMode]="'force'"
+          [rowHeight]="'auto'" [rows]="lookUpItemList">
+          <ngx-datatable-column name="Document Name" [width]="400" [sortable]="false" [canAutoResize]="false" [draggable]="false" [resizeable]="false">
+            <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+              <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <input type="checkbox" class="form-control" value="{{row['key']}}" name="{{row['key']}}"
+					[checked]="row['selected']" (change)="row['selected']=!row['selected']" [disabled]="row['key']==='140'">
+                    <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    <span>{{row['value']}}</span>
+                  </label>
+                </div>
+            </ng-template>
+		  </ngx-datatable-column>
+		  <ngx-datatable-column name="">
+			<ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+				<div class="col-sm-10" *ngIf="row['selected'] && row['key'] =='139'">
+					<input type="text" class="form-control" id="formCount" name="count"
+						[(ngModel)]="organizationModel.formCount" #cmpPincode="ngModel" (keypress)="onlyNumber($event)" maxlength="3">
+				  </div>
+				  <div class="col-sm-10" *ngIf="row['selected'] && row['key'] =='141'">
+					<input type="text" class="form-control" id="equipmentCount" name="equipmentCount"
+						[(ngModel)]="organizationModel.equipmentCount" (keypress)="onlyNumber($event)" maxlength="3">
+				  </div>
+				  <div class="row col-sm-12" *ngIf="row['selected'] && row['key'] =='140'">
+					<table class="w-100">
+						<tr>
+							<td>
+								<div class="row col-sm-12">
+									<div class="col-sm-2">
+										<strong class="strong">Name<span class="asterisk required">*</span>:</strong>
+									</div>
+									<div class="col-sm-10">
+										<input [disabled]="this.isUpdate" type="text" name="locName" class="form-control" placeholder="name"
+										 [(ngModel)]="organizationModel.locationName" required #locationName="ngModel" maxlength="50">
+										 <div class="messages text-danger" *ngIf="(locationName.touched || submitted) && locationName.errors?.required">{{locationValMsg.locationNameIsRequired}}</div>
+									</div>
+								</div>
+							</td>
+
+							<td>
+								<div class="row col-sm-12">
+									<div class="col-sm-2">
+										<strong class="strong">Code<span class="asterisk required">*</span>:</strong>
+									</div>
+									<div class="col-sm-10">
+										<input [disabled]="this.isUpdate" type="text" name="locCode" class="form-control" placeholder="Ab123" #locationCode="ngModel"
+										 [(ngModel)]="organizationModel.locationCode" required maxlength="50" (keypress)="checkOnly($event)">
+										 <div class="messages text-danger" *ngIf="(locationCode.touched || submitted) && locationCode.errors?.required">{{locationValMsg.locationCodeIsRequired}}</div>
+									</div>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</ng-template>
+		  </ngx-datatable-column>
+		</ngx-datatable>
+		<br>
+		<div *ngIf="!organizationModel.kbCopied" class="form-group row ">
+			<div class="checkbox-fade fade-in-primary col-sm-12">
+				<label>
+				  <input type="checkbox" class="form-control" name="kbName"
+					  [checked]="organizationModel.kbdefault" (change)="organizationModel.kbdefault=!organizationModel.kbdefault;">
+				  <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+				  <span>Copy default knowledge base</span>
+				</label>
+			</div>
+		</div>
+		<div *ngIf="organizationModel.kbCopied && organizationModel.kbUpdateAvailable" class="form-group row ">
+			<div class="checkbox-fade fade-in-primary col-sm-12">
+				<label>
+				  <input type="checkbox" class="form-control" name="kbupdate"
+					  [checked]="organizationModel.kbUpdate" (change)="organizationModel.kbUpdate=!organizationModel.kbUpdate;">
+				  <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+				  <span>Get updated default knowledge base</span>
+				</label>
+			</div>
+		</div>
+		<div *ngIf="!organizationModel.emailTemplateCopied" class="form-group row ">
+			<div class="checkbox-fade fade-in-primary col-sm-12">
+				<label>
+					<input type="checkbox" class="form-control" name="eamilName"
+						[checked]="organizationModel.emailTemplateDefault" (change)="organizationModel.emailTemplateDefault=!organizationModel.emailTemplateDefault;">
+					<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+					<span>Copy default email template</span>
+				</label>
+			</div>
+		</div>
+		<div *ngIf="organizationModel.emailTemplateCopied && organizationModel.emailTemplateUpdateAvailable" class="form-group row ">
+			<div class="checkbox-fade fade-in-primary col-sm-12">
+				<label>
+					<input type="checkbox" class="form-control" name="emailupdate"
+						[checked]="organizationModel.emailTemplateUpdate" (change)="organizationModel.emailTemplateUpdate=!organizationModel.emailTemplateUpdate;">
+					<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+					<span>Get updated default email template</span>
+				</label>
+			</div>
+		</div>
+		<div *ngIf="!organizationModel.emailRuleCopied" class="form-group row ">
+				<div class="checkbox-fade fade-in-primary col-sm-12">
+					<label>
+						<input type="checkbox" class="form-control" name="eamilrule"
+							[checked]="organizationModel.emailRuleDefault" (change)="organizationModel.emailRuleDefault=!organizationModel.emailRuleDefault;checkCopyEmailRule()">
+						<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+						<span>Copy default email rule</span>
+					</label>
+				</div>
+			</div>
+			<div *ngIf="organizationModel.emailRuleCopied && organizationModel.emailRuleUpdateAvailable" class="form-group row ">
+				<div class="checkbox-fade fade-in-primary col-sm-12">
+					<label>
+						<input type="checkbox" class="form-control" name="emailruleupdate"
+							[checked]="organizationModel.emailRuleUpdate" (change)="organizationModel.emailRuleUpdate=!organizationModel.emailRuleUpdate;">
+						<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+						<span>Get updated default email rule</span>
+					</label>
+				</div>
+			</div>
+		</form>
+		<div class="form-group row">
+			<div class="col-sm-4"></div>
+			<div class="col-sm-4">
+
+				<button type="button" *ngIf="!this.isUpdate" class="btn btn-success"
+					(click)="$event.preventDefault();saveAndGoto(companyForm.form.valid,'Saved');">
+					Save <span *ngIf="this.isLoading" class="ti-reload rotate-refresh"></span>&nbsp;
+				</button>
+				<button type="button" *ngIf="this.isUpdate" class="btn btn-success"
+					(click)="$event.preventDefault();saveAndGoto(companyForm.form.valid,'Updated');">
+					Update <span *ngIf="this.isLoading"
+						class="ti-reload rotate-refresh"></span>&nbsp;
+				</button>
+				<button type="button" class="btn btn-danger" [disabled]="isLoading"
+					[routerLink]="['/organization/view-organization']" routerLinkActive="active">Cancel</button>
+			</div>
+			<div class="col-sm-4"></div>
+		</div>
+		</app-card>
+	</div>
+</div>
+<div *ngIf="isFlag" class="loading">Loading&#8230;</div>

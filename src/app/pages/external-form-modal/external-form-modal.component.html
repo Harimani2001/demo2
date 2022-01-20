@@ -1,0 +1,61 @@
+<app-modal-basic #externalApprovalmodal [dialogClass]="'modal-md'" [hideHeader]="false" [hideFooter]="false"  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">External User</h4>
+    <button type="button" class="close basic-close" (click)="externalApprovalmodal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <form [formGroup]="onExternalApprovalForm">
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Name
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="name" id="nameId" class="form-control" placeholder="name" formControlName="name" maxlength="50"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('name').touched && onExternalApprovalForm.get('name').hasError('required')">{{externalApprovalErrorTypes.nameValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Email
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="code" id="emailId" class="form-control" placeholder="email" formControlName="email" maxlength="50"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('email').touched && onExternalApprovalForm.get('email').hasError('required')">{{externalApprovalErrorTypes.emailValidation}}</div>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('email').hasError('pattern')">{{externalApprovalErrorTypes.emailPatternValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Validity (Days)
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" formControlName="validity"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('validity').touched && onExternalApprovalForm.get('validity').hasError('required')">{{externalApprovalErrorTypes.validityValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Remarks
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+            <textarea rows="3" class="form-control" formControlName="remarks"></textarea>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('remarks').touched && onExternalApprovalForm.get('remarks').hasError('required')">{{externalApprovalErrorTypes.remarksValidation}}</div>
+            </div>
+          </div>
+          <br>
+          <div class="form-group row">
+            <div class="col-sm-12 text-center">
+              <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="onClickSave();">Submit</button>
+              <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="externalApprovalmodal.hide();">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>

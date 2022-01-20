@@ -1,0 +1,297 @@
+<div class="row" *ngIf="!this.viewIndividualDataFlag && !this.viewRevisionDataFlag">
+  <div class="col-sm-12">
+    <app-card [title]="'View Document Templates'">
+      <div class="row" class="col-sm-12">
+        <div style="text-align: right;">
+          <label> Search :
+            <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search" placeholder="search">
+          </label>
+          <br>
+        </div>
+      </div>
+      <br>
+      <br>
+      <ngx-datatable #myTable class="data-table dt-chk" [rows]='data | dynamicTemplateFilterPipe : filterQuery' [limit]="rowsOnPage"
+        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+        <!-- Row Detail Template -->
+        <ngx-datatable-column style="font-weight: bold;" name="Document Id">
+
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['templateCode']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Title ">
+
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;"> {{row['tittle']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <!-- <ngx-datatable-column name="Document Status">
+        <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['commonDocumentStatus']}}</strong>
+        </ng-template> </ngx-datatable-column>  -->
+
+
+        <ngx-datatable-column name="Action">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <ng-template #popContent>
+              <span class="text-left">
+                <div>
+                  <b>Status :</b>&nbsp; {{row['commonDocumentStatus']}}
+                </div>
+                <div>
+                  <b>Created By :</b>&nbsp; {{row['createdBy']}}
+                </div>
+                <div>
+                  <b>Created On :</b>&nbsp;{{row['createdTime']| date:'dd-MM-yyyy hh:mm a'}}
+                </div>
+                <div>
+                  <b>Last Modified By : </b> {{row['updatedBy']}}
+                </div>
+                <div>
+                  <b>Last Modified On : </b>{{row['updatedTime'] | date:'dd-MM-yy hh:mm a'}}
+                </div>
+              </span>
+            </ng-template>
+            <a  href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"  (click)="modalOverflow.show();loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info" >
+              <i  class="icofont icofont-info-square"></i>
+            </a>
+            <a *ngIf="(this.modal.updateButtonFlag && (row.documentStatus==this.helper.ReviewPending||row.documentStatus==null))" href="javascript:;"
+              class="m-r-15 crm-action-edit text-muted text-primary" [routerLink]="['/dynamicTemplate/add-dynamicTemplate',row.id]"
+              [skipLocationChange]="true" placement="top" ngbTooltip="Edit">
+              <i  class="icofont icofont-edit"></i>
+            </a>
+            <!-- <a *ngIf="this.modal.deleteButtonFlag && row['commonDocumentStatusValue']==this.helper.ReviewPending" href="javascript:;" class="m-r-15 crm-action-delete text-muted text-danger" (click)="openSuccessCancelSwal(row , row['$$index'] );" placement="top" ngbTooltip="Delete">
+                     <i  class="icofont icofont-bin"></i>
+                   </a>*ngIf="revisionList.length > 1" -->
+            <a *ngIf="(this.modal.viewButtonFlag && (row.documentStatus!=null)) "  href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" (click)="viewRowDetails(row.id);"
+              data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+              <i  class="icofont icofont-resize"></i>
+            </a>
+
+            <a   href="javascript:;" class="crm-action-view text-muted text-warning" (click)="viewRevisionDetails(row);"
+            data-ng-open="modalSmall" placement="top" ngbTooltip="Revision">
+            <i  class="icofont icofont-eye"></i>
+          </a>
+           
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </app-card>
+  </div>
+</div>
+
+<!--expandable view -->
+<div class="row">
+  <div class="col-sm-12">
+    <!-- Typography card start -->
+    <app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualDataFlag">
+      <div>
+        <div>
+          <br>
+          <h4>
+            &nbsp;&nbsp;View Template
+            <div style="float: right;">
+              <button *ngIf="(this.modal.updateButtonFlag && dynamicTemplateModel.documentStatus==this.helper.ReviewPending)" type="submit" 
+                class="btn btn-outline-primary btn-primary btn-round"  [routerLink]="['/dynamicTemplate/add-dynamicTemplate',dynamicTemplateModel.id]">Edit</button>
+              &nbsp;&nbsp;
+              <!-- <button [disabled]="!(this.modal.deleteButtonFlag && dynamicTemplateModel.documentStatus==this.helper.ReviewPending)"
+                type="button" class="btn btn-outline-danger btn-danger btn-round" (click)="openSuccessCancelSwal(model.id)">Delete</button> &nbsp;&nbsp; -->
+              <a style="cursor: pointer; font-weight: bold" class="ti-close" (click)="this.viewIndividualDataFlag=false"></a> &nbsp;&nbsp; &nbsp;&nbsp;
+            </div>
+          </h4>
+        </div>
+        <br>
+
+        <squeezebox [multiple]="true">
+          <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-heading accordion-msg">Document Status</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <p>
+                  <span style="background-color:	#FFFF00">{{dynamicTemplateModel.commonDocumentStatus}}</span>
+                </p>
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <sb-item class="accordion-panel" [collapsed]="false">
+            <sb-item-head class="accordion-heading accordion-msg">Title</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <p>{{dynamicTemplateModel.tittle}}</p>
+              </div>
+            </sb-item-body>
+          </sb-item>
+          <sb-item [collapsed]="false" class="accordion-panel">
+            <sb-item-head class="accordion-msg">Body</sb-item-head>
+            <sb-item-body class="accordion-content">
+              <div class="accordion-desc">
+                <div class="htmldata" [innerHtml]="dynamicTemplateModel.body" contenteditable="true"></div>
+              </div>
+            </sb-item-body>
+          </sb-item>
+        </squeezebox>
+        <br>
+        <br>
+        <br>
+      </div>
+    </app-card>
+    <!-- Typography card end -->
+  </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+      <!-- Typography card start -->
+      <app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewRevisionDataFlag">
+        <div>
+          <div>
+            <br>
+            <h4>
+              &nbsp;&nbsp;View Revisions
+              <div style="float: right;">
+                <a style="cursor: pointer; font-weight: bold" class="ti-close" (click)="this.viewRevisionDataFlag=false"></a> &nbsp;&nbsp; &nbsp;&nbsp;
+              </div>
+            </h4>
+          </div>
+  
+          <!-- <squeezebox [multiple]="true">
+            <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">
+                <select name="select" class="form-control input-sm full-data-search" id="apiConfigurationId"
+                required [(ngModel)]="dropDownOne" name="dropDownOne" #role="ngModel" (ngModelChange)="onChangeOfDropDownOne($event)">
+                <option *ngFor="let doc of revisionList;let i=index" [ngValue]="i">{{doc.versionName}}</option>
+              </select>
+            </sb-item-head>
+              <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                      <div class="htmldata" [innerHtml]=this.oldDocumentContents></div>
+                  </div>
+              </sb-item-body>
+            </sb-item>
+            <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-heading accordion-msg">
+              <select name="select" class="form-control input-sm full-data-search" id="apiConfigurationId"
+              required [(ngModel)]="dropDownTwo" name="dropDownTwo" #role1="ngModel" (ngModelChange)="onChangeOfDropDownTwo($event)">
+              <option *ngFor="let doc of revisionList;let i=index" [ngValue]="i">{{doc.versionName}}</option>
+            </select>
+            </sb-item-head>
+              <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                      <div class="htmldata" [innerHtml]=this.outputHtml></div>
+                  </div>
+              </sb-item-body>
+            </sb-item>
+          </squeezebox> -->
+          <!--  -->
+          <br>
+          <br>
+          <div class="row">
+              <div class="col-lg-12">
+                <div class="general-info">
+                  <div class="row">
+                    <div class="col-lg-12 col-xl-6">
+                      <app-card [blockClass]="'appCardColor'">
+                      <div>
+                            <select name="select"  id="apiConfigurationId"
+                            required [(ngModel)]="dropDownOne" name="dropDownOne" #role="ngModel" (ngModelChange)="onChangeOfDropDownOne($event)">
+                            <option *ngFor="let doc of revisionList;let i=index" [ngValue]="i">{{doc.versionName}}</option>
+                        </select>
+                        <span style="float: right;">
+                            <div>
+                                <div>
+                                  <b>Date :</b>&nbsp; <mark>{{this.updatedDate1 | date:'dd-MM-yyyy hh:mm a'}}</mark></div>
+                                  <br>
+                                  <div>
+                                  <b>User :</b>&nbsp; {{this.user1}}</div>
+                                </div>
+                            </span>
+                            <br>
+                            <br>
+                            <hr style="border-bottom:2px solid black">
+                            <div class="htmldata" [innerHtml]=this.oldDocumentContents></div>
+                      </div>
+                    </app-card>
+                    </div>
+                    <!-- end of table col-lg-6 -->
+                    <div class="col-lg-12 col-xl-6">
+                        <app-card [blockClass]="'appCardColor'">
+                      <div>
+                                <select name="select"  id="apiConfigurationId"
+                                required [(ngModel)]="dropDownTwo" name="dropDownTwo" #role1="ngModel" (ngModelChange)="onChangeOfDropDownTwo($event)">
+                                <option *ngFor="let doc of revisionList;let i=index" [ngValue]="i">{{doc.versionName}}</option>
+                              </select>
+   
+                            <span style="float: right;">
+                                <div>
+                                    <div>
+                                      <b>Changes Done On :</b>&nbsp; <mark>{{this.updatedDate2 | date:'dd-MM-yyyy hh:mm a'}}</mark></div>
+                                    <br>
+                                      <div>
+                                      <b>Changes Done By :</b>&nbsp; {{this.user2}}</div>
+                                    </div>
+                                </span>
+                                <br>
+                                <br>
+                              
+                              <hr style="border-bottom:2px solid black">
+                              
+                              <div class="htmldata" [innerHtml]=this.outputHtml></div>
+                      </div>
+                      </app-card>
+                    </div>
+                    <!-- end of table col-lg-6 -->
+                  </div>
+                  <!-- end of row -->
+                </div>
+                <!-- end of general info -->
+              </div>
+              <!-- end of col-lg-12 -->
+            </div>
+          
+        </div>
+      </app-card>
+      <!-- Typography card end -->
+    </div>
+  </div>
+
+  <div class="text-danger" *ngIf="this.dropDownFlag">{{this.dropDownOneVersion}} is greater than {{this.dropDownTwoVersion}}</div>
+
+  <div class="text-danger" *ngIf="this.dropDownFlag">There are no changes to compare</div>
+
+
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+<app-modal-basic class="reset-this" #modalOverflow container="body" [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="modalOverflow.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Document Current Status</h5><br>
+    <div ><br>
+      <div><b>Document Type :</b>&nbsp;{{currentDocType}}</div>
+      <div><b>Document Status :</b>&nbsp;<span style="background-color:	#FFFF00">{{currentDocStatus}}</span></div>
+      <div><b>Created By :</b>&nbsp; {{currentCreatedBy}}</div>
+      <div><b>Last Modified On : </b>{{currentModifiedDate | date:'dd-MM-yy hh:mm a'}}</div>
+    </div>
+    <hr>
+    <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+     
+      <h5>Document  Status Log</h5><br>
+     
+      <div *ngFor="let log of statusLog ;let in = index">
+        <div>{{in+1}}</div>
+        <div><b>Document Status :</b>&nbsp;{{log.commonDocumentStatus}}</div>
+        <div><b>Document Comments :</b>{{log.comments}}</div>
+        <div><b>Commented By :</b>&nbsp; {{log.createdBy}}</div>
+        <div><b>Commented On :</b>{{log.createdTime | date:'dd-MM-yy hh:mm a'}}</div>
+        <hr>
+
+      </div> <div *ngIf="this.modalSpinner" class="loader"></div>
+    </div>
+  </div>
+</app-modal-basic>
+
+

@@ -1,0 +1,499 @@
+<div *ngIf="this.inputField.length>0" style="background: white !important;" class="well well-lg">
+  <div *ngFor='let input of inputField'>
+    <div class="form-group row" *ngIf="(input.subtype==='Text')">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-10">
+        <input class="form-control col-sm-5" [ngStyle]="{'background-color': !input.color? 'white' : input.color}"
+          [disabled]="input.disabled" type="text" [name]='input.name' [(ngModel)]='input.value'
+          [minlength]="input.minlength" [required]="input.required" [maxlength]="input.maxlength"
+          (ngModelChange)="conditionCheckFull(inputField)" #text="ngModel">
+        <div class="messages text-danger" *ngIf="(text.touched || submitted) && text.errors?.required">
+          <label [innerHtml]="input.label"></label> can't be blank</div>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="(input.subtype==='Email')">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label>
+          <span *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-10">
+        <input class="form-control col-sm-5" [type]='input.subtype' [name]='input.name' [(ngModel)]='input.value'
+          [minlength]="input.minlength" [required]="input.required" [maxlength]="input.maxlength"
+          [pattern]="helper.email_pattern" #email="ngModel">
+        <div class="messages text-danger" *ngIf="(email.touched || submitted) && email.errors?.required">
+          <label [innerHtml]="input.label"></label> can't be blank</div>
+        <div class="messages text-danger" *ngIf="email.errors?.pattern">Please enter a valid Email Id</div>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="(input.subtype==='Mobile')">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-10">
+        <input class="form-control col-sm-5" type="text" [name]='input.name' [(ngModel)]='input.value'
+          [minlength]="input.minlength" [required]="input.required" [maxlength]="input.maxlength" #tel="ngModel"
+          pattern="^[6789]\d{9}$" (keypress)="onlyNumber($event)">
+        <div class="messages text-danger" *ngIf="(tel.touched || submitted) && tel.errors?.required">
+          <label [innerHtml]="input.label"></label> can't be blank</div>
+        <div class="messages text-danger" *ngIf="tel.errors?.pattern">Please enter a valid <label
+            [innerHtml]="input.label"></label></div>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf=" (input.type==='number')">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-10">
+        <input class="form-control col-sm-3" [type]='input.type' [name]='input.name' [(ngModel)]='input.value'
+          [disabled]="input.disabled" [minlength]="input.minlength" [maxlength]="input.maxlength"
+          [required]="input.required" (ngModelChange)="calculation(inputField)"
+          (keypress)="onlyNumberWithDecimal($event,input.value)" #dateNumber="ngModel">
+        <div class="messages text-danger" *ngIf="(dateNumber.touched || submitted) && dateNumber.errors?.required">Enter
+          valid
+          <label [innerHtml]="input.label"></label></div>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="(input.type==='date')">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-10">
+        <input class="form-control col-sm-3" [disabled]="input.disabled" [type]='input.type' [name]='input.name'
+          [(ngModel)]='input.value' [required]="input.required" (ngModelChange)="calculation(inputField)"
+          #dateNumber="ngModel">
+        <div class="messages text-danger" *ngIf="(dateNumber.touched || submitted) && dateNumber.errors?.required">Enter
+          valid
+          <label [innerHtml]="input.label"></label></div>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="(input.type==='file')">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div *ngIf="(!input.multiple)" class="col-sm-6">
+
+        <div class="upload-btn-wrapper">
+          <button class="btn-file-upload">Upload a file</button>
+          <input #fileuploaddiv type="file"[name]='input.name' title=""  (change)="onFileUpload($event,input)" [(ngModel)]='input.value' #file="ngModel"  />
+          <span *ngIf='!input.values || (input.values && input.values.length==0)'>No file Choosen</span>
+        </div>
+        <!-- <input [type]='input.type' [name]='input.name' (change)="onFileUpload($event,input)"
+          [(ngModel)]='input.value' #file="ngModel"  id="masterfile"> -->
+        <div class="messages text-danger"
+          *ngIf="(file.touched || submitted) && ( input.required && ( input.values == undefined|| input.values.length==0))">
+          <label [innerHtml]="input.label"></label> can't be blank</div>
+      </div>
+      <div *ngIf="(input.multiple)" class="col-sm-6">
+        <div class=" files color">
+          <input #fileuploaddiv type="file" [name]='input.name' [(ngModel)]='input.value'
+            (change)="onFileUpload($event,input)" multiple #fileMultiple="ngModel">
+        </div>
+        <div class="messages text-danger"
+          *ngIf="(fileMultiple.touched || submitted) && ( input.required && ( input.values == undefined|| input.values.length==0))">
+          <label [innerHtml]="input.label"></label> can't be blank</div>
+      </div>
+      <br><br>
+      <div class="col-form-label" *ngIf='input.values!=undefined && input.values.length>0'>
+        <strong class="col-sm-12" *ngIf="(input.multiple)">Uploaded Files</strong>
+        <strong class="col-sm-12" *ngIf="(!input.multiple)">Uploaded File</strong>
+        <div class="dt-desc dy-ui">
+          <table class="table-striped table-bordered">
+            <thead>
+              <th>Sl. No</th>
+              <th>File Name</th>
+              <th>Date</th>
+              <th>Action</th>
+            </thead>
+            <tbody>
+              <tr *ngFor="let file of input.values ; let fileIndex=index ">
+                <td>{{fileIndex+1}}</td>
+                <td><label>{{file.fileName}}</label></td>
+                <td><label>{{file.displayDate}}</label></td>
+
+                <td><a style="cursor:pointer;font-weight: bold" class="icofont icofont-eye-alt" placement="top"
+                    container="body" ngbTooltip="view"
+                    (click)="downloadFileOrView(file.fileName,file.path,true,input.name)"></a>&nbsp;&nbsp;
+                  <a style="cursor:pointer;font-weight: bold" class="icofont icofont-download" placement="top"
+                    container="body" ngbTooltip="Download"
+                    (click)="downloadFileOrView(file.fileName,file.path,false,input.name)"></a>&nbsp;&nbsp;
+                  <a style="cursor:pointer;font-weight: bold" style="cursor: pointer;" class="icofont icofont-ui-delete"
+                    placement="top" container="body" ngbTooltip="delete"
+                    (click)="deleteUploadedFile(input.values,fileIndex,input.name)"></a>&nbsp;&nbsp;
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id="{{input.name}}"> </div>
+    </div>
+    <div class="sm-12" *ngIf="(input.type==='header')">
+
+      <div *ngIf="(input.subtype==='h1')">
+        <h1 [innerHtml]="input.label"></h1>
+      </div>
+      <div *ngIf="(input.subtype==='h2')">
+        <h2 [innerHtml]="input.label"></h2>
+      </div>
+      <div *ngIf="(input.subtype==='h3')">
+        <h3 [innerHtml]="input.label"></h3>
+      </div>
+
+    </div>
+    <div *ngIf="(input.type==='paragraph')">
+      <p class="sm-12" [innerHtml]="input.label"></p>
+    </div>
+    <div *ngIf="(input.type==='newline')">
+      <hr class="form-hr">
+    </div>
+    <div class="form-group row" *ngIf="(input.type==='textarea')">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label>
+          <span *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div *ngIf="(input.subtype==='quill')" class="col-sm-10">
+        <quill-editor [name]='input.name' [(ngModel)]='input.value' [required]="input.required"
+          [maxlength]="input.maxlength" #quill="ngModel">
+        </quill-editor>
+        <div class="messages text-danger" *ngIf="(quill.touched || submitted) && quill.errors?.required">
+          <label [innerHtml]="input.label"></label> can't be blank</div>
+      </div>
+
+      <div *ngIf="(input.subtype==='ckeditor')" class="col-sm-10">
+        <ckeditor [config]="configOfCkEditior" [name]="input.name" [required]="input.required" [(ngModel)]="input.value"
+          #ckeditor="ngModel"></ckeditor>
+        <div class="messages text-danger" *ngIf="(ckeditor.touched || submitted) && ckeditor.errors?.required">
+          <label [innerHtml]="input.label"></label> can't be blank</div>
+      </div>
+
+    </div>
+    <div class="form-group row" *ngIf="(input.type==='select')" >
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label>
+          <span *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top"
+            [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-10">
+        <div class="container row">
+          <select class="form-control col-sm-5" [required]="input.required" [name]="input.name" [(ngModel)]="input.value" (change)="restValueOfOther(input)"
+            #select="ngModel">
+            <option *ngFor='let optionList of input.values' [value]="optionList.value">{{optionList.label}}
+            </option>
+            <option *ngIf="input.other" value="govalOther">Other</option>
+          </select>
+        </div><br>
+        <div *ngIf="input.value=='govalOther'" class="container row">
+          <label class="col-sm-2" for="OtherId-{{input.name}}">Other Value</label>
+          <div class="col-sm-4">
+            <input id="OtherId-{{input.name}}" class="form-control " [(ngModel)]="input.otherValue" required
+              #selectOtherValue="ngModel" type="text" name="Other-{{input.name}}" placeholder="Value" />
+            <div class="messages text-danger"
+              *ngIf="(selectOtherValue.touched || submitted) && selectOtherValue.errors?.required">
+              <label>Other Value can't be blank</label></div>
+          </div>
+        </div>
+          <div   class="messages text-danger" *ngIf="input.value!='govalOther'&&(select.touched || submitted) && select.errors?.required">
+          <label [innerHtml]="input.label"></label> can't be blank</div>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="(input.type==='checkbox-group')">
+      <b><label class="col-sm-12" [for]='input.name'><label [innerHtml]="input.label"></label><span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+            placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-12">
+        <div class="container row">
+          <ng-container *ngFor="let cheboxvalue of input.values">
+            <div class="col-sm-12">
+              <div class="checkbox-fade fade-in-primary">
+                <label>
+                  <input type="checkbox" [name]="input.name" [checked]="cheboxvalue.selected"
+                    (change)="cheboxvalue.selected=!cheboxvalue.selected;setCheckedData(input.values,input)">
+                  <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                  <span>{{cheboxvalue.label}}</span>
+                </label>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div *ngIf="input.other" class="container row ">
+          <div class="col-sm-12">
+            <div class="checkbox-fade fade-in-primary">
+              <label>
+                <input type="checkbox" [name]="input.name" [checked]="input.otherSelected"
+                  (change)="input.otherSelected=!input.otherSelected;restValueOfOther(input)">
+                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                <span>Other</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="input.otherSelected" class="container row">
+          <label class="col-sm-2" for="OtherId-{{input.name}}">Other Value</label>
+          <div class="col-sm-4">
+            <input id="OtherId-{{input.name}}" class="form-control " [(ngModel)]="input.otherValue" required
+              #checkBoxOtherValue="ngModel" type="text" name="Other-{{input.name}}" placeholder="Value" />
+            <div class="messages text-danger"
+              *ngIf="(checkBoxOtherValue.touched || submitted) && checkBoxOtherValue.errors?.required">
+              <label>Other Value can't be blank</label></div>
+          </div>
+        </div>
+        <div *ngIf="!input.otherSelected && (submitted &&(input.value===undefined||input.value.length==0)&& input.required)"
+          class="messages text-danger"><label [innerHtml]="input.label"></label> can't be blank</div>
+      </div>
+    </div>
+    <div class="form-group row" *ngIf="(input.type==='radio-group')">
+      <b><label class="col-sm-12" [for]='input.name'><label [innerHtml]="input.label"></label> <span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+            placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-12">
+        <div class="form-radio" *ngFor="let radioButtonValue of input.values">
+          <form>
+            <div class="radio radiofill">
+              <label>
+                <input type="checkbox" [name]="input.name" [checked]="radioButtonValue.selected"
+                  (change)="setCheckedAsRadio(input.values,$event,radioButtonValue.value,input)" />
+                <span class="cr"></span>
+                <i class="helper"></i>{{radioButtonValue.label}}
+              </label>
+            </div>
+          </form>
+        </div>
+        <div class=" container row form-radio" *ngIf="input.other">
+          <form>
+            <div class="radio radiofill">
+              <label>
+                <input type="checkbox" [name]="input.name" [checked]="input.otherSelected"
+                  (change)="setCheckedAsRadio(input.values,$event,'govalOther',input)">
+                <span class="cr"></span><i class="helper"></i>
+                <span>Other</span>
+              </label>
+            </div>&nbsp;&nbsp;
+          </form>
+        </div>
+        <div *ngIf="input.otherSelected" class="container row">
+          <label class="col-sm-2" for="OtherId-{{input.name}}">Other Value</label>
+          <div class="col-sm-4">
+            <input id="OtherId-{{input.name}}" class="form-control " [(ngModel)]="input.otherValue" required
+              #radioOtherValue="ngModel" type="text" name="Other-{{input.name}}" placeholder="Value" />
+            <div class="messages text-danger"
+              *ngIf="(radioOtherValue.touched || submitted) && radioOtherValue.errors?.required">
+              <label>Other Value can't be blank</label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="(input.type==='datetime-local')" class="form-group row">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-10">
+        <input class="form-control col-sm-3" [disabled]="input.disabled" type="datetime-local" [name]='input.label'
+          [(ngModel)]='input.value' [required]="input.required" #dateTime="ngModel"
+          (ngModelChange)="calculation(inputField)">
+        <div class="messages text-danger" *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter
+          valid
+          <label [innerHtml]="input.label"></label></div>
+      </div>
+    </div>
+    <div *ngIf="(input.type==='time')" class="form-group row">
+      <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+            *ngIf="input.required!=undefined" class="asterisk">*</span>
+          <a *ngIf="input.description!=undefined" href="javascript:;"
+            class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+            <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+          </a></label></b>
+      <div class="col-sm-10">
+        <input class="form-control col-sm-2" type="time" [disabled]="input.disabled" [name]='input.label'
+          [(ngModel)]='input.value' [required]="input.required" #time="ngModel"
+          (ngModelChange)="calculation(inputField)">
+        <div class="messages text-danger" *ngIf="(time.touched || submitted) && time.errors?.required">Enter
+          valid
+          <label [innerHtml]="input.label"></label></div>
+      </div>
+    </div>
+    <div class="table-responsive ">
+      <app-card *ngIf="input.type=='table'">
+        <h1 style="text-align: center;" class="sm-12" [innerHtml]='input.name'> </h1>
+        <button  class="btn btn-primary" (click)="addRow(input)"><i class="icofont icofont-plus-circle">Add Row</i></button>
+        <table id="tableIdDivRefresh" #tableIdDivRefresh class="table table-striped table-bordered ">
+          <thead>
+            <tr>
+              <th>#</th>  
+              <ng-container *ngFor="let column of input.columns">
+                <th *ngIf="column.type!='hidden'"> <label [innerHtml]='column.label'></label><span *ngIf="column.required!=undefined" class="asterisk">*</span>
+                <a *ngIf="column.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top"
+                [ngbTooltip]="column.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></th>
+              </ng-container>
+            </tr>
+          </thead>
+          <tbody *ngFor="let row of input.rows ; let i = index" [attr.data-index]="i">
+
+            <tr>
+              <td>
+                  <label >{{i+1}}</label>
+                  <input *ngIf="!input.fixedRow" type="checkbox"  [name]='i'   placement="top" ngbTooltip="Delete" (change)="deleteRow($event,input,i);">
+
+               </td>
+               <ng-container *ngFor="let column of input.columns ; let j = index" [attr.data-index]="j">
+                <td  *ngIf="column.type!='hidden'" >
+
+                  <label *ngIf="(column.subtype=='Text')">
+                      <input type="text" [name]='row.row[j].name' [(ngModel)]='row.row[j].value'  [minlength]="column.minlength" [disabled]="column.disabled"
+                        [required]="column.required" [maxlength]="column.maxlength"  #text="ngModel" [ngStyle]="{'background-color': !row.row[j].color? 'transparent' : row.row[j].color}"
+                        (ngModelChange)="conditionCheckForTableFull(input.id,inputField,row.row)" >
+                        <div class="messages text-danger" *ngIf="(text.touched || submitted) && text.errors?.required"><label [innerHtml]="column.label"></label> can't be blank</div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Email')">
+                      <input  type="email" [name]='row.row[j].name' [(ngModel)]='row.row[j].value'
+                        [pattern]="helper.email_pattern" #email="ngModel">
+                        <div class="messages text-danger" *ngIf="(email.touched || submitted) && email.errors?.required"><label [innerHtml]="column.label"></label> can't be blank</div>
+                        <div class="messages text-danger" *ngIf="email.errors?.pattern">Please enter a valid Email Id</div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Mobile')">
+                      <input type="tel" [name]='row.row[j].name' [(ngModel)]='row.row[j].value' pattern="^[6789]\d{9}$" (keypress)="onlyNumber($event)" #mobile="ngModel">
+                      <div class="messages text-danger" *ngIf="(mobile.touched || submitted) && mobile.errors?.required"><label [innerHtml]="column.label"></label> can't be blank</div>
+                        <div class="messages text-danger" *ngIf="mobile.errors?.pattern">Please enter a valid <label  [innerHtml]="column.label"></label></div>
+                    </label>
+
+                    <label *ngIf="(column.type==='number')">
+                      <input type="number" [disabled]="column.disabled" [name]='row.row[j].name' [(ngModel)]='row.row[j].value' #number="ngModel" (keypress)="onlyNumberWithDecimal($event,row.row[j].value)" 
+                      (ngModelChange)="calculationOfTableValue(row.row,input.id,inputField)"
+                      [minlength]="column.minlength" [maxlength]="column.maxlength" [required]="column.required">
+                      <div class="messages text-danger" *ngIf="(number.touched || submitted) && number.errors?.required">Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='date')">
+                        <input type="date" [name]='row.row[j].name' [(ngModel)]='row.row[j].value' #date="ngModel" [required]="column.required">
+                        <div class="messages text-danger" *ngIf="(date.touched || submitted) && date.errors?.required">Enter valid <label [innerHtml]="column.label"></label></div>
+                      </label>
+                    <label *ngIf="(column.type==='textarea')">
+                      <textarea  [name]='row.row[j].name' [(ngModel)]='row.row[j].value' #textarea="ngModel" [required]="column.required"></textarea>
+                      <div class="messages text-danger" *ngIf="(textarea.touched || submitted) && textarea.errors?.required"> <label [innerHtml]="column.label"></label> can't be blank</div>
+                    </label>
+
+                    <div *ngIf="(column.type==='select')">
+                      <label *ngIf="!column.multiple">
+                       <select class="select-table"  [required]="column.required" [name]='row.row[j].name' [(ngModel)]='row.row[j].value' #select="ngModel">
+                         <option *ngFor='let optionList of column.values' [value]="optionList.value">{{optionList.label}}
+                         </option>
+                       </select>
+                       <div class="messages text-danger" *ngIf="(select.touched || submitted) && select.errors?.required"> <label [innerHtml]="column.label"></label> can't be blank</div>
+
+                     </label>
+                     <div  style="width: 400px;"  *ngIf="column.multiple">
+                       <textarea class="multiple-textarea" [rows]="(row.row[j].value.length/50)+1" [innerHtml]="row.row[j].value"></textarea>
+
+                    </div>
+                    </div>
+                    <label *ngIf="(column.type==='checkbox-group')">
+                      <div *ngFor="let cheboxvalue of row.row[j].values ; let lengthIndex=index;" >
+                          <label >
+                            <input type="checkbox" [name]='row.row[j].name'   [checked]="cheboxvalue.selected"
+                              (change)="cheboxvalue.selected=!cheboxvalue.selected;setCheckBoxValidation(row.row[j]);">
+                           {{cheboxvalue.label}}  {{!row.row[j].checkBoxValidationFlag}}
+                          </label>
+                           <div  class="messages text-danger" *ngIf="(!row.row[j].checkBoxValidationFlag) && submitted && column.required && lengthIndex== (row.row[j].values.length-1)"> <label [for]="row.row[j].name" [innerHtml]="column.label"></label> can't be blank</div>
+                      </div>
+
+                    </label>
+
+                    <label *ngIf="(column.type==='radio-group')">
+                      <div *ngFor="let radioButtonValue of row.row[j].values">
+                          <label>
+                            <input class="default-radio" type="checkbox" [name]='row.row[j].name' [checked]="radioButtonValue.selected"
+                              (change)="setCheckedAsRadio(row.row[j].values,$event,radioButtonValue.value)">
+                           {{radioButtonValue.label}}
+                          </label>
+                        </div>
+                    </label>
+                    <label *ngIf="(column.type==='datetime-local')">
+                      <input  type="datetime-local" [name]='row.row[j].name' [(ngModel)]='row.row[j].value'
+                        [required]="column.required" #dateTime="ngModel">
+                        <div class="messages text-danger" *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='time')">
+                      <input  type="time" [name]='row.row[j].name' [(ngModel)]='row.row[j].value'
+                        [required]="column.required" #time="ngModel">
+                      <div class="messages text-danger" *ngIf="(time.touched || submitted) && time.errors?.required">Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+
+                    <div class="form-group row" *ngIf="(column.type==='file')" >
+                        <input style="margin-left: 1rem;" type="file" [name]='row.row[j].name' (change)="onFileUpload($event,row.row[j])" [multiple]="column.multiple"
+                          [(ngModel)]='row.row[j].value' #file="ngModel">
+                        <div class="messages text-danger"
+                          *ngIf="(file.touched || submitted) && ( column.required && ( row.row[j].values == undefined|| row.row[j].values.length==0))">
+                          <label [innerHtml]="column.label"></label> can't be blank {{input.values}}</div>
+                      <br><br>
+                      <div class="col-form-label"  *ngIf='row.row[j].values!=undefined && row.row[j].values.length >0'>
+                        <strong class="col-sm-12" *ngIf="(column.multiple)" >Uploaded Files</strong>
+                        <strong class="col-sm-12" *ngIf="(!column.multiple)" >Uploaded File</strong>
+                        <div class="dt-desc dy-ui">
+                          <table class="table-striped table-bordered">
+                            <thead><th>Sl. No</th><th>File Name</th><th>Date</th><th>Action</th></thead>
+                            <tbody>
+                            <tr *ngFor="let file of row.row[j].values ; let fileIndex=index ">
+                              <td>{{fileIndex+1}}</td>
+                              <td><label>{{file.fileName}}</label></td>
+                              <td><label>{{file.displayDate}}</label></td>
+
+                              <td>
+                                <!-- <a style="cursor:pointer;font-weight: bold" class="icofont icofont-eye-alt" placement="top" container="body"
+                                ngbTooltip="view" (click)="downloadFileOrView(file.fileName,file.path,true,input.name)"></a>&nbsp;&nbsp; -->
+                                <a style="cursor:pointer;font-weight: bold" class="icofont icofont-download" placement="top" container="body"
+                                 ngbTooltip="Download" (click)="downloadFileOrView(file.fileName,file.path,false,row.row[j].name)"></a>&nbsp;&nbsp;
+                                <a style="cursor:pointer;font-weight: bold" style="cursor: pointer;" class="icofont icofont-ui-delete" placement="top" container="body"
+                                ngbTooltip="delete" (click)="deleteUploadedFile(row.row[j].values,fileIndex,row.row[j].name)"></a>&nbsp;&nbsp;
+                              </td>
+                            </tr>
+                          </tbody>
+                          </table>
+                        </div>
+                      </div>
+                  </div>
+              </td>
+              </ng-container>
+            </tr>
+
+          </tbody>
+        </table>
+        <br><br>
+      </app-card>
+    </div>
+  </div>
+
+</div>
+<div *ngIf="spinnerFlag" class="loading ">Loading&#8230; </div>

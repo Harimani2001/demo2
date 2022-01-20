@@ -1,0 +1,147 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <form [formGroup]="onShiftForm">
+        <table id="shift-add-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <strong class="strong">Shift Name<span class="asterisk required">*</span>:</strong>
+                  </div>
+                  <div class="col-sm-8">
+                    <input #shiftName type="text" name="shiftName" class="form-control" placeholder="name" formControlName="name"
+                      maxlength="50" (ngModelChange)="onChangeName()" required />
+                    <div class="messages text-danger"
+                      *ngIf="onShiftForm.get('name').touched && onShiftForm.get('name').hasError('required')">
+                      {{shiftErrorTypes.nameValidation}}</div>
+                    <div class="messages text-danger" *ngIf="isValidName">{{shiftErrorTypes.nameRequiredValidation}}
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <strong class="strong">Start Time<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" name="startTime" atp-time-picker placeholder="--.--"
+                      formControlName="startTime" />
+                    <div class="messages text-danger"
+                      *ngIf="onShiftForm.get('startTime').touched && onShiftForm.get('startTime').hasError('required')">
+                      {{shiftErrorTypes.starttimeValidation}}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <strong class="strong">End Time<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-8">
+                    <input type="text" class="form-control" name="endTime" atp-time-picker placeholder="--.--"
+                    formControlName="endTime" />
+                    <div class="messages text-danger"
+                      *ngIf="onShiftForm.get('endTime').touched && onShiftForm.get('endTime').hasError('required')">
+                      {{shiftErrorTypes.endtimeValidation}}</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="form-group row">
+          <strong class="col-sm-2 strong col-form-label">&nbsp;&nbsp;&nbsp;Active Flag :
+          </strong>
+          <label class="switch">
+            <input type="checkbox" name="activeFlag" formControlName="active" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-sm-12 text-center">
+            <button type="button" *ngIf="isUpdate && permissionModal.updateButtonFlag" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="onClickSave();">Update</button>
+            <button type="button" *ngIf="!isUpdate && permissionModal.createButtonFlag" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="onClickSave();">Save</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="onClickCancel()">Cancel</button>
+          </div>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+        </div>
+        <div class="col-xs-12 col-sm-12 col-md-6">
+          <div style="text-align: right;">
+            <label>Search:
+              <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                class="form-control input-sm full-data-search" name=search placeholder="Search">
+            </label>
+          </div>
+        </div>
+      </div>
+      <ngx-datatable #myTable class="data-table dt-chk" [rows]='data | ShiftFilterPipe : filterQuery' [limit]="10"
+        [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+        <ngx-datatable-column [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false" name="Sl No.">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong>{{row['$$index']+1}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Name">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['name']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Start Time">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['startTime']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="End Time">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['endTime']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Status">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['active']==='Y'?'Active':'In-Active'}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Action">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <a href="javascript:;" *ngIf="permissionModal.updateButtonFlag" (click)="editShift(row)"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+              <i class="icofont icofont-edit edit"></i>
+            </a>
+            <a href="javascript:;" *ngIf="permissionModal.deleteButtonFlag"
+              class="m-r-15 crm-action-delete text-muted text-danger"
+              (click)="openSuccessCancelSwal(row , row['$$index'] );" placement="top" ngbTooltip="Delete">
+              <i class="icofont icofont-bin bin"></i>
+            </a>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </app-card>
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

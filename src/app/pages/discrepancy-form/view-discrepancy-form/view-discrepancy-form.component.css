@@ -1,0 +1,131 @@
+
+
+ table, th, td {
+  border: 1px solid lightgray;
+}
+.header-bg{
+  background-color:#f6f6f6 ;
+}
+.prev, .next , .delete {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  margin-top: -22px;
+  padding: 16px;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Position the "next button" to the right */
+.next {
+  right: 0;
+  border-radius: 3px 0 0 3px;
+}
+
+/* On hover, add a black background color with a little bit see-through */
+.prev:hover, .next:hover ,.delete:hover{
+  background-color: rgba(0,0,0,0.8);
+}
+
+.delete { 
+  cursor: pointer;
+  position: absolute;
+  font-weight: bold;
+  font-size: 15px;
+  color:white;
+  top: 37px;
+  right: 15px; 
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  background-color: rgba(0,0,0,0.4);
+}
+
+ngx-datatable#customTable datatable-body-cell{
+  background-color: white !important;
+}
+
+ngx-datatable#customTable datatable-header-cell{
+  background-color: white !important;
+}
+
+table#testcase-table-urlList tbody th,
+table#testcase-table-urlList tbody td {
+white-space: unset;
+}
+table#testcase-table-urlList,table#testcase-table-urlList td{
+ border: 1px solid black;
+}
+
+.list-wrapper-custom-css{
+  width: 1230px;
+  margin-right: 5px;
+  margin-bottom: 0px;
+  border-radius: 5px;
+  box-shadow: 0 1px 11px 0 rgb(0 0 0 / 12%);
+  border: 1px solid rgba(0,0,0,.125);
+}
+
+.table-allign{
+  width: 70%;
+  margin-top: 20px;
+}
+
+/* .card-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.dfView-list-wrapper {
+  width: 185px;
+  margin:0px 10px 0px 0;
+  height: 100%;
+  box-sizing: border-box;
+  display: inline-block;
+  vertical-align: top;
+  box-shadow:none;
+}
+
+.list {
+  background-color: #ebecf0;
+  border-radius: 3px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  position: relative;
+  white-space: normal;
+}
+
+.dfView-list-cards {
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin: 0px -17px 0px -12px;
+  min-height: 0;
+  width: 250px;
+  height: 200px
+}
+
+#modal-lg-60 .modal-lg {
+max-width: 60%;
+}
+
+.exapndDF .expansion-panel[_ngcontent-c15]{
+  width :160px !important;
+}
+
+.exapndDF .expansion-panel__description[_ngcontent-c15]{
+  flex: 0px !important;
+}
+.exapndDF .expansion-panel__arrow-down[_ngcontent-c15]{
+display: none !important;
+}
+
+.exapndDF .expansion-panel__header[_ngcontent-c15] {
+  padding: 14px 10px !important;
+} */

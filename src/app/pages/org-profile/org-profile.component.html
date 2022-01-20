@@ -1,0 +1,131 @@
+<div class="row" *ngIf="organization">
+    <div class="col-sm-12">
+        <h4 style="font-weight:bolder">Organization Info</h4>
+        <ng-container>
+            <table id="org-table" class="table w-100">
+              <tbody>
+                <tr>
+                  <td>
+                    <div><strong class="strong">Organization Name : </strong>{{organization.organizationName}}</div>
+                  </td>
+                  <td>
+                    <div><strong class="strong">Organization Email : </strong>{{organization.organizationEmail}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div><strong class="strong">Address : </strong>{{organization.street}}</div>
+                  </td>
+                 
+                  <td>
+                    <div><strong class="strong">Project Creation Restriction : </strong>{{organization.projectCount}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div><strong class="strong">Timezone : </strong>{{organization.timeZone}}</div>
+                  </td>
+                  <td>
+                    <div><strong class="strong">DateFormat : </strong>{{organization.dateFormat}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div><strong class="strong">Number Of Users : </strong>{{organization.organizationLicense}}
+                    </div>
+                  </td>
+                  <td>
+                    <div><strong class="strong">Number Of Concurrent Sessions :</strong>{{organization.activeUserSessions}}</div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <div><strong class="strong">Licenses Valid Till : </strong>
+                      <label name="introduction" [innerHtml]="organization.comapnyLicenseValidTill"></label>
+                    </div>
+                  </td>
+                  <td>
+                    <div><strong class="strong">Storage space(GB) : </strong>
+                      <label name="purposeAndScope" [innerHtml]="organization.storageSpace"></label>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </ng-container>
+    </div>
+    <div class="col-sm-12">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="page-header-title">
+              <div class="d-inline">
+                <h4 class="strong">List of Modules</h4>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6" style="text-align: right;">
+            <a container="body" *ngIf="!this.modulesViewFlag" href="javascript:;"
+              (click)="this.modulesViewFlag = !this.modulesViewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Expand"
+              (click)=" this.loadModules();"><i style="font-size: 25px;color: black;"
+                class="icofont icofont-circled-down"></i>
+            </a>
+            <a container="body" *ngIf="this.modulesViewFlag" href="javascript:;"
+              (click)="this.modulesViewFlag = !this.modulesViewFlag"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Hide"><i
+                style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+            </a>
+          </div>
+        </div>
+        <div *ngIf="this.modulesViewFlag">
+            <ngx-datatable [scrollbarH]="false" #myTable class="data-table dt-chk"
+            style="overflow: unset!important;" [rows]='modulesList'
+            [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10">
+            
+            <ngx-datatable-column style="font-weight: bold;" name="Module Name">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                {{row['displayOrder']}}. &nbsp;&nbsp;&nbsp;{{row['value']}}</strong>
+                </ng-template>
+            </ngx-datatable-column>
+        </ngx-datatable>
+        </div>
+      </app-card>
+    </div>
+    <div class="col-sm-12">
+        <app-card>
+          <div class="row">
+            <div class="col-sm-6">
+              <div class="page-header-title">
+                <div class="d-inline">
+                  <h4 class="strong">Statistics</h4>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-6" style="text-align: right;">
+              <a container="body" *ngIf="!this.statisticsViewFlag" href="javascript:;"
+                (click)="this.statisticsViewFlag = !this.statisticsViewFlag"
+                class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Expand"
+                (click)="loadStatistics()"><i style="font-size: 25px;color: black;"
+                  class="icofont icofont-circled-down"></i>
+              </a>
+              <a container="body" *ngIf="this.statisticsViewFlag" href="javascript:;"
+                (click)="this.statisticsViewFlag = !this.statisticsViewFlag"
+                class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Hide"><i
+                  style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+              </a>
+            </div>
+          </div>
+          <div *ngIf="this.statisticsViewFlag">
+              <div class="row">
+                  <div class="col-sm-4" *ngFor="let data of chartList">
+                    <h6 style="text-align: center;">{{data.title}}</h6>
+                    <google-chart [data]="data.data"> </google-chart>
+                  </div>
+              </div>
+          </div>
+        </app-card>
+      </div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

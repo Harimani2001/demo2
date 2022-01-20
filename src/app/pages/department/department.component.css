@@ -1,0 +1,24 @@
+table#add-table tbody th, table#add-table tbody td {
+    white-space: unset;
+    width: 33%;
+}
+
+table#add-table, table#add-table td {
+    border: 1px solid black;
+}
+
+.col-dep-3 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 25%;
+    -ms-flex: 0 0 25%;
+    flex: 0 0 25%;
+    max-width: 28%!important;
+}
+
+.col-dep-9 {
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 75%;
+    -ms-flex: 0 0 75%;
+    flex: 0 0 75%;
+    max-width: 72%!important;
+}

@@ -1,0 +1,147 @@
+<div class="row" *ngIf="!this.viewIndividualData">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-6">
+          <h4>Equipment Summary</h4>
+        </div>
+      </div>
+      <hr style="margin-top: -1px">
+      <form>
+        <div class="row">
+          <div class="col-sm-4">
+            <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Log Book</label>
+            <div class="col-sm-11">
+              <div id="inputgroup" class="input-group">
+                <select name="select" class="form-control" [(ngModel)]="selectedFormIndex"
+                  (ngModelChange)="loadAllFormData()">
+                  <option value="">Select Log</option>
+                  <option *ngFor="let form of formList;let i=index" [value]="i">{{form.value}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          </div>
+      </form>
+    </app-card>
+    <app-card>
+      <div class="row">
+        <div class="col-sm-9"></div>
+        <div class="col-sm-2">
+          <label>
+            <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search"
+              placeholder="search">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        </div>
+        <div class="col-sm-1">
+          <button *ngIf = "this.showCsvButton && this.permissionModal.exportButtonFlag" style="margin-bottom: 10px; padding: 6px 10px !important; border-radius: 2px !important;" ngbTooltip="Csv Download"
+            class="btn btn-primary" (click)="excelExport()"> <i class="icofont icofont-download-alt m-0"></i></button>
+        </div>
+      </div>
+      <ngx-datatable #myTable [scrollbarH]="true" class="data-table dt-chk" [rows]='data | FormReportsFilterPipe : filterQuery'
+								[limit]="rowsOnPage" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+								[rowHeight]="'auto'">
+								<ngx-datatable-column name="Action">
+										<ng-template let-row="row" ngx-datatable-cell-template>
+											<a container="body" href="javascript:;"
+												class="crm-action-view text-muted text-warning"
+												(click)="viewRowDetails(row,row.commonDocumentStatusValue);" data-ng-open="modalSmall"
+												placement="top" ngbTooltip="View">
+												<i  class="icofont icofont-resize view"></i>
+                      </a>
+                      <ng-template  #popContent>
+                        <div ><label style="font-size: 10px !important"><b>Created By:</b> {{row['createdByName']}}</label></div>
+                        <div><label style="font-size: 10px !important" ><b>Created Time:</b> {{row['displayCreatedTime'] }}</label></div>
+                        <div ><label style="font-size: 10px !important"><b>Updated By:</b> {{row['updatedByName']}}</label></div>
+                        <div><label style="font-size: 10px !important" ><b>Updated Time:</b> {{row['displayUpdatedTime'] }}</label></div>
+                      </ng-template>
+                      <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                        (click)="loadDocumentCommentLog(row)" placement="top" [ngbTooltip]="popContent">
+                        <i  class="icofont icofont-info-square info"></i>
+                      </a>
+										</ng-template>
+									</ngx-datatable-column>
+								<ngx-datatable-column style="font-weight: bold;" name="ID">
+									<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+										<strong>{{row['dynamicFormCode']}}</strong>
+									</ng-template>
+								</ngx-datatable-column>
+								<ngx-datatable-column style="font-weight: bold;" name="Equipment">
+										<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+											<strong>{{row['equipmentName']}}</strong>
+										</ng-template>
+									</ngx-datatable-column>
+									<ngx-datatable-column style="font-weight: bold;" name="Batch">
+											<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+												<strong>{{row['batchName']}}</strong>
+											</ng-template>
+									</ngx-datatable-column>
+									<ngx-datatable-column style="font-weight: bold;" name="Product">
+											<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+												<strong>{{row['productName']}}</strong>
+											</ng-template>
+										</ngx-datatable-column>
+									<ngx-datatable-column  style="font-weight: bold;" *ngFor="let col of publishedMandatoryFeildJson.columns; let i = index" [name]="col" flexGrow="1.0">
+                      <ng-template ngx-datatable-header-template>
+                          <span class="datatable-header-cell-wrapper">
+                              <span class="datatable-header-cell-label draggable"><label [innerHtml]="col"></label></span>			
+                          </span>
+                        </ng-template>
+											<ng-template let-row="row"  ngx-datatable-cell-template>
+											   <strong>{{ publishedMandatoryFeildJson.rows[row['$$index']][i] }}</strong>
+										   </ng-template> 
+                   </ngx-datatable-column>
+                   <!-- <ngx-datatable-column style="font-weight: bold;" name="Status">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong>{{row['status']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column> -->
+                  <ngx-datatable-column style="font-weight: bold;" name="Updated By">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong>{{row['updatedByName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Updated Time">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong>{{row['displayUpdatedTime'] }}</strong>
+                    </ng-template>
+                  </ngx-datatable-column> 
+							</ngx-datatable>
+    </app-card>
+  </div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+<app-document-status-comment-log #documentcomments></app-document-status-comment-log>
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData==true">
+  <div *ngFor="let data of popupdata; let in = index">
+    <div><br>
+      <h4>&nbsp;&nbsp;Details
+        <div style="float: right;">
+          <a style="cursor:pointer;font-weight: bold" *ngIf="routeback==null" class="ti-close"
+            (click)="this.viewIndividualData=false">&nbsp;&nbsp;</a>
+        </div>
+      </h4>
+    </div>
+    <br>
+  	<app-stepperprogress></app-stepperprogress>
+		<app-view-form [inputField]='this.popupdata'></app-view-form><br>
+    <ngb-tabset #formDataListTab="ngbTabset" *ngIf="isMapping" class="md-tabs"   (tabChange)="toggle($event.nextId,data)" >
+
+			<ngb-tab *ngFor="let formDatas of data.formDataList; let f = index " id="{{f}}" class="col-md-2">
+				<ng-template ngbTabTitle>
+					<a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary">
+						<h5 class="card-header-text">{{formDatas.formName}}</h5>
+					</a>
+				</ng-template>
+
+				<ng-template ngbTabContent>
+
+					<div class="row">
+						<div class="col-sm-12">
+							<app-view-form [inputField]='formDatas.formDataArray'></app-view-form>
+						</div>
+					</div>
+				</ng-template>
+			</ngb-tab>
+		</ngb-tabset>
+  </div>
+</app-card>

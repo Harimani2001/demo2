@@ -1,0 +1,780 @@
+<div class="row">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-6">
+          <i class="icofont icofont-law-document bg-c-blue"></i>
+          <div class="d-inline">
+            <h4 class="strong">Risk Assessment</h4>
+            <span *ngIf="this.modal.id==0">Add Risk Assessment</span>
+            <span *ngIf="this.modal.id!=0">Risk Assessment Id : {{this.modal.assessmentCode}} {{this.modal.revisionNumber}}</span>
+          </div>
+        </div>
+
+        <div class="col-sm-6">
+          <span *ngIf="!modal.workFlowCompletionFlag && modal.documentPreviewFlag" style="float: right;"><img
+              (click)="documentPreview(true,'pdf');" container="body" ngbTooltip="Preview"
+              style="height: 35px; width: 35px;" class="pointer" src="/assets/images/pdf.png" title="Preview"></span>
+          <span style="float: right;" *ngIf="modal.documentPreviewFlag"><i (click)="documentPreview(false,'pdf');"
+              placement="top" container="body" ngbTooltip="Download Pdf File" style="font-size: 34px;color: #e82c2c;"
+              class="icofont icofont-file-pdf" title="Download Pdf File"></i></span>
+          <span style="float: right;" *ngIf="modal.documentPreviewFlag"><i (click)="documentPreview(false,'docx');"
+              placement="top" container="body" ngbTooltip="Download Doc File" style="font-size: 34px;color: #3232e6;"
+              class="icofont icofont-file-word" title="Download Doc File"></i></span>
+          <div style="text-align: right;">
+            <button *ngIf="this.modal.id ==0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();onsubmit(risk.valid);">Save</button>
+            <button *ngIf="this.modal.id!=0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();openSuccessUpdateSwal(risk.valid);">Update</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              [routerLink]="[backURL]" routerLinkActive="active">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="col-sm-12">
+    <br><br><br><br>
+    <app-card>
+      <form #risk="ngForm">
+        <div class="form-group row ">
+          <label class="col-sm-12 col-form-label">URS
+            <span class="asterisk">*</span>&nbsp;&nbsp;&nbsp;
+            <span class="btn-link" *ngIf="!modal.residualFlag"><u class="black" (click)="loadMultipleSelectUrsAndSpec();">Select URS & Specification</u></span>
+            <span class="pointer" (click)="this.ursDetailedView = !this.ursDetailedView">&nbsp;<i
+                [ngClass]="this.ursDetailedView?'fa-minus-square text-danger':'fa-plus-square text-success'" class="fa"
+                aria-hidden="true"></i></span>
+          </label>
+          <div>
+            <div class="col-sm-12">
+              <ng-select [ngClass]="'ng-select'" disabled [options]="simpleOption" [multiple]="true"
+                [(ngModel)]="ursIdsForView" (ngModelChange)="onChangeURS()" name="name" rounds="ngModel" required
+                #ursr="ngModel"></ng-select>
+              <div class="messages text-danger" *ngIf="this.validateUrs">URS can't be blank</div>
+            </div>
+          </div>
+        </div>
+
+        <app-urs-spec-risk-view *ngIf="this.ursDetailedView" constant="113" [dataList]="this.selectedUrsDetails" [backUrl]="'/add-riskAssessment/'+this.modal.id"></app-urs-spec-risk-view>
+
+        <table id="add-table" class="table w-100">
+          <tr *ngIf="modal.failTestCaseCode">
+            <td colspan="2">
+              <div><strong class="strong">Test Case : </strong>{{modal.failTestCaseCode}}</div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <div class="row">
+                <div class="col-sm-3">
+                  <strong class="strong">Risk Factor<span class="asterisk">*</span> :</strong>
+                </div>
+                <div class="col-sm-9">
+                  <textarea id="riskFActor" [(ngModel)]="modal.riskFactor" class="form-control" name="riskFactor" #riskFactor="ngModel" required [disabled]="modal.residualFlag"></textarea>
+                  <div class="messages text-danger" *ngIf="(riskFactor.touched || submitted) && riskFactor.errors?.required">{{riskConstants.riskFactorNameCanNotBeBlank}}</div>
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <div class="row">
+                <div class="col-sm-3">
+                  <strong class="strong">Risk Scenario<span class="asterisk">*</span> :</strong>
+                </div>
+                <div class="col-sm-9">
+                  <textarea [(ngModel)]="modal.riskScenario" class="form-control" name="riskScenario" #riskScenario="ngModel" required [disabled]="modal.residualFlag"></textarea>
+                  <div class="messages text-danger" *ngIf="(riskScenario.touched || submitted) && riskScenario.errors?.required">{{riskConstants.riskScenarioCanNotBeBlank}}</div>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <div class="row">
+                <div class="col-sm-2">
+                  <strong class="strong">Probable Cause of Risk :</strong>
+                </div>
+                <div class="col-sm-10">
+                  <textarea [(ngModel)]="modal.probableCauseOfRisk" class="form-control" name="probableCauseOfRisk" [disabled]="modal.residualFlag"></textarea>
+                </div>
+              </div>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+                <div class="row">
+                  <div class="col-sm-7">
+                    <app-card>
+                      <div class="row">
+                        <div class="col-sm-5">
+                          <label class="col-form-label">Probability of Occurance
+                            <span class="asterisk">*</span>
+                          </label>
+                          <input type="number" min="1" value="1"  [max]="this.createMarix" step="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"
+                            name="probabilityOfOccuranceNew" [(ngModel)]="modal.probabilityOfOccurance"
+                            (ngModelChange)="csscal('rangeP',modal.probabilityOfOccurance);this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                            [ngModelOptions]="{standalone: true}"/>
+                          <div class="range-wrap">
+                            <div class="range-value" id="rangeP">
+                              <span *ngIf="modal.probabilityOfOccurance != 0">
+                                {{modal.probabilityOfOccurance}}
+                              </span>
+                            </div>
+                            <input id="range" type="range" min="1" [max]="this.createMarix"
+                              [(ngModel)]="modal.probabilityOfOccurance"
+                              (ngModelChange)="csscal('rangeP',modal.probabilityOfOccurance);this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                              [ngModelOptions]="{standalone: true}" step="1" [disabled]="modal.residualFlag">
+                            <div class="messages text-danger" *ngIf="(submitted)&& !this.probabilityRequired">
+                              {{riskConstants.probabilityOfOccuranceCanNotBeBlank}}</div>
+                              <div class="messages text-danger" *ngIf="this.rangePError">
+                                {{this.rangePError}}</div>
+                          </div>
+                        </div>
+                        <div class="col-sm-3">
+                          <label class="col-form-label">
+                          </label>
+                          <select [(ngModel)]="modal.probabilityOfOccurance" name="probabilityOfOccurance" class="form-control"
+                            #probabilityOfOccurance="ngModel" required disabled>
+                            <option value="0">Select Value</option>
+                            <option *ngFor="let risk of this.riskProbability" [value]="risk.key">{{risk.value}}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-4">
+                          <label class="col-form-label">
+                          </label><br>
+                          <label *ngFor="let p of this.riskProbability">
+                            <span *ngIf="p.key == modal.probabilityOfOccurance"><a class="strong">Description :</a>
+                              {{p.description}}</span>
+                          </label>
+                        </div>
+                      </div>
+        
+                      <div class="row">
+                        <div class="col-sm-5">
+                          <label class="col-form-label">Severity
+                            <span class="asterisk">*</span>
+                          </label>
+                          <input type="number" min="1" value="1"  [max]="this.createMarix" step="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"
+                            name="severityNew" [(ngModel)]="modal.severity" (ngModelChange)="csscal('rangeS',modal.severity);this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                            [ngModelOptions]="{standalone: true}"[disabled]="modal.residualFlag"/>
+                          <div class="range-wrap">
+                            <div class="range-value" id="rangeS">
+                              <span *ngIf="modal.severity != 0">
+                                {{modal.severity}}
+                              </span>
+                            </div>
+                            <input id="rangesverity" type="range" min="1" [max]="this.createMarix" [(ngModel)]="modal.severity"
+                              (ngModelChange)="csscal('rangeS',modal.severity);this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                              [ngModelOptions]="{standalone: true}" step="1" [disabled]="modal.residualFlag">
+                            <div class="messages text-danger" *ngIf="( submitted) && !this.severityRequired">
+                              {{riskConstants.severityCanNotBeBlank}}</div>
+                              <div class="messages text-danger" *ngIf="this.rangeSError">
+                                {{this.rangeSError}}</div>
+                          </div>
+                        </div>
+                        <div class="col-sm-3">
+                          <label class="col-form-label">
+                          </label>
+                          <select [(ngModel)]="modal.severity"
+                            (change)="this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                            name="severity" class="form-control" #severity="ngModel" required disabled>
+                            <option value="0">Select Value</option>
+                            <option *ngFor="let risk of this.riskSeverity" [value]="risk.key">{{risk.value}}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-4">
+                          <label class="col-form-label">
+                          </label><br>
+                          <label *ngFor="let p of this.riskSeverity">
+                            <span *ngIf="p.key == modal.severity"><a class="strong">Description :</a> {{p.description}}</span>
+                          </label>
+                        </div>
+                      </div>
+        
+                      <div class="row">
+                        <div class="col-sm-5">
+                          <label class="col-form-label">Detectability
+                            <span class="asterisk">*</span>
+                          </label>
+                          <input type="number" min="1" value="1"  [max]="this.createMarix" step="1" onkeypress="return (event.charCode == 8 || event.charCode == 0 || event.charCode == 13) ? null : event.charCode >= 48 && event.charCode <= 57"
+                            name="detectabilityNew" [(ngModel)]="modal.detectability"
+                            (ngModelChange)="csscal('rangeV',modal.detectability);this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                            [ngModelOptions]="{standalone: true}" step="1" [disabled]="modal.residualFlag"/>
+                          <div class="range-wrap">
+                            <div class="range-value" id="rangeV">
+                              <span *ngIf="modal.detectability != 0">
+                                {{modal.detectability}}
+                              </span>
+                            </div>
+                            <input id="rangeDetect" type="range" min="1" [max]="this.createMarix"
+                              [(ngModel)]="modal.detectability"
+                              (ngModelChange)="csscal('rangeV',modal.detectability);this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                              [ngModelOptions]="{standalone: true}" step="1" [disabled]="modal.residualFlag">
+                            <div class="messages text-danger" *ngIf="(submitted) && !this.detectabilityRequired">
+                              {{riskConstants.detectabilityCanNotBeBlank}}</div>
+                            <div class="messages text-danger" *ngIf="this.rangeVError">
+                                {{this.rangeVError}}</div>
+                          </div>
+                        </div>
+                        <div class="col-sm-3">
+                          <label class="col-form-label">
+                          </label>
+                          <select name="detectability"
+                            (change)="this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                            [(ngModel)]="modal.detectability" #detectability='ngModel' class="form-control" required disabled>
+                            <option value="0">Select Value</option>
+                            <option *ngFor="let risk of this.riskDetectability" [value]="risk.key">{{risk.value}}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-4">
+                          <label class="col-form-label">
+                          </label><br>
+                          <label *ngFor="let p of this.riskDetectability">
+                            <span *ngIf="p.key == modal.detectability"><a class="strong">Description :</a>
+                              {{p.description}}</span>
+                          </label>
+                        </div>
+                      </div>
+        
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">RPN</label>
+                          <div class="col-sm-10">
+                            <!-- <input type="text" [(ngModel)]="modal.rpn" maxlength="100" class="form-control" name="rpn" #rpn="ngModel"
+                              disabled> -->
+                            <table class="risk-rpm-table">
+                              <thead>
+                                <tr style="background-color:#3b5998;color:white">
+                                  <th>Probability</th>
+                                  <th>Severity</th>
+                                  <th>Detectability</th>
+                                  <th>RPN Value<br>(P*S*D)</th>
+                                  <th>Criticality<br>(P*S)</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngIf="this.modal.priority"  [ngStyle]="{'background-color':getColor(this.modal.priority)}">
+                                  <td>{{modal.probabilityOfOccurance}}</td>
+                                  <td>{{modal.severity}}</td>
+                                  <td>{{modal.detectability}}</td>
+                                  <td>{{modal.rpn}}</td>
+                                  <td>{{modal.critical}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                      </div>
+        
+                      <div class=" form-group row">
+                        <label class="col-sm-2 col-form-label">Priority</label>
+                        <div class="col-sm-6">
+                          <select name="priority" [(ngModel)]="modal.priority" #priority='ngModel' class="form-control" disabled
+                            [ngStyle]="{'background-color':getColor(modal.priority)}">
+                            <option value="0">Select One Value Only</option>
+                            <option *ngFor="let risk of this.riskPriority" [value]="risk.key">{{risk.value}}</option>
+                          </select>
+                        </div>
+                        <div class="messages text-danger" *ngIf="this.riskPriorityNoteFlag" style="padding-left: 2%;">Note: RPN value might be low for this case, but Risk is high.</div>
+                      </div>
+                    </app-card>
+                  </div>
+        
+                  <div class="col-sm-5">
+                    <app-card>
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <img src="assets/images/risk_table_1.PNG" style="width: 100%;">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <img src="assets/images/risk_table_2.PNG" style="width: 100%;">
+                        </div>
+                      </div>
+                    </app-card>
+                  </div>
+                </div>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <div class="row">
+                <div class="col-sm-2">
+                  <strong class="strong">Proposed Mitigation:</strong>
+                </div>
+                <div class="col-sm-10">
+                  <textarea [(ngModel)]="modal.proposedMitigation" class="form-control" name="street" [disabled]="modal.residualFlag"></textarea>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <tr [class.hidden]="!modal.residualFlag"> 
+            <td colspan="2">
+                <div class="row">
+                  <div class="col-sm-7">
+                    <app-card title="Residual Risk Assessment Details">
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <label class="col-form-label">Probability of Occurance
+                            <span class="asterisk">*</span>
+                          </label>
+                          <div class="range-wrap">
+                            <div class="range-value" id="rangeRP">
+                              <span *ngIf="modal.residualProbability != 0">
+                                {{modal.residualProbability}}
+                              </span>
+                            </div>
+                            <input id="rangeProbability" type="range" min="1" [max]="this.createMarix"
+                              [(ngModel)]="modal.residualProbability"
+                              (ngModelChange)="csscal('rangeRP',modal.residualProbability);this.createMarix==10? residualrpnCalculation():this.createMarix==5?residualrpnCalculationMatrixFor5x5():residualrpnCalculationMatrix()"
+                              [ngModelOptions]="{standalone: true}" step="1">
+                            <div class="messages text-danger" *ngIf="(submitted)&& !this.probabilityRequired">
+                              {{riskConstants.probabilityOfOccuranceCanNotBeBlank}}</div>
+                          </div>
+                        </div>
+                        <div class="col-sm-3">
+                          <label class="col-form-label">
+                          </label>
+                          <select [(ngModel)]="modal.residualProbability" name="residualProbability" class="form-control"
+                           disabled>
+                            <option value="0">Select Value</option>
+                            <option *ngFor="let risk of this.riskProbability" [value]="risk.key">{{risk.value}}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-5">
+                          <label class="col-form-label">
+                          </label><br>
+                          <label *ngFor="let p of this.riskProbability">
+                            <span *ngIf="p.key == modal.residualProbability"><a class="strong">Description :</a>
+                              {{p.description}}</span>
+                          </label>
+                        </div>
+                      </div>
+        
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <label class="col-form-label">Severity
+                            <span class="asterisk">*</span>
+                          </label>
+                          <div class="range-wrap">
+                            <div class="range-value" id="rangeRS">
+                              <span *ngIf="modal.residualServerity != 0">
+                                {{modal.residualServerity}}
+                              </span>
+                            </div>
+                            <input id="rangeServerity" type="range" min="1" [max]="this.createMarix" [(ngModel)]="modal.residualServerity"
+                              (ngModelChange)="csscal('rangeRS',modal.residualServerity);this.createMarix==10? residualrpnCalculation():this.createMarix==5?residualrpnCalculationMatrixFor5x5():residualrpnCalculationMatrix()"
+                              [ngModelOptions]="{standalone: true}" step="1">
+                            <div class="messages text-danger" *ngIf="( submitted) && !this.severityRequired">
+                              {{riskConstants.severityCanNotBeBlank}}</div>
+                          </div>
+                        </div>
+                        <div class="col-sm-3">
+                          <label class="col-form-label">
+                          </label>
+                          <select [(ngModel)]="modal.residualServerity"
+                            (change)="this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                            name="residualServerity" class="form-control" disabled>
+                            <option value="0">Select Value</option>
+                            <option *ngFor="let risk of this.riskSeverity" [value]="risk.key">{{risk.value}}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-5">
+                          <label class="col-form-label">
+                          </label><br>
+                          <label *ngFor="let p of this.riskSeverity">
+                            <span *ngIf="p.key == modal.residualServerity"><a class="strong">Description :</a> {{p.description}}</span>
+                          </label>
+                        </div>
+                      </div>
+        
+                      <div class="row">
+                        <div class="col-sm-4">
+                          <label class="col-form-label">Detectability
+                            <span class="asterisk">*</span>
+                          </label>
+                          <div class="range-wrap">
+                            <div class="range-value" id="rangeRV">
+                              <span *ngIf="modal.residualDetetablity != 0">
+                                {{modal.residualDetetablity}}
+                              </span>
+                            </div>
+                            <input id="rangeDetetablity" type="range" min="1" [max]="this.createMarix"
+                              [(ngModel)]="modal.residualDetetablity"
+                              (ngModelChange)="csscal('rangeRV',modal.residualDetetablity);this.createMarix==10? residualrpnCalculation():this.createMarix==5?residualrpnCalculationMatrixFor5x5():residualrpnCalculationMatrix()"
+                              [ngModelOptions]="{standalone: true}" step="1">
+                            <div class="messages text-danger" *ngIf="(submitted) && !this.detectabilityRequired">
+                              {{riskConstants.detectabilityCanNotBeBlank}}</div>
+                          </div>
+                        </div>
+                        <div class="col-sm-3">
+                          <label class="col-form-label">
+                          </label>
+                          <select name="residualDetetablity"
+                            (change)="this.createMarix==10? rpnCalculation():this.createMarix==5?rpnCalculationMatrixFor5x5():rpnCalculationMatrix()"
+                            [(ngModel)]="modal.residualDetetablity" class="form-control" disabled>
+                            <option value="0">Select Value</option>
+                            <option *ngFor="let risk of this.riskDetectability" [value]="risk.key">{{risk.value}}</option>
+                          </select>
+                        </div>
+                        <div class="col-sm-5">
+                          <label class="col-form-label">
+                          </label><br>
+                          <label *ngFor="let p of this.riskDetectability">
+                            <span *ngIf="p.key == modal.residualDetetablity"><a class="strong">Description :</a>
+                              {{p.description}}</span>
+                          </label>
+                        </div>
+                      </div>
+        
+                      <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">RPN</label>
+                          <div class="col-sm-10">
+                            <!-- <input type="text" [(ngModel)]="modal.rpn" maxlength="100" class="form-control" name="rpn" #rpn="ngModel"
+                              disabled> -->
+                            <table class="risk-rpm-table">
+                              <thead>
+                                <tr style="background-color: #0D71F0;color:white">
+                                  <th>Probability</th>
+                                  <th>Severity</th>
+                                  <th>Detectability</th>
+                                  <th>RPN Value<br>(P*S*D)</th>
+                                  <th>Criticality<br>(P*S)</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr *ngIf="this.modal.priority"  [ngStyle]="{'background-color':getColor(this.modal.residualPriority)}">
+                                  <td>{{modal.residualProbability}}</td>
+                                  <td>{{modal.residualServerity}}</td>
+                                  <td>{{modal.residualDetetablity}}</td>
+                                  <td>{{modal.residualRpn}}</td>
+                                  <td>{{modal.residualCritical}}</td>
+                                </tr>
+                              </tbody>
+                            </table>
+                          </div>
+                      </div>
+        
+                      <div class=" form-group row">
+                        <label class="col-sm-2 col-form-label">Priority</label>
+                        <div class="col-sm-6">
+                          <select name="residualPriority" [(ngModel)]="modal.residualPriority" class="form-control" disabled
+                            [ngStyle]="{'background-color':getColor(modal.residualPriority)}">
+                            <option value="0">Select One Value Only</option>
+                            <option *ngFor="let risk of this.riskPriority" [value]="risk.key">{{risk.value}}</option>
+                          </select>
+                        </div>
+                        <div class="messages text-danger" *ngIf="this.riskPriorityNoteFlag" style="padding-left: 2%;">Note: RPN value might be low for this case, but Risk is high.</div>
+                      </div>
+                    </app-card>
+                  </div>
+        
+                  <div class="col-sm-5">
+                    <app-card>
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <img src="assets/images/risk_table_1.PNG" style="width: 100%;">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-12">
+                          <img src="assets/images/risk_table_2.PNG" style="width: 100%;">
+                        </div>
+                      </div>
+                    </app-card>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-sm-2">
+                    <strong class="strong">Conclusion:</strong>
+                  </div>
+                  <div class="col-sm-10">
+                    <textarea [(ngModel)]="modal.residualConclusion" class="form-control" name="conclusion"></textarea>
+                  </div>
+                </div>
+            </td>
+          </tr>
+          
+          <tr [class.hidden]="modal.residualFlag">
+            <td colspan="2">
+              <div *ngIf="this.inputField">
+                <app-form-extended #formExtendedId [(inputField)]='inputField' [documentId]="this.helper.RISK_ASSESSMENT_NAME"
+                  [(submitted)]='submitted'></app-form-extended>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+      </form>
+    </app-card>
+  </div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic #modalOfRiskProb [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select Probability of Occurance</h4>
+    <button type="button" class="close basic-close" (click)="modalOfRiskProb.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px;" class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%"
+    height="400px" size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="dt-desc" style="padding: 0px;">
+      <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+        [rows]='this.riskProbability' [limit]="10" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+        [rowHeight]="'auto'">
+
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <label class="container">
+              <input type="radio" name="radio" [(ngModel)]="modal.probabilityOfOccurance" [value]="row.key"
+                name="{{row['value']}}">
+              <span class="checkmark"></span>
+            </label>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;"
+          name="Likelihood of Failure(Occurance of cause Indicates per items)">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['value']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="Rank">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['key']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalOfRiskProb.hide();">Submit</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalOfRiskDetect [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select Detectability</h4>
+    <button type="button" class="close basic-close" (click)="modalOfRiskDetect.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px;" class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%"
+    height="400px" size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="dt-desc" style="padding: 0px;">
+      <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+        [rows]='this.riskDetectability' [limit]="10" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+        [rowHeight]="'auto'">
+
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <label class="container">
+              <input type="radio" name="radio" [(ngModel)]="modal.detectability" [value]="row.key"
+                name="{{row['value']}}">
+              <span class="checkmark"></span>
+            </label>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="Likelihood of Detection">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['value']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="Rank">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['key']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalOfRiskDetect.hide();">Submit</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalOfRiskSeverity [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select Severity</h4>
+    <button type="button" class="close basic-close" (click)="modalOfRiskSeverity.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px;" class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%"
+    height="400px" size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="dt-desc" style="padding: 0px;">
+      <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+        [rows]='this.riskSeverity' [limit]="10" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+        [rowHeight]="'auto'">
+
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <label class="container">
+              <input type="radio" name="radio" [(ngModel)]="modal.severity" [value]="row.key" name="{{row['value']}}">
+              <span class="checkmark"></span>
+            </label>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="Severity of Effect on product">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['value']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="Rank">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['key']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+      </ngx-datatable>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalOfRiskSeverity.hide();">Submit</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #ursAndSpecificationModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select URS & Specification</h4>
+    <button type="button" class="close basic-close" (click)="onCloseUrsAndSpecPopup(false);">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" *ngIf="ursAndSpecificationModal.visible">
+    <div class="dt-desc" style="padding: 0px;">
+      <div style="padding-left: 0px;" class="row" class="col-sm-12">
+        <label style="float: right;"> Search :
+          <input type="search" [(ngModel)]="filterQuery" class="form-control input-sm full-data-search"
+            placeholder="search"></label>
+        <br><br>
+      </div>
+
+      <ngx-datatable #selectDataTable id="parentCustomTable" class="data-table dt-chk" [limit]="10"
+        [rows]='ursAndSpecList | ursAndSpecificationFilter : filterQuery' [columnMode]="'force'" [headerHeight]="50"
+        [footerHeight]="50" [rowHeight]="'auto'">
+        <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+            <div *ngIf="row.childList && row.childList.length>0" class="dt-desc">
+
+              <ngx-datatable #specChildTable id="childCustomTable" class="data-table dt-chk" style="overflow: unset!important;"
+                [rows]='row.childList' [limit]="10" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+                [rowHeight]="'auto'">
+                <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+                  [draggable]="false" [resizeable]="false">
+                  <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                    let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                    <div class="checkbox-fade fade-in-primary">
+                      <label>
+                        <input type="checkbox" name="{{row['code']}}" [checked]="row.selected"
+                          (change)="selectSpec(row)" />
+                        <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                      </label>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Code">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['code']}}</ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="550" [canAutoResize]="false" [sortable]="true" name="Description">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['description']}}</ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="150" [canAutoResize]="true" [sortable]="true" name="Status">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['status']}}</ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Risk #">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['riskCount']}}</ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Test #">
+                  <ng-template let-row="row" ngx-datatable-cell-template>{{row['testCaseCount']}}</ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </div>
+          </ng-template>
+        </ngx-datatable-row-detail>
+
+        <ngx-datatable-column [resizeable]="true" [width]="30" [sortable]="false" [draggable]="false"
+          [canAutoResize]="false">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <a *ngIf="row.childList && row.childList.length>0" href="javascript:;"
+              [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded"
+              title="Expand/Collapse Row" (click)="toggleExpandRow(row)"></a>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row" let-isSelected="isSelected"
+            let-onCheckboxChangeFn="onCheckboxChangeFn">
+            <div class="checkbox-fade fade-in-primary">
+              <label>
+                <input type="checkbox" name="{{row['code']}}" [checked]="row.selected"
+                  (change)="selectURS(row)" />
+                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+              </label>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Code">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['code']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="300" [canAutoResize]="false" [sortable]="true" name="Requirement">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['description']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Testing Required">
+          <ng-template let-row="row" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['testingRequiredText']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Testing Method">
+          <ng-template let-row="row" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row.testingMethod?row.testingMethod:'N/A'}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="150" [canAutoResize]="true" [sortable]="true" name="Status">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['status']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Spec #">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['specCount']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Risk #">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['riskCount']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="100" [canAutoResize]="true" [sortable]="true" name="Test #">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['testCaseCount']}}</ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="onCloseUrsAndSpecPopup(true);">Submit</button>
+  </div>
+</app-modal-basic>

@@ -1,0 +1,80 @@
+
+ng-select.ng-select > div > div.multiple {
+   border: 1px solid #aaa;
+   padding: 6px 10px 6px 10px !important;
+   height: auto;
+   border-radius: 4px;
+}
+
+table, th, td {
+  border: 1px solid lightgray;
+}
+.header-bg{
+  background-color:#f6f6f6 ;
+}
+#upload_button {
+  display: inline-block;
+}
+#upload_button input[type=file] {
+  display:none;
+}
+
+table#AdHoc-table tbody th,
+table#AdHoc-table tbody td {
+  white-space: unset;
+  width: 50%;
+}
+table#AdHoc-table,table#AdHoc-table td{
+    border: 1px solid black;
+}
+
+.paste{
+  width: 16.666667%;
+  font-size: 14px;
+  border-radius: 2px;
+  border: 1px solid #cccccc;
+  height: calc(1.5em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #495057;
+  background-clip: padding-box;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  margin-bottom: .5rem;
+}
+
+.paste-color{
+background-color: lightblue;
+}
+
+.modal-delete-icon{
+  position: absolute;
+    top: 16px;
+    right: 60px;
+    font-size: 16px;
+    color: #292b2c;
+}
+
+.arrow-button {
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  width: auto;
+  margin-top: -22px;
+  padding: 16px;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  transition: 0.6s ease;
+  border-radius: 0 3px 3px 0;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.arrow-button:hover{
+  background-color:white;
+  color : black;
+
+}

@@ -1,0 +1,167 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-sm-12" id="float-action">
+            <app-card>
+                <div class="row">
+                    <div class="col-sm-4">
+                        Compliance Report
+                    </div>
+                 
+                    <div class="col-sm-8 text-right" *ngIf="complianceReportData.length > 0">
+                        <a *ngIf="permissions.createButtonFlag" href="javascript:" class="m-r-15"><img
+                            class="image-radius rounded-0 img-25" src="assets/icon/png-icons/save.svg"
+                            alt="Save Report" placement="bottom" ngbTooltip="Save Report" (click)="saveReport()"></a>
+                    
+                        <a *ngIf="permissions.publishButtonFlag && enbleExternalApproval && isDocumentWorkflowAdded && !isDocumentPublished"
+                            href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                            src="assets/icon/png-icons/published.png" alt="Publish GxP Form" placement="bottom"
+                            ngbTooltip="Publish Compliance Report" (click)="this.publishDocument();"></a>
+                            
+                        <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-27" src="assets/icon/png-icons/checkList.png"
+                              alt="Approval History" placement="bottom" ngbTooltip="Approval History" (click)="onClickWorkflowHistory()"></a>
+
+                        <a *ngIf="permissions.exportButtonFlag" href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                                src="assets/icon/png-icons/pdfExport.png" alt="PDF Export" placement="bottom"
+                                ngbTooltip="PDF Export" (click)="pdfdownload()"></a>
+
+                        <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                                src="assets/icon/png-icons/menu.png" alt="Table of Content" placement="bottom"
+                                ngbTooltip="Table of Content" (click)="onClickTableOfContent()"></a>
+                    </div>
+                </div>
+            </app-card>
+        </div>
+        <div><br><br><br></div>
+        <app-card>
+            <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+                [rows]='complianceReportData' [limit]="30" [columnMode]="'force'"
+                [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+
+                <ngx-datatable-column style="font-weight: bold;" name="Reference" [width]="200" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+                [resizeable]="false">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['reference']}}</strong>
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column style="font-weight: bold;" name="Category" [width]="200" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+                [resizeable]="false">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['category']}}</strong>
+                  </ng-template>
+              </ngx-datatable-column>
+
+                <ngx-datatable-column style="font-weight: bold;" name="Description">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Response" [width]="100" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+                [resizeable]="false">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <select [(ngModel)]="row.response" name="response"
+                        class="form-control">
+                        <option value=""></option>
+                        <option *ngFor="let item of complianceResponse" [value]="item.key">{{item.value}}</option>
+                      </select>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Remarks">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <textarea class="form-control" (blur)="onChangeRemarks($event,row)" name="{{row['category']}}"  [value]="row.remarks" ></textarea>
+                    </ng-template>
+                </ngx-datatable-column>
+            </ngx-datatable>
+        </app-card>
+    </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Audit Trail</strong></div>
+        <div class="col-sm-6" style="text-align: right;">
+          <a container="body" *ngIf="!this.viewFlag" href="javascript:;" (click)="this.viewFlag = !this.viewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+            placement="top" ngbTooltip="Expand"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+          </a>
+          <a container="body" *ngIf="this.viewFlag" href="javascript:;" (click)="this.viewFlag = !this.viewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+           placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+          </a>
+        </div>
+      </div>
+      <br>
+      <div *ngIf="this.viewFlag">
+        <app-audit-trail-view #auditView [permission]="233"></app-audit-trail-view>
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #externalApprovalmodal [dialogClass]="'modal-md'" [hideHeader]="false" [hideFooter]="false">
+    <div class="app-modal-header">
+      <h4 class="modal-title">External Approval</h4>
+      <button type="button" class="close basic-close" (click)="externalApprovalmodal.hide();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body">
+      <div class="row">
+        <div class="col-sm-12">
+          <form [formGroup]="onExternalApprovalForm">
+            <div class="form-group row">
+              <label class="col-sm-10 col-form-label">Name
+                <span class="asterisk required">*</span>
+              </label>
+              <div class="col-sm-10">
+                <input type="text" name="name" id="nameId" class="form-control" placeholder="name" formControlName="name" maxlength="50"/>
+                <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('name').touched && onExternalApprovalForm.get('name').hasError('required')">{{externalApprovalErrorTypes.nameValidation}}</div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-10 col-form-label">Email
+                <span class="asterisk required">*</span>
+              </label>
+              <div class="col-sm-10">
+                <input type="text" name="code" id="emailId" class="form-control" placeholder="email" formControlName="email" maxlength="50"/>
+                <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('email').touched && onExternalApprovalForm.get('email').hasError('required')">{{externalApprovalErrorTypes.emailValidation}}</div>
+                <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('email').hasError('pattern')">{{externalApprovalErrorTypes.emailPatternValidation}}</div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-10 col-form-label">Validity (Days)
+                <span class="asterisk required">*</span>
+              </label>
+              <div class="col-sm-10">
+                <input type="number" class="form-control" formControlName="validity"/>
+                <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('validity').touched && onExternalApprovalForm.get('validity').hasError('required')">{{externalApprovalErrorTypes.validityValidation}}</div>
+              </div>
+            </div>
+            <div class="form-group row">
+              <label class="col-sm-10 col-form-label">Remarks
+                <span class="asterisk required">*</span>
+              </label>
+              <div class="col-sm-10">
+              <textarea rows="3" class="form-control" formControlName="remarks"></textarea>
+                <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('remarks').touched && onExternalApprovalForm.get('remarks').hasError('required')">{{externalApprovalErrorTypes.remarksValidation}}</div>
+              </div>
+            </div>
+            <br>
+            <div class="form-group row">
+              <div class="col-sm-12 text-center">
+                <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="onClickSave();">Submit for Approval</button>
+                <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="externalApprovalmodal.hide();">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+    </div>
+  </app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-document-workflow-history  #documentWorkFlowHistory [permissionConstant]="233"></app-document-workflow-history>

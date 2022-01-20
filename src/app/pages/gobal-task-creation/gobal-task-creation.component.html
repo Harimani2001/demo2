@@ -1,0 +1,247 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <form [formGroup]="gobalTaskForm">
+        <table id="add-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td colspan="2">
+                <div class="row">
+                  <div class="col-sm-1">
+                    <strong class="strong">Title<span class="asterisk required">*</span></strong>
+                  </div>
+                  <div class="col-sm-11" style="padding-left: 73px;">
+                    <input #searchBox type="text" style="border-radius: 3px;" name="code" class="form-control"
+                      formControlName="taskTitle">
+                    <div *ngFor="let validation of validation_messages.taskTitle">
+                      <p class="text-danger"
+                        *ngIf="gobalTaskForm.get('taskTitle').hasError(validation.type) && submitted">
+                        <span>{{ validation.message }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="disableItems">
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Category<span class="asterisk required">*</span></strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select style="border-radius: 3px;" name="select" class="form-control"
+                      formControlName="taskCategory">
+                      <option *ngFor="let task of taskCategoryList" [value]="task.key">{{task.value}}</option>
+                    </select>
+                    <div *ngFor="let validation of validation_messages.taskCategory">
+                      <p class="text-danger"
+                        *ngIf="gobalTaskForm.get('taskCategory').hasError(validation.type) && submitted">
+                        <span>{{ validation.message }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Priority<span class="asterisk required">*</span></strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select style="border-radius: 3px;" name="select" class="form-control" formControlName="priority">
+                      <option value="">Select Priority</option>
+                      <option *ngFor="let priority of priorityList" [value]="priority.key">{{priority.value}}</option>
+                    </select>
+                    <div *ngFor="let validation of validation_messages.priority">
+                      <p class="text-danger"
+                        *ngIf="gobalTaskForm.get('priority').hasError(validation.type) && submitted">
+                        <span>{{ validation.message }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Assigned To<span class="asterisk required">*</span></strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ng-select [ngClass]="'ng-select'" [options]="usersList" [multiple]="true"
+                      formControlName="assignedTo" (ngModelChange)="onChangeUsers($event)">
+                    </ng-select>
+                    <div *ngFor="let validation of validation_messages.assignedTo">
+                      <p class="text-danger"
+                        *ngIf="gobalTaskForm.get('assignedTo').hasError(validation.type) && submitted">
+                        <span>{{ validation.message }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Document Type</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ng-select [ngClass]="'ng-select'" [options]="documentTypeList" [multiple]="true"
+                      formControlName="documentType" (ngModelChange)="onChangeDocumentType($event)">
+                    </ng-select>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="disableItems">
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Equipment</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ng-select [ngClass]="'ng-select'" [options]="equipmentList" [multiple]="true"
+                      formControlName="selectedEquipment"></ng-select>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Item Code(s)</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ng-select [ngClass]="'ng-select'" [options]="documentTypeIdList" [multiple]="true"
+                      formControlName="documentId">
+                    </ng-select>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Due Date<span class="asterisk required">*</span></strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <my-date-picker (keypress)="$event.preventDefault();" name="dueDate" formControlName="dueDate" #date
+                      (click)="openBtnClicked()" placeholder="Due Date" [options]="myDatePickerOptions" required>
+                    </my-date-picker>
+                    <div *ngFor="let validation of validation_messages.dueDate">
+                      <p class="text-danger"
+                        *ngIf="gobalTaskForm.get('dueDate').hasError(validation.type) && submitted">
+                        <span>{{ validation.message }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Notes</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" formControlName="description" rows="3"
+                      name="Description"></textarea>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr *ngIf="disableItems">
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Send Reminder</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <label class="switch">
+                      <input type="checkbox" name="activeFlag" formControlName="remainderFlag"
+                        (ngModelChange)="onChangeRemainderFlag($event)" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row" *ngIf="isRemainderFlag">
+                  <div class="col-sm-3">
+                    <strong class="strong">Due Date Mailing Frequency</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select name="frequency" formControlName="frequency" class="form-control">
+                      <option value="" disabled>Select</option>
+                      <option *ngFor="let frequency of this.frequencyList " [value]="frequency.key">{{frequency.value}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="disableItems">
+          <div class="form-group row">
+            <span class="p-l-20"><i class="icofont icofont-checked"></i> Check List</span>
+          </div>
+          <button class="btn btn-primary btn-sm p-l-20" (click)="addChecklistItem()">Add new</button>
+          <br> <br>
+          <ng-container *ngIf="modal.checklist.length>0">
+            <div class="col-sm-12">
+              <table id="equipment-table-checkList" class="table">
+                <thead class="panel-heading">
+                  <tr class="w-100">
+                    <td class="w-2"><label class="strong"></label></td>
+                    <td class="w-40"><label class="strong">Name</label></td>
+                    <td class="w-2"><label class="strong">Actions</label></td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let checkList of modal.checklist;let i=index">
+                    <td>
+                      <input type="checkbox" [(ngModel)]="checkList.completed" [ngModelOptions]="{standalone: true}" />
+                    </td>
+                    <td width="10px">
+                      <span *ngIf="!checkList.focusFlag" (click)="checkList.focusFlag=true" title="double Click to Edit"
+                        style="cursor: pointer;"
+                        [style.text-decoration]="checkList.completed ? 'line-through' : 'none'">{{checkList.checklistName}}</span>
+                      <input *ngIf="checkList.focusFlag" id="task_global_check_list_name_id_{{i}}" type="text"
+                        class="form-control" [(ngModel)]="checkList.checklistName" [ngModelOptions]="{standalone: true}"
+                        (focusout)="checkList.focusFlag=false" />
+                    </td>
+                    <td>
+                      <i style="cursor: pointer;" (click)="deleteCheckList(checkList)" class="icofont icofont-ui-delete"
+                        title="delete"></i>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+        </div>
+        <div style="color: red;" *ngIf="isCheckListEntered">Please Fill the Details to Continue . . .</div>
+        <div style="color: red;" *ngIf="this.isValidDocumentOrder">Display Order can't be Duplicate . . .<br></div>
+        <a *ngIf="!disableItems" class="btn btn-link strong" role="button" (click)="enableItems();"><u>More option</u><br></a>
+
+        <div *ngIf="fileUploadDesable" class="form-group row">
+          <app-file-upload-for-doc style="padding-top: 13%" #fileupload [multiple]='true' [onlyView]='false'
+            [documentId]="this.receivedId" [update]="this.isUpdate" [documentCode]="this.helper.TASK_CREATION">
+          </app-file-upload-for-doc>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>

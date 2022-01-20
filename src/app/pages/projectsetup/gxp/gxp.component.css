@@ -1,0 +1,10 @@
+table.gxp-table tbody th, table.gxp-table tbody td {
+  white-space: unset;
+}
+
+table.gxp-table, table.gxp-table td {
+  border: 1px solid black;
+}
+#modal-lg-60 .modal-lg {
+  max-width: 60%;
+}

@@ -1,0 +1,26 @@
+<app-modal-basic #modalViewer [hideHeader]="false" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div style="width: 100%;" class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="modalViewer.hide();reload()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="row">
+      <div class="col-sm-4">
+        <h5>Screenshot Image</h5>
+      </div>
+      <div style="text-align: right;" class="col-sm-8"><button class="btn btn-primary" (click)="uploadImage()">
+          <i class="icofont icofont-upload-alt"></i>Upload Image</button></div>
+    </div>
+  </div>
+
+  <div style="max-height: 400px;" class="app-modal-body">
+
+    <div slimScroll railVisible="true" railColor="#004a6d" width="100%" height="400px" size="8px" color="#999"
+      opacity="0.6" allowPageScroll="false">
+      <div style="height: 400px;">
+        <img *ngIf="imageURL" style="height:100%; width:100%" [src]="imageURL" />
+      </div>
+
+    </div>
+  </div>
+</app-modal-basic>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

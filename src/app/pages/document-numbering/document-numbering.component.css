@@ -1,0 +1,8 @@
+table.doc-numbering-table,table.doc-numbering-table td,table.doc-numbering-table td{
+    border: 1px solid black;
+}
+
+table.doc-numbering-table tbody th,
+table.doc-numbering-table tbody td {
+  white-space: unset;
+}

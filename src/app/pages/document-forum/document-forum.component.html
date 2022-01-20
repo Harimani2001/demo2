@@ -1,0 +1,87 @@
+<div [ngClass]="(this.isModalSlide)?'container1':'container'">
+  <div class="reply-container">
+    <label class="badge badge-margin col-form-label">{{currentUserBadge}}</label>
+    <div class="autocomplete">
+      <textarea class="form-control" placeholder="Leave a Comment" [formControl]="commentForm"
+        (keyup)="checkBackSpace($event)" (keypress)="suggest($event,false);" (focusout)="onClickOut();" #commentField
+        (ngModelChange)="searchSuggestions($event)"></textarea>
+      <div class="autocomplete-items" *ngIf="!isReply &&show && suggestions.length >0">
+        <ul class="list-group" id="suggestId" *ngFor="let s of suggestions">
+          <li (click)="selectSuggestion(s)" class="list-group-item pointer">{{s.value}}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="button-container" *ngIf="commentForm.value">
+    <button type="button" class="btn btn-primary btn-sm" (click)="onSubmit()">Submit</button>
+  </div>
+  <br><br>
+
+  <div *ngIf="checkedItemsCount > 0" style="text-align: right;">
+    <button type="button" class="btn-sm btn-primary" (click)="onClickShowAll()">{{hideButtonText}}</button>
+  </div>
+
+  <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{list: list}"></ng-container>
+
+  <ng-template #recursiveListTmpl let-list="list">
+    <div *ngFor="let item of list">
+      <div [ngClass]="item.childFlag ? 'margin-left40' : 'margin-left0 well well-sm'">
+        <div class="reply-container" *ngIf="!item.editIndividualFlag"
+          [ngStyle]="{'margin-left': (item.groupingFlag && !item.showBadge) ? '40px' : '0px'}">
+          <label *ngIf="!item.groupingFlag" class="badge col-form-label">{{item.userBadge.toUpperCase()}}</label>
+
+          <label *ngIf="item.groupingFlag && item.showBadge"
+            class="badge col-form-label">{{item.userBadge.toUpperCase()}}</label>
+          <input style="margin-top: 11px;" type="checkbox" name="check" [(ngModel)]="item.checkedFlag"
+            (ngModelChange)="strickComment(item.id)">&nbsp;
+          <label style="padding-top: 5px;" [style.text-decoration]="item.checkedFlag ? 'line-through' : 'none'"
+            [innerHtml]="item.comments"></label>
+        </div>
+        <div style="margin-left: 40px;">
+          <div *ngIf="!item.editIndividualFlag" class="reply-container" style="margin-top: 8px;">
+            <i *ngIf="!isExterApproval" class="like-icon"
+              [ngClass]="item.userLikeFlag ? 'fa fa-heart' : 'fa fa-heart-o'" (click)="onClickLike(item)"
+              title="Like"></i>
+            <span class="like-count" style="margin-left: 4px;"
+              *ngIf="item.userLikesCount !=0">{{item.userLikesCount}}</span>
+            <div class="like-count" style="margin-left: 1em;" (click)="onCLickReply(item);">Reply</div>
+            <i *ngIf="item.editFlag" class="icofont icofont-edit edit-icon" title="Edit"
+              (click)="onClickEdit(item);"></i>
+            <i *ngIf="item.editFlag && !isExterApproval" class="icofont icofont-ui-delete edit-icon" title="Delete"
+              (click)="onClickDelete(item);"></i>
+            <label class="comment-time float-right">{{item.date}}</label>
+          </div>
+          <hr>
+          <div *ngIf="item.replyFlag || item.editIndividualFlag">
+            <div class="reply-container">
+              <label class="badge badge-margin col-form-label">{{currentUserBadge}}</label>
+              <div class="autocomplete">
+                <textarea class="form-control" placeholder="Leave a reply" [formControl]="replyCommentsForm"
+                  [innerHtml]="replyCommentsForm.value" (keypress)="suggest($event,true);" focus="true"
+                  (ngModelChange)="searchSuggestions($event)" #replyCommentField></textarea>
+                <div class="autocomplete-items" *ngIf="isReply && show  && suggestions.length >0">
+                  <ul class="list-group" *ngFor="let s of suggestions">
+                    <li (click)="replySelectSuggestion(s)" class="list-group-item pointer">{{ s.value }}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="button-container">
+              <button *ngIf="replyCommentsForm.value" type="button" class="btn btn-primary btn-sm"
+                (click)="onReplySubmit(item,replyCommentsForm.value)">Submit</button>
+              <button type="button" class="btn btn-danger btn-sm" (click)="onCancel(item);">Cancel</button>
+            </div>
+            <hr style="margin-top: 50px;">
+          </div>
+        </div>
+        <div>
+          <ng-container *ngTemplateOutlet="recursiveListTmpl; context:{ list: item.list }"></ng-container>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+  <div *ngIf="!isLastPage && list.length>0" class="comments-load-more" (click)="onClickMore()">Show more replies</div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

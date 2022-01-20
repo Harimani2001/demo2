@@ -1,0 +1,7 @@
+.dt-desc {
+    padding: 0px !important;
+    padding-left: 1% !important;
+    overflow: scroll !important;
+    overflow-x: visible !important;
+    max-height: 200px !important;
+}

@@ -1,0 +1,192 @@
+<div *ngIf="addFlag" class="row">
+    <div class="col-sm-12" *ngIf="checkList && checkList.length==0">
+        <button type="button" class="btn btn-primary" (click)="addUrlCheckList(checkList)">
+            <i class="icofont icofont-checked"></i>Add URL
+        </button>
+       
+    </div>
+    <div class="col-sm-12 ">
+        <label class="messages text-danger" *ngIf="!validForm">Please Fill the Details to Continue . . .</label>
+        <!-- && !titleValidateFlag  &&  !urlValidateFlag && !formValidateFlag <label class="messages text-danger" *ngIf="titleValidateFlag">Title already present</label>
+        <label class="messages text-danger"   *ngIf="urlValidateFlag">URL already present</label>
+        <label class="messages text-danger"   *ngIf="formValidateFlag">Form already present</label> -->
+    </div>
+    <div class="col-sm-12">
+        <div style="min-height: 400px;" class="table-responsive" *ngIf="checkList && checkList.length>0">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Title/ Form</th>
+                        <th>URL/ Form Data</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let dto of checkList; let i=index">
+                        <td width="20%">URL
+                            <ui-switch ng-model="all" [(ngModel)]="dto.formFlag" (change)="onChangeOfCategory(dto)"
+                                class="js-small" color="#3498DB" switchColor="#fff" size="small">
+                            </ui-switch>Form
+                        </td>
+                        <ng-container *ngIf="!dto.formFlag">
+                            <td width="30%">
+                                <input type="text" class="form-control" id="titleid-{{i}}" name="title-{{i}}"
+                                    [(ngModel)]="dto.title" [ngModelOptions]="{standalone: true}" #title="ngModel"
+                                    (ngModelChange)="checkURLName(dto.title,checkList)" />
+                                <div class="messages text-danger"
+                                    *ngIf="(title.touched || submittedCheckList) && !dto.title">Title can't be
+                                    blank </div>
+                            </td>
+                            <td width="40%">
+                                <input type="url" class="form-control" id="urlid-{{i}}" name="url-{{i}}"
+                                    [(ngModel)]="dto.url" placeholder="URL" #url="ngModel"
+                                    [ngModelOptions]="{standalone: true}"  (ngModelChange)="checkURLPathName(dto.url,checkList)" />
+                                <div class="messages text-danger"
+                                    *ngIf="(url.touched || submittedCheckList) && !dto.url">URL can't be blank</div>
+                                </td>
+                        </ng-container>
+                        <ng-container *ngIf="dto.formFlag">
+                            <td width="30%">
+                                <angular2-multiselect class="form-control" [data]="orgFormList" id="formTypeId-{{i}}"
+                                    name="formType-{{i}}" [(ngModel)]="dto.documentType" #documentType="ngModel"
+                                    (ngModelChange)="loadOrgFormData(dto)" [settings]="documentSettings">
+                                </angular2-multiselect>
+                                <div class="messages text-danger"
+                                    *ngIf="(documentType.touched || submittedCheckList) && dto.documentType.length == 0">
+                                    Please select form</div>
+                            </td>
+                            <td width="40%">
+                                <angular2-multiselect class="form-control" name="form-{{i}}" [data]="dto.formList" id="formId-{{i}}"
+                                    [(ngModel)]="dto.formId" [ngModelOptions]="{standalone: true}" required
+                                    #formId="ngModel" [settings]="formDataSettings" (ngModelChange)="checkDupliateForm(dto,checkList)">
+                                </angular2-multiselect>
+                                <div class="messages text-danger"
+                                    *ngIf="(formId.touched || submittedCheckList) && dto.formId.length == 0">Please
+                                    select form data</div>
+                            </td>
+                        </ng-container>
+
+                        <td width="10%">
+                            <a class="pointer" role="button" title="Add Reference" (click)="addUrlCheckList(checkList);">
+                                <i class="icofont icofont-ui-add text-success"></i></a>
+                            <i style="cursor: pointer;" (click)="delete(checkList,i)" class="icofont icofont-ui-delete"
+                                title="delete"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+</div>
+<div *ngIf="singleAddFlag" class="row">
+  
+    <div class="col-sm-12"  *ngIf="checkList && checkList.length===0">
+        <button type="button" class="btn btn-primary" (click)="addUrlCheckList(checkList)">
+            <i class="icofont icofont-checked"></i>Add URL
+        </button>
+       
+    </div>
+    <div class="col-sm-12">
+        <label class="messages text-danger" *ngIf="!validForm ">Please Fill the Details to Continue . . .</label>
+        <!--&& !titleValidateFlag  &&  !urlValidateFlag && !formValidateFlag <label class="messages text-danger" *ngIf="titleValidateFlag">Title already present</label>
+        <label class="messages text-danger"   *ngIf="urlValidateFlag">URL already present</label>
+        <label class="messages text-danger"   *ngIf="formValidateFlag">Form already present</label> -->
+    </div>
+    <div class="col-sm-12">
+        <div *ngIf="checkList && checkList.length>0">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Title/ Form</th>
+                        <th>URL/ Form Data</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let dto of checkList; let i=index">
+                        <td width="20%">URL
+                            <ui-switch ng-model="all" [(ngModel)]="dto.formFlag" (change)="onChangeOfCategory(dto)"
+                                class="js-small" color="#3498DB" switchColor="#fff" size="small">
+                            </ui-switch>Form
+                        </td>
+                        <ng-container *ngIf="!dto.formFlag">
+                            <td width="30%">
+                                <input type="text" class="form-control" id="titleid-{{i}}" name="title-{{i}}"
+                                    [(ngModel)]="dto.title" [ngModelOptions]="{standalone: true}" #title="ngModel" (ngModelChange)="checkURLName(dto.title,checkList)"  />
+                                <div class="messages text-danger"
+                                    *ngIf="(title.touched || submittedCheckList) && !dto.title">Title can't be
+                                    blank </div>
+                            </td>
+                            <td width="40%">
+                                <input type="url" class="form-control" id="urlid-{{i}}" name="url-{{i}}"
+                                    [(ngModel)]="dto.url" placeholder="URL" #url="ngModel"
+                                    [ngModelOptions]="{standalone: true}"  (ngModelChange)="checkURLPathName(dto.url,checkList)" />
+                                <div class="messages text-danger"
+                                    *ngIf="(url.touched || submittedCheckList) && !dto.url">URL can't be blank</div>
+                            </td>
+                        </ng-container>
+                        <ng-container *ngIf="dto.formFlag">
+                            <td width="30%">
+                                <angular2-multiselect class="form-control" [data]="orgFormList" id="formTypeId-{{i}}"
+                                    name="formType-{{i}}" [(ngModel)]="dto.documentType" #documentType="ngModel"
+                                    (ngModelChange)="loadOrgFormData(dto)" [settings]="documentSettings">
+                                </angular2-multiselect>
+                                <div class="messages text-danger"
+                                    *ngIf="(documentType.touched || submittedCheckList) && dto.documentType.length == 0">
+                                    Please select form</div>
+                            </td>
+                            <td width="40%">
+                                <angular2-multiselect name="form-{{i}}" [data]="dto.formList" id="formId-{{i}}"
+                                    [(ngModel)]="dto.formId" [ngModelOptions]="{standalone: true}" required
+                                    #formId="ngModel" [settings]="formDataSettings" (ngModelChange)="checkDupliateForm(dto,checkList)">
+                                </angular2-multiselect>
+                                <div class="messages text-danger"
+                                    *ngIf="(formId.touched || submittedCheckList) && dto.formId.length == 0">Please
+                                    select form
+                                    data</div>
+                            </td>
+                        </ng-container>
+
+                        <td width="10%">
+                            <a class="pointer" role="button" title="Add Reference" (click)="addUrlCheckList(checkList);">
+                                <i class="icofont icofont-ui-add text-success"></i></a>
+                            <i style="cursor: pointer;" (click)="saveCheckList(checkList)" class="icofont icofont-save" title="save"></i>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div *ngIf="viewFlag && checkListView && checkListView.length>0" class="row">
+    <div class="col-sm-12">
+        <table class="table table-bordered">
+            <thead>
+                <tr style="background-color: lightgray;">
+                    <th>Title/ Form</th>
+                    <th>URL/ Form Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let dto of checkListView">
+                    <ng-container *ngIf="!dto.formFlag">
+                        <td>{{dto.title}}</td>
+                        <td><a class="pointer text-primary" (click)=navigate(dto.url,true)>{{dto.url}}</a></td>
+                    </ng-container>
+                    <ng-container *ngIf="dto.formFlag">
+                        <td>{{dto.documentType[0].itemName}}</td>
+                        <td><a class="pointer text-primary" (click)=navigate(dto.url,false)>{{dto.formId[0].itemName}}</a>
+                        </td>
+                    </ng-container>
+                </tr>
+            </tbody>
+        </table>
+        <br><br>
+    </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

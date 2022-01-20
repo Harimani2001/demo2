@@ -1,0 +1,566 @@
+<div class="row-sm-8">
+  <div class="col-sm-12">
+    <form #formId="ngForm" class="well well-lg">
+      <div *ngFor='let input of inputField'>
+        <div style="pointer-events: none;" class="form-group row" *ngIf="(input.subtype==='Text')">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div class="col-sm-10">
+            <input class="form-control col-sm-5" [type]='input.subtype' [name]='input.name' [(ngModel)]='input.value'
+              [minlength]="input.minlength" [required]="input.required" [maxlength]="input.maxlength" #text="ngModel">
+          </div>
+        </div>
+        <div style="pointer-events: none;" class="form-group row" *ngIf="(input.subtype==='Email')">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label>
+              <span *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div class="col-sm-10">
+            <input class="form-control col-sm-5" [type]='input.subtype' [name]='input.name' [(ngModel)]='input.value'
+              [minlength]="input.minlength" [required]="input.required" [maxlength]="input.maxlength"
+              [pattern]="helper.email_pattern" #email="ngModel">
+          </div>
+        </div>
+        <div style="pointer-events: none;" class="form-group row" *ngIf="(input.subtype==='Mobile')">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div class="col-sm-10">
+            <input class="form-control col-sm-5" type="text" [name]='input.name' [(ngModel)]='input.value'
+              [minlength]="input.minlength" [required]="input.required" [maxlength]="input.maxlength" #tel="ngModel"
+              pattern="^[6789]\d{9}$" (keypress)="onlyNumber($event)">
+          </div>
+        </div>
+        <div style="pointer-events: none;" class="form-group row"
+          *ngIf="(input.type==='date') || (input.type==='number')">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div class="col-sm-12">
+            <input class="form-control col-sm-2" [type]='input.type' [name]='input.name' [(ngModel)]='input.value'
+              [minlength]="input.minlength" [maxlength]="input.maxlength" [required]="input.required"
+              #dateNumber="ngModel">
+          </div>
+        </div>
+        <div style="pointer-events: none;" class="form-group row" *ngIf="(input.type==='file')" id="{{input.name}}">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div *ngIf="!input.multiple" class="col-sm-6">
+            <input [type]='input.type' [name]='input.name' [(ngModel)]='uploadSingleFile' accept=".pdf,.doc,.docx"
+              #file="ngModel">
+
+          </div>
+          <div *ngIf="input.multiple" class="col-sm-6">
+            <div class=" files color">
+              <input type="file" [name]='input.name' [(ngModel)]='input.value' multiple #fileMultiple="ngModel">
+            </div>
+          </div>
+        </div>
+        <div class="sm-12" *ngIf="(input.type==='header')">
+
+          <div *ngIf="(input.subtype==='h1')">
+            <h1 [innerHtml]="input.label"></h1>
+          </div>
+          <div *ngIf="(input.subtype==='h2')">
+            <h2 [innerHtml]="input.label"></h2>
+          </div>
+          <div *ngIf="(input.subtype==='h3')">
+            <h3 [innerHtml]="input.label"></h3>
+          </div>
+
+        </div>
+        <div *ngIf="(input.type==='paragraph')">
+          <p class="sm-12" [innerHtml]="input.label"></p>
+        </div>
+        <div *ngIf="(input.type==='newline')">
+          <hr class="form-hr">
+        </div>
+        <div style="pointer-events: none;" class="form-group row" *ngIf="(input.type==='textarea')">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label>
+              <span *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div *ngIf="(input.subtype==='quill')" class="col-sm-10">
+            <quill-editor [name]='input.name' [(ngModel)]='input.value' [required]="input.required"
+              [maxlength]="input.maxlength" #quill="ngModel">
+            </quill-editor>
+          </div>
+
+          <div *ngIf="(input.subtype==='ckeditor')" class="col-sm-10">
+            <textarea name="input.name" [required]="input.required" [(ngModel)]="input.value"
+              #ckeditor="ngModel"></textarea>
+          </div>
+
+        </div>
+        <div style="pointer-events: none;" class="form-group row" *ngIf="(input.type==='select')">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label>
+              <span *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div class="col-sm-10">
+            <select class="form-control col-sm-5" [required]="input.required" [name]="input.name"
+              [(ngModel)]="input.value" #select="ngModel">
+              <option *ngFor='let optionList of input.values' [value]="optionList.value">{{optionList.label}}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div style="pointer-events: none;" class="form-group row" *ngIf="(input.type==='checkbox-group')">
+          <b><label class="col-sm-12" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div class="col-sm-10">
+            <div *ngFor="let cheboxvalue of input.values">
+              <div class="checkbox-fade fade-in-primary">
+                <label>
+                  <input type="checkbox" [name]="input.name" [checked]="cheboxvalue.selected">
+                  <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                  <span>{{cheboxvalue.label}}</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="pointer-events: none;" class="form-group row" *ngIf="(input.type==='radio-group')">
+          <b><label class="col-sm-12" [for]='input.name'><label [innerHtml]="input.label"></label> <span
+                *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div *ngFor="let radioButtonValue of input.values" class="form-radio col-sm-10">
+            <form>
+              <div class="radio radiofill">
+                <label>
+                  <input type="checkbox" [name]="input.name" [checked]="radioButtonValue.selected">
+                  <span class="cr"></span>
+                  <i class="helper"></i>{{radioButtonValue.label}}
+                </label>
+
+              </div>
+            </form>
+          </div>
+        </div>
+        <div style="pointer-events: none;" *ngIf="(input.type==='datetime-local')" class="form-group row">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div class="col-sm-10">
+            <input class="form-control col-sm-2" type="datetime-local" [name]='input.label' [(ngModel)]='input.value'
+              [required]="input.required" #dateTime="ngModel">
+            <div class="messages text-danger" *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter
+              valid
+              <label [innerHtml]="input.label"></label></div>
+          </div>
+        </div>
+        <div style="pointer-events: none;" *ngIf="(input.type==='time')" class="form-group row">
+          <b><label class="col-sm-12 col-form-label" [for]='input.name'><label [innerHtml]="input.label"></label><span
+                *ngIf="input.required!=undefined" class="asterisk">*</span>
+              <a *ngIf="input.description!=undefined" href="javascript:;"
+                class="m-r-15 crm-action-info text-muted text-primary" placement="top" [ngbTooltip]="input.description">
+                <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+              </a></label></b>
+          <div class="col-sm-10">
+            <input class="form-control col-sm-2" type="time" [name]='input.label' [(ngModel)]='input.value'
+              [required]="input.required" #time="ngModel">
+          </div>
+        </div>
+        <div class=" col-sm-12">
+          <app-card *ngIf="input.type=='table'">
+            <h4 style="text-align: center;" class="sm-12" [innerHtml]='input.name'> </h4>
+            <div class="table-responsive">
+              <table class="table table-lg">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th *ngFor="let column of input.columns"><label [innerHtml]="column.label"></label></th>
+                  </tr>
+                </thead>
+              </table>
+            </div>
+            <br><br>
+          </app-card>
+        </div>
+      </div>
+    </form>
+    <br><br>
+
+    <div *ngIf="expressionBuilder.length>0" class="form-group row">
+      <div class="col-sm-12">
+        <app-card title="Expression">
+          <form class="table-responsive" #expressionBuilderId="ngForm">
+            <div>
+            </div>
+            <div class="col-sm-12">
+              <label class="col-sm-2">First Operand</label>
+              <label class="col-sm-2">Operator</label>
+              <label class="col-sm-2">Second Operand</label>
+              <label class="col-sm-2"></label>
+              <label class="col-sm-2">To Be Saved In</label>
+              <label class="col-sm-2"></label>
+            </div>
+            <div class="col-sm-12" *ngFor='let expression of expressionBuilder ; let i=index'>
+              <label class="col-sm-2">
+                <select class="form-control" disabled [(ngModel)]="expression.operandOneId"
+                  id="expression-{{expression.id}}" name="expression-{{expression.id}}" #operandOneId="ngModel">
+                  <option *ngFor="let option of expressionDropDownFirst" [value]="option.key"><label
+                      [innerHtml]="option.value"></label></option>
+                </select>
+              </label>
+              <label class="col-sm-2">
+                <select class="form-control" disabled [(ngModel)]="expression.operator"
+                  name="operatorName-{{expression.id}}" #operatorId="ngModel">
+                  <option value="addition">Addition</option>
+                  <option value="subtraction">Subtraction</option>
+                  <option value="multiplication">Multiplication</option>
+                  <option value="division">Division</option>
+                  <option value="percentage">Percentage</option>
+                </select></label>
+              <label class="col-sm-2">
+                <select class="form-control" disabled [(ngModel)]="expression.operandTwoId"
+                  name="operandTwoName-{{expression.id}}" #operandTwoId="ngModel">
+                  <option value="constant">Constant Value</option>
+                  <option *ngFor="let option of expressionDropDownSecond" [value]="option.key"><label
+                      [innerHtml]="option.value"></label></option>
+                </select>
+              </label>
+              <label class="col-sm-2">
+                <input class="form-control" disabled *ngIf="expression.operandTwoId=='constant'" type="number"
+                  placeholder="ex-5" (keypress)="onlyNumber($event)" [(ngModel)]="expression.operandTwoConstant"
+                  name="operandTwoConstantName-{{expression.id}}" id="operandTwoConstantId-{{expression.id}}"
+                  #operandTwoId="ngModel" />
+              </label>
+              <label class="col-sm-2">
+                <select class="form-control" disabled [(ngModel)]="expression.finalResultId"
+                  name="finalResultName-{{expression.id}}" #finalResultId="ngModel">
+                  <option *ngFor="let option of expressionDropDownThird" [value]="option.key"><label
+                      [innerHtml]="option.value"></label></option>
+                </select>
+              </label>
+              <label class="col-sm-1">
+              </label>
+            </div>
+          </form>
+        </app-card>
+      </div>
+    </div>
+
+    <div  *ngIf="conditionBuilder.length>0" class="form-group row">
+      <div class="col-sm-12">
+        <app-card title="Condition">
+          <form #conditionBuilderId="ngForm">
+            <div class="row well well-lg" *ngFor='let condition of conditionBuilder ; let i=index'>
+              <div class="col-sm-12">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <div class="row">
+                      <label class="col-sm-6">Condition Name</label>
+                      <div class="col-sm-6">
+                        <input class="form-control" disabled type="text" maxlength="49"
+                          id="conditionName-{{condition.id}}" name="conditionName-{{condition.id}}"
+                          [(ngModel)]="condition.name" #conditionName="ngModel" />
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="col-sm-4">
+                    <div class="row">
+                      <label class="col-sm-6">Condition Type </label>
+                      <div class="col-sm-6">
+                        <select class="form-control" disabled [(ngModel)]="condition.type" name="type-{{condition.id}}"
+                          #conditionTypeNgModel="ngModel">
+                          <option value="range">Range</option>
+                          <option value="comparator">Comparator</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="condition.type=='comparator'" class="col-sm-3">
+                    <label for="caseSensitive-{{condition.id}}">
+                      <input type="checkbox" disabled name="caseSensitive-{{condition.id}}"
+                        [checked]="condition.caseSensitive" /> Case Sensitive</label></div>
+                  <div *ngIf="condition.type=='range'" class="col-sm-3">
+                    <div class="row">
+                      <div class="col-sm-2">
+                      </div>
+                      <div class="col-sm-10">
+                        <div class="row">
+                          <div class="col-sm-10">
+                            <input class="form-control" disabled maxlength="49" placeholder="Default Value" type="text"
+                              [(ngModel)]="condition.defaultValue" name="defaultValue-{{condition.id}}"
+                              id="defaultValue-{{condition.id}}" #defaultValue="ngModel" />
+                          </div>
+                          <div class="col-sm-2 pl-0">
+                            <input type="color" disabled id="defaultColor-{{condition.id}}"
+                              name="defaultColor-{{condition.id}}" [(ngModel)]="condition.defaultColor"
+                              #defaultColor="ngModel" />
+                          </div>
+                        </div>
+
+                      </div>
+
+                    </div>
+
+
+                  </div>
+                  <div class="col-sm-1">
+
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-12"><br></div>
+              <div *ngIf="condition.type" class="col-sm-12">
+                <div *ngIf="condition.type=='comparator'">
+                  <div class="row">
+                    <div class="col-sm-2">Operand One</div>
+                    <div class="col-sm-1 p-0">Comparator</div>
+                    <div class="col-sm-3">Operand Two</div>
+                    <div class="col-sm-2">Assigned To</div>
+                    <div class="col-sm-4">Output Message</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-2">
+                      <select class="form-control" disabled [(ngModel)]="condition.operandOneId"
+                        name="operandOneName-{{condition.id}}" #operandOneIdNgModel="ngModel">
+                        <option *ngFor="let option of condition.comparatorDropDownFirst" [value]="option.key"><label
+                            [innerHtml]="option.value"></label></option>
+                      </select>
+                    </div>
+                    <div class="col-sm-1 p-0">
+                      <select class="form-control" disabled [(ngModel)]="condition.operator"
+                        name="operator-{{condition.id}}" #operatorNgModel="ngModel">
+                        <option value="equals">Equals</option>
+                        <option value="notEqualTo">Not Equal To</option>
+                        <option value="greaterThan">Greater Than</option>
+                          <option value="greaterThanEqual">Greater than equals</option>
+                          <option value="lessThan">Less Than</option>
+                          <option value="lessThanEqual">Less than equals</option>
+                      </select>
+                    </div>
+                    <div class="col-sm-3">
+                      <div *ngIf="condition.operandTwoId=='constant'" class="row">
+                        <div class="col-sm-6">
+                          <select class="form-control" disabled [(ngModel)]="condition.operandTwoId"
+                            name="operandTwoId-{{condition.id}}" #rangeValueNgModel="ngModel">
+                            <option value="constant">Constant Value</option>
+                            <option *ngFor="let option of condition.comparatorDropDownSecond" [value]="option.key">
+                              <label [innerHtml]="option.value"></label></option>
+                          </select>
+                        </div>
+                        <div class="col-sm-6">
+                          <input class="form-control" disabled type="number" placeholder="ex-5"
+                            [(ngModel)]="condition.constantValue" name="constantValueName-{{condition.id}}"
+                            id="constant-{{condition.id}}" #constantValueNgModel="ngModel" />
+                        </div>
+                      </div>
+                      <div *ngIf="condition.operandTwoId!='constant'" class="row">
+                        <div class="col-sm-12">
+                          <select class="form-control" disabled [(ngModel)]="condition.operandTwoId"
+                            name="operandTwoId-{{condition.id}}" #rangeValueNgModel="ngModel">
+                            <option value="constant">Constant Value</option>
+                            <option *ngFor="let option of condition.comparatorDropDownSecond" [value]="option.key">
+                              <label [innerHtml]="option.value"></label></option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-sm-2">
+                      <select class="form-control" disabled [(ngModel)]="condition.resultOperandId"
+                        name="resultOperandId-{{condition.id}}" #resultOperandIdNgModel="ngModel">
+                        <option *ngFor="let option of condition.comparatorDropDownThird" [value]="option.key"><label
+                            [innerHtml]="option.value"></label></option>
+                      </select>
+                    </div>
+                    <div class="col-sm-4">
+                      <div class="row">
+                        <div class="col-sm-5">
+                          <input class="form-control" disabled maxlength="49" placeholder="Output Value" type="text"
+                            [(ngModel)]="condition.outPutValue" name="outPutValue-{{condition.id}}"
+                            id="outPutValue-{{condition.id}}" #outPutValue="ngModel" />
+                        </div>
+                        <div class="col-sm-1 pl-0">
+                          <input type="color" disabled id="colorId-{{condition.id}}" name="color-{{condition.id}}"
+                            [(ngModel)]="condition.color" #colorId="ngModel" />
+                        </div>
+                        <div class="col-sm-5">
+                          <input class="form-control" disabled maxlength="49" placeholder="Default Value" type="text"
+                            [(ngModel)]="condition.defaultValue" name="defaultValue-{{condition.id}}"
+                            id="defaultValue-{{condition.id}}" #defaultValue="ngModel" />
+                        </div>
+                        <div class="col-sm-1 pl-0">
+                          <input type="color" disabled id="defaultColor-{{condition.id}}"
+                            name="defaultColor-{{condition.id}}" [(ngModel)]="condition.defaultColor"
+                            #defaultColor="ngModel" />
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+                <ng-container *ngIf="condition.type=='range'" class="table-responsive">
+                  <div class="row">
+                    <div class="col-sm-1 pl-0">First Operand</div>
+                    <div class="col-sm-10 ">
+                      <div class="row">
+                        <div class="col-sm-1 pl-0">Lower Limit</div>
+                        <div class="col-sm-3">Lower Limit Value </div>
+                        <div class="col-sm-1">Upper Limit </div>
+                        <div class="col-sm-3">Upper Limit Value </div>
+                        <div class="col-sm-2">Output</div>
+                      </div>
+                    </div>
+                    <div class="col-sm-1 pr-0">Assigned To</div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-1 pt-5 pl-0">
+                      <select class="form-control" disabled [(ngModel)]="condition.operandOneId"
+                        name="operandOneName-{{condition.id}}" #operandOneIdNgModel="ngModel">
+                        <option *ngFor="let option of condition.conditionDropDownFirst" [value]="option.key"><label
+                            [innerHtml]="option.value"></label></option>
+                      </select>
+                    </div>
+                    <div class="well well-lg col-sm-10">
+                      <ng-container *ngFor="let cc of condition.conditionChild ; let j=index">
+                        <div class="row">
+                          <div class="col-sm-1 pl-0">
+                            <select class="form-control" disabled [(ngModel)]="cc.lowerLimitCondition"
+                              name="lowerLimitCondition-{{condition.id}}-{{cc.id}}" placement="top"
+                              [ngbTooltip]="cc.lowerLimitCondition" #lowerLimitConditionNgModel="ngModel">
+                              <option value="greaterThan">Greater Than</option>
+                              <option value="greaterThanEqual">Greater than equals</option>
+                            </select>
+                          </div>
+                          <div class="col-sm-3">
+                            <div *ngIf="cc.lowerLimitValue!='constant'" class="row">
+                              <select class="form-control" disabled [(ngModel)]="cc.lowerLimitValue"
+                                name="lowerLimitValue-{{condition.id}}-{{cc.id}}" #lowerLimitValueNgModel="ngModel">
+                                <option value="constant">Constant Value</option>
+                                <option *ngFor="let option of condition.conditionDropDownSecond" [value]="option.key">
+                                  <label [innerHtml]="option.value"></label></option>
+                              </select>
+                            </div>
+                            <div *ngIf="cc.lowerLimitValue == 'constant' " class="row">
+                              <div class="col-sm-6 pl-0">
+                                <select class="form-control" disabled [(ngModel)]="cc.lowerLimitValue"
+                                  name="lowerLimitValue-{{condition.id}}-{{cc.id}}" #lowerLimitValueNgModel="ngModel">
+                                  <option value="constant">Constant Value</option>
+                                  <option *ngFor="let option of condition.conditionDropDownSecond" [value]="option.key">
+                                    <label [innerHtml]="option.value"></label></option>
+                                </select>
+                              </div>
+                              <div class="col-sm-6 p-0">
+                                <input class="form-control" disabled type="number"
+                                  placeholder="ex-5" [(ngModel)]="cc.lowerConstantValue"
+                                  name="lowerConstantValue-{{condition.id}}-{{cc.id}}"
+                                  id="lowerConstantValue-{{condition.id}}-{{cc.id}}" #operandTwoId="ngModel" />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-1">
+                            <select class="form-control" disabled [(ngModel)]="cc.upperLimitCondition"
+                              name="upperLimitCondition-{{condition.id}}-{{cc.id}}" placement="top"
+                              [ngbTooltip]="cc.upperLimitCondition" #lowerConstantValue="ngModel">
+                              <option value="lessThan">Less Than</option>
+                              <option value="lessThanEqual">Less than equals</option>
+                            </select>
+                          </div>
+                          <div class="col-sm-3">
+                            <div *ngIf="cc.upperLimitValue!='constant'" class="row">
+                              <select class="form-control" disabled [(ngModel)]="cc.upperLimitValue"
+                                name="upperLimitValue-{{condition.id}}-{{cc.id}}" #upperLimitValueNgModel="ngModel">
+                                <option value="constant">Constant Value</option>
+                                <option *ngFor="let option of condition.conditionDropDownSecond" [value]="option.key">
+                                  <label [innerHtml]="option.value"></label></option>
+                              </select>
+                            </div>
+                            <div *ngIf="cc.upperLimitValue == 'constant' " class="row">
+                              <div class="col-sm-6 pl-0">
+                                <select class="form-control" disabled [(ngModel)]="cc.upperLimitValue"
+                                  name="upperLimitValue-{{condition.id}}-{{cc.id}}" #lowerLimitValueNgModel="ngModel">
+                                  <option value="constant">Constant Value</option>
+                                  <option *ngFor="let option of condition.conditionDropDownSecond" [value]="option.key">
+                                    <label [innerHtml]="option.value"></label></option>
+                                </select>
+                              </div>
+                              <div class="col-sm-6 p-0">
+                                <input class="form-control" *ngIf="cc.upperConstantValue" disabled type="number"
+                                  placeholder="ex-5" [(ngModel)]="cc.upperConstantValue"
+                                  name="upperConstantValue-{{condition.id}}-{{cc.id}}"
+                                  id="upperConstantValue-{{condition.id}}-{{cc.id}}" #upperConstantValue="ngModel" />
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-4">
+                            <div class="row">
+                              <div class="col-sm-8">
+                                <input class="form-control" disabled type="text" maxlength="49"
+                                  [(ngModel)]="cc.outPutValue" name="outPutValue-{{condition.id}}-{{cc.id}}"
+                                  id="outPutValue-{{condition.id}}-{{cc.id}}" #outPutValueNgModel="ngModel" />
+                              </div>
+                              <div class="col-sm-2">
+                                <input type="color" disabled id="colorId-{{condition.id}}-{{cc.id}}"
+                                  name="color-{{condition.id}}-{{cc.id}}" [(ngModel)]="cc.color" #colorId="ngModel" />
+                              </div>
+                              <div class="col-sm-2">
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </ng-container>
+
+                    </div>
+                    <div class="col-sm-1 pt-5 pr-0">
+                      <select class="form-control" disabled [(ngModel)]="condition.resultOperandId"
+                        name="resultOperandId-{{condition.id}}" #resultOperandIdNgModel="ngModel">
+                        <option *ngFor="let option of condition.conditionDropDownThird" [value]="option.key"><label
+                            [innerHtml]="option.value"></label></option>
+                      </select>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+            </div>
+          </form>
+        </app-card>
+      </div>
+    </div>
+
+
+    <div>
+      <app-card title="View Formula">
+        <div class="row">
+          <div class="col-md-11" #formula></div>
+          <div class="col-md-1"></div>
+        </div>
+      </app-card>
+    </div>
+
+  </div>
+</div>

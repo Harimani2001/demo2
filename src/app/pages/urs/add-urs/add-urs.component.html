@@ -1,0 +1,294 @@
+<div class="row">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-6">
+          <i class="icofont icofont-law-document bg-c-blue"></i>
+          <div class="d-inline">
+            <h4 class="strong">User Requirement Specification</h4>
+            <span *ngIf="this.modal.id==0">Add User Requirement Specification</span>
+            <span *ngIf="this.modal.id!=0">URS : {{this.modal.ursCode}} {{this.modal.revisionNumber}}</span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <span *ngIf="!modal.workFlowCompletionFlag && modal.documentPreviewFlag" style="float: right;"><img
+              (click)="documentPreview(true,'pdf');" container="body" ngbTooltip="Preview"
+              style="height: 35px; width: 35px;" class="pointer" src="/assets/images/pdf.png" title="Preview"></span>
+          <span style="float: right;" *ngIf="modal.documentPreviewFlag"><i (click)="documentPreview(false,'pdf');"
+              placement="top" container="body" ngbTooltip="Download Pdf File" style="font-size: 34px;color: #e82c2c;"
+              class="icofont icofont-file-pdf" title="Download Pdf File"></i></span>
+          <span style="float: right;" *ngIf="modal.documentPreviewFlag"><i (click)="documentPreview(false,'docx');"
+              placement="top" container="body" ngbTooltip="Download Doc File" style="font-size: 34px;color: #3232e6;"
+              class="icofont icofont-file-word" title="Download Doc File"></i></span>
+          <div style="text-align: right;">
+            <button *ngIf="this.modal.id ==0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();saveAndGoto(urs.valid);">Save</button>
+            <button *ngIf="this.modal.id!=0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();openSuccessUpdateSwal(urs.valid);">Update</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="onClickClose()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="col-sm-12">
+    <br><br><br>
+    <app-card>
+      <form #urs="ngForm">
+        <table id="add-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Requirement<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea autofocus="autofocus" type="text" id="requirement" class="form-control max-textarea" [(ngModel)]="modal.ursName" name="ursName"
+                      #ursName="ngModel" placeholder="Requirement" maxlength="250" required></textarea>
+                    <div class="messages text-danger"
+                      *ngIf="(ursName.touched || submitted) && ursName.errors?.required">Requirement can't be blank</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Description :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ui-switch (change)="editorSwap=!editorSwap" [checked]="editorSwap" class="js-small" color="#3498DB"
+                      switchColor="#fff" size="small" [disabled]="(editorSwap && modal.description)?true:false">
+                    </ui-switch>
+                    &nbsp;
+                    <label class="text-success" *ngIf="!editorSwap">Enable Advance Editor</label>
+                    <label class="text-danger" *ngIf="editorSwap">Disable Advance Editor</label>
+                    <div *ngIf="editorSwap">
+                      <quill-editor [(ngModel)]="modal.description" [options]="this.helper.editQuillOptions"
+                        (ready)="onEditorCreated($event)" name="description"> </quill-editor>
+                    </div>
+                    <textarea *ngIf="!editorSwap" class="form-control max-textarea" [(ngModel)]="modal.description" name="street"></textarea>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Category<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select #categoryName="ngModel" [(ngModel)]="modal.category" name="categoryName"
+                      class="form-control">
+                      <option value=0 disabled>Select Category</option>
+                      <option *ngFor="let category of categoryList" [value]="category.id">{{category.categoryName}}
+                      </option>
+                    </select>
+                    <p style="cursor: pointer !important ;float:right;text-decoration: underline;"
+                      (click)="addCategoryModal.show();addCategoryForm.reset();"
+                      class="p-l-20 p-t-10 m-b-0 text-c-blue">Add Category</p>
+                    <div class="messages text-danger" *ngIf="(categoryName.touched || submitted )&& modal.category==0">Please select the category</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Priority<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select #priority="ngModel" [(ngModel)]="modal.priority" name="priority"
+                      (change)="selectOption($event.target.value)" class="form-control"
+                      [ngStyle]="{'background-color': this.returnColor}">
+                      <option value=0>Select Priority</option>
+                      <option *ngFor="let priority of priorityList" [value]="priority.id">{{priority.priorityName}}
+                      </option>
+                    </select>
+                    <div class="messages text-danger" *ngIf="(priority.touched || submitted )&& modal.priority==0">Please select the priority</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Potential risk on failure :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select [(ngModel)]="modal.potentialRisk" name="potentialRisk"
+                      (change)="onChangePotentialAndImplemenation()" class="form-control">
+                      <option value="">Select Potential Risk</option>
+                      <option *ngFor="let item of potentialList" [value]="item.key">{{item.value}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Testing Required:</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ui-switch (change)="modal.testingRequired=!modal.testingRequired; onTestingRequired();" [checked]="modal.testingRequired"
+                      class="js-small" color="#3498DB" switchColor="#fff" size="small">
+                    </ui-switch>
+                    </div>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="this.modal.testingRequired">
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Implementation Method :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select [(ngModel)]="modal.implementationMethod" name="implementationMethod"
+                      (change)="onChangePotentialAndImplemenation()" class="form-control">
+                      <option value="">Select Implementation Method</option>
+                      <option *ngFor="let item of implemenationList" [value]="item.key">{{item.value}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Testing Method :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select [(ngModel)]="modal.testingMethod" name="testingMethod"
+                      class="form-control">
+                      <option *ngFor="let item of testingMethodList" [value]="item.key">{{item.value}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Compliance Requirement :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <span class="text-c-blue" style="cursor: pointer"><u (click)="onClickCompliance();">Click Here to Select{{this.modal.complianceRequirements.length > 0?'('+this.modal.complianceRequirements.length+' items selected)':''}}</u></span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <div class="form-group row">
+            <span class="p-l-20"><i class="icofont icofont-checked"></i> Check List</span>
+          </div>
+          <div class="form-group row" *ngIf="modal.checklist && modal.checklist.length==0">
+            <div class="col-sm-4"></div>
+            <div class="col-sm-4">
+              <button type="button" class="btn btn-primary btn-sm" (click)="this.addChecklistItem();">
+                <i class="icofont icofont-checked"></i>Add
+              </button>
+            </div>
+            <div class="col-sm-4"></div>
+          </div>
+          <ng-container *ngIf="modal.checklist.length>0">
+            <div class="col-sm-12">
+              <table id="equipment-table-checkList" class="table">
+                <thead class="panel-heading">
+                  <tr class="w-100">
+                    <td style="width: 1%;"><label class="strong">S No.</label></td>
+                    <td class="w-40"><label class="strong">Name</label></td>
+                    <td class="w-10"><label class="strong">Actions</label></td>
+                  </tr>
+                </thead>
+                <tbody class="panel-body">
+                  <ng-container *ngFor="let checkList of modal.checklist; let i = index">
+                    <tr>
+                      <td>
+                        <label placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Display Order">{{i+1}} </label>
+                      </td>
+                      <td>
+                        <input type="text" id="check_list_name_id_{{i}}" autofocus class="form-control" [(ngModel)]="checkList.checklistName"
+                          (ngModelChange)="onChangecheckList()" [ngModelOptions]="{standalone: true}" />
+                      </td>
+                      <td>
+                        <a class="pointer" role="button" title="Add" (click)="addChecklistItem(checkList);">
+                          <i class="icofont icofont-ui-add text-success"></i></a>
+                        <a class="pointer" role="button" title="Delete"
+                          (click)="deleteCheckList(checkList);onChangecheckList()">
+                          <i class="icofont icofont-ui-delete text-danger"></i></a>
+                      </td>
+                    </tr>
+                  </ng-container>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+        </div>
+        <div style="color: red;" *ngIf="isCheckListEntered">Please Fill the Details to Continue . . .</div>
+        
+        <div class="form-group row">
+          <app-file-upload-for-doc #fileupload [multiple]=true [onlyView]=false [documentId]="this.receivedId"
+            [update]="this.modal.id!=0" [documentCode]="this.helper.URS_VALUE"></app-file-upload-for-doc>
+        </div>
+
+        <div *ngIf="this.inputField">
+          <app-form-extended #formExtendedId [(inputField)]='inputField' [documentId]="this.helper.URS_NAME"
+            [(submitted)]='submitted'></app-form-extended>
+        </div>
+
+      </form>
+    </app-card>
+  </div>
+  
+</div>
+
+<app-modal-basic id="modal-lg-50" #addCategoryModal [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="addCategoryModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <app-card>
+      <div class="row">
+        <div class="col-sm-12">
+          <form #addCategoryForm="ngForm">
+            <div class="form-group row">
+              <label class="col-sm-6 col-form-label">Category Name<span class="asterisk required">*</span>
+              </label>
+              <div class="row">&nbsp;&nbsp;&nbsp;
+                <div class="col-sm-6">
+                  <input type="text" class="form-control" maxlength="200" name="categoryName"
+                    [(ngModel)]="addCatModal.categoryName" #addCategory="ngModel" required
+                    placeholder="Category Name" />
+                  <div class="messages text-danger" *ngIf="(addCategory.touched || submittedCategory)&& addCategory?.errors?.required ">Category Name is required</div>
+                </div>
+                <div class="col-sm-2">
+                  <button class="btn btn-primary" style="padding: .5rem .75rem;"
+                    (click)="onsubmit(addCategoryForm);" center type='submit' [ngClass]="'btn btn-primary'">
+                    <span> <i class="icofont icofont-plus-circle"></i>Add</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</app-modal-basic>
+<div *ngIf="ursSpinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-compliance-assesment-modal #complianceAssesmentModal [selectedList]="this.modal.complianceRequirements" (onSubmit)="onSubmitComplianceAssesment($event)"></app-compliance-assesment-modal>

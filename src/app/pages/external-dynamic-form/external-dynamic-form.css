@@ -1,0 +1,32 @@
+.ql-video,.ql-link{
+    display: none !important;
+    }
+    
+    .select-table {
+        width: 158px;
+    }
+    .default-radio input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+      }
+    .default-radio{
+        background-color: initial;
+        cursor: default;
+        -webkit-appearance: radio;
+        box-sizing: border-box;
+        margin: 3px 3px 0px 5px;
+        padding: initial;
+        border: initial;
+    }
+    
+    #align {
+        font-size: medium;
+        display: inline-block;
+        text-transform: capitalize;
+        color:black;
+        margin-top: 5px;
+    }
+    

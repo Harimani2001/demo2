@@ -1,0 +1,17 @@
+
+:host #discipline-qe /deep/ .ql-container{
+    height: 250px;
+  }
+
+  :host #discipline-qe /deep/ .ql-toolbar.ql-snow{
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    padding: 8px;
+    overflow-y: hidden;
+  }
+  
+table#chapter-table, table#chapter-table td, table#chapter-table th {
+    border: 1px solid lightgray;
+    white-space: normal;
+  }

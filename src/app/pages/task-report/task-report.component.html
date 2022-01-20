@@ -1,0 +1,348 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+        <app-card>
+            <div class="row">
+              <div class="col-sm-4">
+                <div class="page-header-title">
+                  <i class="icofont icofont-file-psd bg-c-blue"></i>
+                  <div class="d-inline">
+                    <h4>Task Reports</h4>
+                    <span>View all Task Report</span> 
+                  </div>
+                </div> 
+              </div>
+              <div class="col-sm-4">
+               
+              </div>
+              <div class="col-sm-4">
+
+  
+
+
+                <span style="float:right;">
+                  <img (click)="excelDownload();" acement="top" container="body" ngbTooltip="Download excel" style="height: 28px; width: 28px;" class="pointer" src="/assets/images/excel.png"
+                  alt="GoVal">
+                </span>
+
+                <span style="float:right;">
+                  <img (click)="funcOpen();" acement="top" container="body" ngbTooltip="Filters" style="height: 28px; width: 28px;padding-right: 5px;" class="pointer" src="/assets/icon/png-icons/filter.png"
+                  alt="GoVal">
+                </span>
+
+                <span style="float:right;">
+                  <img (click)="this.showSearch=!this.showSearch" acement="top" container="body" ngbTooltip="search" style="height: 28px; width: 28px;padding-right: 5px;" class="pointer" src="/assets/icon/png-icons/search.png"
+                  alt="GoVal">
+              
+                      <input *ngIf="this.showSearch" type="search" [(ngModel)]="filterQuery"(ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search"
+            name=search placeholder="Search">
+                </span>
+             
+              </div>
+            </div>
+
+       
+          </app-card>
+          
+<div id="myModal" class="modal1">  
+  
+
+
+<div class="modal-content1">
+
+  <div class="modal-header1">   
+    <h4 style="text-align: left;color:#555555;">Filters<span class="close" (click)=funcClose();>&times;</span></h4>
+  </div>
+  
+
+<div class="modal-body1">
+
+  <div class="row">
+      <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3">
+          <label class="col-form-label p-b-0">Location</label>
+        <div style="text-align: left;">
+          <angular2-multiselect [data]="locationsList"
+          [(ngModel)]="location"
+          [settings]="locationSett"
+          (ngModelChange)="loadProjects()">
+          </angular2-multiselect>
+          </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3">
+          <label class="col-form-label p-b-0">Project</label>
+          <div style="text-align: left;">
+            <angular2-multiselect [data]="projectList"
+              [(ngModel)]="selectedProject"
+              [settings]="projectSett"
+              (ngModelChange)="onChangeProject()">
+              </angular2-multiselect>
+            </div>
+        </div>
+        <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3">
+            <label class="col-form-label p-b-0">Users</label>
+          <div style="text-align: left;">
+              <angular2-multiselect [data]="userItemList"
+                    [(ngModel)]="selectedUserItems"
+                    [settings]="UserSettings"
+                    (ngModelChange)="onChangeFilters()">
+              </angular2-multiselect>
+          </div>
+        </div>
+      <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3">
+          <label class="col-form-label p-b-0">Status</label>
+        <div style="text-align: left;">
+              <angular2-multiselect [data]="statusList"
+                    [(ngModel)]="selectedStatusItems"
+                    [settings]="statusSettings"
+                    (ngModelChange)="onChangeStatus()">
+              </angular2-multiselect>
+          </div>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3">
+          <label class="col-form-label p-b-0">Category</label>
+        <div style="text-align: left;">
+          <angular2-multiselect [data]="taskCategoryList"
+          [(ngModel)]="selectedTaskCategory"
+          [settings]="taskCateSettings"
+          (ngModelChange)="onChangeFilters()">
+          </angular2-multiselect>
+            </div>
+        </div>
+       
+      <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3" *ngIf="isAdvancedReport">
+        <label class="col-form-label p-b-0">Equipment</label>
+        <div style="text-align: left; ">
+          <angular2-multiselect [data]="equipmentList"
+            [(ngModel)]="selectedEqu"
+            [settings]="equipmentSettings"
+            (ngModelChange)="onChangeFilters()">
+            </angular2-multiselect>
+          </div>
+      </div>
+      <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3" *ngIf="isAdvancedReport">
+        <label class="col-form-label p-b-0">Document Type</label>
+        <div style="text-align: left;">
+          <angular2-multiselect [data]="documentTypeList"
+            [(ngModel)]="selectedDocuType"
+            [settings]="docTypeSettings"
+            (ngModelChange)="onChangeFilters()">
+            </angular2-multiselect>
+          </div>
+      </div>
+    </div>
+    <br>
+    <div class="row">
+      <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3">
+        <label class="col-form-label p-b-0 p-l-15">Created From Date</label>
+                <form class="form-inline">
+                  <div class="col-sm-12">
+                    <div >
+                        <my-date-picker (keypress)="$event.preventDefault();" #date placeholder='Created From Date' name="startDate" (ngModelChange) = "fromDateChange($event)"  [options]="myDatePickerOptions"
+                        [(ngModel)]="startdate1"  required #dobs="ngModel" (click)="openBtnClicked(date)"></my-date-picker>
+                    </div>
+                  </div>
+        </form>
+      
+    </div>
+    <div class="col-xs-12 col-sm-12 col-sm-12 col-md-3">
+        <label class="col-form-label p-b-0 p-l-15">Created To Date </label>
+        <form class="form-inline">  
+          <div class="col-sm-12">
+            <div >
+                <my-date-picker (keypress)="$event.preventDefault();" #date1 placeholder="Created To Date" name="endDate" (ngModelChange) = "toDateChange($event)"   [options]="myDatePickerOptions"
+                [(ngModel)]="Enddate1"  required #dob="ngModel" (click)="openBtnClicked(date1)" ></my-date-picker>
+            </div>
+          </div>
+        </form>
+    </div>
+ 
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-danger"  (click)="funcClose()">Apply</button>
+ </div> 
+</div>
+</div>
+
+          <ngb-tabset #taskTab="ngbTabset" (tabChange)="loadTaskReportData($event.nextId);">
+              <ngb-tab id="basic" title="Basic Report">
+                  <ng-template ngbTabContent>
+
+                        <ngx-datatable #myTable class="data-table dt-chk" [rows]='filterData | TaskReportFilterPipe : filterQuery'
+          [limit]="10" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [scrollbarH]="true" >
+          
+          <ngx-datatable-column style="font-weight: bold;" name="Project">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['projectName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+       
+          <ngx-datatable-column style="font-weight: bold;" [width]="90" name="Category">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['category']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Task Code">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskCode']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" [width]="200" name="Title">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['title']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" [width]="80" name="Status">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" [width]="100"name="Priorty" >
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong 
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['priority']}}
+                </strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Assigned to" prop="userName">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong 
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['userName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Due Date">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong 
+                  style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['dueDate']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Remaining">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong 
+                  style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['remaingDays']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Created Date" prop="updatedDate">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong 
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['updatedDate']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Resolution Date">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong 
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['resolutionDate']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <!-- <ngx-datatable-column style="font-weight: bold;" name="Action">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong 
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['timeDuration']}}</strong>
+                </ng-template>
+              </ngx-datatable-column> -->
+          
+        </ngx-datatable>
+                  </ng-template>
+                </ngb-tab>
+                <ngb-tab id="advanced" title="Advanced Report">
+                    <ng-template ngbTabContent>
+                        <ngx-datatable #myTable class="data-table dt-chk" [rows]='filterData | TaskReportFilterPipe : filterQuery'
+          [limit]="10" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [scrollbarH]="true" >
+          
+          <ngx-datatable-column style="font-weight: bold;" name="Project">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['projectName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Category">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['category']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Task Code">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskCode']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Title">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['title']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Status">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;"name="Priorty" >
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong 
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['priority']}}
+                </strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Assigned To" prop="userName">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong 
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['userName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Equipment" prop="equipmentName">
+              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                <strong 
+                  style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['equipmentName']}}</strong>
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column style="font-weight: bold;" name="Document Type">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong 
+                    style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['documentType']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column style="font-weight: bold;" name="Document Code">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong 
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['documentCode']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Due Date">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong 
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['dueDate']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Remaining">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong 
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['remaingDays']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Created Date"  prop="updatedDate">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong 
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['updatedDate']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Resolution Date">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong 
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['resolutionDate']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+        </ngx-datatable>
+                  </ng-template>
+                  </ngb-tab>
+          </ngb-tabset>
+      </app-card>
+      </div>
+      </div>
+      <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

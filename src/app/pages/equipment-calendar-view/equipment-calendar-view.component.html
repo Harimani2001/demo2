@@ -1,0 +1,409 @@
+
+  <div class="row">
+    <div class="col-sm-6">
+      <h4>Equipment Events</h4>
+    </div>
+  </div>
+  <hr style="margin-top: -1px">
+  <div class="row">
+    <div class="col-sm-3">
+      <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Equipment</label>
+      <div class="col-sm-11">
+        <div id="inputgroup" class="input-group">
+            <ng-select [ngClass]="'ng-select'" [options]="this.equipmentData" aria-placeholder="Select Equipment" name="selectEquipment" #eqId (ngModelChange)="onChangeEquipment()"
+                  [multiple]="false"  [(ngModel)]="seletedEquipment" required>
+                </ng-select>
+          <!-- <select name="selectEquipments" class="form-control" [(ngModel)]="seletedEquipment" (ngModelChange)="onChangeEquipment()">
+            <option value="">Select Equipment</option>
+            <option *ngFor="let equipment of equipmentList" [value]="equipment.id">{{equipment.name}}</option>
+          </select> -->
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-3">
+      <label class="col-form-label"></label>
+      <div class="col-sm-11" style="padding-top: 10px;">
+        <button *ngIf="seletedEquipment !='' && permissionModal.createButtonFlag" type="button" class="btn btn-sm btn-primary" (click)="addEvent()"
+          title="Add Event">Add Event </button>
+      </div>
+    </div>
+  </div>
+  <hr style="margin-top: 2px">
+<ngb-tabset type="pills">
+  <ngb-tab title="Open">
+    <ng-template ngbTabContent>
+      <div class="col-xs-12 col-sm-12 col-md-12">
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+            <div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-6">
+            <div style="text-align: right;">
+              <label>Search:
+                <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search"
+                  name=search placeholder="Search">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+        [rows]='this.openevents | EquipmentCalendarPipe : filterQuery' [limit]="10" [columnMode]="'force'" [headerHeight]="50"
+        [footerHeight]="50" [rowHeight]="'auto'">
+
+        <ngx-datatable-column name="Complete" [width]="90" [sortable]="false" [canAutoResize]="false"
+            [draggable]="false" [resizeable]="false">
+            <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+              let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+              <div class="checkbox-fade fade-in-primary">
+                <label *ngIf="permissionModal.createButtonFlag || permissionModal.updateButtonFlag" container="body" placement="right" triggers="mouseenter:mouseleave"
+                ngbPopover="Select to Complete">
+                  <input type="checkbox" name="{{row['title']}}" (change)="completeStatus(row);" />
+                  <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                </label>
+              </div>
+            </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false" name="Sl No.">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong>{{row['$$index']+1}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Equipment Name">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row.equipmentDto['equipmentName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Notes">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['title']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Status">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <!-- <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong> -->
+              <span class="badge badge-pill badge-danger" title="{{'Click to edit'}}" (click)="editStatus(row.$$index)" *ngIf="!showStatusDropDown[row.$$index] && ( row.status != null)">
+                {{row['status']}}
+              </span>
+              <span title="{{'Click to edit'}}" (click)="editStatus(row.$$index)" *ngIf="!showStatusDropDown[row.$$index] && (row.status == '' || row.status == null)">
+                Select Status
+              </span>
+              <select [(ngModel)]="row.status" name="status" *ngIf="showStatusDropDown[row.$$index]" (change)="changeStatus(row,row.$$index)">
+                <option value="Open">Open</option>
+                <option value="Completed">Completed</option>
+              </select>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Due Date">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;" [ngStyle]="{'color': row.equipmentDto.remainingDays >= 0 ? 'black' : '#FD3A4A' }">{{row['end']|date:this.datePipeFormat}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="No of Days remaining">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;" [ngStyle]="{'color': row.equipmentDto.remainingDays >= 0 ? 'black' : '#FD3A4A' }">{{row.equipmentDto['remainingDays']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Created By">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['createdBy']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Action">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+              <i style="font-size: 18px;" *ngIf="permissionModal.updateButtonFlag" class="icofont icofont-edit edit" (click)="onEditEvent(row)"></i></strong>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </ng-template>
+  </ngb-tab>
+
+  <ngb-tab title="Completed">
+    <ng-template ngbTabContent>
+      <div class="col-xs-12 col-sm-12 col-md-12">
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+            <div>
+            </div>
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-6">
+            <div style="text-align: right;">
+              <label>Search:
+                <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search"
+                  name=search placeholder="Search">
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+        [rows]='this.completeevents | CalendarPipe : filterQuery' [limit]="10" [columnMode]="'force'" [headerHeight]="50"
+        [footerHeight]="50" [rowHeight]="'auto'">
+
+        <ngx-datatable-column [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false" name="Sl No.">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong>{{row['$$index']+1}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Equipment Name">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row.equipmentDto['equipmentName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Notes">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['title']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Status">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+              <span class="badge badge-pill badge-success">{{row['status']}}</span>
+            </strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Due Date">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;" [ngStyle]="{'color': row.equipmentDto.remainingDays >= 0 ? 'black' : '#FD3A4A' }">{{row['end']|date:this.datePipeFormat}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="No of Days remaining">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;" [ngStyle]="{'color': row.equipmentDto.remainingDays >= 0 ? 'black' : '#FD3A4A' }">{{row.equipmentDto['remainingDays']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Created By">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['createdBy']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Action">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <a container="body" *ngIf="permissionModal.updateButtonFlag" href="javascript:;"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit"
+              (click)="onEditEvent(row)"><i class="icofont icofont-edit edit"></i> 
+						</a>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </ng-template>
+  </ngb-tab>
+
+  <ngb-tab title="Calender View">
+    <ng-template ngbTabContent>
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row text-center">
+        <div class="col-md-4">
+          <div class="btn-group">
+            <div class="btn btn-primary" mwlCalendarPreviousView [view]='view' [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()">
+              Previous
+            </div>
+            <div class="btn btn-outline-secondary" mwlCalendarToday [(viewDate)]="viewDate">
+              Today
+            </div>
+            <div class="btn btn-primary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+              (viewDateChange)="closeOpenMonthViewDay()">
+              Next
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en'}}</h3>
+        </div>
+        <div class="col-md-4">
+          <div class="btn-group">
+            <div class="btn btn-primary" (click)="setView('month')" [class.active]="view === 'month'">
+              Month
+            </div>
+            <div class="btn btn-primary" (click)="setView('week')" [class.active]="view === 'week'">
+              Week
+            </div>
+            <div class="btn btn-primary" (click)="setView('day')" [class.active]="view === 'day'">
+              Day
+            </div>
+          </div>
+        </div>
+      </div>
+      <br />
+      <ng-template #customCellTemplate let-day="day" let-locale="locale">
+        <div class="cal-cell-top">
+          <span class="cal-day-badge" *ngIf="day.badgeTotal > 0">{{ day.badgeTotal }}</span>
+          <span class="cal-day-number">{{ day.date | calendarDate:'monthViewDayNumber':locale }}</span>
+        </div>
+        <small *ngIf="day.events.length>0">
+          <div *ngFor="let details of day.events; let i = index" style="max-width: 130px;">
+            &nbsp;&nbsp;{{i+1}} : {{ details.title }}
+          </div>
+        </small>
+      </ng-template>
+      <div [ngSwitch]="view">
+        <mwl-calendar-month-view *ngSwitchCase="'month'" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
+          (dayClicked)="onClickOnDay($event)" (eventTimesChanged)="eventTimesChanged($event)"
+         (beforeViewRender)="beforeMonthViewRender($event)">
+        </mwl-calendar-month-view>
+
+        <mwl-calendar-week-view *ngSwitchCase="'week'" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
+          (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)">
+        </mwl-calendar-week-view>
+
+        <mwl-calendar-day-view *ngSwitchCase="'day'" [viewDate]="viewDate" [events]="events" [refresh]="refresh"
+          (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)">
+        </mwl-calendar-day-view>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <tbody>
+            <tr *ngFor="let event of holidayEvents">
+              <td style="visibility: hidden !important;">
+                <input mwlFlatpickr [(ngModel)]="event.start" (ngModelChange)="refresh.next()" [altInput]="true"
+                  [convertModelValue]="true" [enableTime]="false" dateFormat="Y-m-dTH:i" altFormat="F j, Y H:i"
+                  placeholder="Not set" />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </app-card> 
+  </div>
+</div>
+</ng-template> 
+</ngb-tab>
+
+<ngb-tab id="audit" title="Audit Trail">
+  <ng-template ngbTabContent>
+    <app-audit-trail-view #auditView [permission]="this.helper.CALENDAR_VIEW"></app-audit-trail-view>
+  </ng-template>
+</ngb-tab>
+
+</ngb-tabset>
+
+
+
+<ng-template #modalContent let-close="close">
+  <div class="modal-header">
+    <h5 class="modal-title">Event Details</h5><button type="button" class="close" (click)="close()"><span aria-hidden="true">&times;</span></button>
+  </div>
+  <div class="modal-body"><div>Event:<pre>{{ modalData?.event.title}}</pre></div></div>
+  <div class="modal-footer"><button type="button" class="btn btn-outline-secondary" (click)="close()">OK</button></div>
+</ng-template>
+<ng-template #modalContent1 let-close="close">
+  <div style="width: 100%;">
+  <div class="modal-header">
+    <h5 class="modal-title">Event Details</h5>
+    <button type="button" class="close" id="eventDetailsClose" (click)="close()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="dt-desc" style="padding: 0px;">
+      <div *ngIf="this.equipmentEvents.length != 0">
+        <table class="table-striped table-bordered" style="width: 100% !important;">
+          <thead>
+            <tr>
+              <th>Action</th>
+              <th>Description</th>
+              <th>Equipment</th>
+              <th>Status</th>
+              <th>Remaining Days</th>
+              <th>Updated By</th>
+              <th>Updated Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let details of equipmentEvents">
+              <td *ngIf="details.equipmentDto != null"><i *ngIf="permissionModal.updateButtonFlag" style="font-size: 18px;" class="icofont icofont-edit edit" (click)="onEditEvent(details)"></i></td>
+              <td *ngIf="details.equipmentDto == null"></td>
+              <td>{{details.title}}</td>
+              <td *ngIf="details.equipmentDto != null">{{details.equipmentDto.equipmentName}}</td>
+              <td *ngIf="details.equipmentDto != null">{{details.equipmentDto.currentStatus}}</td>
+              <td *ngIf="details.equipmentDto != null">{{details.equipmentDto.remainingDays}}</td>
+              <td *ngIf="details.equipmentDto == null"></td>
+              <td *ngIf="details.equipmentDto == null"></td>
+              <td *ngIf="details.equipmentDto == null"></td>
+              <td>{{details.createdBy}}</td>
+              <td>{{details.displayUpdatedTime}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary" (click)="close()">
+      OK
+    </button>
+  </div>
+</div>
+</ng-template>
+<ng-template #addEventmodal let-close="close">
+  <div class="modal-header">
+    <h5 class="modal-title">Add Event for Equipment</h5>
+    <button type="button" class="close" (click)="close()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="onAddEventForm">
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Event Description
+          <span class="asterisk required">*</span>
+        </label>
+        <div class="col-sm-10">
+          <input type="text" name="eventDesc" class="form-control" formControlName="description">
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-2 col-form-label">Due Date
+          <span class="asterisk required">*</span>
+        </label>
+        <div class="col-sm-10" id="inputgroup">
+          <input class="form-control"  name="eventDueDate" placeholder="Not set" mwlFlatpickr formControlName="dueDate" (ngModelChange)="findHolidayDate($event);refresh.next()" 
+            [altInput]="true" [convertModelValue]="true" [minDate]="minDate" [enableTime]="false" dateFormat="Y-m-dTH:i" [altFormat]="this.pattern" />
+          <div class="col-sm-10 messages text-danger" >{{dueDateMesssage}}</div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <label class="col-sm-4 col-form-label">Due Date Mailing Frequency</label>
+        <div class="col-sm-10">
+          <div class="input-group">
+              <select name="frequency" formControlName="frequency" required class="form-control">
+              <option value="" disabled>Select</option>
+              <option *ngFor="let frequency of this.frequencyList " [value]="frequency.key">{{frequency.value}}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group row">
+        <div class="text-center">
+          <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10" [disabled]="!onAddEventForm.valid" (click)="saveEvent(onAddEventForm.valid);">
+            <span *ngIf="this.selectedEventId==0">Save</span>
+            <span *ngIf="this.selectedEventId!=0">Update</span>
+          </button>
+          <button type="button" id="closeButtonIdOfAddEvent" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="close()">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

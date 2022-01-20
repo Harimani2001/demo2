@@ -1,0 +1,32 @@
+.required {
+  color: red;
+}
+
+div.scroll-list {
+  overflow: auto;
+  max-height: 70vh;
+}
+
+.drag-over {
+  border: #ff525b dashed 2px;
+}
+
+.drag-hint {
+  border: #ffc100 dashed 2px;
+  /*transition: all .2s ease-in-out;*/
+  /*transform: scale(1.05);*/
+}
+
+.drag-target-border {
+  border: #00bfff dashed 2px;
+}
+
+.squeezebox .sb-item {
+  overflow: hidden;
+}
+
+.squeezebox .sb-item .sb-item-body {
+  height: 0;
+  overflow: hidden;
+  transition: 0.5s height;
+}

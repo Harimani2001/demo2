@@ -1,0 +1,41 @@
+<app-modal-basic  class="reset-this" #documentcommentsmodal  container="body" [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+	<div class="app-modal-body">
+		<button type="button" class="close basic-close-light-box" (click)="close();">
+			<span aria-hidden="true">&times;</span>
+		</button>
+		<span *ngIf="this.commentLog && this.commentLog.projectName">
+		<h5>File size</h5><br>
+		<div><br>
+			<div><b>FTP:</b>&nbsp;{{this.ftpFolderSize}}</div>
+		</div>
+		<hr>
+	  </span>
+		<h5>Document Current Status</h5><br>
+		<div><br>
+			<div><b>Document Type :</b>&nbsp;{{currentDocType}}</div>
+			<div><b>Document Status :</b>&nbsp;<span style="background-color:	#FFFF00">{{currentDocStatus}}</span></div>
+			<div><b>Created By :</b>&nbsp;{{currentCreatedBy}}</div>
+			<div><b>Last Modified On : </b>&nbsp;{{currentModifiedDate}}</div>
+		</div>
+		<hr>
+		<div style="max-height: 350px !important;">
+		<div slimScroll railVisible="true" railColor="#004a6d" width="100%" height="350px"
+			size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+
+			<h5>Document Status Log</h5><br>
+
+			<div *ngFor="let log of statusLog ;let in = index">
+				<div>{{in+1}}</div>
+				<div *ngIf="isMappedForms"><b>Document Name : </b>&nbsp;{{log.templateName}}</div>
+				<div><b>Document Level :</b>&nbsp;{{log.level}}</div>
+				<div><b>Document Status :</b>&nbsp;{{log.commonDocumentStatus}}</div>
+				<div><b>Document Comments :</b>{{log.comments}}</div>
+				<div><b>Commented By :</b>&nbsp; {{log.createdBy}}</div>
+				<div><b>Commented On :</b>{{log.displayCreatedTime}}</div>
+				<hr>
+			</div>
+		</div>
+	</div>
+	</div>
+</app-modal-basic>
+<div *ngIf="this.modalSpinner" class="loading">Loading&#8230;</div>

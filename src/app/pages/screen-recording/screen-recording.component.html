@@ -1,0 +1,225 @@
+<!-- <div id="pass">
+    <app-card *ngIf="showCardFlag">
+      <div class="row">
+        <div class="col-sm-6 form-group">
+          <select class="recording-media form-control">
+            <option value="record-audio-plus-video">Microphone+Camera</option>
+            <option value="record-screen">Full Screen</option>
+            <option value="record-audio-plus-screen">Microphone+Screen</option>
+          </select>
+        </div>
+        <div class="col-sm-6 form-group">
+          <select class="media-container-format form-control">
+            <option>default</option>
+            <option>vp8</option>
+            <option>vp9</option>
+            <option>h264</option>
+            <option>mkv</option>
+            <option>opus</option>
+            <option>ogg</option>
+            <option>pcm</option>
+            <option>gif</option>
+            <option>whammy</option>
+            <option>WebAssembly</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">&nbsp;&nbsp;
+        <div class="col-sm-2 form-group">
+          <input type="checkbox" id="chk-timeSlice" title="Use intervals based recording" />
+          <label for="chk-timeSlice" title="Use intervals based recording">Use timeSlice?</label>
+        </div>
+        <div class="col-sm-2 form-group">
+          <input type="checkbox" id="chk-fixSeeking" title="Fix video seeking issues?">
+          <label for="chk-fixSeeking" title="Fix video seeking issues?">Fix Seeking Issues?</label>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4 form-group">
+          <select class="media-resolutions form-control">
+            <option value="default">Default resolutions</option>
+            <option value="640x480">480p</option>
+            <option value="1920x1080">1080p</option>
+            <option value="1280x720">720p</option>
+            <option value="3840x2160">4K Ultra HD (3840x2160)</option>
+          </select>
+        </div>
+        <div class="col-sm-4 form-group">
+    
+          <select class="media-framerates form-control">
+            <option value="default">Default framerates</option>
+            <option value="15">15 fps</option>
+            <option value="5">5 fps</option>
+            <option value="24">24 fps</option>
+            <option value="30">30 fps</option>
+            <option value="60">60 fps</option>
+          </select>
+        </div>
+        <div class="col-sm-4 form-group">
+          <select class="media-bitrates form-control">
+            <option value="default">Default bitrates</option>
+            <option value="8000000">1 MB bps</option>
+            <option value="8000000000">1 GB bps</option>
+            <option value="800000000">100 MB bps</option>
+            <option value="800000">100 KB bps</option>
+            <option value="8000">1 KB bps</option>
+            <option value="800">100 Bytes bps</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">&nbsp;
+        <div class="col-sm-3 form-group">
+          <button id="btn-start-recording" class="btn btn-primary">Start Recording</button>&nbsp;&nbsp;
+          <button id="btn-pause-recording" class="btn btn-warning" style="display: none; font-size: 15px;">Pause</button>
+        </div>
+      </div>
+      <br>
+      <iframe src="" style="display: none;" id="video_iframe" height="500" width="100%"></iframe>
+      <div class="col-sm-10">
+        <video srcObject="" id="gum" style="display: none;" width="100%" autoplay muted></video>
+      </div>
+      <br>
+      <br>
+      <div class="row">
+        <div style="display: none;" class="col-sm-6 form-group">
+          <button id="save-to-disk" class="btn btn-primary">
+            <i class="icofont icofont-download"></i>Save To Disk</button>&nbsp;&nbsp;
+          <button id="upload-to-test-case" class="btn btn-primary" (click)="uploadFile()">
+            <i class="icofont icofont-upload-alt"></i>Upload to Test case</button>&nbsp;&nbsp;
+         
+        </div>
+      </div>
+      <div style="visibility: hidden;" id="recording-player"></div>
+    </app-card>
+</div> -->
+<!-- 
+<app-modal-basic #modalSmall id="PRAHAN" [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-body modal-view-scroll-y my-custom-scrollbar">
+    <button type="button" class="close basic-close-light-box" (click)="modalSmall.hide();closeView();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Screen Recording..</h5>
+    <br>
+    <hr>
+    <div class="row">
+      <div class="col-sm-6 form-group">
+        <select class="recording-media form-control">
+          <option value="record-audio-plus-video">Microphone+Camera</option>
+          <option value="record-screen">Full Screen</option>
+          <option value="record-audio-plus-screen">Microphone+Screen</option>
+        </select>
+      </div>
+      <div class="col-sm-6 form-group">
+        <select class="media-container-format form-control">
+          <option>default</option>
+          <option>vp8</option>
+          <option>vp9</option>
+          <option>h264</option>
+          <option>mkv</option>
+          <option>opus</option>
+          <option>ogg</option>
+          <option>pcm</option>
+          <option>gif</option>
+          <option>whammy</option>
+          <option>WebAssembly</option>
+        </select>
+      </div>
+    </div>
+    <div class="row">&nbsp;&nbsp;
+      <div class="col-sm-2 form-group">
+        <input type="checkbox" id="chk-timeSlice" title="Use intervals based recording" />
+        <label for="chk-timeSlice" title="Use intervals based recording">Use timeSlice?</label>
+      </div>
+      <div class="col-sm-2 form-group">
+        <input type="checkbox" id="chk-fixSeeking" title="Fix video seeking issues?">
+        <label for="chk-fixSeeking" title="Fix video seeking issues?">Fix Seeking Issues?</label>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4 form-group">
+        <select class="media-resolutions form-control">
+          <option value="default">Default resolutions</option>
+          <option value="640x480">480p</option>
+          <option value="1920x1080">1080p</option>
+          <option value="1280x720">720p</option>
+          <option value="3840x2160">4K Ultra HD (3840x2160)</option>
+        </select>
+      </div>
+      <div class="col-sm-4 form-group">
+
+        <select class="media-framerates form-control">
+          <option value="default">Default framerates</option>
+          <option value="15">15 fps</option>
+          <option value="5">5 fps</option>
+          <option value="24">24 fps</option>
+          <option value="30">30 fps</option>
+          <option value="60">60 fps</option>
+        </select>
+      </div>
+      <div class="col-sm-4 form-group">
+        <select class="media-bitrates form-control">
+          <option value="default">Default bitrates</option>
+          <option value="8000000">1 MB bps</option>
+          <option value="8000000000">1 GB bps</option>
+          <option value="800000000">100 MB bps</option>
+          <option value="800000">100 KB bps</option>
+          <option value="8000">1 KB bps</option>
+          <option value="800">100 Bytes bps</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-3 form-group">
+        <button id="btn-start-recording" class="btn btn-primary" (click)="modalSmall.hide()">Start Recording</button>&nbsp;&nbsp;
+        <button id="btn-pause-recording" class="btn btn-warning" style="display: none; font-size: 15px;">Pause</button>
+      </div>
+    </div>
+    <br>
+
+    <div class="row">
+      <div slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999"
+        opacity="0.6" allowPageScroll="false">
+        <div class="col-sm-10">
+          <iframe src="" style="display: none;" id="video_iframe" height="500" width="100%"></iframe>
+          <video srcObject="" id="gum" style="display: none;" width="100%" autoplay muted></video>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div style="display: none;" class="col-sm-6 form-group">
+        <button id="save-to-disk" class="btn btn-primary"><i class="icofont icofont-download"></i>Save To
+          Disk</button>&nbsp;&nbsp;&nbsp;
+        <button id="upload-to-test-case" class="btn btn-primary" (click)="uploadFile()"><i
+            class="icofont icofont-upload-alt"></i>Upload to Test case</button>&nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn btn-primary" (click)="modalSmall.hide();closeView();">Close</button>
+      </div>
+    </div>
+
+    <div style="visibility: hidden;" id="recording-player"></div>
+  </div>
+</app-modal-basic> -->
+
+<!-- <app-modal-basic #modalVideo id="modalVideo" [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="closeView()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Recorded Video</h5>
+    <br>
+    <hr>
+    <div slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+      <div class="col-sm-10">
+        <iframe src="" style="display: none;" id="video_iframe" height="500" width="100%"></iframe>
+        <video srcObject="" id="gum" style="display: none;" width="100%" autoplay muted></video>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button id="save-to-disk" class="btn btn-primary">
+      <i class="icofont icofont-download"></i>Save To Disk</button>&nbsp;&nbsp;
+    <button id="upload-to-test-case" class="btn btn-primary" (click)="uploadFile()">
+      <i class="icofont icofont-upload-alt"></i>Upload to Test case</button>
+  </div>
+</app-modal-basic> -->

@@ -1,0 +1,202 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-sm-12" id="float-action">
+            <app-card>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <angular2-multiselect name="locationName" [data]="this.locationsList" id="locationId"
+                            (ngModelChange)="loadAll($event, this.validationStatus,this.selectedYear)" [(ngModel)]="this.location"
+                            [settings]="locationDropdownSettings"></angular2-multiselect>
+                    </div>
+                    <div class="col-sm-2">
+                        <angular2-multiselect name="locationName" [data]="this.yearList" id="selectedYear"
+                        (ngModelChange)="loadAll(this.location, this.validationStatus,$event)" [(ngModel)]="this.selectedYear"
+                        [settings]="locationDropdownSettings"></angular2-multiselect>
+                    </div>
+                    <div class="col-sm-8 text-right">
+                        <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                                src="assets/icon/png-icons/search.png" alt="Search" placement="bottom"
+                                ngbTooltip="Search" (click)="this.showSearch=!this.showSearch"></a>
+                        <input *ngIf="this.showSearch" type="search" [(ngModel)]="filterQuery"
+                            (ngModelChange)="this.helper.setPaginator(table)"
+                            class="form-control input-sm full-data-search m-r-15" placeholder="Search" />
+
+                        <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                                src="assets/icon/png-icons/verify.png" alt="Verify" placement="bottom"
+                                ngbTooltip="Verify"
+                                (click)="verify(this.helper.Inventory_Report_Value, '', this.helper.Inventory_Report_Value)"></a>
+
+                        <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                                src="assets/icon/png-icons/pdfExport.png" alt="PDF Export" placement="bottom"
+                                ngbTooltip="PDF Export" (click)="pdfdownload()"></a>
+
+                        <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                                src="assets/icon/png-icons/menu.png" alt="Table of Content" placement="bottom"
+                                ngbTooltip="Table of Content" (click)="onClickTableOfContent()"></a>
+                    </div>
+                </div>
+            </app-card>
+        </div>
+        <div><br><br><br></div>
+        <app-card>
+            <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk" id="inventory-report-table-id"
+            [rows]='tableData | InventoryReportFilterPipe: filterQuery' [columnMode]="'force'" [headerHeight]="50"
+            [footerHeight]="50" [rowHeight]="'auto'">
+
+                <ngx-datatable-column style="font-weight: bold;" name="Action" [width]="50">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <a container="body" placement="top" class="m-r-15 crm-action-view text-muted text-warning"
+                            (click)="loadModal(row.id)" ngbTooltip="Share"><i class="icofont icofont-share-alt bin"></i>
+                        </a>
+                        <a container="body" *ngIf="permissionModal.viewButtonFlag && row.editable"
+                            routerLinkActive="active" (click)="navigateToProjectSummary(row.id)"
+                            class="m-r-15 crm-action-view text-muted text-warning" placement="top" ngbTooltip="View"> <i
+                                class="icofont icofont-resize view"></i>
+                        </a>
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column style="font-weight: bold;" name="Project Name">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['projectName']}}</strong>
+                    </ng-template>
+                </ngx-datatable-column>
+               
+                <ngx-datatable-column name="Validation Status">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['validationStatus']}}</strong>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="System Status">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['systemStatus']}}</strong>
+                    </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Department">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['departmentName']}}</strong>
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column name="System Owner">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['systemOwnerName']}}</strong>
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column name="GAMP Category">
+                    <ng-template let-row="row" ngx-datatable-cell-template> <strong
+                            style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['introduction']}}</strong>
+                    </ng-template>
+                </ngx-datatable-column>
+
+                <ngx-datatable-column name="Release Date" [width]="170">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                            {{row.displayReleaseDate}}
+                        </strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                  <ngx-datatable-column name="Actual Date" [width]="170">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <ng-container *ngIf="row.displayVsrNextReviewDate && !row.displayActualDate">
+                            <my-date-picker (keypress)="$event.preventDefault();" #date
+                            name="actualDate" (dateChanged)="onChangeActualDate(row.actualDate)"
+                            (ngModelChange)="saveActualDate($event, row)" #actualDate="ngModel"
+                            placeholder="Actual Date" [options]="myDatePickerOptions"
+                            [(ngModel)]="row.actualDate" [disabled]="!row.editable"></my-date-picker>
+                        </ng-container>
+                        <ng-container *ngIf="row.displayVsrNextReviewDate && row.displayActualDate">
+                            <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                                {{row.displayActualDate}}
+                            </strong>
+                        </ng-container>
+                    </ng-template>
+                  </ngx-datatable-column>
+
+                <ngx-datatable-column name="Next Review Date" [width]="170">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <ng-container *ngIf="row.displayVsrNextReviewDate && row.displayActualDate">
+                            <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                                {{row.displayVsrNextReviewDate}}
+                            </strong>
+                        </ng-container>
+                    </ng-template>
+                </ngx-datatable-column>
+            </ngx-datatable>
+        </app-card>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-6 strong"><strong>&nbsp;&nbsp;Audit Trail</strong></div>
+          <div class="col-sm-6" style="text-align: right;">
+            <a container="body" *ngIf="!this.viewFlag" href="javascript:;" (click)="this.viewFlag = !this.viewFlag" class="m-r-15 crm-action-edit text-muted text-primary" 
+              placement="top" ngbTooltip="Expand"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+            </a>
+            <a container="body" *ngIf="this.viewFlag" href="javascript:;" (click)="this.viewFlag = !this.viewFlag" class="m-r-15 crm-action-edit text-muted text-primary"
+             placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;" class="icofont icofont-circled-up"></i>
+            </a>
+          </div>
+        </div>
+        <br>
+        <div *ngIf="this.viewFlag">
+          <app-audit-trail-view #auditView [permission]="203"></app-audit-trail-view>
+        </div>
+      </app-card>
+    </div>
+  </div>
+
+<app-modal-basic #shareInvetoryReport [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-md'">
+    <div class="app-modal-header">
+        <button type="button" class="close basic-close-light-box" (click)="onClose();">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="app-modal-body">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group row">
+                    <label class="col-sm-8 col-form-label">Users <span class="asterisk required">*</span></label>
+                    <div class="col-sm-10">
+                        <span>
+                            <angular2-multiselect name="users" [data]="userList" id="users" required #users="ngModel"
+                                [(ngModel)]="selectedUsers" [settings]="dropdownSettings">
+                            </angular2-multiselect>
+                            <div class="messages text-danger" *ngIf="isSubmitted && users.errors?.required">Users can't
+                                be blank</div>
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-8 col-form-label">Remarks</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" [(ngModel)]="mailRemarks" name="remarks" #remarks="ngModel"
+                            rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="width: 100%;" class="app-modal-footer">
+        <div class="row">
+            <div style="text-align: center;" class="col-sm-12">
+                <button class="btn btn-success" (click)="sendReportMail();">Send</button>
+                <button class="btn btn-danger" (click)="onClose();">Cancel</button>
+            </div>
+        </div>
+    </div>
+</app-modal-basic>
+
+<app-form-esign-verification #formVerification></app-form-esign-verification>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

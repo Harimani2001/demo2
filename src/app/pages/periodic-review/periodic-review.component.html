@@ -1,0 +1,158 @@
+<div class="row" *ngIf="!this.viewIndividualDataFlag">
+  <div class="col-sm-12">
+    <app-card>
+      <app-card>
+        <div class="page-header-title">
+          <i class="icofont icofont-clock-time bg-c-blue"></i>
+          <div class="d-inline">
+            <h4>Periodic Review</h4>
+            <span>view all Periodic Review Dates for all Documents</span>
+          </div>
+        </div>
+      </app-card>
+      <br>
+      <div class="form-group row">
+        <label class="col-sm-5">
+          <select class="form-control col-sm-6" name="projectName" [(ngModel)]="projectId"
+            (ngModelChange)="loadDocumentsForProject()">
+            <option value="">Select Project</option>
+            <option *ngFor="let project of projectList" [ngValue]="project.id">{{project.projectName}}
+            </option>
+          </select>
+        </label>
+        <label class="col-sm-6" style="text-align: right;">
+          <button *ngIf="isSelectedForReviewDate" class="btn btn-primary" (click)="modalSmallReviewDate.show();resetReviewForm()">
+            <i class="icofont icofont-plus-circle"></i> Add Review Date
+          </button>
+        </label>
+      </div>
+      <ngx-datatable #myTable class="data-table dt-chk" [rows]='data | FacilityFilterPipe : filterQuery' [limit]="10"
+        [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template  class="datatable-checkbox" ngx-datatable-cell-template let-row="row" let-isSelected="isSelected"
+            let-onCheckboxChangeFn="onCheckboxChangeFn">
+            <div class="checkbox-fade fade-in-primary" *ngIf="row['reviewDate'] === ''">
+              <label>
+                <input type="checkbox" name="{{row['docName']}}" [checked]="data[row['$$index']].selectedFlag"
+                  (change)="data[row['$$index']].selectedFlag=!data[row['$$index']].selectedFlag;onClickSelect();" />
+                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+              </label>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Document No">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['docNumber']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Document Type">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['docName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Project Version">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['projectVersionName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Document Version">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['documentVersion']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Next Review Date">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['reviewDate']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Remaining Days">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong *ngIf="row['reviewDate'] != ''" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['remainingDays']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Last Updated">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong *ngIf="row['updatedBy'] !=''" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['updatedBy']}} | {{row['updatedTime']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <!-- <ngx-datatable-column name="Periodic Review">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;"></strong>
+          </ng-template>
+        </ngx-datatable-column> -->
+        <ngx-datatable-column name="Action">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <a href="javascript:;" *ngIf="permissionModal.updateButtonFlag" (click)="modalSmallReviewDate.show();editReviewDate(row)"
+              class="m-r-15 crm-action-edit text-primary" placement="top" ngbTooltip="Edit Review Date">
+              <i  class="icofont icofont-edit edit"></i>
+            </a>
+            
+            <a href="javascript:;" (click)="viewPdf(row)" class="m-r-15 crm-action-edit text-primary"
+              placement="top" ngbTooltip="View Pdf">
+              <i  class="icofont icofont-eye-alt"></i>
+            </a>
+
+            <a *ngIf="row['reviewDate'] !== '' && row['docVersionActiveFlag']" href="javascript:;" (click)="changeDocVersion(row)" class="m-r-15 crm-action-edit text-primary"
+            placement="top" ngbTooltip="Change Version">
+            <i  class="icofont icofont-hand-drag1 bin"></i>
+          </a>
+            
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </app-card>
+  </div>
+</div>
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualDataFlag">
+  <br>
+  <div class="row">
+    <div class="col-sm-4">
+      <h4> Document PDF</h4>
+    </div>
+    <div class="col-sm-8" style="text-align: right;">
+      <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.closeIndividualData()">&nbsp;&nbsp;</a>
+    </div>
+  </div>
+  <div class="row">
+    <div class=" form-group row" style="text-align: center;" id="fileUploadIdVendor"></div>
+  </div>
+</app-card>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic style="background-color:#fff" #modalSmallReviewDate [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select Review Date </h4>
+    <button type="button" class="close basic-close" #closebutton (click)="modalSmallReviewDate.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <form [formGroup]="onReviewDateForm">
+      <div class="form-group row">
+
+        <label class="col-sm-10 col-form-label">Review Date
+        </label>
+        <div class="col-sm-10">
+          <div class="input-group" id="a">
+            <input class="form-control date" placeholder="Review Date" formControlName="reviewDate"
+              readonly="readonly" name="a" ngbDatepicker #a="ngbDatepicker" [minDate]="today" (click)="openDatepicker(a)">
+            </div>
+            <div class="messages text-danger" *ngIf="onReviewDateForm.get('reviewDate').touched && onReviewDateForm.get('reviewDate').hasError('required')">
+              {{periodicReviewErrorTypes.reviewDateValidation}}
+            </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalSmallReviewDate.hide()">Close</button>
+    <button type="button" class="btn btn-success" (click)="saveReviewDate()">Save</button>
+  </div>
+</app-modal-basic>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

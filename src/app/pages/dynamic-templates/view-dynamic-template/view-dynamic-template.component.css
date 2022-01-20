@@ -1,0 +1,39 @@
+.high {
+    color: red;
+}
+.highlight {
+    color:green;
+}
+
+del {
+    color:rgb(190, 28, 28);
+    }
+ins {
+    color:rgb(20, 148, 20);
+    }
+    .vl {
+        border-left: 6px solid green;
+        height: auto;
+        position: absolute;
+        left: 50%;
+        margin-left: -3px;
+        top: 0;
+    }
+
+    .squeezebox .sb-item {
+        overflow: hidden;
+       }
+       
+       .squeezebox .sb-item .sb-item-body {
+        height: 0;
+        overflow: hidden;
+        transition: 0.5s height;
+       }
+
+       .appCardColor{
+           background-color:rgb(202, 200, 200);
+       }
+
+       .modal-body .slimScrollDiv {
+        height: 400px !important;
+      }

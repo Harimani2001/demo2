@@ -1,0 +1,139 @@
+
+:root {
+  --flow_step-circle-width: 24px;
+  --flow_step-left-padding: 24px;
+}
+
+ul.flow_step {
+  padding-left: var(--flow_step-left-padding);
+  list-style-type: none;
+  counter-reset: section;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.flow_step ._mdc-stepper__step {
+  position: relative;
+}
+
+/* stepper circle */
+.flow_step ._mdc-stepper__step:before {
+  font-family: Roboto;
+  font-weight: 400;
+  font-size: 12px;
+  position: absolute;
+  top: 12px;
+  counter-increment: section;
+  content: counter(section);
+
+
+  text-align: center;
+  line-height: var(--flow_step-circle-width);
+}
+/* color of active stepper circle*/
+.flow_step ._mdc-stepper__step._mdc-stepper__step--active:before,
+.flow_step ._mdc-stepper__step._mdc-stepper__step--done:before {
+  background-color: var(--mdc-theme-primary);
+}
+
+.flow_step > ._mdc-stepper__step:not(:last-of-type) {
+  margin-bottom: 10px;
+  -webkit-transition: margin-bottom 0.4s;
+  transition: margin-bottom 0.4s;
+}
+
+._mdc-stepper__step._mdc-stepper__step--done:before {
+  content: "\e5ca";
+  font-size: 16px;
+  font-family: "Material Icons";
+}
+
+._mdc-stepper__step._mdc-stepper__step--wrong:before {
+  content: "\e001";
+  font-size: 24px;
+  font-family: "Material Icons";
+  background-color: red !important;/*todo theme*/
+}
+
+._mdc-stepper__step__title {
+  cursor: pointer;
+  margin-left:-24px;/*so the ripple is 24 to the left of the number*/
+  padding-top: 15.5px;
+  padding-left: calc(36px + 24px); /*per spec 12px from step counter, undoes the -24 margin*/
+  padding-bottom: 24px;
+  display: block;
+  font-size:14px;
+  font-family: Roboto, sans serif;
+  font-weight: 400;
+  color:rgba(0,0,0,0.38);/*per spec*/
+}
+/*
+._mdc-stepper__step__title:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+}
+*/
+
+._mdc-stepper__step__label {
+  display: block;
+  position: absolute;
+  font-family: "Roboto";
+  font-size: 0.8rem;
+  font-weight: 400;/*per spec*/
+  color:rgba(0,0,0,0.54);/*per spec*/
+
+}
+
+._mdc-stepper__step--active ._mdc-stepper__step__title {
+  font-weight: 500;
+  color:rgba(0,0,0,0.87);/*per spec*/
+}
+
+._mdc-stepper__step__content {
+  position: relative;
+  /*display:none;*/
+  /*height: calc(100% - 132px);*/
+  max-height:0;
+  transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+  width: inherit;
+  /*overflow: visible;*/
+  overflow:hidden;
+  margin-left: 41px;
+  margin-right: 24px;
+}
+
+/* shows the step if it's marked as active, animates it */
+._mdc-stepper__step._mdc-stepper__step--active ._mdc-stepper__step__content {
+  max-height: 9999px;
+  transition: max-height 1s ease-in-out;
+}
+
+/*applies vertical line */
+.flow_step > ._mdc-stepper__step:not(:last-of-type):after {
+  content: "";
+  position: absolute;
+  top: 46px;
+  left: 12.5px;
+  width: 1px;
+  height: 40%;
+  height: calc(100% - 38px);
+  background-color: rgba(0, 0, 0, 0.1);
+  -webkit-transition: all 0.4s;
+  transition: all 0.4s;
+}
+/*
+.flow_step > ._mdc-stepper__step--active:not(:last-child):after {
+  height: 93%;
+  height: calc(100% - 12px);
+}
+*/
+._mdc-stepper__step__content__actions {
+  padding-top: 16px;
+  -webkit-display: flex;
+  -moz-display: flex;
+  -ms-display: flex;
+  display: -webkit-box;
+  display: flex;
+  -ms-flex-pack: start;
+  -webkit-box-pack: start;
+  justify-content: flex-start;
+}

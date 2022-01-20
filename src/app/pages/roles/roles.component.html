@@ -1,0 +1,69 @@
+
+<div class="row">
+    <div class="col-sm-12">
+      <app-card [title]="'Roles'">
+        <form  #myform="ngForm"  >
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Role name
+            </label>
+            <div class="col-sm-6">
+              <input type="text" class="form-control"  name="roleNames" [(ngModel)]="roleName" #roleNames="ngModel" required/>
+              <div class="messages text-danger" *ngIf="(roleNames.valid || submitted)&& roleNames?.errors?.required ">Role Name is required</div>
+              <button (click)="onsubmit(myform.valid);" center type='submit'  [ngClass]="'btn btn-primary m-t-10'">
+                <span *ngIf="!this.updateFlag">Add</span><span *ngIf="this.updateFlag">Update</span>
+              </button>
+               <div class="text-success" *ngIf="valadationMessage != '' && valadationMessage != null">{{valadationMessage}}</div>
+            </div>
+          </div>
+        </form>
+      </app-card>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-sm-12">
+      <app-card [title]="''">
+        <br>
+        <div class="row">
+          <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+            
+          </div>
+          <div class="col-xs-12 col-sm-12 col-md-6">
+            <div style="text-align: right;">
+              <label>Search:
+                <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search" placeholder="Search name">
+              </label>
+            </div>
+          </div>
+        </div>
+        <ngx-datatable #myTable class="data-table dt-chk" [rows]='data | CategoryFilterPipe : filterQuery' [limit]="5" [columnMode]="'force'"
+        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+          <!-- Row Detail Template -->
+          <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow >
+          </ngx-datatable-row-detail>
+          
+           <ngx-datatable-column name="Sr No." [width]="50">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong>{{row['code']}}</strong>
+            </ng-template>
+          </ngx-datatable-column> 
+          <ngx-datatable-column style="font-weight: bold;" name="Role name" >
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['value']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Action"[width]="50">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+             <button type="submit" class="btn btn-primary" routerLinkActive="active" (click)="editrole(row.value,row.code)" >Edit</button> 
+            </ng-template>
+          </ngx-datatable-column> 
+        </ngx-datatable>
+      </app-card>
+    </div>
+  </div>
+  
+  
+  
+  
+  
+  

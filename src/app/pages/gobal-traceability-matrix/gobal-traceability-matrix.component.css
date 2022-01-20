@@ -1,0 +1,32 @@
+.tableFixHead {
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .tableFixHead table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .tableFixHead th,
+  .tableFixHead td {
+    padding: 8px 16px;
+  }
+
+  .tableFixHead th {
+    position: sticky;
+    top: 0;
+  }
+  .wordBreak {
+    overflow-wrap: break-word;
+  }
+
+  table.traceability{
+    width: 100%;
+    border: black;
+    border-collapse: collapse;
+}
+ 
+table.traceability td{
+  white-space: initial;
+}

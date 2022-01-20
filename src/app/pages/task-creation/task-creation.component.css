@@ -1,0 +1,97 @@
+.card {
+    border-radius: 5px;
+    box-shadow: 0 1px 11px 0 rgba(0, 0, 0, 0.12);
+    border: none;
+    margin-bottom: 10px;
+}
+
+.custom-class-example {
+    color: #ccc;
+}
+/* .custom-class-example .c-token{
+    background: #38d574 !important;
+}
+.custom-class-example .pure-checkbox label::before {
+    border-color: #38d574 !important;
+}
+.custom-class-example .pure-checkbox input[type="checkbox"]:checked + label[_ngcontent-c1]:before {
+    background: #38d574 !important;
+} */
+.custom-class-example .selected-list[_ngcontent-c6] button[_ngcontent-c6] {
+    width: 100%  !important;
+    box-shadow: none  !important;
+    border: none;
+    color: #0091ae !important;
+    font-size: 15px;
+}
+
+.custom-class-example .selected-list[_ngcontent-c6] .fa-angle-down[_ngcontent-c6], .selected-list[_ngcontent-c6] .fa-angle-up[_ngcontent-c6] {
+    font-size: 15pt;
+    position: absolute;
+    right: 30px;
+    top: 25%;
+}
+.custom-class-example .selected-list[_ngcontent-c6] .c-list[_ngcontent-c6] .c-token[_ngcontent-c6] {
+    list-style: none;
+    padding: 0px 5px;
+    background: none !important;
+    color:  #0091ae !important;
+    border-radius: 2px;
+    margin-right: 4px;
+    float: left;
+}
+.custom-class-example .selected-list[_ngcontent-c20] button[_ngcontent-c20] {
+    width: 100%;
+     box-shadow: none !important;
+    padding: 10px;
+    border: none !important;
+    color: #0091ae !important;
+}
+.custom-class-example .selected-list[_ngcontent-c8] button[_ngcontent-c8]{
+    width: 100%;
+    box-shadow: none !important;
+   padding: 10px;
+   border: none !important;
+   color: #0091ae !important;
+}
+.custom-class-example .selected-list button{
+    width: 100%;
+    box-shadow: none !important;
+   padding: 10px;
+   border: none !important;
+   color: #0091ae !important;
+}
+.sameLine {
+    display: inline;
+  }
+
+  .swal2-modal .swal2-title {
+    font-size: 25px !important;
+  }
+
+  table#task-table tbody th,
+table#task-table tbody td {
+  white-space: unset;
+  width: 50%;
+}
+table#task-table,table#task-table td{
+    border: 1px solid black;
+}
+table#equipment-table-checkList tbody th,
+table#equipment-table-checkList tbody td {
+  white-space: unset;
+}
+table#equipment-table-checkList,table#equipment-table-checkList td,table#equipment-table-checkList th{
+    border: 1px solid black;
+}
+
+.horzontal_line {
+    margin: 0px;
+    margin-top: 0.2rem;
+    border: 0;
+    border-top: 1px solid rgba(0,0,0,.1);
+   }
+
+.f-s-13{
+    font-size: 13px !important;
+}

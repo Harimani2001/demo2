@@ -1,0 +1,8 @@
+table#org-table tbody th,
+  table#org-table tbody td {
+    white-space: unset;
+    width: 50%;
+  }
+  table#org-table,table#org-table td{
+      border: 1px solid black;
+  }

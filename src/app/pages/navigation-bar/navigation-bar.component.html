@@ -1,0 +1,17 @@
+<!-- <app-card [title]=""> -->
+  <!-- <div class="row"> -->
+        <div class="row" *ngIf="(routeBack==null || routeBack=='')">
+          <div class="col-sm-1"></div>
+          <div class="col-sm-1"><a class="crm-action-view text-muted text-warning" (click)="onclickFirst();" placement="top" ngbTooltip="First">
+              <i style="font-size: 30px" class="icofont icofont-rounded-double-left"></i></a></div>
+          <div class="col-sm-2"><a class="crm-action-view text-muted text-warning" (click)="onclickPrevious();" placement="top" ngbTooltip="Previous">
+              <i style="font-size: 30px" class="icofont icofont-caret-left"></i></a></div>
+          <div class="col-sm-4 p-l-0 p-r-0" style="text-align: center;"><a class="crm-action-view text-muted text-warning" style="font-size: 22px">{{current}}/{{total}}</a></div>
+          <div class="col-sm-1"><a class="crm-action-view text-muted text-warning" (click)="onclickNext();" placement="top" ngbTooltip="Next">
+              <i style="font-size: 30px" class="icofont icofont-caret-right"></i></a></div>
+          <div class="col-sm-2"><a class="crm-action-view text-muted text-warning" (click)="onclickLast();" placement="top" ngbTooltip="Last">
+              <i style="font-size: 30px" class="icofont icofont-rounded-double-right"></i></a></div>
+          <div class="col-sm-2"></div>
+        </div>
+  <!-- </div> -->
+<!-- </app-card> -->

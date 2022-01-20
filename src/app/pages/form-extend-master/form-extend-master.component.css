@@ -1,0 +1,9 @@
+.qrCode-wrap{
+    display: none;
+}
+.addTask-wrap{
+    display: none;
+}
+.placeholder-wrap,.className-wrap,.toggle-wrap,.inline-wrap,.other-wrap,.get-data, .save-template,.data-dialog{
+    display: none;
+  } 

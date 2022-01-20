@@ -1,0 +1,528 @@
+<div *ngIf="tableFlag && modulePermissionFlag ==true" class="row">
+  <div class="col-sm-12">
+    <app-card [title]="'Role Permission Table'" [classHeader]="true">
+      <div class="row">
+        <div class="col-sm-12 col-xl-4 m-b-30">
+          <button class="btn btn-primary" (click)="addRoleResetData();">
+            <i class="icofont icofont-plus-circle"></i> Add Role
+          </button>
+        </div>
+        <div class="col-sm-12 col-xl-4 m-b-30"></div>
+        <div class="col-sm-12 col-xl-4 m-b-30">
+          <div style="text-align: right;">
+            <label>Search:
+              <input type="search" [(ngModel)]="this.filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                class="form-control input-sm full-data-search" (ngModelChange)="rowsAfterFilterRole()" placeholder="">
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <app-card *ngIf="addFlag" [title]="'Add Role'" [classHeader]="true " class="col-sm-12">
+          <form #myform="ngForm">
+            <div class="form-group row">
+              <div class="col-sm-6">
+                <input type="text" class="form-control" name="roleNames" [(ngModel)]="roleName" #roleNames="ngModel"
+                  (ngModelChange)="isRoleNameExists($event);" required />
+                <div *ngIf="errorMessageForAdd">
+                  <p class="messages text-danger">{{errorMessageForAdd}}</p>
+                </div>
+                <div class="messages text-danger" *ngIf="(roleNames.valid || submitted) && roleNames?.errors?.required">
+                  Role Name is required</div>
+              </div>
+            </div>
+
+            <div class="form-group row">
+              <strong class="col-sm-2 strong col-form-label">Active Flag :</strong>
+              <label class="switch">
+                <input type="checkbox" name="activeFlag" [(ngModel)]="activeFlag" />
+                <span class="slider round"></span>
+              </label>
+            </div>
+
+            <br>
+            <div class="form-group row">
+              <div class="col-sm-12">
+                <button type="button" [disabled]="errorMessageForAdd"
+                  class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                  (click)="onSubmitRoles(myform.valid);">Save
+                </button>
+                <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+                  (click)="addFlag=false;tableOffsetRole=0">Cancel
+                </button>
+              </div>
+            </div>
+          </form>
+        </app-card>
+      </div>
+
+      <ngx-datatable [scrollbarH]="true" #mydatatable class="material data-table" [headerHeight]="50"
+        [limit]="rowsOnPage" [columnMode]="'force'" [footerHeight]="50" [rowHeight]="'auto'"
+        [rows]="roles | RoleFilterPipe : this.filterQuery " [offset]="tableOffsetRole" (page)="onChangeRole($event)">
+        <ngx-datatable-column name="Sr. No">
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+            <span (click)="updateRoleName($event, '', row)">
+              {{row['$$index']+1}}
+            </span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Role Name">
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+            <span title="Click to edit" (click)="updateRoleName($event, 'value', row)"
+              (dblclick)="editingRowName[row.$$index ] = true;updateRoleName($event, 'value', row)"
+              *ngIf="!editingRowName[row.$$index ]">
+              {{row['roleName']}}
+            </span>
+            <input type="text" autofocus (blur)="updateRoleName($event, 'value', row)"
+              *ngIf="editingRowName[row.$$index ]" [(value)]="row['roleName']" class="form-control" />
+            <div *ngIf="errorMessage != ''&& row['$$index']== errorMessageIndex ">
+              <p class="messages text-danger">{{errorMessage}}</p>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Active">
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+            <span>{{row['activeFlag'] ? 'Active' : 'In-Active'}}</span>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Action">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <a container="body" placement="top" ngbTooltip="Update" href="javascript:;"
+              id="updateButton_{{row['$$index']}}" class=" m-r-15  crm-action-view text-muted text-primary"
+              (click)="updateRow(row , row['$$index'] )">
+              <i class="icofont icofont-refresh edit"></i>
+            </a>
+            <a container="body" placement="top" ngbTooltip="Module Permission" href="javascript:;"
+              class="m-r-15 crm-action-view text-muted text-danger"
+              (click)="getRoleIdForModulePermission(row['id'] );this.filterQuery=''">
+              <i class="icofont icofont-binary info"></i>
+            </a>
+            <a container="body" placement="top" ngbTooltip="Permissions List" href="javascript:;"
+              class="m-r-15 crm-action-view text-muted text-danger"
+              (click)="roleChanged(row['id'] );this.filterQuery=''">
+              <i style="font-size: 25px;color: #3769DA;" class="icofont icofont-settings-alt"></i>
+            </a>
+            <a *ngIf="row.activeFlag" href="javascript:;" container="body"
+              class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Clone"
+              (click)="onClickClone(row.id);"><i class="icofont icofont-copy"></i>
+            </a>
+            <ui-switch class="js-small" (change)="deactivateRole(row)" [checked]="row.activeFlag" color="#93BE52"
+              switchColor="#fff" defaultBgColor="#F56482" size="small">
+            </ui-switch>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </app-card>
+  </div>
+</div>
+
+<div *ngIf="!tableFlag" class="row">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-6">
+          <i class="icofont icofont-law-document bg-c-blue"></i>
+          <div class="d-inline">
+            <h4 class="strong">Roles Management</h4>
+            <span>Permission List</span>
+          </div>
+        </div>
+        <div class="col-sm-6 text-right">
+          <button *ngIf="editPermission==false && hasdata==true && documentroleid!=0" type="submit"
+            class="btn btn-sm btn-primary waves-effect waves-light m-r-10" (click)="editdata();">
+            Edit</button>
+          <button type="button" *ngIf="editPermission==true && hasdata==true && documentroleid!=0"
+            class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="onsubmit(this.modal);">
+            Save
+          </button>
+          <button type="submit" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+            (click)="onCancel()">Cancel</button>
+          <label>
+            <input type="search" [(ngModel)]="this.filterQuery1" class="form-control input-sm full-data-search"
+              (ngModelChange)="rowsAfterFilter()" placeholder="Search name">
+          </label>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="col-sm-12">
+    <br><br><br><br>
+    <app-card *ngIf="documentroleid!=0">
+      <ngx-datatable [scrollbarH]="true" class="data-table dt-chk"
+        [rows]="permissions | RoleManagementPipeFilter : this.filterQuery1 " id="rolesCustomTable"
+        [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="rowsOnPage"
+        [offset]="tableOffset" (page)="onChange($event)">
+        <ngx-datatable-column [width]="50" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false" [frozenLeft]="true">
+
+          <ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+            <div class="checkbox-fade fade-in-default datatable-header-cell-label">
+              <label *ngIf="editPermission==true&&this.filterQuery1==''">
+                <input type="checkbox" id="all-permission-id" placement="top" ngbTooltip="Select All"
+                  [checked]="this.selectAll" (click)="selectAllData(!this.selectAll)" />
+                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+              </label>
+            </div>
+          </ng-template>
+
+          <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row">
+            <div class="checkbox-fade fade-in-default datatable-header-cell-label">
+              <label *ngIf="editPermission==true">
+                <input id="rowall-permission-id-{{row['$$index']}}" type="checkbox" [checked]="row.flag"
+                  (change)="row.flag=!row.flag;selectrow(row);" />
+                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+              </label>
+            </div>
+          </ng-template>
+
+        </ngx-datatable-column>
+        <ngx-datatable-column [width]="300" name="Document List" [frozenLeft]="true">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong ([ngModal])="row.permissionTitle"
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['permissionTitle']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="View">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[0]=='N'">
+                      <input id="view-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['viewButtonFlag']}}" value="" [checked]="row.viewButtonFlag"
+                        (change)="row.viewButtonFlag=!row.viewButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[0]=='Y'">
+                      N/A
+                    </span>
+                    <span *ngIf=" row.groupCategoryId === 7   ||   row.groupCategoryId ===8">
+                      <input id="view-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['viewButtonFlag']}}" value="" [checked]="row.viewButtonFlag"
+                        (change)="row.viewButtonFlag=!row.viewButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                  </label>
+                </div>
+              </strong>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Create">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[1]=='N'">
+                      <input id="create-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['createButtonFlag']}}" value="" [checked]="row.createButtonFlag"
+                        (change)="row.createButtonFlag=!row.createButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[1]=='Y'">
+                      N/A
+                    </span>
+                    <span
+                    *ngIf="this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[1]=='M'">
+                    As per PDF settings permission
+                  </span>
+                    <span *ngIf=" row.groupCategoryId === 7   ||   row.groupCategoryId ===8">
+                      <input id="create-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['createButtonFlag']}}" value="" [checked]="row.createButtonFlag"
+                        (change)="row.createButtonFlag=!row.createButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                  </label>
+                </div>
+              </strong>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Update">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[2]=='N'">
+                      <input id="update-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['updateButtonFlag']}}" value="" [checked]="row.updateButtonFlag"
+                        (change)="row.updateButtonFlag=!row.updateButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[2]=='Y'">
+                      N/A
+                    </span>
+                    <span
+                    *ngIf="this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[2]=='M'">
+                    As per PDF settings permission
+                  </span>
+                    <span *ngIf=" row.groupCategoryId === 7   ||   row.groupCategoryId ===8">
+                      <input id="update-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['updateButtonFlag']}}" value="" [checked]="row.updateButtonFlag"
+                        (change)="row.updateButtonFlag=!row.updateButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                  </label>
+                </div>
+              </strong>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Delete">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[3]=='N'">
+                      <input id="delete-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['deleteButtonFlag']}}" value="" [checked]="row.deleteButtonFlag"
+                        (change)="row.deleteButtonFlag=!row.deleteButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[3]=='Y'">
+                      N/A
+                    </span>
+                    <span *ngIf=" row.groupCategoryId === 7   ||   row.groupCategoryId ===8">
+                      <input id="delete-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['deleteButtonFlag']}}" value="" [checked]="row.deleteButtonFlag"
+                        (change)="row.deleteButtonFlag=!row.deleteButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                  </label>
+                </div>
+              </strong>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Import data">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[4]=='N'">
+                      <input id="import-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['importButtonFlag']}}" value="" [checked]="row.importButtonFlag"
+                        (change)="row.importButtonFlag=!row.importButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[4]=='Y'">
+                      N/A
+                    </span>
+                    <span *ngIf=" row.groupCategoryId === 7   ||   row.groupCategoryId ===8">
+                      <input id="import-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['importButtonFlag']}}" value="" [checked]="row.importButtonFlag"
+                        (change)="row.importButtonFlag=!row.importButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                  </label>
+                </div>
+              </strong>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+
+        <ngx-datatable-column name="Export data">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[5]=='N'">
+                      <input id="export-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['exportButtonFlag']}}" value="" [checked]="row.exportButtonFlag"
+                        (change)="row.exportButtonFlag=!row.exportButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[5]=='Y'">
+                      N/A
+                    </span>
+                    <span *ngIf=" row.groupCategoryId === 7   ||   row.groupCategoryId ===8">
+                      <input id="export-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['exportButtonFlag']}}" value="" [checked]="row.exportButtonFlag"
+                        (change)="row.exportButtonFlag=!row.exportButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                  </label>
+                </div>
+              </strong>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Workflow">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[6]=='N'">
+                      <input id="workflow-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['workFlowButtonFlag']}}" value="" [checked]="row.workFlowButtonFlag"
+                        (change)="row.workFlowButtonFlag=!row.workFlowButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[6]=='Y'">
+                      N/A
+                    </span>
+                    <span *ngIf=" row.groupCategoryId === 7   ||   row.groupCategoryId ===8">
+                      <input id="workflow-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['workFlowButtonFlag']}}" value="" [checked]="row.workFlowButtonFlag"
+                        (change)="row.workFlowButtonFlag=!row.workFlowButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                  </label>
+                </div>
+              </strong>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Publish">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <div>
+              <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[7]=='N'">
+                      <input id="publish-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['publishButtonFlag']}}" value="" [checked]="row.publishButtonFlag"
+                        (change)="row.publishButtonFlag=!row.publishButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                    <span
+                      *ngIf=" row.groupCategoryId != 7   &&   row.groupCategoryId !=8  && this.mapData.get(row.permissionValue) && this.mapData.get(row.permissionValue)[7]=='Y'">
+                      N/A
+                    </span>
+                    <span *ngIf=" row.groupCategoryId === 7   ||   row.groupCategoryId ===8">
+                      <input id="publish-permission-id-{{row['$$index']}}" [disabled]="editPermission==false"
+                        type="checkbox" name="{{row['publishButtonFlag']}}" value="" [checked]="row.publishButtonFlag"
+                        (change)="row.publishButtonFlag=!row.publishButtonFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                    </span>
+                  </label>
+                </div>
+              </strong>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </app-card>
+
+
+  </div>
+</div>
+<div *ngIf="!modulePermissionFlag" class="row">
+  <div class="col-md-12">
+    <app-card title='Module Permission'>
+      <div>
+        <div style="text-align: right;">
+          <label>Search:
+            <input type="search" [(ngModel)]="this.filterQuery3" class="form-control input-sm full-data-search"
+              (ngModelChange)="rowsAfterFilterModule()" placeholder="Search name">
+          </label>
+        </div>
+      </div>
+
+      <ngx-datatable class="data-table dt-chk" [headerHeight]="50" [limit]="rowsOnPage" [columnMode]="'force'"
+        [footerHeight]="50" [rowHeight]="'auto'"
+        [rows]="this.ModulePermissionMasterDto.modulePermissionChild | ModulePermissionFilter : this.filterQuery3"
+        [offset]="tableOffsetModule" (page)="onChangeModule($event)">
+        <ngx-datatable-column name="Module Name">
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+            <span>
+              {{row['moduleName']}}
+            </span>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column>
+          <ng-template ngx-datatable-cell-template let-row="row" let-value="value">
+            <label class="switch"><input type="checkbox" name="activeFlag" id="row.activeFlag"
+                [disabled]="row.constantName ==this.helper.ROLE_MANAGEMENT"
+                [checked]="row.activeFlag" (change)="row.activeFlag=!row.activeFlag">
+              <span class="slider round"></span></label>
+            <ng-container
+              *ngIf="this.ModulePermissionMasterDto.adminFlag && row.constantName ==this.helper.ROLE_MANAGEMENT"><label
+                class="messages text-success">&nbsp;Super Admin Access cannot be disabled </label></ng-container>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+      <br>
+      <div class="form-group row">
+        <div class="col-sm-5"></div>
+        <div class="col-sm-4">
+          <button type="button" class="btn btn-success" (click)="saveAndGoTo()">Save
+
+          </button>
+          <button type="button" class="btn btn-danger"
+            (click)="modulePermissionFlag=true;tableOffsetModule=0;this.filterQuery3=''" routerLinkActive="active">Back
+          </button>
+        </div>
+        <div class="col-sm-4"></div>
+      </div>
+      <!-- </form> -->
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #cloneRoleModal>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Clone Role</h4>
+  </div>
+  <div class="app-modal-body" style="max-height: 500px;">
+    <div class="col-sm-12">
+      <form #cloneRoleForm="ngForm">
+        <div class="form-group row">
+          <div class="col-sm-12">
+            <label for="name">Role Name<span class="asterisk required">*</span> :</label>
+            <input type="text" class="form-control" name="cloneRoleName" [(ngModel)]="clonedRoleName"
+              #cloneRoleName="ngModel" (ngModelChange)="isRoleNameExists($event);" required />
+            <div *ngIf="errorMessageForAdd">
+              <p class="messages text-danger">{{errorMessageForAdd}}</p>
+            </div>
+            <div class="messages text-danger"
+              *ngIf="(cloneRoleName.valid || clonedRoleSubmitted) && cloneRoleName?.errors?.required">
+              Role Name is required</div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" [disabled]="errorMessageForAdd" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+      (click)="cloneRole(cloneRoleForm.valid);">Save</button>
+    <button type="button" class="btn btn-sm btn-danger waves-effect waves-light" (click)="cloneRoleModal.hide();">Cancel
+    </button>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

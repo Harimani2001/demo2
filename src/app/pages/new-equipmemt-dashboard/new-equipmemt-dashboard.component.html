@@ -1,0 +1,421 @@
+
+  <div class="row">
+    <div class="col-sm-6">
+      <h4>Equipment Dashboard</h4>
+    </div>
+  </div>
+  <hr style="margin-top: -1px">
+  <div class="row" *ngIf="!isReceivedId">
+    <div class="col-sm-4">
+      <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;Equipment</label>
+      <div class="col-sm-11">
+        <div id="inputgroup" class="input-group">
+            <ng-select [ngClass]="'ng-select'" [options]="this.equipmentDataList" aria-placeholder="Select Equipment" (ngModelChange)="onChangeEquipment(equipmentId.value)"
+            [multiple]="false" [(ngModel)]="seletedEquipment" name="equipmentId" #equipmentId rounds="ngModel" required>
+          </ng-select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<br>
+<br>
+<div class="row">
+  <div class="col-sm-12" *ngFor="let details of filtredData">
+    <br>
+    <div class="card-block user-detail-card hovereffect">
+      <div class="row ">
+        <div class="col-sm-3">
+          <div class="align-center">
+              <h4><label class="label label-primary">{{details.equipmentName}}</label></h4>
+              <img class="hovereffect" *ngIf="details.equipmentImage == null || details.equipmentImage == '' " height="150" width="200" src="assets/images/widget/NoImage.png">
+              <img *ngIf="details.equipmentImage != null && details.equipmentImage != ''" height="150" width="200" [src]="details.equipmentImage" alt=" ">
+              <br><br>
+              <div>
+                <button type="button" class="btn btn-sm btn-primary" (click)="modalLarge.show();loadEquipmentDetails(details.equipmentId)" data-toggle="tooltip" data-placement="top" title="Equipment Information">Info </button>
+                <button type="button" class="btn btn-sm btn-danger" (click)="modalLarge1.show();loadEquipmentHistory(details.equipmentId)" data-toggle="tooltip" data-placement="top" title="Equipment History Status">History </button>
+                <button type="button" class="btn btn-sm"style="background-color: #FFAA1D ; color: white;"  (click)="modalLargeTask.show();loadEquipmentTasks(details.equipmentId)" data-toggle="tooltip" data-placement="top" title="Equipment Task History Status">Task </button>
+              </div>
+              <br>
+              <div *ngIf="details.remainingDays != null && details.dueDate !=null">
+                <label *ngIf="details.remainingDays >= 0" style="font-size: 15px;" class="label label-success">Remaining Days &nbsp;:&nbsp; {{details.remainingDays}}</label>
+                <label *ngIf="details.remainingDays < 0" style="font-size: 15px;" class="label label-danger">{{details.remainingDueDays}}</label>
+              </div>
+          </div>
+        </div>
+        <div class="col-sm-5 vertical-line" >
+          <h6 class="f-w-600 align-center ">Current Batch</h6>
+          <div *ngIf="details.currentStatus === '' || details.currentStatus === null">
+            <br><br><br>
+              <h6 class="f-w-600 align-center ">No Batch Found</h6>
+          </div>
+          <div class="user-detail" *ngIf="details.currentStatus != '' && details.currentStatus != null">
+            <div class="row">
+              <div class="col-sm-5">
+                <h6 class="text-muted f-w-600 m-b-30"><i class="icofont icofont-users-alt-3"></i>Batch No :</h6>
+              </div>
+              <div class="col-sm-7">
+                <h6 class="m-b-30">{{details.batchName}}</h6>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-5">
+                <h6 class="text-muted f-w-600 m-b-30"><i class="icofont icofont-institution"></i>Product Name :</h6>
+              </div>
+              <div class="col-sm-7">
+                <h6 class="m-b-30">{{details.productName}}</h6>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-5">
+                <h6 class="text-muted f-w-600 m-b-30"><i class="icofont icofont-ui-home"></i>Current Status :</h6>
+              </div>
+              <div class="col-sm-7">
+                <h6 class="m-b-30"><b style="background-color: yellow">{{details.currentStatus}}</b></h6>
+              </div>
+            </div>
+            <div class="row" *ngIf="details.lastStatus != null && details.lastStatus != ''">
+              <div class="col-sm-5">
+                <h6 class="text-muted f-w-600 m-b-30"><i class="icofont icofont-ui-touch-phone"></i>Previous Status :</h6>
+              </div>
+              <div class="col-sm-7">
+                <h6 class="m-b-30"><b style="background-color: green;color: white">{{details.lastStatus}}</b></h6>
+              </div>
+            </div>
+            <!-- <div class="row">
+              <div class="col-sm-5">
+                <h6 class="text-muted f-w-600 m-b-30"><i class="icofont icofont-ui-timer"></i>Due Date:</h6>
+              </div>
+              <div class="col-sm-7">
+                <h6 class="m-b-30" *ngIf="details.dueDate !=null">{{details.dueDate| date:'yyyy-MM-dd'}}</h6>
+                <h6 class="m-b-30" *ngIf="details.dueDate ==null">N/A</h6>
+              </div>
+            </div> -->
+          </div>
+        </div>
+        <div class="col-sm-4 vertical-line">
+          <h6 class="f-w-600 align-center">Previous Batch</h6>
+          <div *ngIf="details.lastStatus === null || details.lastStatus ===''">
+              <br><br><br>
+                <h6 class="f-w-600 align-center ">No Previous Batch Found</h6>
+            </div>
+            <div class="user-detail" *ngIf="details.lastStatus != null && details.lastStatus !=''">
+                <div class="row">
+                    <div class="col-sm-5">
+                      <h6 class="text-muted f-w-600 m-b-30"><i class="icofont icofont-users-alt-3"></i>Batch No :</h6>
+                    </div>
+                    <div class="col-sm-7">
+                      <h6 class="m-b-30">{{details.previousBatchName}}</h6>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <h6 class="text-muted f-w-600 m-b-30"><i class="icofont icofont-institution"></i>Product Name :</h6>
+                    </div>
+                    <div class="col-sm-7">
+                      <h6 class="m-b-30">{{details.previousProductName}}</h6>
+                    </div>
+                  </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-modal-basic #modalLarge [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Equipment Details</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto"
+  size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="dt-desc" style="padding: 0px;">
+      <table class="table-striped table-bordered" style="width: 100%;">
+        <tr>
+          <td width="50%">Equipment Name</td>
+          <td width="50%" style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.name}}</td>
+        </tr>
+        <tr>
+          <td>Equipment Code</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.code}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.category">
+          <td>Category</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.category}}</td>
+        </tr>
+        <tr>
+          <td>Location</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.locationName}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.departmentName">
+          <td>Department</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.departmentName}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.systemOwnerName">
+          <td>System Owner</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.systemOwnerName}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.description">
+          <td>Description</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.description}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.component">
+          <td>Component</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.component}}</td>
+        </tr>
+        <tr>
+          <td>Qualification Status</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.qualificationStatus}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.gxpRelevence">
+          <td>GxP Relevance Status</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.gxpRelevence}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.model">
+          <td>Model</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.model}}
+          </td>
+        </tr>
+        <tr *ngIf="equipmentDetails.dateOfPurchase">
+          <td>Date Of Purchase </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.dateOfPurchase| date:this.datePipeFormat}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.manufacturer">
+          <td>Make / Manufactured By</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.manufacturer}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.soldBy">
+          <td>Supplied / Sold By</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.soldBy}}</td>
+        </tr>
+        <tr *ngIf="equipmentDetails.totalCapacity">
+          <td>Total Capacity </td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.totalCapacity}}
+          </td>
+        </tr>
+        <tr *ngIf="equipmentDetails.usageCapacity">
+          <td>Recommended usage Capacity</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.usageCapacity}}
+          </td>
+        </tr>
+        <tr *ngIf="equipmentDetails.iqCompletionDate">
+          <td>Initial IQ completion Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.iqCompletionDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr *ngIf="equipmentDetails.oqCompletionDate">
+          <td>Initial OQ completion Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.oqCompletionDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr *ngIf="equipmentDetails.releaseDate">
+          <td>Release Date</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.releaseDate| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr *ngIf="equipmentDetails.periodicReview">
+          <td>Periodic Review</td>
+          <td style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+            {{equipmentDetails.periodicReview| date:'yyyy-MM-dd'}}
+          </td>
+        </tr>
+        <tr>
+        </tr>
+      </table>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalLarge.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalLarge1 [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Equipment Status History</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge1.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 500px !important;" class="app-modal-body">
+    <div class="dy-width-400 dt-desc" style="padding: 0px;"slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto"
+    size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+      <div *ngIf="this.dashboardDetails.length == 0" >
+        <br>
+        <h6 class="f-w-600 align-center ">No History Found</h6>
+      </div>
+      <div *ngIf="this.dashboardDetails.length != 0" >
+        <table class="table-striped table-bordered" style="width: 100%;">
+          <thead>
+            <tr>
+              <th>Batch No</th>
+              <th>Product Name</th>
+              <th>Status</th>
+              <!-- <th>Due Date</th> -->
+              <th>From</th>
+              <th>To</th>
+              <th>Total Hours</th>
+              <th>Updated By</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let details of dashboardDetails">
+              <td>{{details.batchName}}</td>
+              <td>{{details.productName}}</td>
+              <td>{{details.currentStatus}}</td>
+              <!-- <td *ngIf="details.dueDate !=null">{{details.dueDate| date:'yyyy-MM-dd'}}</td>
+              <td *ngIf="details.dueDate ==null">N/A</td> -->
+              <td>{{details.displayCreatedTime }}</td>
+              <td *ngIf="details.statusActiveFlag !='N'" >On going</td>
+              <td *ngIf="details.statusActiveFlag =='N'">{{details.displayUpdatedTime }}</td>
+              <td *ngIf="details.statusActiveFlag !='N'"></td>
+              <td *ngIf="details.statusActiveFlag =='N'">{{details.totalHours}}</td>
+              <td>{{details.createdBy}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalLarge1.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #modalLargeTask [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+    <div class="app-modal-header">
+      <h4 class="modal-title">Equipment Task History</h4>
+      <button type="button" class="close basic-close" (click)="modalLargeTask.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div style="max-height: 500px !important;" class="app-modal-body">
+      <div class="dy-width-400 dt-desc" style="padding: 0px;"slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto"
+      size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+        <!-- <div *ngIf="this.completeTaskList.length == 0 && this.pendingTaskList.length == 0" >
+          <br>
+          <h6 class="f-w-600 align-center ">No History Found</h6>
+        </div> -->
+        <div class="accordion-desc" >
+            <!-- <h4 style="color: #014c8c;">Task List</h4> -->
+            <ngb-tabset #taskTab="ngbTabset">
+              <ngb-tab id="open" title="Open / Inprogress">
+                <ng-template ngbTabContent>
+                  <ngx-datatable #pendingTable [scrollbarH]="true" class="data-table dt-chk" [rows]='pendingTaskList' [limit]="10"[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                  <ngx-datatable-column style="font-weight: bold;" name="Project Name">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['globalProjectName']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Task Id">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <a [routerLink]="" (click)="redirect(row)"
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskCode']}}</a>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Description">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskTitle']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Due Date">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['dueDate'] |date:this.datePipeFormat }}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" [width] = "100" name="Remaining Days/Overdue">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['remaingDays']}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Status">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column style="font-weight: bold;" name="Assigned To">
+                    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                      <strong
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['selectedUserNames']}}</strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                </ngx-datatable>
+                </ng-template>
+              </ngb-tab>
+              <ngb-tab id="completed" title="Completed">
+                <ng-template ngbTabContent>
+                  <ngx-datatable #pendingTable [scrollbarH]="true" class="data-table dt-chk" [rows]='completeTaskList' [limit]="10"[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                    <ngx-datatable-column style="font-weight: bold;" name="Project Name">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['globalProjectName']}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column style="font-weight: bold;" name="Task Id">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <a [routerLink]="" (click)="redirect(row)"
+                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskCode']}}</a>
+                      </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column style="font-weight: bold;" name="Description">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskTitle']}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column style="font-weight: bold;" name="Due Date">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['dueDate']|date:this.datePipeFormat}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column style="font-weight: bold;" name="Status">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column style="font-weight: bold;" name="Assigned To">
+                      <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                        <strong
+                          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['selectedUserNames']}}</strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+                  </ngx-datatable>
+                </ng-template>
+              </ngb-tab>
+              </ngb-tabset>
+          </div>
+      </div>
+    </div>
+    <div class="app-modal-footer">
+      <button type="button" class="btn btn-default waves-effect" (click)="modalLargeTask.hide()">Close</button>
+    </div>
+  </app-modal-basic>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

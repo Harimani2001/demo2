@@ -1,0 +1,711 @@
+<app-modal-basic #importURSModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+	<div class="app-modal-header">
+		<h4 class="modal-title">Import URS</h4>
+		<button type="button" class="close basic-close" (click)="importURSModal.hide();onCloseImportURSModal();">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="app-modal-body">
+		<div class="row">
+			<div class="col-sm-4">
+				<div class="form-group">
+					<label class="col-sm-8 col-form-label">Location<span class="asterisk">*</span> </label>
+					<div class="col-sm-12">
+						<select name="select" class="form-control" id="locationConfigurationId" required name="location"
+							#globallocation="ngModel" (change)="loadProjects();" [(ngModel)]="locationId">
+							<option value="0">Select Location</option>
+							<option *ngFor="let location of locationsList" [value]="location.id">{{location.name}}
+							</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-4">
+				<div class="form-group">
+					<label class="col-sm-8 col-form-label">Project <span class="asterisk required">*</span></label>
+					<div class="col-sm-12">
+						<angular2-multiselect name="globalProjectName" [data]="this.projectList" id="apiConfigurationId"
+							(ngModelChange)="onProjectChange($event);" [(ngModel)]="projectId"
+							#globalProjectName="ngModel" required [settings]="dropdownSettings"> </angular2-multiselect>
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<div class="form-group">
+					<label class="col-sm-8 col-form-label">Search</label>
+					<div class="col-sm-12">
+						<input type="search" [(ngModel)]="filterQuery" class="form-control" placeholder="search">
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-1">
+				<button *ngIf="isSelectedForImport" type="button" class="btn btn-sm btn-success"
+					(click)="importUrsData();" style="margin-top: 32px;">Import</button>
+			</div>
+			<div class="col-sm-12" *ngIf="ursListForImport.length > 0" style="margin-bottom: 15px;">
+				<strong class="strong">Import all dependent items (Risk, Specifications, Test cases):</strong>
+				<ui-switch (change)="isDependentSelected=!isDependentSelected" [checked]="isDependentSelected"
+				  class="js-small" color="#3498DB" switchColor="#fff" size="small">
+				</ui-switch>
+			</div>
+			<div class="col-sm-12">
+				<ngx-datatable [scrollbarH]="false" #myTable class="data-table dt-chk"
+					style="overflow: unset!important;" [rows]='ursListForImport | combinedFilter : filterQuery'
+					[limit]="30" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+					<ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+						[draggable]="false" [resizeable]="false">
+						
+						<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+
+							<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+								<label style="margin-bottom: -3px !important;"
+									*ngIf="ursListForImport.length > 0" container="body"
+									placement="right" triggers="mouseenter:mouseleave" ngbPopover="Select All">
+									<input type="checkbox" [checked]="selectAllURS" name="Urs"
+										(click)="selectAllDataForImport($event,'URS')" />
+									<span class="cr">
+										<i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+								</label>
+							</div>
+						</ng-template>
+
+						<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+							let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+							<div class="checkbox-fade fade-in-primary">
+								<label>
+									<input type="checkbox" [checked]="row.selectedForImport"
+										(change)="row.selectedForImport=!row.selectedForImport;onChangeImportSelectData();" />
+									<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+								</label>
+							</div>
+						</ng-template>
+
+					</ngx-datatable-column>
+					<!-- <ngx-datatable-column name="Select" [width]="130" [sortable]="false" [canAutoResize]="false"
+						[draggable]="false" [resizeable]="false"
+						*ngIf="specCreate && isSelectedForImport && individualPermissionsresult(this.helper.SP_VALUE)">
+
+						<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+							<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+								
+								<span>Spec &nbsp;</span>
+							</div>
+						</ng-template>
+
+						<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+							let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+							<div class="checkbox-fade fade-in-primary" *ngIf="row.selectedForImport">
+								<label style="margin-bottom: -3px !important;">
+									<input type="checkbox" [checked]="row.selectedSpecForImport"
+										(change)="row.selectedSpecForImport=!row.selectedSpecForImport;onClickSpecIndividual(row)" />
+									<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+											title="Select All"></i></span>
+								</label>
+								<span>
+									<i class="text-nav-color icofont icofont-listine-dots" style="cursor: pointer;"
+										title="View And Select"
+										(click)="importIndividualModal.show();onClickSpecIndividual(row);"></i>
+								</span>
+								<span *ngIf="row.selectedSpecList">
+									({{row['selectedSpecList'].length}})
+								</span>
+							</div>
+						</ng-template>
+
+					</ngx-datatable-column>
+					<ngx-datatable-column name="Select" [width]="130" [sortable]="false" [canAutoResize]="false"
+						[draggable]="false" [resizeable]="false"
+						*ngIf="riskCreate && isSelectedForImport && individualPermissionsresult(this.helper.RISK_ASSESSMENT_VALUE)">
+
+						<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+
+							<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+								
+								<span>Risk &nbsp;</span>
+							</div>
+						</ng-template>
+
+						<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+							let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+							<div class="checkbox-fade fade-in-primary" *ngIf="row.selectedForImport">
+								<label style="margin-bottom: -3px !important;">
+									<input type="checkbox" [checked]="row.selectedRiskForImport"
+										(change)="row.selectedRiskForImport=!row.selectedRiskForImport;onClickRiskIndividual(row);" />
+									<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+											title="Select All"></i></span>
+								</label>
+								<span>
+									<i class="text-nav-color icofont icofont-listine-dots" style="cursor: pointer;"
+										title="View And Select"
+										(click)="importIndividualRiskModal.show();onClickRiskIndividual(row);"></i>
+								</span>
+								<span *ngIf="row.selectedRiskList">
+									({{row['selectedRiskList'].length}})
+								</span>
+							</div>
+						</ng-template>
+
+					</ngx-datatable-column>
+					<ngx-datatable-column name="Select" [width]="130" [sortable]="false" [canAutoResize]="false"
+						[draggable]="false" [resizeable]="false"
+						*ngIf="iqtcCreate && isSelectedForImport && individualPermissionsresult(this.helper.IQTC_VALUE)">
+
+						<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+
+							<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+								
+								<span>IQTC &nbsp;</span>
+							</div>
+						</ng-template>
+
+						<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+							let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+							<div class="checkbox-fade fade-in-primary" *ngIf="row.selectedForImport">
+								<label style="margin-bottom: -3px !important;">
+									<input type="checkbox" [checked]="row.selectedIQTCForImport"
+										(change)="row.selectedIQTCForImport=!row.selectedIQTCForImport;onClickTestcasesIndividual(row,this.helper.IQTC_VALUE);" />
+									<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+											title="Select All"></i></span>
+								</label>
+								<span>
+									<i class="text-nav-color icofont icofont-listine-dots" style="cursor: pointer;"
+										title="View And Select"
+										(click)="importIndividualtestcasesModal.show();onClickTestcasesIndividual(row,this.helper.IQTC_VALUE);"></i>
+								</span>
+								<span *ngIf="row.selectedIqtcList">
+									({{row['selectedIqtcList'].length}})
+								</span>
+							</div>
+						</ng-template>
+
+					</ngx-datatable-column>
+					<ngx-datatable-column name="Select" [width]="130" [sortable]="false" [canAutoResize]="false"
+						[draggable]="false" [resizeable]="false"
+						*ngIf="oqtcCreate && isSelectedForImport && individualPermissionsresult(this.helper.OQTC_VALUE)">
+
+						<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+
+							<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+								
+								<span>OQTC &nbsp;</span>
+							</div>
+						</ng-template>
+
+						<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+							let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+							<div class="checkbox-fade fade-in-primary" *ngIf="row.selectedForImport">
+								<label style="margin-bottom: -3px !important;">
+									<input type="checkbox" [checked]="row.selectedOQTCForImport"
+										(change)="row.selectedOQTCForImport=!row.selectedOQTCForImport;onClickTestcasesIndividual(row,this.helper.OQTC_VALUE)" />
+									<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+											title="Select All"></i></span>
+								</label>
+								<span>
+									<i class="text-nav-color icofont icofont-listine-dots" style="cursor: pointer;"
+										title="View And Select"
+										(click)="importIndividualtestcasesModal.show();onClickTestcasesIndividual(row,this.helper.OQTC_VALUE);"></i>
+								</span>
+								<span *ngIf="row.selectedOqtcList">
+									({{row['selectedOqtcList'].length}})
+								</span>
+							</div>
+						</ng-template>
+
+					</ngx-datatable-column>
+					<ngx-datatable-column name="Select" [width]="130" [sortable]="false" [canAutoResize]="false"
+						[draggable]="false" [resizeable]="false"
+						*ngIf="pqtcCreate && isSelectedForImport && individualPermissionsresult(this.helper.PQTC_VALUE)">
+
+						<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+
+							<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+								
+								<span>PQTC &nbsp;</span>
+							</div>
+						</ng-template>
+
+						<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+							let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+							<div class="checkbox-fade fade-in-primary" *ngIf="row.selectedForImport">
+								<label style="margin-bottom: -3px !important;">
+									<input type="checkbox" [checked]="row.selectedPQTCForImport"
+										(change)="row.selectedPQTCForImport=!row.selectedPQTCForImport;onClickTestcasesIndividual(row,this.helper.PQTC_VALUE);" />
+									<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+											title="Select All"></i></span>
+								</label>
+								<span>
+									<i class="text-nav-color icofont icofont-listine-dots" style="cursor: pointer;"
+										title="View And Select"
+										(click)="importIndividualtestcasesModal.show();onClickTestcasesIndividual(row,this.helper.PQTC_VALUE);"></i>
+								</span>
+								<span *ngIf="row.selectedPqtcList">
+									({{row['selectedPqtcList'].length}})
+								</span>
+							</div>
+						</ng-template>
+
+					</ngx-datatable-column>
+					<ngx-datatable-column name="Select" [width]="130" [sortable]="false" [canAutoResize]="false"
+						[draggable]="false" [resizeable]="false"
+						*ngIf="ioqtcCreate && isSelectedForImport && individualPermissionsresult(this.helper.IOQTC_VALUE)">
+
+						<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+
+							<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+							
+								<span>IOQTC &nbsp;</span>
+							</div>
+						</ng-template>
+
+						<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+							let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+							<div class="checkbox-fade fade-in-primary" *ngIf="row.selectedForImport">
+								<label style="margin-bottom: -3px !important;">
+									<input type="checkbox" [checked]="row.selectedIOQTCForImport"
+										(change)="row.selectedIOQTCForImport=!row.selectedIOQTCForImport;onClickTestcasesIndividual(row,this.helper.IOQTC_VALUE);" />
+									<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+											title="Select All"></i></span>
+								</label>
+								<span>
+									<i class="text-nav-color icofont icofont-listine-dots" style="cursor: pointer;"
+										title="View And Select"
+										(click)="importIndividualtestcasesModal.show();onClickTestcasesIndividual(row,this.helper.IOQTC_VALUE);"></i>
+								</span>
+								<span *ngIf="row.selectedIoqtcList">
+									({{row['selectedIoqtcList'].length}})
+								</span>
+							</div>
+						</ng-template>
+
+					</ngx-datatable-column>
+					<ngx-datatable-column name="Select" [width]="130" [sortable]="false" [canAutoResize]="false"
+						[draggable]="false" [resizeable]="false"
+						*ngIf="opqtcCreate && isSelectedForImport && individualPermissionsresult(this.helper.OPQTC_VALUE)">
+
+						<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+
+							<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+								
+								<span>OPQTC &nbsp;</span>
+							</div>
+						</ng-template>
+
+						<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+							let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+							<div class="checkbox-fade fade-in-primary" *ngIf="row.selectedForImport">
+								<label style="margin-bottom: -3px !important;">
+									<input type="checkbox" [checked]="row.selectedOPQTCForImport"
+										(change)="row.selectedOPQTCForImport=!row.selectedOPQTCForImport;onClickTestcasesIndividual(row,this.helper.OPQTC_VALUE);" />
+									<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"
+											title="Select All"></i></span>
+								</label>
+								<span>
+									<i class="text-nav-color icofont icofont-listine-dots" style="cursor: pointer;"
+										title="View And Select"
+										(click)="importIndividualtestcasesModal.show();onClickTestcasesIndividual(row,this.helper.OPQTC_VALUE);"></i>
+								</span>
+								<span *ngIf="row.selectedOpqtcList">
+									({{row['selectedOpqtcList'].length}})
+								</span>
+							</div>
+						</ng-template>
+
+					</ngx-datatable-column> -->
+					<ngx-datatable-column style="font-weight: bold;" name="ID">
+
+						<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+							<strong>{{row['ursCode']}}</strong>
+						</ng-template>
+					</ngx-datatable-column>
+					<ngx-datatable-column style="font-weight: bold;" name="Requirement">
+
+						<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+								style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['ursName']}}</strong>
+						</ng-template>
+					</ngx-datatable-column>
+
+					<ngx-datatable-column name="Category">
+						<ng-template let-row="row" ngx-datatable-cell-template>
+							<strong
+								style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['categoryName']}}</strong>
+						</ng-template>
+					</ngx-datatable-column>
+
+					<ngx-datatable-column name="Priority">
+						<ng-template let-row="row" ngx-datatable-cell-template> <strong
+								style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['priorityName']}}</strong>
+						</ng-template>
+					</ngx-datatable-column>
+					<ngx-datatable-column name="Testing Required">
+						<ng-template let-row="row" ngx-datatable-cell-template> <strong
+								style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['testingRequiredText']}}</strong>
+						</ng-template>
+					</ngx-datatable-column>
+					<ngx-datatable-column name="Testing Method">
+						<ng-template let-row="row" ngx-datatable-cell-template> <strong
+								style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row.testingMethod?row.testingMethod:'N/A'}}</strong>
+						</ng-template>
+					</ngx-datatable-column>
+				</ngx-datatable>
+			</div>
+			<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+		</div>
+	</div>
+	<div class="app-modal-footer">
+		<button type="button" class="btn btn-default waves-effect"
+			(click)="importURSModal.hide();onCloseImportURSModal();">Close</button>
+	</div>
+</app-modal-basic>
+
+<app-modal-basic #importIndividualModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+	<div class="app-modal-header">
+		<h4 class="modal-title">Import Specification Master</h4>
+		<button type="button" class="close basic-close" (click)="importIndividualModal.hide();onCloseClearObject()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="app-modal-body" *ngIf="this.selectedUrsRow && this.selectedUrsRow.specificationImportList">
+		<ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+			style="overflow: unset!important;" [rows]='this.selectedUrsRow.specificationImportList' [limit]="5"
+			[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+			<ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+				[draggable]="false" [resizeable]="false" name="Select">
+				<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+					let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+					<div class="checkbox-fade fade-in-primary">
+						<label>
+							<input type="checkbox" [checked]="row.selectedForImport"
+								(change)="row.selectedForImport=!row.selectedForImport;" />
+							<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+						</label>
+					</div>
+				</ng-template>
+
+			</ngx-datatable-column>
+			<ngx-datatable-column style="font-weight: bold;" name="Spec Id">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong>{{row['spCode']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Type">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong>{{row['spTypeValue']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Spec Description">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['spDescription']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Document Status">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+		</ngx-datatable>
+	</div>
+	<div class="app-modal-footer">
+		<button type="button" class="btn btn-sm btn-success"
+			(click)="importIndividualModal.hide();onCloseIndividualSpec();">Import</button>
+	</div>
+</app-modal-basic>
+<app-modal-basic #importIndividualRiskModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+	<div class="app-modal-header">
+		<h4 class="modal-title">Import Risk Assessment</h4>
+		<button type="button" class="close basic-close" (click)="importIndividualRiskModal.hide();onCloseClearObject()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="app-modal-body" *ngIf="this.selectedUrsRow && this.selectedUrsRow.riskImportList">
+		<ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+			style="overflow: unset!important;" [rows]='this.selectedUrsRow.riskImportList' [limit]="5"
+			[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+			<ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+				[draggable]="false" [resizeable]="false" name="Select">
+				<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+					let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+					<div class="checkbox-fade fade-in-primary">
+						<label>
+							<input type="checkbox" [checked]="row.selectedForImport"
+								(change)="row.selectedForImport=!row.selectedForImport;" />
+							<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+						</label>
+					</div>
+				</ng-template>
+
+			</ngx-datatable-column>
+			<ngx-datatable-column style="font-weight: bold;" name="Risk Id">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong>{{row['assessmentCode']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Risk Factor">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['riskFactor']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Severity">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['severityName']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Probability">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['probabilityOfOccuranceName']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Detectability">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['detectabilityName']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="RPN">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['rpn']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Criticality">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['critical']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Priority">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['priorityName']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+		</ngx-datatable>
+	</div>
+	<div class="app-modal-footer">
+		<button type="button" class="btn btn-sm btn-success"
+			(click)="importIndividualRiskModal.hide();onCloseIndividualRisk()">Import</button>
+	</div>
+</app-modal-basic>
+<app-modal-basic #importIndividualtestcasesModal [dialogClass]="'modal-lg'"
+	class="modal-dialog modal-dialog-scrollable">
+	<div class="app-modal-header">
+		<h4 class="modal-title">Import Test cases</h4>
+		<button type="button" class="close basic-close"
+			(click)="importIndividualtestcasesModal.hide();onCloseClearObject()">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="app-modal-body"
+		*ngIf="this.selectedUrsRow && this.selectedUrsRow.IQTCImportList && this.selectedTestcaseType ==='108'">
+		<ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+			style="overflow: unset!important;" [rows]='this.selectedUrsRow.IQTCImportList' [limit]="30"
+			[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+			<ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+				[draggable]="false" [resizeable]="false" name="Select">
+				<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+					let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+					<div class="checkbox-fade fade-in-primary">
+						<label>
+							<input type="checkbox" [checked]="row.selectedForImport"
+								(change)="row.selectedForImport=!row.selectedForImport;" />
+							<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+						</label>
+					</div>
+				</ng-template>
+
+			</ngx-datatable-column>
+			<ngx-datatable-column style="font-weight: bold;" name="Test Id">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong>{{row['testCaseCode']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+			<ngx-datatable-column name="Test Description">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Expected Result">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['expectedResult']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+		</ngx-datatable>
+	</div>
+	<div class="app-modal-body"
+		*ngIf="this.selectedUrsRow && this.selectedUrsRow.PQTCImportList && this.selectedTestcaseType ==='109'">
+		<ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+			style="overflow: unset!important;" [rows]='this.selectedUrsRow.PQTCImportList' [limit]="30"
+			[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+			<ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+				[draggable]="false" [resizeable]="false" name="Select">
+				<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+					let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+					<div class="checkbox-fade fade-in-primary">
+						<label>
+							<input type="checkbox" [checked]="row.selectedForImport"
+								(change)="row.selectedForImport=!row.selectedForImport;" />
+							<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+						</label>
+					</div>
+				</ng-template>
+
+			</ngx-datatable-column>
+			<ngx-datatable-column style="font-weight: bold;" name="Test Id">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong>{{row['testCaseCode']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+			<ngx-datatable-column name="Test Description">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Expected Result">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['expectedResult']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+		</ngx-datatable>
+	</div>
+	<div class="app-modal-body"
+		*ngIf="this.selectedUrsRow && this.selectedUrsRow.OQTCImportList && this.selectedTestcaseType ==='110'">
+		<ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+			style="overflow: unset!important;" [rows]='this.selectedUrsRow.OQTCImportList' [limit]="30"
+			[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+			<ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+				[draggable]="false" [resizeable]="false" name="Select">
+				<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+					let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+					<div class="checkbox-fade fade-in-primary">
+						<label>
+							<input type="checkbox" [checked]="row.selectedForImport"
+								(change)="row.selectedForImport=!row.selectedForImport;" />
+							<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+						</label>
+					</div>
+				</ng-template>
+
+			</ngx-datatable-column>
+			<ngx-datatable-column style="font-weight: bold;" name="Test Id">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong>{{row['testCaseCode']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+			<ngx-datatable-column name="Test Description">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Expected Result">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['expectedResult']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+		</ngx-datatable>
+	</div>
+	<div class="app-modal-body"
+		*ngIf="this.selectedUrsRow && this.selectedUrsRow.IOQTCImportList && this.selectedTestcaseType ==='207'">
+		<ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+			style="overflow: unset!important;" [rows]='this.selectedUrsRow.IOQTCImportList' [limit]="30"
+			[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+			<ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+				[draggable]="false" [resizeable]="false" name="Select">
+				<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+					let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+					<div class="checkbox-fade fade-in-primary">
+						<label>
+							<input type="checkbox" [checked]="row.selectedForImport"
+								(change)="row.selectedForImport=!row.selectedForImport;" />
+							<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+						</label>
+					</div>
+				</ng-template>
+
+			</ngx-datatable-column>
+			<ngx-datatable-column style="font-weight: bold;" name="Test Id">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong>{{row['testCaseCode']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+			<ngx-datatable-column name="Test Description">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Expected Result">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['expectedResult']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+		</ngx-datatable>
+	</div>
+	<div class="app-modal-body"
+		*ngIf="this.selectedUrsRow && this.selectedUrsRow.OPQTCImportList && this.selectedTestcaseType ==='208'">
+		<ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable" class="data-table dt-chk"
+			style="overflow: unset!important;" [rows]='this.selectedUrsRow.OPQTCImportList' [limit]="30"
+			[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+			<ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+				[draggable]="false" [resizeable]="false" name="Select">
+				<ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+					let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+					<div class="checkbox-fade fade-in-primary">
+						<label>
+							<input type="checkbox" [checked]="row.selectedForImport"
+								(change)="row.selectedForImport=!row.selectedForImport;" />
+							<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+						</label>
+					</div>
+				</ng-template>
+
+			</ngx-datatable-column>
+			<ngx-datatable-column style="font-weight: bold;" name="Test Id">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong>{{row['testCaseCode']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+			<ngx-datatable-column name="Test Description">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+
+			<ngx-datatable-column name="Expected Result">
+				<ng-template let-row="row" ngx-datatable-cell-template>
+					<strong
+						style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['expectedResult']}}</strong>
+				</ng-template>
+			</ngx-datatable-column>
+		</ngx-datatable>
+	</div>
+	<div class="app-modal-footer">
+		<button type="button" class="btn btn-sm btn-success"
+			(click)="importIndividualtestcasesModal.hide();onCloseIndividualTestcases()">Import</button>
+	</div>
+</app-modal-basic>

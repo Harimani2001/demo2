@@ -1,0 +1,142 @@
+<div class="row">
+	<div class="col-sm-12">
+		<app-card [title]="'Email Logs'">
+		<div class="row">
+<div class="col-sm-3">
+	  <label class="col-form-label">&nbsp;&nbsp;&nbsp;&nbsp;From Date</label>
+	   <form class="form-inline">
+					<div class="col-sm-11">
+						<div id="inputgroup" class="input-group">
+							<input class="form-control" placeholder="From Date"
+								name="startDate" [(ngModel)]="startdate1" ngbDatepicker
+								#e="ngbDatepicker" #dob="ngModel" required readonly="readonly" [maxDate]="today">
+							<div class="input-group-addon bg-default" (click)="e.toggle();openDatepicker(e)">
+								<span class="icofont icofont-ui-calendar"></span>
+							</div>
+
+						</div>
+					</div>
+		</form><br>
+</div>
+<div class="col-sm-3">
+	  <label class="col-form-label">&nbsp;&nbsp;&nbsp;To Date </label><br>
+	  <form class="form-inline">
+					<div class="col-sm-11">
+						<div id="inputgroup"  class="input-group">
+							<input class="form-control" placeholder="To Date"
+								name="endDate" [(ngModel)]="Enddate1" ngbDatepicker
+								#f="ngbDatepicker" #dob="ngModel" required readonly="readonly" [maxDate]="today">
+							<div class="input-group-addon bg-default" (click)="f.toggle();openDatepicker(f)">
+								<span class="icofont icofont-ui-calendar"></span>
+							</div>
+							</div>
+						</div>
+	 </form>
+</div>
+
+							<div class="col-sm-3"><br>&nbsp;&nbsp;
+								<label class="col-form-label">&nbsp;&nbsp;&nbsp; </label>
+								<button type="button" class="btn btn-primary" (click)="loadAuditDateRange()">Search</button>
+							</div>
+</div>
+
+		<!-- <div class="row">
+			<div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+				<div></div>
+			</div>
+			<div>
+				<div>
+					<div></div>
+				</div>
+				<div>
+					<div style="text-align: right;">
+						<label><button *ngIf="pendingFlag"
+								(click)="downloadFile()" class="btn btn-primary">Export
+								to excel</button> </label>
+					</div>
+				</div>
+			</div>
+		</div> -->
+		<div class="col-xs-12 col-sm-12 col-md-12">
+				<div  style="text-align: right;">
+						<a  href="javascript:;"  (click)="downloadFile()"placement="top" ngbTooltip="Csv Download"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAPMSURBVFhH7ZZpT1NBFIb55I/wJ/hdEyExxoXEBEnEJTFGUUwgSEKMG0QFdxARUNQgUkARxYKAEjaxpIqIFi2KKKtlkX2VHaXCsed05nrb3pKrzkVjfMibMvfMnPPe6ZxJPf4jkvBYHYjS8YSblSytODCxCDDPhRT9vHCTIg1OTs2INynSICLcpGiDiFCTWhhEhJl0TlzWXu4gOc4xLkTpRYWY1GoHOb9tUssd5PyWSZE7qEasrHpwkRyl3eE4x7jkLBQTYlBLfsngLt0RWEyxsupRSqKlWFn1yBfvz4qCyhYzdH/uh66RPsiveQx70sIdCkQVXYe6riYYGB+Gxt5WSKvMBX9dGMVK3z+DtsEuOJx9gcbBt0/S+HlLjbSelVUPX4jqGO6Bufk5MNRXkQkkz1wmxUPvnoWv1lkYmRqFwlojtA110ZzUihyK66uLaJzyNJvGsaX2811aVyHlYGXVwxcG3oqgZB/7O2i8z/b2k1+moaajXkqOhZEsUyGNj+Ul0Bxjw0saR+Zfpji+II7x5ZC4R2lSDlZWPXxhUEYkJWvqa5OSOYvvSEXzKwhIP+oS908Ng4kvU/S14ri2sxGsc99sL39cmsPKqocvVGNwd2o47Sgy/XUGXlreQnRRssMcU2stfLOZ2mt7gfGZSTqn8jgrqx6+UI1Broj8S/DwTTmMTU/AvO0voSxdiqXbmgZJfnKPPnPNjxwublZWPTzxzxjkinxgP3PGRpP07KD+PD2zDHyiz9MF18jYitUbFcVsuIcn5k3S0t9O45DMU9QAb2RNcudFAT2LZzt2NDee1jyRGUThFYTgMcBjwQ3q7pc76KcMonpHB+n84LXwrtN+zeiri6X4ucIkuoZ6RgfoK8bzhSQaMqQ5KOxqxNz+gcbCDB7KjoGqjzXQNzYErYOdcM9URDsgnxNTnELd2W+b09BjoTuQX9RceK1gJycZs2gszKBW+rcNLtbPLWEG8W3lkuMc45LjLvZX7WDUxatU3FlKBhV0g1mzo8UOllgeg19AIISER7mYcqfgI2dnvbz9apdt3bqEWbOj1RkcHBqGDZt3wYk4naIhuXCO57pNw57rfJcyWz/Q8gzqDJmwxmc7xKfmKhpDYcxrvd/08lU+K5klR7TaQU5eQQn4bNsLSXdLXMzhs7W+OyZXrPYJYnZc0dogciYmEXYEHoKUHINkDv/f4h865eW9OYNZUWYxDM5areAfdMDWNNGSQbdN4Qwa1FKnrmTC6+ZuqKqzgPemndQQ1BTr/YYUm+JPgo2ADbFgU/xpsCEWbAoPD4/vAGU+LU8uS1YAAAAASUVORK5CYII="></a>
+						<!-- <a href="javascript:;"  (click)="pdfdownload()" placement="top" ngbTooltip="Pdf Download"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAANSSURBVFhH7ZZLT1NBFIBZ+SP8Ce7FYI1BKDUQyqOkJCBFYsJLHgsEISRCQhAjhYRXWEg3BBOCFhdsmhBdIfIogra05Y0BigiUd1vb0h4505FXb80tzMDGLzlpZ+bemS8z98xM2H9YUqHWAKuoaur8TLtlB3bMAuynoeOdj7kkS8EDu5O9JEtBhLkka0GEqSQPQYSZJC9BhIkkT0Hk0pK8BZFLSYoV3DOZYFQuh+/Z2bA/NUVrT8B+xAQdVjz4khhWe3rA2t0NK11dYCwooLWhwVVwa3AQ5urrwbOzA0NSKfg8HtoiHq6Chw4HjGdkkN+h6Gjw7O7SFvFwFUQWW1thubMThmNiAHw+Wise7oK/19ZAn5gI37KyaE1ocBdEZmprYbq6mpZC40oETaWlMBIbC46lJVojHu6CbpsNvqamwkJLC0wWFYHP66Ut4uAu+LO3F360t4PX6YSJzEyyL4aCednGUfAoaw05OWCfmyNFPFlG4uJgW68nZTFwFdweHgZTSQkt+Vnr6yNZvW82g31xEfaMRiIutEeGR8oFg2oER6zgZHEx2AYGyAyuarUwp1aDIT+f7Im4cU+oVGAuKwNjYSGZ2emqKvqmH5TRaD+dCSaCXpeLzBRK6JOSSOA2g9/f9ugoSZxfOh2Mp6eT4xBxrqyQ5/Fb/QtzQRxkvrGRLCEOhsmBt5hgmXswO0tmbzwtDcYUCjLDp2Em6HW7YaG5mQyypNGQC4KlvFz00eZaXycnznmYCVoqK2GhqYksDy4ZLp1rc5O2XhxmgrikTqsVNvr7YUyphH2LhbZcDmaCmBB4c8asvchxFgxmgiyoa2gjg58PIUGBeEPV/PAQdB/dtjNzS+BpeV2AVLDIK6s9vCdLMd5SKm9QNT88BJGNTRs8TFbBC3WHoNDpwGcipIqtu9KEm1TrBF6CiGHSAlHxadCg0QqKYWCbJEbhuH0/PoIqnYWnIPKhTwdxyifQ3q0LkMO6qIRH9jsP5PlUJxDegkjN6xZIz34GHe8/Hsvh/5SsIodEpuiiKsJchSAmzeOjpCmoeHUsmPf8pVsiSzEEJMV5UJBn1LS9hbEZK3wxzoMsSQXVjRoSEmmyTTAprhNMBEyIfybFdRMeGZ+LQYsChIX9ARRfoiPSJnT3AAAAAElFTkSuQmCC"></a> -->
+				  <label  >Search:
+					<input  type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"class="form-control input-sm full-data-search" placeholder="">
+				  </label>
+				</div>
+      </div>
+
+		<ngx-datatable [scrollbarH]="true"
+			#myTable class="material data-table col-xs-12 col-sm-12 col-md-12"
+			[rows]='data | auditTrailFilter : filterQuery' [limit]="rowsOnPage"
+			 [headerHeight]="50" [footerHeight]="50"
+			[rowHeight]="'auto'"> <!-- Row Detail Template --> <ngx-datatable-row-detail
+			[rowHeight]="'auto'" #myDetailRow> <ng-template
+			let-row="row" let-expanded="expanded"
+			ngx-datatable-row-detail-template>
+      <div class="dt-desc">
+        <table class="table-striped table-bordered">
+          <tr>
+            <th colspan="3"><strong>System Remarks</strong></th>
+          </tr>
+          <tr><td>{{ row['status']}}</td></tr>
+        </table>
+        <br>
+        <table class="table-striped table-bordered">
+          <tr>
+            <th colspan="3"><strong>Send to </strong></th>
+          </tr>
+          <tr><td>{{row['systemRemarks']}}</td></tr>
+        </table>
+        <br>
+        <table class="table-striped table-bordered">
+          <tr>
+            <th colspan="3"><strong>Template Name</strong></th>
+          </tr>
+          <tr><td>{{row['templateName']}}</td></tr>
+        </table>
+        <br>
+        <table class="table-striped table-bordered">
+          <tr>
+            <th colspan="3"><strong>Document Type</strong></th>
+          </tr>
+          <tr><td>{{row['documentName']}}</td></tr>
+        </table>
+        <br>
+        <table class="table-striped table-bordered">
+          <tr>
+            <th colspan="3"><strong>Document Code</strong></th>
+          </tr>
+          <tr><td>{{row['documentCode']}}</td></tr>
+        </table>
+      </div>
+
+    </ng-template> </ngx-datatable-row-detail>
+    <ngx-datatable-column  [resizeable]="true" [width]="5"
+			[sortable]="false" [draggable]="false" [canAutoResize]="true">
+		<ng-template let-row="row" let-expanded="expanded"
+			ngx-datatable-cell-template> <a href="javascript:;"
+			[class.datatable-icon-right]="!expanded"
+			[class.datatable-icon-down]="expanded" title="Expand/Collapse Row"
+			(click)="toggleExpandRow(row)"> </a> </ng-template> </ngx-datatable-column>
+			<ngx-datatable-column
+			[resizeable]="true" [width]="400" [sortable]="true" name="UserName">
+		<ng-template let-row="row" ngx-datatable-cell-template>{{row['sendByUser']}}</ng-template> </ngx-datatable-column>
+		<ngx-datatable-column
+			 [sortable]="true" [width]="400" name="Event"> <ng-template
+			let-row="row" ngx-datatable-cell-template>{{row['event']}}</ng-template> </ngx-datatable-column>
+			<ngx-datatable-column
+			 [sortable]="true" [width]="400" name="Project Name"> <ng-template
+      let-row="row" ngx-datatable-cell-template>{{row['projectName']}}</ng-template> </ngx-datatable-column>
+      <ngx-datatable-column
+			 [sortable]="true" [width]="400" name="Version"> <ng-template
+			let-row="row" ngx-datatable-cell-template>{{row['versionName']}}</ng-template> </ngx-datatable-column>
+		   <ngx-datatable-column
+			 [sortable]="true" [width]="400" name="CreatedTime"> <ng-template
+			let-row="row" ngx-datatable-cell-template>{{row['createdTime'] | date:'dd-MM-yyyy HH:mm a'}}</ng-template> </ngx-datatable-column> </ngx-datatable> </app-card>
+	</div>
+</div>
+<!-- <div class="loading-spinner" *ngIf="spinnerFlag">
+	<span class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Loading&#8230;</span>
+</div> -->

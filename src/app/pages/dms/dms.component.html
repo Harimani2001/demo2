@@ -1,0 +1,154 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="col-sm-12" id="float-action">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-3 page-header-title">
+            <i class="icofont icofont-file-document bg-c-blue"></i>
+            <div class="d-inline">
+              <h4 class="strong">My Documents</h4>
+              <span>View My Documents</span>
+            </div>
+          </div>
+          <div class="col-sm-3">
+            <angular2-multiselect name="documentName" [data]="this.documentList" id="documentId"
+              (ngModelChange)="filterDms($event, this.version)" [(ngModel)]="this.document"
+              [settings]="documentDropDownSettings">
+            </angular2-multiselect>
+          </div>
+          <div class="col-sm-2">
+            <angular2-multiselect name="versionName" [data]="this.versionList" id="versionId"
+              (ngModelChange)="filterDms(this.document, $event)" [(ngModel)]="this.version"
+              [settings]="versionDropDownSettings">
+            </angular2-multiselect>
+          </div>
+          <div class="col-sm-4 text-right">
+            <a href="javascript:" class="m-r-15">
+              <img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/search.png" alt="Search"
+                placement="bottom" ngbTooltip="Search" (click)="onChangeSearch();"></a>
+
+            <input *ngIf="this.showSearch" id="search" type="search" [(ngModel)]="filterQuery"
+              (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search m-r-15"
+              placeholder="Search">
+
+            <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                src="assets/icon/png-icons/mergePDF.png" alt="Merge PDF" placement="bottom" ngbTooltip="Merge PDF"
+                (click)="mergePfs();"></a>
+
+            <a *ngIf="enableCsv" href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+                src="assets/icon/png-icons/csvExport.png" alt="Export Excel" placement="bottom"
+                ngbTooltip="Export Excel" (click)="downloadExcel();"></a>
+
+            <ng-template #popContent>
+              <span class="text-left">
+                <div>
+                  <label style="font-size: 12px !important"><b>FTP : </b>{{ftpFolderSize}}</label>
+                </div>
+              </span>
+            </ng-template>
+            <a container="body" href="javascript:" class="crm-action-info text-muted text-primary" placement="bottom"
+              [ngbTooltip]="popContent"><i class="icofont icofont-info-square info"></i>
+            </a>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <div><br><br><br></div>
+
+    <app-card>
+      <ngx-datatable id="fileViewTable" class="data-table dt-chk" [rows]='fileList| DmsFilterPipe : filterQuery' [limit]="20"
+        [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+        <ngx-datatable-column [width]="50" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row" let-isSelected="isSelected"
+            let-onCheckboxChangeFn="onCheckboxChangeFn">
+            <div class="checkbox-fade fade-in-primary">
+              <input type="checkbox" class="cr" name="{{row['name']}}" (change)="onCickForMergePdf($event, row);" />
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="File Name" [width]="850" [sortable]="true"
+          [canAutoResize]="true" [resizeable]="false" [draggable]="false">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+              <img *ngIf="row.docType === 'Static_Documents'" class="image-radius img-25"
+                src="assets/icon/png-icons/static_document.png" alt="">
+              <img *ngIf="row.docType === 'Form'" class="image-radius img-25" src="assets/icon/png-icons/form.png"
+                alt="">
+              <img *ngIf="row.docType === 'Template'" class="image-radius img-25"
+                src="assets/icon/png-icons/template.png" alt="">
+              <img *ngIf="row.docType === 'Org_Group'" class="image-radius img-25" src="assets/icon/png-icons/form.png"
+                alt="">
+              {{row['name']}}
+            </strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="Date Modified" [width]="350" [sortable]="true"
+          [canAutoResize]="true" [resizeable]="false" [draggable]="false">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['date']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column style="font-weight: bold;" name="Action" [width]="200" [sortable]="true"
+          [canAutoResize]="true" [resizeable]="false" [draggable]="false">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+              (click)="loadDocumentCommentLog(row);" placement="top" ngbTooltip="Info">
+              <i class="icofont icofont-info-square info"></i>
+            </a>
+            <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+              (click)="fetchFileFromFtp(row);" placement="top" ngbTooltip="View">
+              <i class="icofont icofont-eye-alt"></i>
+            </a>
+            <a container="body" href="javascript:;" class="crm-action-info text-muted text-primary"
+              placement="top" ngbTooltip="Certificate Download" [class.disabled]="row['certificateButton']"
+              (click)="!row['certificateButton'] ? downloadCertificate(row) : !row['certificateButton'];">
+            <img class="image-radius rounded-0"
+              src="assets/icon/png-icons/certificates.png" alt="Forum" placement="bottom"
+              width="25" height="22">
+           </a>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #modalOverflow [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="modalOverflow.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto"
+      size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+      <h5>Document Status Log</h5><br>
+      <div *ngIf="this.infoData">
+        <hr>
+        <div *ngIf="this.infoData.projectSetup"><b>Project Name : </b>{{this.infoData.projectSetup}}</div>
+        <div><b>File Name : </b>{{this.infoData.fileName}}</div>
+        <div><b>Created By : </b>{{this.infoData.createdBy}}</div>
+        <div><b>Created Time : </b>{{this.infoData.createdTime}}</div>
+        <div><b>File Size : </b>{{this.infoData.ftpFileSize}}</div>
+      </div>
+      <div *ngFor="let log of statusLog ;let in = index;">
+        <div>{{in+1}}</div>
+        <hr>
+        <div>
+          <p>Esign Data</p>
+        </div>
+        <hr>
+        <div><b>Document Status : </b>{{log.commonDocumentStatus}}</div>
+        <div><b>Document Comments : </b>{{log.comments}}</div>
+        <div><b>Commented By : </b>{{log.createdBy}}</div>
+        <div><b>Commented On : </b>{{log.createdTime | date:'dd-MM-yy hh:mm a'}}</div>
+      </div>
+      <div *ngIf="this.modalSpinner" class="loader"></div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

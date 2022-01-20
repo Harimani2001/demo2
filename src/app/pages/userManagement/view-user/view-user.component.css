@@ -1,0 +1,28 @@
+.modal-body .slimScrollDiv {
+  height: 400px !important;
+}
+
+.fontStyle {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-weight: normal;
+}
+
+.dot.user-active, .dot.user-in-active {
+  height: 15px;
+  width: 15px;
+  margin-left: 5px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.user-active {
+  background-color: green;
+}
+
+.user-in-active {
+  background-color: red;
+}
+
+#field-spacing .form-control {
+  width: auto;
+}

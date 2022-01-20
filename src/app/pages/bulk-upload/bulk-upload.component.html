@@ -1,0 +1,1305 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-12">
+          <label>Select Document:</label>
+          <select name="select" class="form-control input-sm full-data-search" [(ngModel)]="selectedDocument"
+            (ngModelChange)="onChangeDocument();" name="document">
+            <option value="" selected>Select Document</option>
+            <option *ngFor="let doc of docItemList" [ngValue]="doc.key">{{doc.value}}</option>
+          </select>
+          <a href="javascript:" *ngIf="selectedDocument!=''" class="m-r-20 float-right"><img
+              class="image-radius rounded-0 img-30" src="assets/icon/png-icons/csvDownload.png" alt="Sample Download"
+              placement="top" ngbTooltip="Sample Download" (click)="sampleFileDownload();"></a>
+        </div>
+      </div>
+      <br>
+      <div *ngIf="selectedDocument!=''">
+        <div class="row">
+          <div class="col-sm-12">
+            <label class="custom-file">
+              <input #myInput type="file" ng2FileSelect [uploader]="uploader" accept=".xls"
+                (change)="extractFile($event);">
+              <span class="custom-file-control"></span>
+            </label>
+          </div>
+        </div>
+        <br>
+        <div class="messages text-danger" *ngIf="!isUploaded && validationMessage !=''">
+          {{validationMessage}}
+        </div>
+        <div *ngIf="this.isUploaded">
+          <div class="table-responsive " *ngIf="selectedDocument === '107'">
+            <table id="tableIdDivRefresh1" #tableIdDivRefresh class="table table-striped table-bordered ">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Requirement</th>
+                  <th>Description</th>
+                  <th>Category</th>
+                  <th>Priority</th>
+                  <th>Potential risk on failure</th>
+                  <th>Testing Required</th>
+                  <th>Implementation Method</th>
+                  <th>Testing Method</th>
+                  <th>Compliance Requirement</th>
+                  <th>Check List</th>
+                  <th *ngFor="let column of formExtendedColumns">
+                    <label *ngIf="(column.type!='header' && column.type!='newline' && column.type!='paragraph')"
+                      [innerHtml]='column.label'></label>
+                  </th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let row of excelData ; let i = index" [attr.data-index]="i">
+                <tr>
+                  <td>
+                    <label>{{i+1}}</label>
+                  </td>
+                  <td>
+                    <input type="text" name="ursName-{{i}}" [(ngModel)]="row.ursName" class="form-control"
+                      [ngStyle]="{'background-color': row.ursName != '' ? 'white' : '#FD3A4A'}" />
+                  </td>
+                  <td>
+                    <input type="text" name="description-{{i}}" [(ngModel)]="row.description" class="form-control" />
+                  </td>
+                  <td>
+                    <select name="category-{{i}}" [(ngModel)]="row.category"
+                      (ngModelChange)="onCategoryChange($event,row);"
+                      [ngStyle]="{'background-color': row.category != '' ? 'white' : '#FD3A4A'}"
+                      name="{{row.categoryName}}" class="form-control">
+                      <option *ngFor="let category of categoryList" [value]="category.id">{{category.categoryName}}
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="priority-{{i}}" [(ngModel)]="row.priority"
+                      (ngModelChange)="onPriorityChange($event,row);" name="{{row.priorityName}}" class="form-control"
+                      [ngStyle]="{'background-color': row.priority != '' ? 'white' : '#FD3A4A'}">
+                      <option *ngFor="let priority of priorityList" [value]="priority.id">{{priority.priorityName}}
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <select name="potentialRisk-{{i}}" [(ngModel)]="row.potentialRisk"
+                      (change)="onChangePotentialAndImplemenation(row);" class="form-control">
+                      <option value="">Select Potential Risk</option>
+                      <option *ngFor="let item of potentialList" [value]="item.key">{{item.value}}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <label>No </label>
+                    <ui-switch [checked]="row.testingRequired"
+                      (change)="row.testingRequired=!row.testingRequired; onTestingRequired(row);" class="js-small"
+                      color="#3498DB" switchColor="#fff" size="small">
+                    </ui-switch>
+                    <label> Yes</label>
+                  </td>
+                  <td>
+                    <select *ngIf="row.testingRequired" name="implementationMethod-{{i}}"
+                      [(ngModel)]="row.implementationMethod" (change)="onChangePotentialAndImplemenation(row);"
+                      class="form-control">
+                      <option value="">Select Implementation Method</option>
+                      <option *ngFor="let item of implemenationList" [value]="item.key">{{item.value}}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select *ngIf="row.testingRequired" name="testingMethod-{{i}}" [(ngModel)]="row.testingMethod"
+                      class="form-control">
+                      <option *ngFor="let item of testingMethodList" [value]="item.key">{{item.value}}
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <angular2-multiselect name="complianceRequirements-{{i}}" [data]="complianceRequirements" [(ngModel)]="row.complianceRequirements" [settings]="dropdownSettings">
+                    </angular2-multiselect>
+                  </td>
+                  <td>
+                    <a href="javascript:" (click)="openURSCheckListModal(row);">Click here to Configure</a>
+                  </td>
+
+                  <td *ngFor="let column of row.jsonExtraData">
+                    <label *ngIf="(column.subtype=='Text')">
+                      <input type="text" [name]='column.name' [(ngModel)]='column.value' [minlength]="column.minlength"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [maxlength]="column.maxlength" #text="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(text.touched || submitted) && text.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Email')">
+                      <input type="email" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="fieldValidation(column)" [pattern]="helper.email_pattern" #email="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(email.touched || submitted) && email.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                      <div class="messages text-danger" *ngIf="email.errors?.pattern">Please enter a valid Email Id
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Mobile')">
+                      <input type="tel" [name]='column.name' [(ngModel)]='column.value' pattern="^[6789]\d{9}$"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"
+                        (keypress)="onlyNumber($event)" #mobile="ngModel" (ngModelChange)="fieldValidation(column)">
+                      <div class="messages text-danger"
+                        *ngIf="(mobile.touched || submitted) && mobile.errors?.required"><label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                      <div class="messages text-danger" *ngIf="mobile.errors?.pattern">Please enter a valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+
+                    <label *ngIf="(column.type==='number')">
+                      <input type="number" [disabled]="column.disabled" [name]='column.name' [(ngModel)]='column.value'
+                        #number="ngModel" (keypress)="onlyNumber($event)" (ngModelChange)="fieldValidation(column)"
+                        (ngModelChange)="calculationOfTableValue(column,row)" [minlength]="column.minlength"
+                        [maxlength]="column.maxlength" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(number.touched || submitted) && number.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='date')">
+                      <input type="date" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" #date="ngModel"
+                        [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(date.touched || submitted) && date.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='textarea')">
+                      <textarea [name]='column.name' [(ngModel)]='column.value' #textarea="ngModel"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"></textarea>
+                      <div class="messages text-danger"
+                        *ngIf="(textarea.touched || submitted) && textarea.errors?.required"> <label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                    </label>
+
+                    <div *ngIf="(column.type==='select')">
+                      <label *ngIf="!column.multiple">
+                        <select class="select-table" [required]="column.required" [name]='column.name'
+                          (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                          #select="ngModel">
+                          <option *ngFor='let optionList of column.values' [value]="optionList.value"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                            {{optionList.label}}
+                          </option>
+                        </select>
+                        <div class="messages text-danger"
+                          *ngIf="(select.touched || submitted) && select.errors?.required"> <label
+                            [innerHtml]="column.label"></label> can't be blank</div>
+                      </label>
+                      <div style="width: 400px;" *ngIf="column.multiple">
+                        <textarea class="multiple-textarea" [rows]="(column.value.length/50)+1"
+                          [innerHtml]="column.value"></textarea>
+                      </div>
+                    </div>
+                    <label *ngIf="(column.type==='checkbox-group')">
+                      <div *ngFor="let cheboxvalue of column.values ; let lengthIndex=index;">
+                        <label>
+                          <input type="checkbox" [name]='column.name' [checked]="cheboxvalue.selected"
+                            (change)="cheboxvalue.selected=!cheboxvalue.selected;setCheckBoxValidation(column);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{cheboxvalue.label}}
+                        </label>
+                        <div class="messages text-danger"
+                          *ngIf="(!column.checkBoxValidationFlag) && submitted && column.required && lengthIndex== (column.values.length-1)">
+                          <label [for]="column.name" [innerHtml]="column.label"></label> can't be blank
+                        </div>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='radio-group')">
+                      <div *ngFor="let radioButtonValue of column.values">
+                        <label>
+                          <input class="default-radio" type="checkbox" [name]='column.name'
+                            [checked]="radioButtonValue.selected"
+                            (change)="setCheckedAsRadio(column.values,$event,radioButtonValue.value);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{radioButtonValue.label}}
+                        </label>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='datetime-local')">
+                      <input type="datetime-local" [name]='column.name'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                        [required]="column.required" #dateTime="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='time')">
+                      <input type="time" [name]='column.name' (ngModelChange)="onChangeFieldForDateAndDropdowns(column)"
+                        [ngStyle]="{'background-color':!column.fieldError? 'white' : '#FD3A4A'}"
+                        [(ngModel)]='column.value' [required]="column.required" #time="ngModel">
+                      <div class="messages text-danger" *ngIf="(time.touched || submitted) && time.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label class="form-group row" *ngIf="(column.type==='file')">
+                      <input style="margin-left: 1rem;" type="text" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFileName(column)"
+                        [ngStyle]="{'background-color':!column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="column.fieldError">
+                        {{column.errorMessage}}</div>
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <br><br>
+          </div>
+
+          <div class="table-responsive " *ngIf="selectedDocument === '200'">
+            <table id="tableIdDivRefresh1" #tableIdDivRefresh class="table table-striped table-bordered ">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>URS List</th>
+                  <th>Type</th>
+                  <th>Description</th>
+                  <th *ngFor="let column of formExtendedColumns">
+                    <label *ngIf="(column.type!='header' && column.type!='newline' && column.type!='paragraph')"
+                      [innerHtml]='column.label'></label>
+                  </th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let row of excelData ; let i = index" [attr.data-index]="i">
+                <tr>
+                  <td>
+                    <label>{{i+1}}</label>
+                  </td>
+                  <td>
+                    <ng-select [ngClass]="'ng-select'" [options]="simpleOption" [multiple]="true"
+                      [(ngModel)]="row['ursList']" (ngModelChange)="onRiskUrsChange($event,row);" name="{{row['urs']}}"
+                      rounds="ngModel" [disabled]="isReadOnly"
+                      [ngStyle]="{'background-color': row['ursList'] != ''? 'white' : '#FD3A4A'}"></ng-select>
+                  </td>
+                  <td>
+                    <select name="select" [(ngModel)]="row['spTypeKey']"
+                      (ngModelChange)="onSpecificationTypeChange($event,row);"
+                      [ngStyle]="{'background-color': row['spTypeKey'] != ''? 'white' : '#FD3A4A'}"
+                      name="{{row['type']}}" class="form-control">
+                      <option *ngFor="let type of specificationType" [value]="type.key">{{type.value}}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <textarea class="form-control" name="description-{{i}}" id="descriptionid-{{i}}"
+                      [(ngModel)]="row.spDescription" rows="4"
+                      [ngStyle]="{'background-color': row.spDescription != ''? 'white' : '#FD3A4A'}"></textarea>
+                  </td>
+                  <td *ngFor="let column of row.jsonExtraData">
+                    <label *ngIf="(column.subtype=='Text')">
+                      <input type="text" [name]='column.name' [(ngModel)]='column.value' [minlength]="column.minlength"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [maxlength]="column.maxlength" #text="ngModel"
+                        [ngStyle]="{'background-color':!column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(text.touched || submitted) && text.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Email')">
+                      <input type="email" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="fieldValidation(column)" [pattern]="helper.email_pattern" #email="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(email.touched || submitted) && email.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                      <div class="messages text-danger" *ngIf="email.errors?.pattern">Please enter a valid Email Id
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Mobile')">
+                      <input type="tel" [name]='column.name' [(ngModel)]='column.value' pattern="^[6789]\d{9}$"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"
+                        (keypress)="onlyNumber($event)" #mobile="ngModel" (ngModelChange)="fieldValidation(column)">
+                      <div class="messages text-danger"
+                        *ngIf="(mobile.touched || submitted) && mobile.errors?.required"><label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                      <div class="messages text-danger" *ngIf="mobile.errors?.pattern">Please enter a valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='number')">
+                      <input type="number" [disabled]="column.disabled" [name]='column.name' [(ngModel)]='column.value'
+                        #number="ngModel" (keypress)="onlyNumber($event)" (ngModelChange)="fieldValidation(column)"
+                        (ngModelChange)="calculationOfTableValue(column,row)" [minlength]="column.minlength"
+                        [maxlength]="column.maxlength" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(number.touched || submitted) && number.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='date')">
+                      <input type="date" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" #date="ngModel"
+                        [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(date.touched || submitted) && date.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='textarea')">
+                      <textarea [name]='column.name' [(ngModel)]='column.value' #textarea="ngModel"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"></textarea>
+                      <div class="messages text-danger"
+                        *ngIf="(textarea.touched || submitted) && textarea.errors?.required"> <label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                    </label>
+                    <div *ngIf="(column.type==='select')">
+                      <label *ngIf="!column.multiple">
+                        <select class="select-table" [required]="column.required" [name]='column.name'
+                          (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                          #select="ngModel">
+                          <option *ngFor='let optionList of column.values' [value]="optionList.value"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                            {{optionList.label}}
+                          </option>
+                        </select>
+                        <div class="messages text-danger"
+                          *ngIf="(select.touched || submitted) && select.errors?.required"> <label
+                            [innerHtml]="column.label"></label> can't be blank</div>
+                      </label>
+                      <div style="width: 400px;" *ngIf="column.multiple">
+                        <textarea class="multiple-textarea" [rows]="(column.value.length/50)+1"
+                          [innerHtml]="column.value"></textarea>
+                      </div>
+                    </div>
+                    <label *ngIf="(column.type==='checkbox-group')">
+                      <div *ngFor="let cheboxvalue of column.values ; let lengthIndex=index;">
+                        <label>
+                          <input type="checkbox" [name]='column.name' [checked]="cheboxvalue.selected"
+                            (change)="cheboxvalue.selected=!cheboxvalue.selected;setCheckBoxValidation(column);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{cheboxvalue.label}}
+                        </label>
+                        <div class="messages text-danger"
+                          *ngIf="(!column.checkBoxValidationFlag) && submitted && column.required && lengthIndex== (column.values.length-1)">
+                          <label [for]="column.name" [innerHtml]="column.label"></label> can't be blank
+                        </div>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='radio-group')">
+                      <div *ngFor="let radioButtonValue of column.values">
+                        <label>
+                          <input class="default-radio" type="checkbox" (ngModelChange)="fieldValidation(column)"
+                            [name]='column.name' [checked]="radioButtonValue.selected"
+                            (change)="setCheckedAsRadio(column.values,$event,radioButtonValue.value);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{radioButtonValue.label}}
+                        </label>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='datetime-local')">
+                      <input type="datetime-local" [name]='column.name'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                        [required]="column.required" #dateTime="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='time')">
+                      <input type="time" [name]='column.name' (ngModelChange)="onChangeFieldForDateAndDropdowns(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"
+                        [(ngModel)]='column.value' [required]="column.required" #time="ngModel">
+                      <div class="messages text-danger" *ngIf="(time.touched || submitted) && time.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label class="form-group row" *ngIf="(column.type==='file')">
+                      <input style="margin-left: 1rem;" type="text" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFileName(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="column.fieldError">
+                        {{column.errorMessage}}</div>
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <br><br>
+          </div>
+
+          <div class="table-responsive"
+            *ngIf="selectedDocument === '108' || selectedDocument === '109' || selectedDocument === '110' || selectedDocument === '207' || selectedDocument === '208'">
+            <table id="tableIdDivRefresh1" #tableIdDivRefresh class="table table-striped table-bordered ">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Test description</th>
+                  <th>Environment</th>
+                  <th>URS List</th>
+                  <th>Specification List</th>
+                  <th>Risk Assessment List</th>
+                  <th>Acceptance Criteria</th>
+                  <th>Pre-Requisite</th>
+                  <th>Expected Result</th>
+                  <th>Test Steps</th>
+                  <th *ngFor="let column of formExtendedColumns">
+                    <label *ngIf="(column.type!='header' && column.type!='newline' && column.type!='paragraph')"
+                      [innerHtml]='column.label'></label>
+                  </th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let row of excelData ; let i = index" [attr.data-index]="i">
+                <tr>
+                  <td>
+                    <label>{{i+1}}</label>
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.description" class="form-control"
+                      [ngStyle]="{'background-color': row.description != ''? 'white' : '#FD3A4A'}" />
+                  </td>
+                  <td>
+                    <select name="environment-{{i}}" class="form-control" [(ngModel)]="row.environment">
+                      <option value="">Select Environment</option>
+                      <option *ngFor="let data of enviroments" [value]="data.key">{{data.key}}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <ng-select [ngClass]="'ng-select'" [options]="simpleOption" [multiple]="true"
+                      [ngStyle]="{'background-color': (row.ursListData != '' || row.specList != '' || row.riskCodeList != '')? 'white' : '#FD3A4A'}"
+                      [(ngModel)]="row['ursListData']" (ngModelChange)="onUrsChange($event,row);"
+                      name="{{row['ursId']}}" rounds="ngModel" [disabled]="isReadOnly"></ng-select>
+                  </td>
+                  <td>
+                    <ng-select [ngClass]="'ng-select'" [options]="specSimpleOption" [multiple]="true"
+                      [ngStyle]="{'background-color': (row.specList != '' || row.ursListData != '' || row.riskCodeList != '')? 'white' : '#FD3A4A'}"
+                      [(ngModel)]="row['specList']" (ngModelChange)="onRiskSpecChange($event,row);"
+                      name="{{row['specId']}}" rounds="ngModel" [disabled]="isReadOnly"></ng-select>
+                  </td>
+                  <td>
+                    <ng-select [ngClass]="'ng-select'" [options]="riskSimpleOption" [multiple]="true"
+                      [ngStyle]="{'background-color': (row.riskCodeList != '' || row.specList != '' || row.ursListData != '')? 'white' : '#FD3A4A'}"
+                      [(ngModel)]="row['riskCodeList']" (ngModelChange)="onRiskChange($event,row);"
+                      name="{{row['riskId']}}" rounds="ngModel" [disabled]="isReadOnly"></ng-select>
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.acceptanceCriteria" class="form-control" />
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.preRequisites" class="form-control" />
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.expectedResult" class="form-control"
+                      [ngStyle]="{'background-color': row.expectedResult != ''? 'white' : '#FD3A4A'}" />
+                  </td>
+                  <td>
+                    <a href="javascript:" (click)="openTestCaseCheckListModal(row);">Click here to Configure</a>
+                  </td>
+                  <td *ngFor="let column of row.jsonExtraData">
+                    <label *ngIf="(column.subtype=='Text')">
+                      <input type="text" [name]='column.name' [(ngModel)]='column.value' [minlength]="column.minlength"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [maxlength]="column.maxlength" #text="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(text.touched || submitted) && text.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Email')">
+                      <input type="email" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="fieldValidation(column)" [pattern]="helper.email_pattern" #email="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(email.touched || submitted) && email.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                      <div class="messages text-danger" *ngIf="email.errors?.pattern">Please enter a valid Email Id
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Mobile')">
+                      <input type="tel" [name]='column.name' [(ngModel)]='column.value' pattern="^[6789]\d{9}$"
+                        (keypress)="onlyNumber($event)" #mobile="ngModel" (ngModelChange)="fieldValidation(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(mobile.touched || submitted) && mobile.errors?.required"><label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                      <div class="messages text-danger" *ngIf="mobile.errors?.pattern">Please enter a valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='number')">
+                      <input type="number" [disabled]="column.disabled" [name]='column.name' [(ngModel)]='column.value'
+                        #number="ngModel" (keypress)="onlyNumber($event)" (ngModelChange)="fieldValidation(column)"
+                        (ngModelChange)="calculationOfTableValue(column,row)" [minlength]="column.minlength"
+                        [maxlength]="column.maxlength" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(number.touched || submitted) && number.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='date')">
+                      <input type="date" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" #date="ngModel"
+                        [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(date.touched || submitted) && date.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='textarea')">
+                      <textarea [name]='column.name' [(ngModel)]='column.value' #textarea="ngModel"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"></textarea>
+                      <div class="messages text-danger"
+                        *ngIf="(textarea.touched || submitted) && textarea.errors?.required"> <label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                    </label>
+                    <div *ngIf="(column.type==='select')">
+                      <label *ngIf="!column.multiple">
+                        <select class="select-table" [required]="column.required" [name]='column.name'
+                          (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                          #select="ngModel">
+                          <option *ngFor='let optionList of column.values' [value]="optionList.value"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                            {{optionList.label}}
+                          </option>
+                        </select>
+                        <div class="messages text-danger"
+                          *ngIf="(select.touched || submitted) && select.errors?.required"> <label
+                            [innerHtml]="column.label"></label> can't be blank</div>
+                      </label>
+                      <div style="width: 400px;" *ngIf="column.multiple">
+                        <textarea class="multiple-textarea" [rows]="(column.value.length/50)+1"
+                          [innerHtml]="column.value"></textarea>
+                      </div>
+                    </div>
+                    <label *ngIf="(column.type==='checkbox-group')">
+                      <div *ngFor="let cheboxvalue of column.values ; let lengthIndex=index;">
+                        <label>
+                          <input type="checkbox" [name]='column.name' [checked]="cheboxvalue.selected"
+                            (change)="cheboxvalue.selected=!cheboxvalue.selected;setCheckBoxValidation(column);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{cheboxvalue.label}}
+                        </label>
+                        <div class="messages text-danger"
+                          *ngIf="(!column.checkBoxValidationFlag) && submitted && column.required && lengthIndex== (column.values.length-1)">
+                          <label [for]="column.name" [innerHtml]="column.label"></label> can't be blank
+                        </div>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='radio-group')">
+                      <div *ngFor="let radioButtonValue of column.values">
+                        <label>
+                          <input class="default-radio" type="checkbox" [name]='column.name'
+                            [checked]="radioButtonValue.selected"
+                            (change)="setCheckedAsRadio(column.values,$event,radioButtonValue.value);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{radioButtonValue.label}}
+                        </label>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='datetime-local')">
+                      <input type="datetime-local" [name]='column.name'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                        [required]="column.required" #dateTime="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='time')">
+                      <input type="time" [name]='column.name' (ngModelChange)="onChangeFieldForDateAndDropdowns(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"
+                        [(ngModel)]='column.value' [required]="column.required" #time="ngModel">
+                      <div class="messages text-danger" *ngIf="(time.touched || submitted) && time.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label class="form-group row" *ngIf="(column.type==='file')">
+                      <input style="margin-left: 1rem;" type="text" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFileName(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="column.fieldError">
+                        {{column.errorMessage}}}</div>
+                    </label>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <br><br>
+          </div>
+          <div *ngIf="isDynamicForm">
+            <div *ngFor="let data of excelData">
+              <strong>Sheet Name:- &nbsp;&nbsp;</strong><b style="color: royalblue;">{{data.sheetName}}</b>
+              <table id="tableIdDivRefresh" #tableIdDivRefresh
+                class="table-responsive table table-striped table-bordered ">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th *ngFor="let column of data.jsonData"><label [innerHtml]='column.label'
+                        *ngIf="(column.type!='header' && column.type!='newline' && column.type!='paragraph' &&column.type!='table')"></label>
+                      <a *ngIf="column.description!=undefined" href="javascript:;"
+                        class="m-r-15 crm-action-info text-muted text-primary" placement="top"
+                        [ngbTooltip]="column.description">
+                        <i style="font-size: 17px" class="icofont icofont-info-circle"></i>
+                      </a>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody *ngFor="let row of data.rowList ; let i = index" [attr.data-index]="i">
+                  <tr>
+                    <td>
+                      <label>{{i+1}}</label>
+                    </td>
+                    <td *ngFor="let column of data.jsonData ; let j = index" [attr.data-index]="j">
+
+                      <label *ngIf="(column.subtype=='Text')">
+                        <input type="text" [name]='row.jsonData[j].name' [(ngModel)]='row.jsonData[j].value'
+                          (ngModelChange)="onChangeField(row.jsonData[j])" [minlength]="column.minlength"
+                          [required]="column.required" [maxlength]="column.maxlength" #text="ngModel"
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                        <div class="messages text-danger" *ngIf="(text.touched || submitted) && text.errors?.required">
+                          <label [innerHtml]="column.label"></label> can't be blank
+                        </div>
+                      </label>
+                      <label *ngIf="(column.subtype=='Email')">
+                        <input type="email" [name]='row.jsonData[j].name' [(ngModel)]='row.jsonData[j].value'
+                          (ngModelChange)="onChangeField(row.jsonData[j])" [pattern]="helper.email_pattern"
+                          #email="ngModel"
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                        <div class="messages text-danger"
+                          *ngIf="(email.touched || submitted) && email.errors?.required"><label
+                            [innerHtml]="column.label"></label> can't be blank</div>
+                        <div class="messages text-danger" *ngIf="email.errors?.pattern">Please enter a valid Email Id
+                        </div>
+                      </label>
+                      <label *ngIf="(column.subtype=='Mobile')">
+                        <input type="tel" [name]='row.jsonData[j].name' (ngModelChange)="onChangeField(row.jsonData[j])"
+                          [(ngModel)]='row.jsonData[j].value' pattern="^[6789]\d{9}$" (keypress)="onlyNumber($event)"
+                          #mobile="ngModel"
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                        <div class="messages text-danger"
+                          *ngIf="(mobile.touched || submitted) && mobile.errors?.required"><label
+                            [innerHtml]="column.label"></label> can't be blank</div>
+                        <div class="messages text-danger" *ngIf="mobile.errors?.pattern">Please enter a valid <label
+                            [innerHtml]="column.label"></label></div>
+                      </label>
+
+                      <label *ngIf="(column.type==='number')">
+                        <input type="number" [disabled]="column.disabled" [name]='row.jsonData[j].name'
+                          (ngModelChange)="onChangeField(row.jsonData[j])" [(ngModel)]='row.jsonData[j].value'
+                          #number="ngModel" (keypress)="onlyNumber($event)"
+                          (ngModelChange)="calculationOfTableValue(column,row.jsonData)" [minlength]="column.minlength"
+                          [maxlength]="column.maxlength" [required]="column.required"
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                        <div class="messages text-danger"
+                          *ngIf="(number.touched || submitted) && number.errors?.required">Enter valid <label
+                            [innerHtml]="column.label"></label></div>
+                      </label>
+                      <label *ngIf="(column.type==='date')">
+                        <input type="date" [name]='row.jsonData[j].name'
+                          (ngModelChange)="onChangeFieldForDateAndDropdowns(row.jsonData[j])"
+                          [(ngModel)]='row.jsonData[j].value' #date="ngModel" [required]="column.required"
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                        <div class="messages text-danger" *ngIf="(date.touched || submitted) && date.errors?.required">
+                          Enter valid <label [innerHtml]="column.label"></label></div>
+                      </label>
+                      <label *ngIf="(column.type==='textarea')">
+                        <textarea [name]='row.jsonData[j].name' (ngModelChange)="onChangeField(row.jsonData[j])"
+                          [(ngModel)]='row.jsonData[j].value' #textarea="ngModel" [required]="column.required"
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}"></textarea>
+                        <div class="messages text-danger"
+                          *ngIf="(textarea.touched || submitted) && textarea.errors?.required"> <label
+                            [innerHtml]="column.label"></label> can't be blank</div>
+                      </label>
+
+                      <div *ngIf="(column.type==='select')">
+                        <label *ngIf="!column.multiple">
+                          <select class="select-table" [required]="column.required" [name]='row.jsonData[j].name'
+                            (ngModelChange)="onChangeFieldForDateAndDropdowns(row.jsonData[j])"
+                            [(ngModel)]='row.jsonData[j].value' #select="ngModel"
+                            [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                            <option *ngFor='let optionList of column.values' [value]="optionList.value">
+                              {{optionList.label}}
+                            </option>
+                          </select>
+                          <div class="messages text-danger"
+                            *ngIf="(select.touched || submitted) && select.errors?.required"> <label
+                              [innerHtml]="column.label"></label> can't be blank</div>
+
+                        </label>
+                        <div style="width: 400px;" *ngIf="column.multiple">
+                          <textarea style="pointer-events: none;" class="multiple-textarea"
+                            [rows]="(row.jsonData[j].value.length/50)+1" [innerHtml]="row.jsonData[j].value"></textarea>
+
+                        </div>
+                      </div>
+                      <label *ngIf="(column.type==='checkbox-group')">
+                        <div *ngFor="let cheboxvalue of row.jsonData[j].values ; let lengthIndex=index;">
+                          <label>
+                            <input type="checkbox" [name]='row.jsonData[j].name' [checked]="cheboxvalue.selected"
+                              (change)="cheboxvalue.selected=!cheboxvalue.selected;setCheckBoxValidation(row.jsonData[j]);onChangeFieldForDateAndDropdowns(row.jsonData[j])"
+                              [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                            {{cheboxvalue.label}}
+                          </label>
+                          <div class="messages text-danger"
+                            *ngIf="(!row.jsonData[j].checkBoxValidationFlag) && submitted && column.required && lengthIndex== (row.jsonData[j].values.length-1)">
+                            <label [for]="row.jsonData[j].name" [innerHtml]="column.label"></label> can't be blank
+                          </div>
+                        </div>
+                      </label>
+
+                      <label *ngIf="(column.type==='radio-group')">
+                        <div *ngFor="let radioButtonValue of row.jsonData[j].values">
+                          <label>
+                            <input class="default-radio" type="checkbox" [name]='row.jsonData[j].name'
+                              [checked]="radioButtonValue.selected"
+                              (change)="setCheckedAsRadio(row.jsonData[j].values,$event,radioButtonValue.value);onChangeFieldForDateAndDropdowns(row.jsonData[j])">
+                            {{radioButtonValue.label}}
+                          </label>
+                        </div>
+                      </label>
+                      <label *ngIf="(column.type==='datetime-local')">
+                        <input type="datetime-local" [name]='row.jsonData[j].name'
+                          (ngModelChange)="onChangeFieldForDateAndDropdowns(row.jsonData[j])"
+                          [(ngModel)]='row.jsonData[j].value' [required]="column.required" #dateTime="ngModel"
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                        <div class="messages text-danger"
+                          *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter valid <label
+                            [innerHtml]="column.label"></label></div>
+                      </label>
+                      <label *ngIf="(column.type==='time')">
+                        <input type="time" [name]='row.jsonData[j].name'
+                          (ngModelChange)="onChangeFieldForDateAndDropdowns(row.jsonData[j])"
+                          [(ngModel)]='row.jsonData[j].value' [required]="column.required" #time="ngModel"
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                        <div class="messages text-danger" *ngIf="(time.touched || submitted) && time.errors?.required">
+                          Enter valid <label [innerHtml]="column.label"></label></div>
+                      </label>
+
+                      <label class="form-group row" *ngIf="(column.type==='file')">
+                        <input style="margin-left: 1rem;" type="text" [name]='row.jsonData[j].name'
+                          (ngModelChange)="onChangeFileName(row.jsonData[j])" [(ngModel)]='row.jsonData[j].value'
+                          [ngStyle]="{'background-color': !row.jsonData[j].fieldError? 'white' : '#FD3A4A'}">
+                        <div class="messages text-danger" *ngIf="row.jsonData[j].fieldError">
+                          {{row.jsonData[j].errorMessage}}</div>
+                      </label>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <br><br>
+            </div>
+          </div>
+
+          <div class="table-responsive " *ngIf="selectedDocument === '113'">
+            <table id="tableIdDivRefresh1" #tableIdDivRefresh class="table table-striped table-bordered ">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Risk Factor</th>
+                  <th>Risk scenario</th>
+                  <th>URS List</th>
+                  <th>Specification List</th>
+                  <th>ProbableCauseOfRisk</th>
+                  <th>probabilityOfOccurance</th>
+                  <th>Severity</th>
+                  <th>Detectability</th>
+                  <th>Proposed Mitigation</th>
+                  <th *ngFor="let column of formExtendedColumns">
+                    <label *ngIf="(column.type!='header' && column.type!='newline' && column.type!='paragraph')"
+                      [innerHtml]='column.label'></label>
+                  </th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let row of excelData ; let i = index" [attr.data-index]="i">
+                <tr>
+                  <td>
+                    <label>{{i+1}}</label>
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.riskFactor" class="form-control"
+                      [ngStyle]="{'background-color': row.riskFactor != ''? 'white' : '#FD3A4A'}" />
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.riskScenario" class="form-control"
+                      [ngStyle]="{'background-color': row.riskScenario != ''? 'white' : '#FD3A4A'}" />
+                  </td>
+
+                  <td>
+                    <ng-select [ngClass]="'ng-select'" [options]="simpleOption" [multiple]="true"
+                      [(ngModel)]="row['ursList']" (ngModelChange)="onRiskUrsChange($event,row);"
+                      name="{{row['riskScenario']}}" rounds="ngModel" [disabled]="isReadOnly"
+                      [ngStyle]="{'background-color': (row['ursList'] != '' || row['specList'] != '')? 'white' : '#FD3A4A'}">
+                    </ng-select>
+                  </td>
+                  <td>
+                    <ng-select [ngClass]="'ng-select'" [options]="specSimpleOption" [multiple]="true"
+                      [(ngModel)]="row['specList']" (ngModelChange)="onRiskSpecChange($event,row);"
+                      name="{{row['riskScenario']}}" rounds="ngModel" [disabled]="isReadOnly"
+                      [ngStyle]="{'background-color': (row['specList'] != '' || row['ursList'] != '')? 'white' : '#FD3A4A'}">
+                    </ng-select>
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.probableCauseOfRisk" class="form-control" />
+                    <!-- <input type="text" [(ngModel)]="row.probableCauseOfRisk" class="form-control"
+                      [ngStyle]="{'background-color': row.probableCauseOfRisk != ''? 'white' : '#FD3A4A'}" /> -->
+                  </td>
+                  <td>
+                    <select name="select" [(ngModel)]="row['probabilityOfOccurance']"
+                      (ngModelChange)="onProbabilityOfOccuranceChange($event,row);"
+                      [ngStyle]="{'background-color': row['probabilityOfOccurance'] != ''? 'white' : '#FD3A4A'}"
+                      name="{{row['probabilityOfOccuranceName']}}" class="form-control">
+                      <option *ngFor="let risk of riskProbability" [value]="risk.key">{{risk.value}}</option>
+                    </select>
+                  </td>
+                  <td class="w-12">
+                    <select name="select" [(ngModel)]="row['severity']" (ngModelChange)="onSeverityChange($event,row);"
+                      name="{{row['severityName']}}" class="form-control"
+                      [ngStyle]="{'background-color': row['severity'] != ''? 'white' : '#FD3A4A'}">
+                      <option *ngFor="let risk of riskSeverity" [value]="risk.key">{{risk.value}}</option>
+                    </select>
+                  </td>
+                  <td class="w-12">
+                    <select name="select" [(ngModel)]="row['detectability']"
+                      (ngModelChange)="onDetectabilityChange($event,row);" name="{{row['detectabilityName']}}"
+                      class="form-control"
+                      [ngStyle]="{'background-color': row['detectability'] != ''? 'white' : '#FD3A4A'}">
+                      <option *ngFor="let risk of riskDetectability" [value]="risk.key">{{risk.value}}</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.proposedMitigation" class="form-control" />
+                    <!-- <input type="text" [(ngModel)]="row.proposedMitigation" class="form-control"
+                      [ngStyle]="{'background-color': row.proposedMitigation != ''? 'white' : '#FD3A4A'}" /> -->
+                  </td>
+                  <td *ngFor="let column of row.jsonExtraData">
+
+                    <label *ngIf="(column.subtype=='Text')">
+                      <input type="text" [name]='column.name' [(ngModel)]='column.value' [minlength]="column.minlength"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [maxlength]="column.maxlength" #text="ngModel"
+                        [ngStyle]="{'background-color':!column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(text.touched || submitted) && text.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Email')">
+                      <input type="email" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="fieldValidation(column)" [pattern]="helper.email_pattern" #email="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(email.touched || submitted) && email.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                      <div class="messages text-danger" *ngIf="email.errors?.pattern">Please enter a valid Email Id
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Mobile')">
+                      <input type="tel" [name]='column.name' [(ngModel)]='column.value' pattern="^[6789]\d{9}$"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"
+                        (keypress)="onlyNumber($event)" #mobile="ngModel" (ngModelChange)="fieldValidation(column)">
+                      <div class="messages text-danger"
+                        *ngIf="(mobile.touched || submitted) && mobile.errors?.required"><label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                      <div class="messages text-danger" *ngIf="mobile.errors?.pattern">Please enter a valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+
+                    <label *ngIf="(column.type==='number')">
+                      <input type="number" [disabled]="column.disabled" [name]='column.name' [(ngModel)]='column.value'
+                        #number="ngModel" (keypress)="onlyNumber($event)" (ngModelChange)="fieldValidation(column)"
+                        (ngModelChange)="calculationOfTableValue(column,row)" [minlength]="column.minlength"
+                        [maxlength]="column.maxlength" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(number.touched || submitted) && number.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='date')">
+                      <input type="date" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" #date="ngModel"
+                        [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(date.touched || submitted) && date.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='textarea')">
+                      <textarea [name]='column.name' [(ngModel)]='column.value' #textarea="ngModel"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"></textarea>
+                      <div class="messages text-danger"
+                        *ngIf="(textarea.touched || submitted) && textarea.errors?.required"> <label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                    </label>
+
+                    <div *ngIf="(column.type==='select')">
+                      <label *ngIf="!column.multiple">
+                        <select class="select-table" [required]="column.required" [name]='column.name'
+                          (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                          #select="ngModel">
+                          <option *ngFor='let optionList of column.values' [value]="optionList.value"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                            {{optionList.label}}
+                          </option>
+                        </select>
+                        <div class="messages text-danger"
+                          *ngIf="(select.touched || submitted) && select.errors?.required"> <label
+                            [innerHtml]="column.label"></label> can't be blank</div>
+
+                      </label>
+                      <div style="width: 400px;" *ngIf="column.multiple">
+                        <textarea class="multiple-textarea" [rows]="(column.value.length/50)+1"
+                          [innerHtml]="column.value"></textarea>
+
+                      </div>
+                    </div>
+                    <label *ngIf="(column.type==='checkbox-group')">
+                      <div *ngFor="let cheboxvalue of column.values ; let lengthIndex=index;">
+                        <label>
+                          <input type="checkbox" [name]='column.name' [checked]="cheboxvalue.selected"
+                            (change)="cheboxvalue.selected=!cheboxvalue.selected;setCheckBoxValidation(column);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{cheboxvalue.label}}
+                        </label>
+                        <div class="messages text-danger"
+                          *ngIf="(!column.checkBoxValidationFlag) && submitted && column.required && lengthIndex== (column.values.length-1)">
+                          <label [for]="column.name" [innerHtml]="column.label"></label> can't be blank
+                        </div>
+                      </div>
+
+                    </label>
+
+                    <label *ngIf="(column.type==='radio-group')">
+                      <div *ngFor="let radioButtonValue of column.values">
+                        <label>
+                          <input class="default-radio" type="checkbox" (ngModelChange)="fieldValidation(column)"
+                            [name]='column.name' [checked]="radioButtonValue.selected"
+                            (change)="setCheckedAsRadio(column.values,$event,radioButtonValue.value);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{radioButtonValue.label}}
+                        </label>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='datetime-local')">
+                      <input type="datetime-local" [name]='column.name'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                        [required]="column.required" #dateTime="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='time')">
+                      <input type="time" [name]='column.name' (ngModelChange)="onChangeFieldForDateAndDropdowns(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"
+                        [(ngModel)]='column.value' [required]="column.required" #time="ngModel">
+                      <div class="messages text-danger" *ngIf="(time.touched || submitted) && time.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label class="form-group row" *ngIf="(column.type==='file')">
+                      <input style="margin-left: 1rem;" type="text" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFileName(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="column.fieldError">
+                        {{column.errorMessage}}</div>
+                    </label>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+            <br><br>
+
+          </div>
+          <div class="table-responsive " *ngIf="selectedDocument === '128'">
+            <table id="tableIdDivRefresh128" #tableIdDivRefresh class="table table-striped table-bordered ">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Document Title</th>
+                  <th>File Upload</th>
+                  <th *ngFor="let column of formExtendedColumns">
+                    <label *ngIf="(column.type!='header' && column.type!='newline' && column.type!='paragraph')"
+                      [innerHtml]='column.label'></label>
+                  </th>
+                </tr>
+              </thead>
+              <tbody *ngFor="let row of excelData ; let i = index" [attr.data-index]="i">
+                <tr>
+                  <td>
+                    <label>{{i+1}}</label>
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.documentName" class="form-control"
+                      [ngStyle]="{'background-color': row.documentName != ''? 'white' : '#FD3A4A'}" />
+                  </td>
+                  <td>
+                    <input type="text" [(ngModel)]="row.uploadedFile" class="form-control"
+                      [ngStyle]="{'background-color': row.uploadedFile != ''? 'white' : '#FD3A4A'}" />
+                  </td>
+
+                  <td *ngFor="let column of row.jsonExtraData">
+
+                    <label *ngIf="(column.subtype=='Text')">
+                      <input type="text" [name]='column.name' [(ngModel)]='column.value' [minlength]="column.minlength"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [maxlength]="column.maxlength" #text="ngModel"
+                        [ngStyle]="{'background-color':!column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(text.touched || submitted) && text.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Email')">
+                      <input type="email" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="fieldValidation(column)" [pattern]="helper.email_pattern" #email="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(email.touched || submitted) && email.errors?.required">
+                        <label [innerHtml]="column.label"></label> can't be blank
+                      </div>
+                      <div class="messages text-danger" *ngIf="email.errors?.pattern">Please enter a valid Email Id
+                      </div>
+                    </label>
+                    <label *ngIf="(column.subtype=='Mobile')">
+                      <input type="tel" [name]='column.name' [(ngModel)]='column.value' pattern="^[6789]\d{9}$"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"
+                        (keypress)="onlyNumber($event)" #mobile="ngModel" (ngModelChange)="fieldValidation(column)">
+                      <div class="messages text-danger"
+                        *ngIf="(mobile.touched || submitted) && mobile.errors?.required"><label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                      <div class="messages text-danger" *ngIf="mobile.errors?.pattern">Please enter a valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+
+                    <label *ngIf="(column.type==='number')">
+                      <input type="number" [disabled]="column.disabled" [name]='column.name' [(ngModel)]='column.value'
+                        #number="ngModel" (keypress)="onlyNumber($event)" (ngModelChange)="fieldValidation(column)"
+                        (ngModelChange)="calculationOfTableValue(column,row)" [minlength]="column.minlength"
+                        [maxlength]="column.maxlength" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(number.touched || submitted) && number.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='date')">
+                      <input type="date" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" #date="ngModel"
+                        [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="(date.touched || submitted) && date.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='textarea')">
+                      <textarea [name]='column.name' [(ngModel)]='column.value' #textarea="ngModel"
+                        (ngModelChange)="fieldValidation(column)" [required]="column.required"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"></textarea>
+                      <div class="messages text-danger"
+                        *ngIf="(textarea.touched || submitted) && textarea.errors?.required"> <label
+                          [innerHtml]="column.label"></label> can't be blank</div>
+                    </label>
+
+                    <div *ngIf="(column.type==='select')">
+                      <label *ngIf="!column.multiple">
+                        <select class="select-table" [required]="column.required" [name]='column.name'
+                          (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                          #select="ngModel">
+                          <option *ngFor='let optionList of column.values' [value]="optionList.value"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                            {{optionList.label}}
+                          </option>
+                        </select>
+                        <div class="messages text-danger"
+                          *ngIf="(select.touched || submitted) && select.errors?.required"> <label
+                            [innerHtml]="column.label"></label> can't be blank</div>
+
+                      </label>
+                      <div style="width: 400px;" *ngIf="column.multiple">
+                        <textarea class="multiple-textarea" [rows]="(column.value.length/50)+1"
+                          [innerHtml]="column.value"></textarea>
+
+                      </div>
+                    </div>
+                    <label *ngIf="(column.type==='checkbox-group')">
+                      <div *ngFor="let cheboxvalue of column.values ; let lengthIndex=index;">
+                        <label>
+                          <input type="checkbox" [name]='column.name' [checked]="cheboxvalue.selected"
+                            (change)="cheboxvalue.selected=!cheboxvalue.selected;setCheckBoxValidation(column);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{cheboxvalue.label}}
+                        </label>
+                        <div class="messages text-danger"
+                          *ngIf="(!column.checkBoxValidationFlag) && submitted && column.required && lengthIndex== (column.values.length-1)">
+                          <label [for]="column.name" [innerHtml]="column.label"></label> can't be blank
+                        </div>
+                      </div>
+
+                    </label>
+
+                    <label *ngIf="(column.type==='radio-group')">
+                      <div *ngFor="let radioButtonValue of column.values">
+                        <label>
+                          <input class="default-radio" type="checkbox" (ngModelChange)="fieldValidation(column)"
+                            [name]='column.name' [checked]="radioButtonValue.selected"
+                            (change)="setCheckedAsRadio(column.values,$event,radioButtonValue.value);onChangeFieldForDateAndDropdowns(column)"
+                            [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                          {{radioButtonValue.label}}
+                        </label>
+                      </div>
+                    </label>
+                    <label *ngIf="(column.type==='datetime-local')">
+                      <input type="datetime-local" [name]='column.name'
+                        (ngModelChange)="onChangeFieldForDateAndDropdowns(column)" [(ngModel)]='column.value'
+                        [required]="column.required" #dateTime="ngModel"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger"
+                        *ngIf="(dateTime.touched || submitted) && dateTime.errors?.required">Enter valid <label
+                          [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label *ngIf="(column.type==='time')">
+                      <input type="time" [name]='column.name' (ngModelChange)="onChangeFieldForDateAndDropdowns(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}"
+                        [(ngModel)]='column.value' [required]="column.required" #time="ngModel">
+                      <div class="messages text-danger" *ngIf="(time.touched || submitted) && time.errors?.required">
+                        Enter valid <label [innerHtml]="column.label"></label></div>
+                    </label>
+                    <label class="form-group row" *ngIf="(column.type==='file')">
+                      <input style="margin-left: 1rem;" type="text" [name]='column.name' [(ngModel)]='column.value'
+                        (ngModelChange)="onChangeFileName(column)"
+                        [ngStyle]="{'background-color': !column.fieldError? 'white' : '#FD3A4A'}">
+                      <div class="messages text-danger" *ngIf="column.fieldError">
+                        {{column.errorMessage}}</div>
+                    </label>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+            <br><br>
+
+          </div>
+          <br>
+          <div style="text-align: center" class="messages text-danger" *ngIf="isValidTableData">Please Fill all the Data
+          </div>
+          <br>
+          <div class="form-group row">
+            <div style="text-align: center">
+              <button type="button" class="btn btn-success" *ngIf="permissionModal.createButtonFlag"
+                [disabled]="isLoading" (click)="importData();">Import
+                <span *ngIf="isLoading" class="ti-reload rotate-refresh"></span>&nbsp;
+              </button>
+              <p *ngIf="!permissionModal.createButtonFlag"
+                style="color: red; font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;">You don't
+                have create permission, please contact admin..!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #ursCheckListModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Check List</h4>
+    <div style="position: absolute;top: 20px;right: 10px;">
+      <button type="button" class="btn btn-sm btn-danger" (click)="ursCheckListModal.hide();">Close</button>
+    </div>
+  </div>
+  <div class="app-modal-body">
+    <div class="form-group row" *ngIf="checkList.length==0">
+      <div class="col-sm-4"></div>
+      <div class="col-sm-4">
+        <button type="button" class="btn btn-primary btn-sm" (click)="addChecklistItem();">
+          <i class="icofont icofont-checked"></i>Add
+        </button>
+      </div>
+      <div class="col-sm-4"></div>
+    </div>
+    <ng-container *ngIf="checkList.length>0">
+      <div class="col-sm-12">
+        <table id="equipment-table-checkList" class="table">
+          <thead class="panel-heading">
+            <tr class="w-100">
+              <td style="width: 1%;"><label class="strong">S No.</label></td>
+              <td class="w-40"><label class="strong">Name</label></td>
+              <td class="w-10"><label class="strong">Actions</label></td>
+            </tr>
+          </thead>
+          <tbody class="panel-body">
+            <ng-container *ngFor="let item of checkList; let i = index">
+              <tr>
+                <td>
+                  <label placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Display Order">{{i+1}}</label>
+                </td>
+                <td>
+                  <input type="text" id="check_list_name_id_{{i}}" autofocus class="form-control"
+                    [(ngModel)]="item.checklistName" (ngModelChange)="onChangecheckList();"
+                    [ngModelOptions]="{standalone: true}" />
+                </td>
+                <td>
+                  <a class="pointer" role="button" title="Add" (click)="addChecklistItem();">
+                    <i class="icofont icofont-ui-add text-success"></i></a>
+                  <a class="pointer" role="button" title="Delete" (click)="deleteCheckList(i, checkList);">
+                    <i class="icofont icofont-ui-delete text-danger"></i></a>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+    <div class="messages text-danger" *ngIf="isCheckListEntered">Please Fill the Details to Continue . . .</div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #testCaseCheckListModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Test Steps</h4>
+    <div style="position: absolute;top: 20px;right: 10px;">
+      <button type="button" class="btn btn-sm btn-danger" (click)="testCaseCheckListModal.hide();">Close</button>
+    </div>
+  </div>
+  <div class="app-modal-body">
+    <div class="form-group row" *ngIf="checkList.length==0">
+      <div class="col-sm-4"></div>
+      <div class="col-sm-4">
+        <button type="button" class="btn btn-primary btn-sm" (click)="addChecklistItem();">
+          <i class="icofont icofont-checked"></i>Add
+        </button>
+      </div>
+      <div class="col-sm-4"></div>
+    </div>
+    <ng-container *ngIf="checkList.length>0">
+      <div class="form-group row">
+        <div class="col-sm-12">
+          <div id="check-list-drag-id" class="panel panel-default" dnd-sortable-container [sortableData]="checkList"
+            droppable [dropScope]="[]">
+            <table id="testcase-table-checkList" class="table">
+              <thead class="panel-heading">
+                <tr class="w-100">
+                  <td class="w-10"><label class="strong">S No.</label></td>
+                  <td class="w-40"><label class="strong">Test Steps</label></td>
+                  <td class="w-40"><label class="strong">Expected Result</label></td>
+                  <td class="w-10"><label class="strong">Actions</label></td>
+                </tr>
+              </thead>
+              <tbody class="panel-body">
+                <ng-container *ngFor="let item of checkList; let i = index">
+                  <tr [draggable] dnd-sortable [sortableIndex]="i" [dragData]="item">
+                    <td>
+                      <label placement="top" triggers="mouseenter:mouseleave"
+                        ngbTooltip="Test Steps Order">{{i+1}}</label>
+                    </td>
+                    <td>
+                      <input type="text" id="check_list_name_id_{{i}}" autofocus class="form-control"
+                        [(ngModel)]="item.checklistName" (ngModelChange)="onChangecheckList();"
+                        [ngModelOptions]="{standalone: true}" />
+                    </td>
+                    <td>
+                      <textarea class="form-control" [ngModelOptions]="{standalone: true}" name="expectedResult-{{i}}"
+                        [(ngModel)]="item.expectedResult" rows="1"></textarea>
+                    </td>
+                    <td>
+                      <a class="pointer" role="button" title="Add Test Steps" (click)="addChecklistItem();">
+                        <i class="icofont icofont-ui-add text-success"></i></a>
+                      <a class="pointer" role="button" title="Delete" (click)="deleteCheckList(i, checkList);">
+                        <i class="icofont icofont-ui-delete text-danger"></i></a>
+                    </td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+    <div class="messages text-danger" *ngIf="isCheckListEntered">Please Fill the Details to Continue . . .</div>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

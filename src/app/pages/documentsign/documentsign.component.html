@@ -1,0 +1,110 @@
+<div *ngIf="!isIcon">
+  <div class="row">
+    <div class="col-sm" *ngIf="docSignselectList.length>0">
+      <ng-select [ngClass]="'ng-select'" [options]="docSignselectList" [multiple]="false" [(ngModel)]="docSelection"
+        (ngModelChange)="clickFilter($event)"></ng-select>
+    </div>
+    <div class="col-sm text-center">
+      <button type="button" class=" {{this.summaryorindividual==true?'p-0 m-0':''}}  btn btn-primary waves-effect "
+        (click)="openMyModal('effect-1')">Esign</button>
+    </div>
+  </div>
+</div>
+
+  <a role="button" *ngIf="isIcon" ><img class="image-radius rounded-0 img-25 m-r-20 float-right"
+    src="assets/icon/png-icons/esign.png" alt="Forum" placement="bottom" ngbTooltip="Approve"
+    (click)="openMyModal('effect-1');"></a>
+
+<app-modal-animation #documentEsign container="body" [modalID]="'effect-1'" [modalClass]="'md-effect-1'">
+  <!-- <div *ngIf="isIcon" style="background-color: #7d7f80;">
+    <br><br>
+  </div> -->
+  <h3 class="pt-2 pb-1">Electronic Signature</h3>
+  <button *ngIf="isIcon" type="button" class="close basic-close-light-box" style="position: absolute;right: 12px;top: 98px;font-size: 40px;color: white;" 
+  (click)="closeMyModal('effect-1')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+    <form style="height: 460px; overflow-y: scroll;background: white !important;border: none;" class="well well-lg pt-1" [formGroup]="esignForm" (ngSubmit)="onSubmit(esignForm)">
+      <div class="row">
+        <label class="col-sm-6 pt-4 text-left">Please enter your Comments</label>
+        <div class="col-sm-6">
+          <textarea class="form-control" id="workFlowCommentsId" placeholder="Comments" formControlName="comments"
+            name="description" maxlength="250" cols="50" rows="3"> </textarea>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-6">
+          <strong class="float-left">Do you Approve or Reject this Document?</strong>
+        </div>
+        <div class="col-sm-6">
+          <input type="radio" [(ngModel)]="finalstatus" [ngModelOptions]="{standalone: true}" name="status"
+            [value]="true"> Approve &nbsp;&nbsp;&nbsp;
+          <input type="radio" [(ngModel)]="finalstatus" [ngModelOptions]="{standalone: true}" name="status"
+            [value]="false"> Reject &nbsp;&nbsp;&nbsp;
+        </div>
+      </div>
+      <div class="row" *ngIf="!finalstatus">
+        <div class="col-sm-6">
+          <strong class="float-left">Resume workflow from current level after publish</strong>
+        </div>
+        <div class="col-sm-6">
+          <label class="switch" style="height: 32px;"><input type="checkbox" name="activeFlag"
+            [(ngModel)]="rejectionOption"  [ngModelOptions]="{standalone: true}" /><span class="slider round"></span></label>
+        </div>
+      </div>
+      <div class="row">
+        <strong class="col-sm-12 strong text-left">This verification requires your electronic signature. </strong>
+      </div>
+      <hr class="m-2">
+      <div class="row">
+        <div class="col-sm-2">
+          <input type="checkbox" id="acceptCheckBox" name="check" (change)="onclickAccept()"> I Accept
+        </div>
+        <div class="col-sm-10"><h6>{{this.esignAgreementMessage.agreementMessage}}</h6></div>
+      </div>
+      <div class="row pt-1" *ngIf="this.agreementCheck">
+        <label class="col-sm-6 text-left">Please enter your Email Id or User Name</label>
+        <div class="col-sm-6">
+          <input class="form-control" size="49" formControlName="userName" type="email" autocomplete="new-password"
+            placeholder="Email Id or User Name" name="userName" required />
+        </div>
+      </div>
+      <div class="row pt-1" *ngIf="this.agreementCheck">
+        <label class="col-sm-6 text-left"> Please enter your Password</label>
+        <div class="col-sm-6">
+          <input id="passwordId" class="form-control" size="49" formControlName="password" type="password" placeholder="password"
+            name="password" autocomplete="new-password" required />
+        </div>
+      </div>
+      <div class="row pt-1" *ngIf="this.agreementCheck">
+        <div class="col-sm-6 pt-5"><label for="viewSignatureId"><input type="checkbox" [checked]="viewSignature" id="viewSignatureId"
+              (click)="viewSignature=!viewSignature;viewSignature?clearSignature():'';" />&nbsp;Enable Signature Pad</label></div>
+        <div *ngIf="viewSignature" class="col-sm-6">
+          <div class="well well-sm mb-0">
+            <signature-pad [options]="signaturePadOptions" (onEndEvent)="signatureComplete()">
+            </signature-pad>
+          </div>
+          <button type="button" *ngIf="esignForm.get('signature').value"
+              class="mr-0 btn btn-sm btn-link waves-effect waves-light"  (click)="clearSignature()">Clear</button>
+        </div>
+      </div>
+      <div class="row col-sm-12" *ngIf="this.agreementCheck">
+        <p *ngFor="let item of errorList" class="text-danger">{{item}}</p>
+        <p class="text-danger p-0" *ngIf="(this.submitted) && esignForm.get('userName').hasError('required')">
+          <span>{{esignErrors.usernameValidation}}</span></p>
+        &nbsp;&nbsp;<p class="text-danger p-0"
+          *ngIf="(this.submitted) && esignForm.get('password').hasError('required')">
+          <span>{{esignErrors.passwordValidaiton}}</span></p>
+        &nbsp;&nbsp;<p class="text-danger p-0"
+          *ngIf="(this.submitted) && esignForm.get('comments').hasError('required')">
+          <span>{{esignErrors.commentsValidation}}</span></p>
+      </div>
+      <br>
+      <button style="text-align: center;" *ngIf="!esignSpinnerFlag && this.agreementCheck" type="submit"
+        class="btn btn-danger waves-effect waves-light ">ESign</button>
+    </form>
+    <button (click)="closeMyModal('effect-1')" aria-label="Close" class="md-close-btn"><i
+      class="icofont icofont-ui-close"></i></button>
+</app-modal-animation>
+
+<div *ngIf="this.esignSpinnerFlag" class="loading">Loading&#8230;</div>

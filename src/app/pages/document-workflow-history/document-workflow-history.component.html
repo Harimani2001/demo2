@@ -1,0 +1,118 @@
+<app-modal-basic #workFlowHistoryModal [dialogClass]="'modal-lg'" [hideClickOutSide]="true"
+  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow Configuration And Approval History</h4>
+    <button type="button" class="close basic-close" (click)="workFlowHistoryModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body">
+    <div style="max-height: 300px !important;" class="col-sm slimScrollDiv">
+      <div class="dt-desc dy-width-300">
+        <ng-container>
+          <ul class="progress-indicator">
+            <li *ngFor="let data of this.stepperData;"  class="{{data.workFlowCompleted?'completed':'pending' }}">
+              <label>
+                <span style="white-space: pre-line;" class="bubble"></span>
+                <div  style="text-align: left;" class="strong"><a role="button" *ngIf="data.workFlowCompleted"><img style="width: 25px; height: 25px;" class="image-radius rounded-0 img-30 m-r-10"
+                  src="assets/icon/png-icons/checked.png" alt="Forum" placement="bottom" ngbTooltip="External Approval"></a> {{data.levelName}} : {{data.type}}<br>
+                  <span *ngIf="data.allUserApproval">(All User Approval)</span><br>
+                  <div><b class="black"><u>Users</u></b>
+                    <div *ngIf="data.allUserApproval && data.userApprovalList.length > 0">
+                      <li *ngFor="let user of data.userApprovalList;let i = index ">
+                        {{i+1}}.{{user.user}}&nbsp;
+                        <div *ngIf="!data.pendingDocumentsFlag && user.comments" class="black"><b>Comments : </b> {{user.comments}}</div>
+                        <div *ngIf="!data.pendingDocumentsFlag && user.dateTime" class="black"><b>Date : </b> {{user.dateTime}}</div>
+                      </li>
+                    </div>
+                    <div *ngIf="data.allUserApproval && data.userApprovalList.length == 0">
+                      <li *ngFor="let user of data.userArray;let i = index ">{{i+1}}.{{user}}</li>
+                    </div>
+                    <div *ngIf="!data.allUserApproval">
+                      <li *ngFor="let user of data.userArray;let i = index ">{{i+1}}.{{user}}
+                        <div *ngIf="!data.pendingDocumentsFlag && data.comments!=null && data.comments !='not applicable' && data.createdUserName === user" class="black"><b>Comments :</b> {{data.comments}}</div>
+                        <div *ngIf="!data.pendingDocumentsFlag && data.createdTime!=null && data.createdTime !='not applicable' && data.createdUserName === user" class="black"><b>Created Time :</b>&nbsp;{{data.createdTime}}</div>
+                      </li>
+                    </div>
+                  </div>
+                  <div *ngIf="data.externalApprovalList.length >0">
+                    <b class="black"><u>External Approval</u></b>
+                    <li *ngFor="let user of data.externalApprovalList;let i = index ">
+                      {{i+1}}.{{user.user}}
+                      <div *ngIf="!data.pendingDocumentsFlag && user.comments" class="black"><b>Comments : </b> {{user.comments}}</div>
+                      <div *ngIf="!data.pendingDocumentsFlag && user.dateTime" class="black"><b>Date : </b> {{user.dateTime}}</div>
+                    </li>
+                    <br>
+                  </div>
+                <div *ngIf="data.currentLevel" class="text-danger">
+                  Pending for Approval
+                  <br>
+                </div>
+                <div>
+                  <a *ngIf="data.levelApprovalHistory && data.levelApprovalHistory.length > 1" href="javascript:;" style="text-decoration: underline;" (click)="loadLevelHistory(data)">View History</a>
+                </div>
+    </div>
+    </label>
+    </li>
+    </ul><br><br>
+    </ng-container>
+  </div>
+  </div>
+  <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #levelHistroyModal [dialogClass]="'modal-lg'" [hideClickOutSide]="true" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow History</h4>
+    <button type="button" class="close basic-close" (click)="levelHistroyModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+   <div *ngIf="this.levelApprovalHistory.length == 0">No History found</div>
+   <div *ngIf="this.levelApprovalHistory.length > 0">
+    <ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable"
+    class="data-table dt-chk" style="overflow: unset!important;"
+    [rows]='levelApprovalHistory' [limit]="5" [columnMode]="'force'" [headerHeight]="50"
+    [footerHeight]="50" [rowHeight]="'auto'">
+
+    <ngx-datatable-column name="Name">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['userName']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Department">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['department']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Date">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['date']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Comments">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['comments']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Status">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+   </div>
+                    
+  </div>
+</app-modal-basic>

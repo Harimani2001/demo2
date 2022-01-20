@@ -1,0 +1,267 @@
+
+<div class="row" *ngIf="!this.viewIndividualDataFlag">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-6">
+          <h3><strong class="strong">Template Library</strong></h3>
+        </div>
+        <div class="col-sm-6 text-right">
+
+        <a *ngIf="this.search" href="javascript:"><img class="image-radius rounded-0 img-25"
+            src="assets/icon/png-icons/search.png" alt="Search" placement="bottom" ngbTooltip="Search"
+            (click)="onClickSearch()"></a>
+
+        <input id="searchBox" [autofocus] *ngIf="this.search && this.showSearch" type="search" [(ngModel)]="filterQuery"
+          (ngModelChange)="this.helper.setPaginator(table);" class="form-control input-sm full-data-search m-r-5"
+          placeholder="Search">
+          
+          &nbsp;&nbsp;
+
+            <a href="javascript:"><img class="image-radius rounded-0 img-25 m-r-15"
+                src="assets/icon/png-icons/addDoc.png" alt="Add Template Library" placement="bottom"
+                ngbTooltip="Add Template Library" (click)="createVendor();"></a>
+
+                <div class="nav-item nav-grid">
+                  <a *ngIf="tableView" href="javascript:" class="m-r-20"><img class="image-radius rounded-0 img-25"
+                      src="assets/icon/png-icons/tableView.png" alt="Table View" placement="top" ngbTooltip="Table view"
+                      (click)="changeview(false)"></a>
+          
+                  <a *ngIf="!tableView" href="javascript:" class="m-r-20"><img class="image-radius rounded-0 img-30"
+                      src="assets/icon/png-icons/cardView.png" alt="Card View" placement="top" ngbTooltip="Card View"
+                      (click)="changeview(true)"></a>
+                </div>
+        </div>
+      </div>
+      
+  
+
+
+      <ngb-tabset #vendorTab="ngbTabset" (tabChange)="tabChange($event.nextId);">
+        <ngb-tab title="Template" id="draft">
+
+          <ng-template ngbTabContent>
+
+            <div *ngIf=!tableView style="padding-top: 10px;">  
+            <ngx-datatable [scrollbarH]="true" #Table class="data-table dt-chk"
+            [rows]='tableData | TemplateLibraryFilterPipe : filterQuery' [columnMode]="'force'"
+            [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [externalPaging]="true"
+            [count]="page.totalElements"  [offset]="page.pageNumber" [limit]="page.size"
+            (page)="setPage($event)">
+
+              <ngx-datatable-column name="Project Name">
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                  <strong class="fontStyle">{{row['projectName']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Category">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong class="fontStyle">{{row['projectType']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Equipment">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong class="fontStyle">{{row['equipment']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Software">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong class="fontStyle">{{row['software']}}</strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Status">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong class="fontStyle" [ngStyle]="{'color': row['isActive'] === 'Y' ? 'green': 'red'}">
+                    {{row['isActive'] === 'Y' ? 'Active' : 'In-Active'}}</strong>
+                </ng-template>
+              </ngx-datatable-column>  
+            <ngx-datatable-column name="Action">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+                <ng-template #popContent>
+                  <span class="text-left">
+                    <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                    <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                    <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                    <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                  </span>
+                </ng-template>
+                <a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+                  placement="right" placement="top" [ngbTooltip]="popContent">
+                  <i class="icofont icofont-info-square info"></i>
+                </a>
+                <a container="body" 
+                  href="javascript:;" class="m-r-15 crm-action-edit text-muted text-primary" (click)="toEdit(row.id)"
+                  placement="top" ngbTooltip="Edit">
+                  <i  class="icofont icofont-edit edit"></i>
+                </a>
+                <a container="body" 
+                  href="javascript:;" class="m-r-15 crm-action-delete text-muted text-danger"
+                  (click)="openSuccessCancelSwal(row);" placement="top" ngbTooltip="Delete">
+                  <i  class="icofont icofont-bin bin"></i>
+                </a>
+       
+                <!--<a container="body" *ngIf="this.modal.exportButtonFlag" href="javascript:;"
+                  class="crm-action-success text-muted text-success"
+                  (click)="downloadFileOrView(row,false);" placement="top" ngbTooltip="Download">
+                  <i  class="icofont icofont-download"></i></a>&nbsp;
+                <a container="body" role="button" href="javascript:;" class="text-warning"
+                  (click)="openIndividualWorkflowSetup(row)" data-ng-open="modalSmall" placement="top"
+                  ngbTooltip="Workflow">
+                  <i class="icofont icofont-chart-flow-alt-1"></i>
+                </a>-->
+              </ng-template>
+            </ngx-datatable-column>
+
+          </ngx-datatable>
+        
+            </div>
+
+            <div *ngIf=tableView style="padding-top: 10px;">
+              <div class="row" >
+                <div class="col-sm-3" *ngFor="let row of tableData" >
+      
+                  <div class="card card1">
+                      <div class="wrapper">
+                        <img class="card-img-top card-img1" [src]="downloadImage(row)" alt="Card image cap">
+                        <div class="card-body">
+                          <strong style="padding-bottom:5px;padding-left:10px;font-size: 15px;color: gray;">{{row.projectName}}</strong>
+                          <table class="cardTable">
+                            <tr>
+                              <td class="cardTd"><strong>Category&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;</strong><span>{{row.projectType}}</span></td>
+                            </tr>
+      
+                            <tr>
+                              <td class="cardTd"><strong>Equipment &nbsp;: &nbsp;</strong><span>{{row.equipment}}</span></td>
+                            </tr>
+      
+                            <tr>
+                              <td class="cardTd"><strong>Software &nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;</strong><span>{{row.software}}</span></td>
+                            </tr>
+
+                            <tr>
+                              <td class="cardTd"><strong>Created By : &nbsp;</strong><span>{{row.createdName}}</span></td>
+                            </tr>
+
+                            <tr>
+                              <td class="cardTd" style="border: none;"><strong>Status&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: &nbsp;</strong>
+                                <span [ngStyle]="{'color': row['isActive'] === 'Y' ? 'green': 'red'}"> {{row.isActive === 'Y' ? 'Active' : 'In-Active'}}</span></td>
+                            </tr>
+                          </table>
+         
+               
+                            <div style="text-align:center;padding:-20px;margin-bottom:-20px;">
+                                <ng-template #popContent>
+                                  <span class="text-left">
+                                    <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                                    <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                                    <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                                    <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                                  </span>
+                                </ng-template>
+                            <a container="body" href="javascript:;" class="m-r-25 crm-action-info text-muted text-primary button"
+                              placement="right" placement="top" [ngbTooltip]="popContent">
+                              <i class="icofont icofont-info-square info" style="font-size: 22px;"></i>
+                            </a>
+                            <a container="body" 
+                              href="javascript:;" class="m-r-25 crm-action-edit text-muted text-primary button" (click)="toEdit(row.id)"
+                              placement="top" ngbTooltip="Edit">
+                              <i  class="icofont icofont-edit edit" style="font-size: 22px;"></i>
+                            </a>
+                            <a container="body"
+                              href="javascript:;" class="m-r-0 crm-action-delete text-muted text-danger button"
+                              (click)="openSuccessCancelSwal(row , '' );" placement="top" ngbTooltip="Delete">
+                              <i  class="icofont icofont-bin bin" style="font-size: 22px;"></i>
+                            </a>
+                            </div> 
+                      </div>
+                      </div>              
+                      </div>
+                      </div>
+                      </div>
+            </div>
+					</ng-template>
+    
+        </ngb-tab>
+
+        <ngb-tab id="audit" title="Audit Trail">
+					<ng-template ngbTabContent>
+						<app-audit-trail-view #auditView [permission]="this.helper.TEMPLATE_LIBRARY_VALUE"></app-audit-trail-view>
+					</ng-template>
+        </ngb-tab>
+    
+      </ngb-tabset>
+      
+      
+
+ 
+
+    </app-card>
+  </div>
+</div>
+
+
+
+
+
+
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualDataFlag">
+  <div *ngFor="let data of popupdata">
+    <div class="col-sm-12" id="float-action">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-4 d-inline">
+            <h5 class="strong">Project Name : </h5>
+            <span>{{data.vendorCode}}</span>
+          </div>
+          <div class="col-sm-8" style="text-align: right;">
+
+     
+
+            <button 
+              type="submit" (click)="toEdit(data.id)"
+              class="btn btn-sm btn-primary  waves-effect waves-light m-r-10">Edit</button>
+
+            <button
+              type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="openSuccessCancelSwal(data)">Delete &nbsp;&nbsp;</button>              
+
+              <button *ngIf="routeback!=null" type="button"
+              class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              [routerLink]="[this.routeback]">Cancel</button>
+              
+              <button *ngIf="routeback==null" type="button" class="btn btn-sm btn-danger  waves-effect waves-light"
+              (click)="onClickClose()">Cancel</button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <br><br><br>
+
+
+  <!--<div class="row">
+    <div [ngClass]="(commentsSwitch)?'col-sm-9':'col-sm-12'">
+      <pdf-viewer style="display: block;" #ApprovalPDFViewerComponent [src]="pdfURL" [page]="pageVariable"
+        [show-all]="showAll" (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom"
+        [stick-to-page]="true" (error)="onError($event)"></pdf-viewer>
+    </div>
+    <div *ngIf="commentsSwitch" class="col-sm-3">
+      <app-document-forum [chapter]="this.outLineList" [documentList]="this.commentsDocumentsList"
+        [isDocumentWorkFlow]="true"></app-document-forum>
+    </div>
+  </div>
+
+  <ng-container *ngIf="this.popupdata && this.popupdata.length >0 && !disableFormOnUpdate">
+  <app-view-form [inputField]='this.popupdata'></app-view-form><br>
+   </ng-container>
+  <app-individual-audit-trail [permission]="this.helper.TEMPLATE_LIBRARY_VALUE" [id]="data.id"></app-individual-audit-trail>-->
+  
+</div>
+</app-card>
+
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+
+
+

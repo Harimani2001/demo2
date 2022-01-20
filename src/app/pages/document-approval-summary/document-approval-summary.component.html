@@ -1,0 +1,249 @@
+<div class="row">
+  <div id="float-action" class="col-sm-12" style="margin-top: 2px;">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="page-header-title">
+            <i style="width: 30px;height: 30px;" class="icofont icofont-data bg-c-blue"></i>
+            <div class="d-inline" style="padding-top: 4px;">
+              <h4>Document Approval</h4>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-7" *ngIf="tableView">
+          <select style="width: 50%;" class="form-control" [(ngModel)]="selectedDocument" name="Title"
+            #titleSelectDropDown="ngModel" (change)="onChange($event.target.selectedIndex)">
+            <option value="" disabled>Select Document</option>
+            <option *ngFor="let doc of docItemList" [ngValue]="doc.key">{{doc.value}}</option>
+          </select>
+        </div>
+        <div class="col-sm-7" *ngIf="!tableView">
+          <div class="row">
+            <div class="col-sm-6">
+                <angular2-multiselect name="document" [data]="this.documentsList" [settings]="documentTypeSettings" (ngModelChange)="onChangeDocument($event);"
+                [(ngModel)]="selectedDocuments"  id="documents" rounds="ngModel" required>
+                </angular2-multiselect>
+            </div>
+             <div class="col-sm-3">
+                <angular2-multiselect name="actionType" [data]="this.actionTypesList"
+                [(ngModel)]="selectedActionType"  id="actionType" rounds="ngModel" required  [settings]="actionTypeSettings"  (ngModelChange)="onChangeActionType($event);">
+                </angular2-multiselect>
+             </div>
+             <div class="col-sm-3" *ngIf="selectedActionType && selectedActionType.length > 0 && selectedDocumentsForApproval.length > 0">
+                <button *ngIf="selectedActionType[0].id == 2" type="button" class="btn btn-success btn-sm" (click)="esignmodal.show()">
+                    Esign ({{selectedDocumentsForApproval.length}})
+                </button>
+                <button *ngIf="selectedActionType[0].id == 1" type="button" class="btn btn-primary btn-sm" (click)="approveModal.show()">
+                    Approve ({{selectedDocumentsForApproval.length}})
+                </button>
+             </div>
+        </div>
+        </div>
+        <div class="col-sm-1">
+          <div style="float: right;">
+            <a *ngIf="!tableView" href="javascript:" class="m-r-20"><img class="image-radius rounded-0 img-25"
+                src="assets/icon/png-icons/tableView.png" alt="Table View" placement="bottom" ngbTooltip="Table view"
+                (click)="changeview(true)"></a>
+
+            <a *ngIf="tableView" href="javascript:" class="m-r-20"><img class="image-radius rounded-0 img-30"
+                src="assets/icon/png-icons/cardView.png" alt="Card View" placement="bottom" ngbTooltip="Card View"
+                (click)="changeview(false)"></a>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  <div class="col-sm-12" *ngIf="tableView">
+    <app-individual-document-workflow [permissionConstant]="this.selectedDocument" [documentPrimaryKey]="this.documentPrimaryKey"
+    (onClose)="tabChange('approve');"></app-individual-document-workflow>
+  </div>
+    <div class="col-sm-12" style="margin-top:70px" *ngIf="!tableView">
+      <div style="display: flex;overflow: auto;">
+        <div *ngFor="let document of filteredDocumentData">
+          <div class="card list-wrapper">
+            <div class="card-block list">
+            <div class="datatable-checkbox">
+                <div class="checkbox-fade fade-in-primary card-title-padding" [ngStyle]="{'background-color':document.colorCode}" style="width: 330px;">
+                    <label>
+                        <input type="checkbox" [checked]="document.selectAll"
+                        (click)="selectAllData($event,document)"/>
+                        <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary" title="Select All"></i></span>
+                        <span class="card-title">{{document.documentName}}</span>
+                    </label>
+                </div>
+            </div>
+              <div class="list-cards" [ngStyle]="{'max-height':windowHeight.innerHeight-250+'px'}">
+                <div *ngFor="let item of document.documentList">
+                    <div class="card card-margin" style="opacity: 1;">
+                        <div class="card-body" style="padding: 10px;">
+                            <div>
+                                <div class="checkbox-fade fade-in-primary">
+                                    <label>
+                                        <input type="checkbox" name="{{item.documentCode}}" [checked]="item.approvedFlag"
+                                        (change)="item.approvedFlag=!item.approvedFlag;onSelectForApprove();"/>
+                                        <span class="cr" style="height: 17px; width: 17px;"><i class="cr-icon icofont icofont-ui-check txt-primary" title="Select"></i></span>
+                                        <span>{{item.documentCode}} {{item.revisionNumber}}</span>
+                                    </label>
+                                </div>
+                                <span style="float: right;">
+                                  <a container="body" href="javascript:;" *ngIf="item.viewFlag"
+                                  class="m-r-15 crm-action-view text-muted text-warning" (click)="routeView(item);" placement="top"
+                                  ngbTooltip="View">
+                                  <i  class="icofont icofont-resize view"></i>
+                                </a>
+                                </span>
+                            </div>
+                            <hr class="horzontal_line">
+                            <span class="font-13" style="text-overflow: ellipsis;
+                            display: -webkit-box;
+                            -webkit-line-clamp: 2;
+                            overflow: hidden !important;
+                            -webkit-box-orient: vertical;">
+                                <strong>Title</strong> : {{item.documentTitle}}
+                            </span>
+                            <hr *ngIf="item.documentDetails" class="horzontal_line">
+                            <span *ngIf="item.documentDetails" class="font-13" [innerHtml]="item.documentDetails"></span>
+                            <hr class="horzontal_line">
+                            <span class="font-13"><strong>Created</strong> : {{item.createdBy}} / {{item.createdTime}} </span>
+                            <hr class="horzontal_line">
+                            <span class="font-13">
+                                <strong>Updated</strong> : {{item.updatedBy}} / {{item.lastModifiedTime}}
+                            </span>
+                            <hr class="horzontal_line">
+                            <span class="font-13">
+                                <strong>Status</strong> : {{item.levelName}}
+                            </span>
+                        </div>    
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <app-modal-basic #esignmodal [dialogClass]="'modal-lg'" tabindex="-1" role="dialog" aria-hidden="true" class="modal-dialog modal-dialog-scrollable">
+    <div class="loading-spinner" *ngIf="spinnerFlag">
+      <span
+        class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing&#8230;</span>
+    </div>
+    <div class="app-modal-header">
+      <h4 class="modal-title">Document Decision</h4>
+      <button type="button" class="close basic-close" (click)="esignmodal.hide();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body">
+      <div class="row">
+      <div class="col-sm-12">
+          <div class="table-responsive">
+            <table id="esign-documents-table" class="table table-framed">
+              <tr>
+                <th>S.No</th>
+                <th>Id </th>
+                <th>Document Title </th>
+              </tr>
+              <tr *ngFor="let n of selectedDocumentsForApproval;let c=index">
+                <td>{{c+1}} </td>
+                <td>{{n.documentCode}} {{n.revisionNumber}}</td>
+                <td>{{n.documentTitle}}</td>
+              </tr>
+            </table>
+          </div>
+          <br>
+        <div class="col-sm-12">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm">
+              </div>
+              <div class="container">
+                <app-documentsign #documentSign *ngIf="this.selectedDocumentsForApproval.length>0" [data]="this.selectedDocumentsForApproval">
+                </app-documentsign>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div>
+        <div style="color: darkgreen" *ngIf="this.validationMessage!=''"></div>
+      </div>
+    </div>
+    <div class="app-modal-footer">
+    </div>
+  </app-modal-basic>
+
+  <app-modal-basic #approveModal [dialogClass]="'modal-lg'" tabindex="-1" role="dialog" aria-hidden="true" class="modal-dialog modal-dialog-scrollable">
+    <div class="loading-spinner" *ngIf="spinnerFlag">
+      <span
+        class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing&#8230;</span>
+    </div>
+    <div class="app-modal-header">
+      <h4 class="modal-title">Document Decision</h4>
+      <button type="button" class="close basic-close" (click)="approveModal.hide();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body">
+      <div class="row">
+  
+      </div>
+      <div class="row">
+  
+        <div class="col-sm-12">
+        </div>
+      </div>
+      <div class="col-sm-12">
+          <div class="table-responsive">
+            <table id="approval-documents-table" class="table table-framed">
+              <tr>
+                <th>S.No</th>
+                <th>Id </th>
+                <th>Document Title </th>
+  
+              </tr>
+              <tr *ngFor="let n of this.selectedDocumentsForApproval;let c=index">
+                <td>{{c+1}} </td>
+                <td>{{n.documentCode}} {{n.revisionNumber}}</td>
+                <td>{{n.documentTitle}}</td>
+              </tr>
+            </table>
+          </div>
+        <div class="col-sm-12">
+          <div class="container">
+            <div class="row">
+              <div class="col-sm">
+              </div>
+              <div class="container">
+                <div class="row justify-content-md-center">
+                  <div class="col-md-auto">
+                    <textarea  id="documentApprovalComment" placeholder="Please provide your comments to make the decision" [(ngModel)]="comments"
+                      rows="4" cols="50%" maxlength="480"></textarea>
+                  </div>
+                </div>
+                <div class="row justify-content-md-center m-t-10">
+                  <div class="col-sm col-lg-2">
+                    <div *ngIf="comments!=null && comments!=''"><button class="btn btn-primary"
+                        (click)="approveModal.hide();approve()"><i
+                          class="icofont icofont-check-circled"></i>Approve</button></div>
+                  </div>
+                  <div class="col-sm col-lg-2 ">
+                    <div *ngIf="comments!=null && comments!=''"><button (click)="approveModal.hide();reject()"
+                        class="btn btn-danger"><i class="icofont icofont-close-circled"></i>Reject</button></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="color: darkgreen" *ngIf="this.validationMessage!=''"></div>
+      </div>
+    </div>
+    <div class="app-modal-footer">
+    </div>
+  </app-modal-basic>
+  <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

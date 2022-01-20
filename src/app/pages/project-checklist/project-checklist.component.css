@@ -1,0 +1,3 @@
+table#project-table-checkList, table#project-table-checkList td, table#project-table-checkList th {
+    border: 1px solid lightgray;
+}

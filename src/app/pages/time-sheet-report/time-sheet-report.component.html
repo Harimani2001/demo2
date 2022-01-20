@@ -1,0 +1,88 @@
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-sm-12" id="float-action">
+            <app-card>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <select name="select" class="form-control" id="locationId" name="locationName"
+                            (change)="onChangeLocation();" [(ngModel)]="this.location">
+                            <option value="0" disabled>Select Location</option>
+                            <option *ngFor="let location of locationList" [value]="location.id">{{location.name}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2">
+                        <angular2-multiselect name="projectName" [data]="this.projectList" id="projectId"
+                            (ngModelChange)="onChangeProject()" [(ngModel)]="this.project"
+                            [settings]="projectDropdownSettings">
+                        </angular2-multiselect>
+                    </div>
+                    <div class="col-sm-2">
+                        <my-date-picker (keypress)="$event.preventDefault();" #date1 placeholder='From Date'
+                            name="fromDate" [options]="myDatePickerOptions" [(ngModel)]="fromDate"
+                            (click)="openBtnClicked()"></my-date-picker>
+                    </div>
+                    <div class="col-sm-2">
+                        <my-date-picker (keypress)="$event.preventDefault();" #date2 placeholder="To Date" name="toDate"
+                            [options]="myDatePickerOptions" [(ngModel)]="toDate" (click)="openBtnClicked()">
+                        </my-date-picker>
+                    </div>
+                    <div class="col-sm-1">
+                        <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                            (click)="loadTaskTimeSheetForDateRange()">Search</button>
+                    </div>
+                    <div class="col-sm-3 text-right"></div>
+                </div>
+            </app-card>
+        </div>
+        <div><br><br><br></div>
+
+        <app-card *ngIf="taskDataList && taskDataList.length>0">
+            <div class="row">
+                <div class="col-sm-9">
+                    <ngx-datatable #taskTable id="parentCustomTable" class="data-table dt-chk" [limit]="10"
+                        [rows]='taskDataList | ursAndSpecificationFilter : filterQuery' [columnMode]="'force'"
+                        [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                        <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+                            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+                                <div *ngIf="row.timeSheetList && row.timeSheetList.length>0" class="dt-desc">
+                                    <ngx-datatable id="childCustomTable" class="data-table dt-chk" [rowHeight]="'auto'"
+                                        style="overflow: unset!important;" [rows]='row.timeSheetList' [limit]="10"
+                                        [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50">
+                                        <ngx-datatable-column [canAutoResize]="false" [width]="680" [sortable]="true" name="User Name">
+                                            <ng-template let-row="row" ngx-datatable-cell-template>{{row['userName']}}</ng-template>
+                                        </ngx-datatable-column>
+
+                                        <ngx-datatable-column [canAutoResize]="true" [sortable]="true" name="Man Hours">
+                                            <ng-template let-row="row" ngx-datatable-cell-template>{{row['userWiseDurationInString']}}</ng-template>
+                                        </ngx-datatable-column>
+                                    </ngx-datatable>
+                                </div>
+                            </ng-template>
+                        </ngx-datatable-row-detail>
+
+                        <ngx-datatable-column [resizeable]="false" [width]="30" [sortable]="false" [draggable]="false"
+                            [canAutoResize]="false">
+                            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                                <a *ngIf="row.timeSheetList && row.timeSheetList.length>0" href="javascript:;"
+                                    [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded"
+                                    title="Expand/Collapse Row" (click)="toggleExpandRow(row)"></a>
+                            </ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column [canAutoResize]="false" [width]="700" [sortable]="true" name="Document Name">
+                            <ng-template let-row="row" ngx-datatable-cell-template>{{row['documentName']}}</ng-template>
+                        </ngx-datatable-column>
+
+                        <ngx-datatable-column [canAutoResize]="true" [sortable]="true" name="Man Hours">
+                            <ng-template let-row="row" ngx-datatable-cell-template>{{row['documentWiseDurationInString']}}</ng-template>
+                        </ngx-datatable-column>
+                    </ngx-datatable>
+                </div>
+                <div class="col-sm-3"></div>
+            </div>
+        </app-card>
+    </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

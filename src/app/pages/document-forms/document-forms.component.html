@@ -1,0 +1,467 @@
+<div>
+  <app-card>
+    <div>
+      <!-- <br>
+      <div class="row">
+        <div class="col-sm-6">
+          <b>Select Form:</b>&nbsp;
+          <select class="form-control" style="display: inline-block;width: 50%;" [(ngModel)]="selectedForm"
+            (ngModelChange)="loadDocumentSpecifiedData();">
+            <option disabled [value]="0">Choose Form</option>
+            <option *ngFor="let form of documentSpecificForms" [value]="form.key">{{form.value}}</option>
+          </select>
+        </div>
+        <div class="col-sm-6">
+          <button *ngIf="this.isUserInWorkFlow && selectedForm != '0' && documentSpecifiedData.length == 0"
+            style="float: right;margin-right: 20px;" class="btn btn-primary" (click)=navigate()>
+            <i class="icofont icofont-plus-circle"></i>Add
+          </button>
+          <button *ngIf="this.isUserInWorkFlow && selectedForm != '0' && documentSpecifiedData.length > 0"
+            style="float: right;margin-right: 20px;" class="btn btn-primary"
+            (click)="FormSpecificWorkFlowSetting.show();loadDataForFlow();loadAllActiveLocations();">
+            <i class="icofont icofont-plus-circle"></i>Workflow Setup
+          </button>
+        </div>
+      </div>
+      <br> -->
+      <div class="col-sm-12">
+        <ngx-datatable #myTable class="data-table dt-chk "
+          [rows]='documentSpecificFormsData' [limit]="rowsOnPage" [columnMode]="'force'"
+          [headerHeight]="50" [footerHeight]="50" [rowHeight]='"auto"' [loadingIndicator]='loading'>
+          <ngx-datatable-column style="font-weight: bold;" name="Form Name">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong>{{row['templateName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="ID">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong>{{row['dynamicFormCode']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+         
+          <ngx-datatable-column *ngIf="this.equipmentFlag" style="font-weight: bold;" name="Equipment">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong>{{row['equipmentName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Document Status">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong>{{row['status']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column style="font-weight: bold;" name="Updated By">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong>{{row['updatedByName']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column style="font-weight: bold;" name="Updated Time">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong>{{row['displayUpdatedTime']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Action">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <a *ngIf="this.isUserInWorkFlow && row.id === 0" href="javascript:" class="m-r-10"><img
+								class="image-radius rounded-0 img-27" src="assets/icon/png-icons/addDoc.png" alt="Add URS"
+                placement="bottom" ngbTooltip="Add" (click)="navigate(row.masterDynamicFormId)"></a>
+                
+              <a container="body" role="button" href="javascript:;" class="m-r-10 crm-action-view text-muted text-warning"
+                (click)="viewRowDetails(row);" data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                <i class="icofont icofont-resize view"></i>
+              </a>
+              <a container="body" role="button" href="javascript:;" *ngIf="row.publishedflag" class="m-r-10 text-warning"
+                (click)="formSpecificWorkFlow.show();loadDocumentTimeline(row.id,row.masterDynamicFormId)" data-ng-open="modalSmall"
+                placement="top" ngbTooltip="Workflow">
+                <i class="icofont icofont-chart-flow-alt-1"></i>
+              </a>
+              <a container="body" role="button" href="javascript:;" *ngIf="!row.publishedflag && row.id != 0" class="m-r-10 text-warning"
+              (click)="FormSpecificWorkFlowSetting.show();loadDataForFlow(row.masterDynamicFormId);loadAllActiveLocations();" data-ng-open="modalSmall"
+              placement="top" ngbTooltip="Workflow Setup">
+              <i class="icofont icofont-chart-flow-alt-1"></i>
+             </a>
+              <a container="body" href="javascript:;" class="m-r-10 text-primary"
+                placement="right" (click)="loadDocumentCommentLog(row)" placement="top" [ngbTooltip]="popContent">
+                <i class="icofont icofont-info-square info"></i>
+              </a>
+              <ng-template #popContent>
+                <div><label style="font-size: 10px !important"><b>Updated By:</b>
+                    {{row['updatedByName']}}</label>
+                </div>
+                <div><label style="font-size: 10px !important"><b>Updated Time:</b>
+                    {{row['displayUpdatedTime'] }}</label></div>
+              </ng-template>
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+      </div>
+    </div>
+  </app-card>
+</div>
+
+<app-modal-basic id="modal-lg-60" #FormSpecificWorkFlowSetting [dialogClass]="'modal-lg'" [hideHeader]="false"
+  [hideFooter]="false" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h5 class="font-header">Workflow Setup</h5>
+    <button type="button" class="close basic-close" (click)="FormSpecificWorkFlowSetting.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="container" [ngClass]="add?'':'dy-width-400 x-scroll-hide'">
+      <div class="form-group row">
+        <div class="row">
+          <div *ngIf="add " class="col-sm-12">
+            <div class="container m-0">
+              <div class="form-group row">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-sm-12">
+
+                      <div *ngIf="createLevel">
+                        <div class="row">
+                          <div class="col-sm-9">
+                            Level Name<span class="asterisk">*</span>
+                            <input class="form-control" [(ngModel)]="levelName" placeholder="Level name"
+                              style="padding-top: 0px; height: 37px;" maxlength="15" type="text">
+                          </div>
+                        </div>
+                      </div>
+                      <div *ngIf="!createLevel" class="row">
+                        <div class="col-sm-5">
+                          <label class="col-sm-8 p-l-0" for="level">Select Levels<span class="asterisk">*</span>
+                          </label><br>
+                          <ng-select [ngClass]="'ng-select'" [options]="this.workflowLevelList"
+                            aria-placeholder="Select Level" id="level" (ngModelChange)="validateSave()"
+                            [disabled]="this.freezeFlagForLevel" [multiple]="false" [(ngModel)]="levelId" name="level"
+                            rounds="ngModel" required>
+                          </ng-select>
+                          <p *ngIf="!this.freezeFlagForLevel && levelId == ''"
+                            style="cursor: pointer !important ;float:right;text-decoration: underline;"
+                            (click)="createLevel=true;this.levelName=null;this.validateSave();"
+                            class="p-l-20 p-t-10 m-b-0 text-c-blue">Create Level</p>
+                        </div>
+
+                        <ng-container *ngFor="let item of workflowSettingsList">
+                          <div *ngIf="item.mainPageCheck && this.levelId!=0" class="col-sm-2.5"
+                            style="padding-top:44px">{{item.settingsName}}
+                            <ui-switch class="js-small" [disabled]="this.freezeFlagForLevel"
+                              (change)="diableOtherSetting(item,workflowSettingsList)" color="#93BE52"
+                              switchColor="#fff" defaultBgColor="#F56482" size="small" [checked]="item.check">
+                            </ui-switch>
+                          </div>&nbsp;&nbsp;&nbsp;
+                        </ng-container>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="this.levelId!=0">
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Locations<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="locations" [data]="this.locationsList" id="locationId"
+                      (ngModelChange)="this.loadDepartments($event);validateSave()" [(ngModel)]="locationId"
+                      rounds="ngModel" required [settings]="locationDropdownSettings"></angular2-multiselect>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Departments<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="departments" [data]="this.departments" id="departmentId"
+                      (onDeSelectAll)="onRoleDeSelect($event)" (onDeSelect)="onRoleDeSelect([$event])"
+                      (ngModelChange)="this.loadUser(this.rolesId,$event, true);validateSave()"
+                      [(ngModel)]="departmentId" rounds="ngModel" required [settings]="dropdownSettings">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Roles<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="roles" [data]="this.roles" id="rolesId"
+                      (ngModelChange)="this.loadUser($event,this.departmentId, true);validateSave()" [(ngModel)]="rolesId" rounds="ngModel"
+                      required [settings]="dropdownSettings"> </angular2-multiselect>
+                  </div>
+                </div>
+                <div class="form-group row ">
+                  <label class="col-sm-8 col-form-label">Users<span class="asterisk">*</span>
+                  </label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="users" [data]="this.roleUsers" id="usersId"
+                      (ngModelChange)="validateSave()" [(ngModel)]="usersId" rounds="ngModel" required
+                      [settings]="dropdownSettings"> </angular2-multiselect>
+                  </div>
+                </div>
+                <br><br><br>
+              </div>
+            </div>
+
+          </div>
+          <div *ngIf="!add" style="text-align: center;" class="col">
+            <div class="row"><strong class="strong col-sm-7 text-right" style="float: right;">Workflow Design</strong>
+              <div class="col-sm-5" style="padding-right: 25px;">
+                <button *ngIf="this.documentFlows.length>1" style="float: right;"
+                  (click)="updateLevelOrderOfDocument(this.documentFlows);this.switchButtonColorFlag=false;"
+                  type="button"
+                  [class]="this.switchButtonColorFlag?'btn btn-primary p-t-3 p-b-3':'btn btn-default p-t-3 p-b-3'"><i
+                    class="icofont icofont-save"></i> Update Order </button>
+              </div>
+            </div>
+
+            <div style="cursor: pointer;margin-left: 20%;margin-right: 20%;" dnd-sortable-container
+              [sortableData]="this.documentFlows" droppable [dropScope]="[]" (onDrop)="onadd($event)">
+              <div class="panel-body ">
+                <li [draggable] dnd-sortable [sortableIndex]="i" *ngFor="let item of this.documentFlows; let i = index"
+                  [dragData]="item" [dragEnabled]="!this.freezeFlagForLevel" class="list-group-item">
+                  <div style="text-align: left" class="container ">
+                    <div class="row">
+                      <label class="col-sm-8"><strong class="strong">Level Name :</strong> {{item.levelName}}</label>
+                      <div class="col-sm-4">
+                        <a *ngIf="i!=0 && !this.freezeFlagForLevel" container="body" placement="top"
+                          triggers="mouseenter:mouseleave" ngbTooltip="Move Up"
+                          (click)="moveUpOrDown(this.documentFlows,i,true)">
+                          <i class="icofont icofont-arrow-up "></i>
+                        </a>
+                        <a *ngIf="i!=(this.documentFlows.length-1) && !this.freezeFlagForLevel" container="body"
+                          placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Move Down"
+                          (click)="moveUpOrDown(this.documentFlows,i,false)">
+                          <i class="icofont icofont-arrow-down "></i>
+                        </a>
+                        <a container="body" *ngIf="!this.freezeFlagForLevel" placement="top"
+                          triggers="mouseenter:mouseleave" ngbTooltip="Delete"
+                          (click)="deleteLevelOfDocumentSwal(item.id)">
+                          <i class="icofont icofont-bin "></i>
+                        </a>
+                        <a container="body" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Edit"
+                          (click)="editLevelOfDocument(item); this.addButtonFlag=false;">
+                          <i class="icofont icofont-edit "></i>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <label><strong class="strong">Order:</strong> {{item.orderId}}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <i style="font-size:500%" class="icofont icofont-long-arrow-down d-flex justify-content-center "></i>
+                </li>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="p-10" style="text-align-last: center;">
+      <button *ngIf="!this.freezeFlagForLevel && this.addButtonFlag" style="text-align: center;"
+        class="btn btn-primary btn-outline-primary btn-icon" ngbTooltip="Add More Level" placement="top"
+        container="body" triggers="mouseenter:mouseleave" (click)="addNewLevelForDocument(this.documentFlows)"><i
+          class="icofont icofont-plus-circle"></i></button>
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: right;" class="col-sm-12">
+        <button *ngIf="this.validSave && add && !createLevel" (click)="saveLevelData()" type="button"
+          class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+        <button *ngIf="add && !createLevel" (click)="this.loadDataForFlow(); this.addButtonFlag=true" type="button"
+          class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+        <button *ngIf="createLevel" type="button" [disabled]="this.levelName==null || this.levelName==''"
+          (click)="createWorkflowLevel()" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+        <button *ngIf="createLevel" (click)="createLevel=false" type="button"
+          class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+      </div>
+
+    </div>
+  </div>
+
+</app-modal-basic>
+
+<app-modal-basic #formSpecificWorkFlow [dialogClass]="'modal-lg'" [hideHeader]="false" [hideFooter]="false">
+  <div class="app-modal-header">
+    <h5 class="font-header">Workflow</h5>
+    <button type="button" class="close basic-close" (click)="formSpecificWorkFlow.hide();loadDocumentSpecificFormsWithData()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="col-sm " style="height: 80px;">
+      <ul class="progress-indicator">
+        <li class="completed">
+          <span lacement="top" ngbTooltip="created" class="bubble"></span>
+          Published
+          <br><small></small>
+        </li>
+        <li *ngFor="let data of this.getStatus;let i = index "
+          class=" {{ data.lastEntry?' current  ':(data.status=='Accepted')?'completed':(data.status=='Rejected')?'rejected':'pending' }}">
+
+          <label>
+            <ng-template #popoverStepper>
+              <div *ngIf="data.createdUserName!=null"><b>Action By :</b>&nbsp; {{data.createdUserName}}</div>
+              <div *ngIf="data.createdTime!=null"><b>Created Time :</b>&nbsp;{{data.createdTime}}</div>
+              <div *ngIf="data.comments!=null"><b>Comments :</b> {{data.comments}}</div>
+              <div *ngIf="data.status!=null"><b>Status :</b> {{data.status}}</div>
+            </ng-template>
+            <ng-template #noproperty>
+              <div><b>Level Name:</b>&nbsp; {{data.levelName}}</div>
+            </ng-template>
+            <span style="white-space: pre-line;" placement="top" container="body" triggers="mouseenter:mouseleave"
+              [ngbPopover]="data.comments=='not applicable'?noproperty:popoverStepper" class="bubble"
+              (click)="approveOrReject(data)">
+            </span>
+            <ng-template #showmoreusers>
+              <b>Users for level:-<br> {{ data.levelName}} :</b>
+              <ul class="list-group" *ngFor="let d of data.userArray">
+                <li class="list-group-item">{{d}}</li>
+              </ul>
+            </ng-template>
+            <i class="icofont icofont-ui-user-group" placement="bottom" container="body"
+              triggers="mouseenter:mouseleave" [ngbPopover]="showmoreusers"></i>
+            {{data.type}}<br>
+            <span *ngIf="!data.permission && data.lastEntry" class="messages text-danger">You dont have permission to do
+              this action.</span>
+          </label>
+        </li>
+      </ul>
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic id="modal-lg-60" #approveModal [dialogClass]="'modal-lg'" tabindex="-1" role="dialog"
+  aria-hidden="true">
+  <div class="loading-spinner" *ngIf="spinnerFlag">
+    <span
+      class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing&#8230;</span>
+  </div>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Document Decision</h4>
+    <button type="button" class="close basic-close" (click)="approveModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="col-sm-12">
+      <div class="col-sm-12">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm">
+            </div>
+            <div class="container">
+              <div class="row justify-content-md-center">
+                <div class="col-md-auto">
+                  <textarea id="documentApprovalComment" placeholder="Please provide your comments to make the decision"
+                    [(ngModel)]="comments" rows="4" cols="50%" maxlength="480"></textarea>
+                </div>
+              </div>
+              <div class="row justify-content-md-center m-t-10">
+                <div class="col-sm col-lg-2">
+                  <div *ngIf="comments!=null && comments!=''"><button class="btn btn-primary"
+                      (click)="approveModal.hide();documentApproveOrReject('Y')"><i
+                        class="icofont icofont-check-circled"></i>Approve</button></div>
+                </div>
+                <div class="col-sm col-lg-2 ">
+                  <div *ngIf="comments!=null && comments!=''"><button
+                      (click)="approveModal.hide();documentApproveOrReject('N')" class="btn btn-danger"><i
+                        class="icofont icofont-close-circled"></i>Reject</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>
+
+<app-modal-animation #documentEsign class="p-20" container="body" [modalID]="'effect-1'" [modalClass]="'md-effect-1'">
+  <h3>Electronic Signature</h3>
+
+  <div class="row" style="text-align: left;">
+    <form [formGroup]="esignForm" (ngSubmit)="onSubmit(esignForm)">
+
+      <div class="row">
+        <div class="col-sm-6">
+          <strong>Please enter your Comments </strong>
+        </div>
+        <div class="col-sm-6">
+          <textarea class="form-control" id="workFlowCommentsId" placeholder="Comments" formControlName="comments"
+            name="description" cols="50" rows="4"> </textarea>
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-sm-6">
+          <strong>Do you Approve or Reject this Document?</strong>
+        </div>
+        <div class="col-sm-6">
+          <input type="radio" [(ngModel)]="finalstatus" [ngModelOptions]="{standalone: true}" name="status"
+            [value]="true"> Approve &nbsp;&nbsp;&nbsp;
+          <input type="radio" [(ngModel)]="finalstatus" [ngModelOptions]="{standalone: true}" name="status"
+            [value]="false"> Reject
+        </div>
+      </div>
+      <br>
+      <div class="row">
+        <div class="col-sm-12">
+          <strong class="strong">This form requires your electronic signature. </strong>
+        </div>
+      </div>
+      <hr>
+      <div class="row">
+        <div class="col-sm-2">
+          <input type="checkbox" [checked]="this.agreementCheck" [name]="check" (change)="onclickAccept()"> I Accept
+        </div>
+        <div class="col-sm-10">
+          <h6>{{this.esignAgreementMessage.agreementMessage}}</h6>
+        </div>
+      </div>
+      <br>
+      <div class="row" *ngIf="this.agreementCheck">
+        <label class="col-sm-6">Please enter your Email Id or User Name</label>
+        <div class="col-sm-6">
+          <input class="form-control" size="49" formControlName="userName" type="email" autocomplete="new-password"
+            placeholder="Email Id or User Name" name="userName" required />
+        </div>
+      </div><br>
+      <div class="row" *ngIf="this.agreementCheck">
+        <label class="col-sm-6"> Please enter your Password</label>
+        <div class="col-sm-6">
+          <input class="form-control" size="49" formControlName="password" type="password" placeholder="password"
+            name="password" autocomplete="new-password" required />
+        </div>
+      </div>
+      <div class="row">
+        <p *ngFor="let item of errorList" class="text-danger">
+          {{item}}
+        </p>
+        <p class="text-danger p-0" *ngIf="(this.submitted) && esignForm.get('userName').hasError('required')">
+          <span>{{esignErrors.usernameValidation}}</span>
+        </p>
+        &nbsp;&nbsp;<p class="text-danger p-0"
+          *ngIf="(this.submitted) && esignForm.get('password').hasError('required')">
+          <span>{{esignErrors.passwordValidaiton}}</span>
+        </p>
+        &nbsp;&nbsp;<p class="text-danger p-0"
+          *ngIf="(this.submitted) && esignForm.get('comments').hasError('required')">
+          <span>{{esignErrors.commentsValidation}}</span>
+        </p>
+      </div>
+      <br>
+      <button style="text-align: center;" *ngIf="!spinnerFlag && this.agreementCheck" type="submit"
+        class="btn btn-danger waves-effect waves-light ">ESign</button>
+    </form>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+
+  <button (click)="closeMyModal($event)" aria-label="Close" class="md-close-btn"><i
+      class="icofont icofont-ui-close"></i></button>
+</app-modal-animation>

@@ -1,0 +1,188 @@
+<app-modal-basic id="modal-lg-60" #individualDocumentWorkflowModal [dialogClass]="'modal-lg'" [hideHeader]="false"
+  [hideFooter]="false" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h5 class="font-header">Esign Workflow Setup</h5>
+    <button type="button" class="close basic-close"
+      (click)="individualDocumentWorkflowModal.hide(); onClosePopUpModel();resetDataArray()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="container">
+      <div class="form-group row">
+        <div class="row">
+
+          <!--Add-->
+          <div *ngIf="add " class="col-sm-12">
+            <div class="container m-0">
+              <div class="form-group row">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-sm-12">
+
+                      <!--add-->
+
+                      <div *ngIf="!createLevel">
+
+                        <div class="container">
+                          <table class="esignTable">
+                            <thead class="esignThead">
+                              <tr>
+
+                                <th class="esignTh">Name</th>
+                                <th class="esignTh">Email</th>
+                                <th class="esignTh">Remarks</th>
+                                <th class="esignTh">Valid Till(days)</th>
+                                <th class="esignTh">Action</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngFor="let dynamic of dynamicArray; let i = index;" class="esignTr">
+
+                                <td class="esignTd">
+                                  <input id="name" [(ngModel)]="dynamicArray[i].name" class="form-control" type="text"
+                                    size="30" autocomplete="on" #name="ngModel" placeholder="Name" required />
+                                </td>
+                                <td class="esignTd">
+                                  <input id="email" [(ngModel)]="dynamicArray[i].email" class="form-control" type="text"
+                                    size="30" autocomplete="on" #email="ngModel" placeholder="Email" required
+                                    (change)="onChange($event.target.value)" />
+                                </td>
+                                <td style="width: 300px;" class="esignTd">
+                                  <textarea rows="3" [(ngModel)]="dynamicArray[i].remarks" class="form-control"
+                                    name="remarks" placeholder="Remarks"></textarea>
+                                </td>
+                                <td class="esignTd">
+                                  <input type="number" [(ngModel)]="dynamicArray[i].validity" class="form-control"
+                                    aria-valuenow="3" size="30" name="validity" min="2" max="15" [value]="2" />
+                                </td>
+                                <td class="esignTd">
+                                  <a class="pointer" role="button" title="Add" (click)="addDataArray()"
+                                    ngbToolTip="Add">
+                                    <i class="icofont icofont-ui-add text-success"></i></a>
+                                  <a class="pointer" role="button" title="Delete" (click)="removeDataArray(i)"
+                                    ngbToolTip="Delete">
+                                    <i class="icofont icofont-ui-delete text-danger"></i></a>
+
+
+
+                                </td>
+
+                              </tr>
+
+                            </tbody>
+
+                          </table>
+                          <div class="messages text-danger" *ngIf="deleteMessage">First form can be deleted</div>
+                          <div class="messages text-danger" *ngIf="emailValidation">Email already exists</div>
+                          <div class="messages text-danger" *ngIf="isCheckListNotEntered||!validateData">Please fill the above form</div>
+                          <div class="messages text-danger" *ngIf="this.isvalidEmail">Email is Invalid</div>
+                          <div class="messages text-danger" *ngIf="validityCheck">Duration should be greater than of 2
+                            days</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+
+          <!--View-->
+          <div *ngIf="!add" style="text-align: center;" class="col">
+            <div class="row">
+              <div class="col-sm-5" style="padding-right: 25px;">
+                <button *ngIf="this.documentFlows.length>1" style="float: right;"
+                  (click)="updateLevelOrderOfDocument(this.documentFlows);this.switchButtonColorFlag=false;"
+                  type="button"
+                  [class]="this.switchButtonColorFlag?'btn btn-primary p-t-3 p-b-3':'btn btn-default p-t-3 p-b-3'"><i
+                    class="icofont icofont-save"></i> Update Order </button>
+              </div>
+            </div>
+            <div style="cursor: pointer;margin-left: 20%;margin-right: 20%;" dnd-sortable-container
+              [sortableData]="this.documentFlows" droppable [dropScope]="[]" (onDrop)="onadd($event)">
+              <div class="panel-body ">
+
+                <li [draggable] dnd-sortable [sortableIndex]="i" *ngFor="let item of this.listArray; let i = index"
+                  [dragData]="item" [dragEnabled]="!this.freezeFlagForLevel" class="list-group-item" style="box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;">
+
+
+                  <div style="text-align: left;" class="container ">
+                    <a style="float:right;" container="body" *ngIf="!publishedFlag" placement="top"
+                      triggers="mouseenter:mouseleave" ngbTooltip="Delete"
+                      (click)="deleteLevelOfDocumentSwal(item.documentId)">
+                      <i class="icofont icofont-bin"></i>
+                    </a>
+                    <div class="container " style="overflow-x: hidden;">
+                      <div class="row">
+                        <label class="col-sm-8"><strong class="strong">Name :</strong> {{item.name}}</label>
+                      </div>
+
+                      <div class="row">
+                        <label class="col-sm-8"><strong class="strong">Email :</strong> {{item.email}}</label>
+                        <div class="col-sm-4">
+                          <label><strong class="strong">Validity :</strong> {{item.validity}}</label>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <label class="col-sm-8"><strong class="strong">Remarks :</strong> {{item.remarks}}</label>
+                        <div class="col-sm-4">
+                          <label [style.color]="onCheck(item.completionFlag)"><strong class="strong">Status :</strong>
+                            {{item.completionFlag}}</label>
+                        </div>
+                      </div>
+
+                      <div class="row" *ngIf="!deleteIcon(item.completionFlag)">
+                        <label class="col-sm-8"><strong class="strong">Transaction Id :</strong>
+                          {{item.transactionId}}</label>
+                      </div>
+
+                    </div>
+                  </div>
+                  <i style="font-size:40px" class="icofont icofont-long-arrow-down d-flex justify-content-center "></i>
+                </li>
+
+
+
+              </div>
+            </div>
+          </div>
+
+
+
+
+        </div>
+      </div>
+    </div>
+
+    <div class="p-10" style="text-align-last: center;">
+      <button *ngIf="!this.freezeFlagForLevel && this.addButtonFlag" style="text-align: center;"
+        class="btn btn-primary btn-outline-primary btn-icon" ngbTooltip="Add More Level" placement="top"
+        container="body" triggers="mouseenter:mouseleave"
+        (click)="addNewLevelForDocument(this.documentFlows);resetDataArray();addDataArray();"><i
+          class="icofont icofont-plus-circle"></i></button>
+    </div>
+
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+
+  </div>
+
+
+  <!--footer-->
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+
+
+        <button type="submit" *ngIf="add && !createLevel" (click)="saveLevelData();this.addButtonFlag=false"
+          type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+
+        <button *ngIf="add && !createLevel" (click)="this.loadDataForFlow();resetDataArray();this.addButtonFlag=true"
+          type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>

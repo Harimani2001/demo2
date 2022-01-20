@@ -1,0 +1,528 @@
+<div class="row" *ngIf="!this.viewIndividualData">
+	<div class="col-sm-12">
+		<app-card [title]="''">
+			<div class="row">
+				<div class="col-sm-4">
+					<h4 class="f-w-600 strong">{{this.formName}}</h4>
+				</div>
+				<div class="col-sm-8 text-right">
+					<a *ngIf="this.tab && (this.tab.activeId!='audit')" href="javascript:" class="m-r-15"><img
+						class="image-radius rounded-0 img-25" src="assets/icon/png-icons/addDoc.png" alt="Add"
+						placement="bottom" ngbTooltip="Add" (click)="navigate(false)"></a>
+					<a *ngIf="isSelectedPublishData && !isWorkflowDocumentOrderSequence"
+						href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+							src="assets/icon/png-icons/published.png" alt="Publish" placement="bottom" ngbTooltip="Publish"
+							(click)="publish()"></a>
+
+					<a *ngIf="selectAllCSVFlag"
+						href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+							src="assets/icon/png-icons/csvExport.png" alt="CSV Export" placement="bottom"
+							ngbTooltip="CSV Export" (click)="exportCSV()"></a>
+
+					<a *ngIf="this.exportButtonFlag && this.tab && this.tab.activeId=='draft' && this.draftIds && this.draftIds.length>0"
+						href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+							src="assets/icon/png-icons/pdfExport.png" alt="PDF Export" placement="bottom"
+							ngbTooltip="PDF Export" (click)="this.viewpdf=true; draftPdfPreview.show()"></a>
+					
+					<span *ngIf="isSelectedPublishData " class="messages text-danger">{{isWorkflowDocumentOrderSequence}}</span>
+					<span [innerHtml]="inWorkFlowMessage"></span>
+				
+					<span class="col-sm-2" *ngIf="this.tab && !(this.tab.activeId=='audit' || this.tab.activeId=='summary')">
+						<input type="search" id="searchForm" class="form-control  full-data-search" placeholder="Search" 
+							[(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"/>
+					</span>
+					
+					<a *ngIf="formType!='Organization Specific'" href="javascript:" class="m-r-15"><img
+						class="image-radius rounded-0 img-25" src="assets/icon/png-icons/menu.png"
+						alt="Table of Content" placement="bottom" ngbTooltip="Table of Content"
+						(click)="onClickTableOfContent(this.adminComponent.taskDocType)"></a>
+
+					<a *ngIf="formType=='Organization Specific'" href="javascript:" class="m-r-15"><img
+						class="image-radius rounded-0 img-25" src="assets/icon/png-icons/menu.png"
+						alt="Table of Content" placement="bottom" ngbTooltip="Table of Content"
+						(click)="onClickTableOfContentForOrgForm(this.adminComponent.taskDocType)"></a>
+
+					<span *ngIf="this.tab && !(this.tab.activeId=='audit' || this.tab.activeId=='summary')">
+						<img class="image-radius rounded-0 pointer img-30" src="assets/icon/png-icons/forum.png"
+							alt="Forum" placement="bottom" ngbTooltip="Forum" (click)="openDocumentForum()">
+					</span>
+				</div>
+			</div>
+			<br>
+			<ngb-tabset #formTab="ngbTabset" (tabChange)="tabChange($event.nextId);">
+				<ngb-tab id="summary" title="Summary">
+					<ng-template ngbTabContent>
+						<ng-container *ngIf="this.constants">
+							<app-individual-document-summary  [permissionConstant]="this.adminComponent.taskDocType">
+							</app-individual-document-summary>
+						</ng-container>
+					</ng-template>
+				</ngb-tab>
+				
+				<ngb-tab title="Draft" id="draft">
+					<ng-template ngbTabContent>
+						<ngx-datatable #myTable class="data-table dt-chk " [rows]='data |  dyanmicFormFilter : filterQuery'
+							[limit]="rowsOnPage" [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+							[rowHeight]='"auto"' [loadingIndicator]='loading'>
+							<ngx-datatable-column *ngIf="publishButtonFlag" name="Select" [width]="50">
+								<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+									<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+										<label *ngIf="filterQuery=='' && data.length !=0 " container="body" placement="right"
+											triggers="mouseenter:mouseleave" ngbPopover="Select All">
+											<input type="checkbox" [checked]="selectAll" (click)="selectAllData($event)" />
+											<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+										</label>
+									</div>
+								</ng-template>
+					
+								<ng-template *ngIf="!this.isMapping" class="datatable-checkbox" ngx-datatable-cell-template let-row="row">
+									<div class="checkbox-fade fade-in-primary">
+										<label *ngIf="this.permissionMap[row.permissionConstant].publishButtonFlag" >
+											<input type="checkbox" name="{{row['id']}}" [checked]="row.publishedflag"
+												(change)="onChangePublishData(row,this.permissionMap);" />
+											<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+										</label>
+									</div>
+								</ng-template>
+								<ng-template *ngIf="this.isMapping" class="datatable-checkbox" ngx-datatable-cell-template let-row="row">
+									<div class="checkbox-fade fade-in-primary">
+										<label *ngIf="this.permissionMap[row.permissionConstant].publishButtonFlag && (
+											!isWorkflowDocumentOrderSequence && 	(!row.workFlowSequenceFlag || row.perviousGroupPartCompleted))" >
+											<input type="checkbox" name="{{row['id']}}" [checked]="row.publishedflag"
+												(change)="onChangePublishData(row,this.permissionMap);" />
+											<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+										</label>
+									</div>
+								</ng-template>
+					
+							</ngx-datatable-column>
+					
+							<ngx-datatable-column style="font-weight: bold;" name="ID">
+								<ng-template  let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+									<strong >{{row['dynamicFormCode']}}</strong>
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column *ngIf="this.isMapping" style="font-weight: bold;" name="Part">
+								<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+									<strong>{{row['templateName']}}</strong>
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column style="font-weight: bold;" name="Report Number">
+								<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+									<strong>{{row['reportNumber']}} </strong>
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column *ngIf="this.equipmentFlag" style="font-weight: bold;" name="Equipment">
+								<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+									<strong>{{row['equipmentName']}}</strong>
+								</ng-template>
+							</ngx-datatable-column>
+							<!-- <ngx-datatable-column style="font-weight: bold;" name="Batch">
+														<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+															<strong>{{row['batchName']}}</strong>
+														</ng-template>
+													</ngx-datatable-column>
+													<ngx-datatable-column style="font-weight: bold;" name="Product">
+															<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+																<strong>{{row['productName']}}</strong>
+															</ng-template>
+														</ngx-datatable-column> -->
+					
+					
+							<ngx-datatable-column style="font-weight: bold;" name="Document Status">
+								<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+									<strong>{{row['status']}}</strong>
+								</ng-template>
+							</ngx-datatable-column>
+					
+							<ngx-datatable-column style="font-weight: bold;" name="Updated By">
+								<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+									<strong>{{row['updatedByName']}}</strong>
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column style="font-weight: bold;" name="Updated Time">
+								<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+									<strong>{{row['displayUpdatedTime']}}</strong>
+								</ng-template>
+							</ngx-datatable-column>
+							<ngx-datatable-column name="Action">
+								<ng-template let-row="row" ngx-datatable-cell-template>
+									<a container="body" role="button" *ngIf="this.permissionMap[row.permissionConstant].viewButtonFlag" href="javascript:;"
+										class="crm-action-view text-muted text-warning"
+										(click)="viewRowDetails(row,row.commonDocumentStatusValue);nextId=0" data-ng-open="modalSmall"
+										placement="top" ngbTooltip="View">
+										<i  class="icofont icofont-resize view"></i>
+									</a>
+									<ng-template #popContent>
+										<div><label style="font-size: 10px !important"><b>Updated By:</b> {{row['updatedByName']}}</label>
+										</div>
+										<div><label style="font-size: 10px !important"><b>Updated Time:</b>
+												{{row['displayUpdatedTime'] }}</label></div>
+									</ng-template>
+									<a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary"
+										placement="right" (click)="loadDocumentCommentLog(row)" placement="top" [ngbTooltip]="popContent">
+										<i  class="icofont icofont-info-square info"></i>
+									</a>
+									<a container="body" *ngIf="this.createButtonFlag" href="javascript:;"
+										(click)="cloneOfDynamicForm(row)" class="m-r-15 crm-action-edit text-muted text-primary"
+										placement="top" ngbTooltip="Copy">
+										<i  class="icofont icofont-copy copy"></i>
+									</a>
+								</ng-template>
+							</ngx-datatable-column>
+						</ngx-datatable>
+					
+					</ng-template>
+				</ngb-tab>
+				<ngb-tab title="Published" id="published">
+					
+						<ng-template ngbTabContent>
+							<div class="row"  style="padding:20px;">
+								 <!-- <div class="col-sm-3">
+									From:
+									<my-date-picker (keypress)="$event.preventDefault();" #fromDateView name="fromDate"  [(ngModel)]="fromDate" #fromDateViewModal="ngModel" required   (dateChanged)="onDateChanged($event,true)" placeholder="From Date"
+										[options]="fromDateOptions">
+									</my-date-picker>
+								</div>
+								<div class="col-sm-3">
+									To:
+									<my-date-picker (keypress)="$event.preventDefault();" #toDateView name="toDate"[(ngModel)]="toDate" #toDateViewModal="ngModel" required   (dateChanged)="onDateChanged($event,false)" placeholder="To Date" [options]="toDateOptions">
+									</my-date-picker>
+								</div>  -->
+								<div class="col-sm-6 row">
+									<div><strong class="strong">In Progress &nbsp;&nbsp;&nbsp;</strong></div>
+									<div>
+										<ui-switch [(ngModel)]="publishedToggle" ng-model="all" class="js-small" color="#3498DB" 
+										(change)="publishedToggle=!masterDynamicForm.multipleEntryFlag" switchColor="#fff" size="small" unchecked>
+										</ui-switch>
+									</div>
+									<div><strong class="strong">&nbsp;&nbsp;&nbsp;Completed </strong></div>
+								</div>
+
+							</div>
+								<ngx-datatable #myTable class="data-table dt-chk"
+								[rows]='publishedData | dyanmicFormFilter : filterQuery : fromDate : toDate: publishedToggle'
+								[limit]="rowsOnPage"
+								[columnMode]="'force'"
+								[headerHeight]="50"
+								[footerHeight]="50"
+								[rowHeight]='"auto"'
+								[loadingIndicator]='loading'
+								[scrollbarH]="true">
+								<ngx-datatable-column *ngIf="this.csvExportFlag && this.csvFullPermission" name="Select" [width]="50">
+									<ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+										<div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+											<label *ngIf="filterQuery=='' && publishedData.length !=0 " container="body" placement="right"
+												triggers="mouseenter:mouseleave" ngbPopover="Select All For CSV Export">
+												<input type="checkbox" [checked]="selectAllCSVFlag" (click)="selectAllDataForCSVExport($event)" />
+												<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+											</label>
+										</div>
+									</ng-template>
+									<ng-template  class="datatable-checkbox" ngx-datatable-cell-template let-row="row">
+										<div *ngIf="row.completedAllPart && this.csvFullPermission" class="checkbox-fade fade-in-primary">
+											<label  >
+												<input type="checkbox" name="{{row['id']}}" [checked]="row.flag"
+													(change)="onChangeCSV(row);" />
+												<span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+											</label>
+										</div>
+									</ng-template>
+								</ngx-datatable-column>
+								<ngx-datatable-column style="font-weight: bold;" name="ID">
+									<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+										<strong>{{row['dynamicFormCode']}} {{row['revisionNumber']}} </strong>
+									</ng-template>
+								</ngx-datatable-column>
+
+								<ngx-datatable-column *ngIf="this.isMapping" style="font-weight: bold;" name="Part">
+									<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+										<strong>{{row['templateName']}}</strong>
+									</ng-template>
+								</ngx-datatable-column>
+								
+								<ngx-datatable-column style="font-weight: bold;" name="Report Number">
+									<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+										<strong>{{row['reportNumber']}} </strong>
+									</ng-template>
+								</ngx-datatable-column>
+								<ngx-datatable-column *ngIf="this.equipmentFlag" style="font-weight: bold;" name="Equipment">
+										<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+											<strong>{{row['equipmentName']}}</strong>
+										</ng-template>
+									</ngx-datatable-column>
+									<!-- <ngx-datatable-column style="font-weight: bold;" name="Batch">
+											<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+												<strong>{{row['batchName']}}</strong>
+											</ng-template>
+									</ngx-datatable-column>
+									<ngx-datatable-column style="font-weight: bold;" name="Product">
+											<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+												<strong>{{row['productName']}}</strong>
+											</ng-template>
+										</ngx-datatable-column> -->
+								   <ngx-datatable-column style="font-weight: bold;" name="Document Status">
+										<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+											<strong>{{row['status']}}</strong>
+										</ng-template>
+									</ngx-datatable-column>
+								<ngx-datatable-column style="font-weight: bold;" name="Updated By">
+										<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+											<strong>{{row['updatedByName']}}</strong>
+										</ng-template>
+								</ngx-datatable-column>
+								<ngx-datatable-column style="font-weight: bold;" name="Updated Time">
+										<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+											<strong>{{row['displayUpdatedTime']}}</strong>
+										</ng-template>
+								</ngx-datatable-column>
+								<ngx-datatable-column name="Action">
+									<ng-template let-row="row" ngx-datatable-cell-template>
+										<a container="body" *ngIf="this.permissionMap[row.permissionConstant].viewButtonFlag" href="javascript:;"
+											class="crm-action-view text-muted text-warning"
+											(click)="viewRowDetails(row,row.commonDocumentStatusValue);nextId=0" data-ng-open="modalSmall"
+											placement="top" ngbTooltip="View">
+											<i  class="icofont icofont-resize view"></i>
+										</a>
+										<ng-template  #popContent>
+											<div ><label style="font-size: 10px !important"><b>Updated By:</b> {{row['updatedByName']}}</label></div>
+											<div><label style="font-size: 10px !important" ><b>Updated Time:</b> {{row['displayUpdatedTime'] }}</label></div>
+										</ng-template>
+										<a container="body" href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+											(click)="loadDocumentCommentLog(row)" placement="top" [ngbTooltip]="popContent">
+											<i  class="icofont icofont-info-square info"></i>
+										</a>
+										<a container="body" *ngIf="this.permissionMap[row.permissionConstant].createButtonFlag" href="javascript:;"
+											(click)="cloneOfDynamicForm(row)" class="m-r-15 crm-action-edit text-muted text-primary" placement="top"
+											ngbTooltip="Copy">
+											<i  class="icofont icofont-copy copy"></i>
+										</a>
+									</ng-template>
+								</ngx-datatable-column>
+							</ngx-datatable>
+						</ng-template>
+					</ngb-tab>
+				<ngb-tab id="feedback" title="Feedback">
+						<ng-template ngbTabContent>
+							<br>
+							<app-document-forum #forumView [constant]="this.adminComponent.taskDocType"  [isDocumentWorkFlow]="true" [documentList]="this.commentsDocumentsList"></app-document-forum>
+						</ng-template>
+					</ngb-tab>
+					<ngb-tab id="audit" title="Audit Trail">
+						<ng-template ngbTabContent>
+							<app-audit-trail-view #auditView [permission]="this.constants" [mappingId]="this.mappingId"></app-audit-trail-view>
+						</ng-template>
+					</ngb-tab>
+
+			</ngb-tabset>
+		</app-card>
+	</div>
+</div>
+
+
+<!-- doc sign end -->
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData">
+	<ng-container *ngFor="let data of popupdata; let in = index">
+			<div class="row pt-1 pb-3">
+				<div class="col-sm-4">
+					<h6><label class="strong">Form Name:</label>{{data.templateName}}</h6>
+				</div>
+				<div class="col-sm-1 pr-0 text-left">
+					<h6><label class="strong">ID:</label>{{data.dynamicFormCode}} {{data.revisionNumber}}</h6>
+				</div>
+				<div  class="col-sm-2">
+					<app-stepperprogress *ngIf="globalPublishFlag" [isIcon]="true"></app-stepperprogress>
+				  </div>
+				<div class="col-sm-5 text-right">
+					<!-- <span *ngIf="data.documentPreviewFlag">
+						<i (click)="downloadTemplate('docx',data);" style="font-size: 24px;color: #3232e6;"
+							class="icofont icofont-file-word" title="Download Doc File" placement="top" container="body"
+							ngbTooltip="Download Doc File"></i>
+						<i (click)="downloadTemplate('pdf',data);" style="font-size: 24px;color: #e82c2c;"
+							class="icofont icofont-file-pdf" title="Download Pdf File" placement="top" container="body"
+							ngbTooltip="Download Pdf File"></i>
+					</span> -->
+					<!-- <button type="submit" *ngIf="!data.workFlowCompletionFlag && !this.globalPublishFlag"
+						class="btn btn-sm btn-success waves-effect waves-light" (click)="navigate(true,data)">Edit</button> -->
+					 
+					<a *ngIf="!data.workFlowCompletionFlag && !this.globalPublishFlag" href="javascript:" class="m-r-15"><img
+							class="image-radius rounded-0 img-30 img-height" src="assets/icon/png-icons/esign-edit.png"
+							alt="Edit" placement="bottom" ngbTooltip="Edit"
+							(click)="navigate(true,data);"></a>
+						<!-- <ng-container *ngIf="!this.isMapping">
+							<button type="button" (click)="inviteUser(data.id);" *ngIf="!this.data.publishedflag"
+								class="btn btn-sm btn-info  waves-effect waves-light">Invite User</button>
+						</ng-container> -->
+
+						<a *ngIf="!this.isMapping && !this.data.publishedflag" href="javascript:" class="m-r-15"><img
+							class="image-radius rounded-0 img-25 img-height" src="assets/icon/png-icons/emailAndNotify.png"
+							alt="Invite User" placement="bottom" ngbTooltip="Invite User"
+							(click)="inviteUser(data.id);"></a>
+
+						<!-- <ng-container *ngIf="!this.isMapping">
+							<button type="button" (click)="individualPublish(data,nextId);"
+								*ngIf="!this.data.publishedflag && !isWorkflowDocumentOrderSequence"
+								[disabled]="!this.permissionModel.publishButtonFlag"
+								class="btn btn-sm btn-primary  waves-effect waves-light">Publish</button>
+						</ng-container> -->
+						<a *ngIf="!this.permissionModel.publishButtonFlag && !this.isMapping && !this.data.publishedflag && !isWorkflowDocumentOrderSequence"
+						href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25 img-height"
+						  src="assets/icon/png-icons/published.png" alt="Publish" placement="bottom" ngbTooltip="Publish"
+						  (click)="individualPublish(data,nextId);"></a>
+						
+						  <a *ngIf="!this.permissionModel.publishButtonFlag && this.isMapping && !this.data.formDataList[+nextId].publishedflag && !isWorkflowDocumentOrderSequence && 
+						  (!this.data.workFlowSequenceFlag || this.data.formDataList[+nextId].previousFormWrokFlowCompletionFlag)"
+						  href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25 img-height"
+							src="assets/icon/png-icons/published.png" alt="Publish" placement="bottom" ngbTooltip="Publish"
+							(click)="individualPublish(data,nextId);"></a>
+
+						<!-- <ng-container *ngIf="this.isMapping">
+							<button type="button" (click)="individualPublish(data,nextId);" *ngIf="!this.data.formDataList[+nextId].publishedflag && !isWorkflowDocumentOrderSequence && 
+													(!this.data.workFlowSequenceFlag || this.data.formDataList[+nextId].previousFormWrokFlowCompletionFlag)"
+								[disabled]="!this.permissionModel.publishButtonFlag"
+								class="btn btn-sm btn-primary  waves-effect waves-light">Publish</button>
+						</ng-container> -->
+					<!-- <button type="submit"
+						*ngIf="!data.workFlowCompletionFlag && !this.globalPublishFlag && permissionModel.workFlowButtonFlag"
+						class="btn btn-sm btn-warning waves-effect waves-light" (click)="verify(data)">Verify</button> -->
+					
+						<a *ngIf="!data.workFlowCompletionFlag && !this.globalPublishFlag && permissionModel.workFlowButtonFlag"
+						href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25 img-height"
+						  src="assets/icon/png-icons/verify.png" alt="Verify" placement="bottom" ngbTooltip="Verify"
+						  (click)="verify(data)"></a>
+	  
+					  <a *ngIf="(this.permissionModel.deleteButtonFlag && !this.globalPublishFlag )"
+						href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25 img-height"
+						  src="assets/icon/png-icons/delete.png" alt="Delete" placement="bottom" ngbTooltip="Delete"
+						  (click)="openSuccessCancelSwal(data)"></a>
+
+					<!-- <button type="button" *ngIf="(this.permissionModel.deleteButtonFlag && !this.globalPublishFlag )"
+						class="btn btn-sm btn-danger waves-effect waves-light" (click)="openSuccessCancelSwal(data)">Delete</button> -->
+					
+					<a *ngIf="!data.workFlowCompletionFlag " href="javascript:"
+						class="m-r-15"><img class="image-radius rounded-0 img-25 img-height"
+						  src="assets/icon/png-icons/pdfSetting.png" alt="PDF View" placement="bottom" [ngbTooltip]="pdfView?'Data View':'PDF View'"
+						  (click)="pdfView=!pdfView;documentPreview(data);"></a>
+
+					<!-- <ng-container *ngIf="!data.workFlowCompletionFlag ">
+					<label> Data View&nbsp;<label class="switchNew"><input type="checkbox" name="pdfView" [(ngModel)]="pdfView"
+								(change)="documentPreview(data)" />
+							<span class="sliderNew round"></span></label>&nbsp;PDF View
+					</label>
+					</ng-container> -->
+					<button type="button" *ngIf="data.apiRawDataFilePath" (click)="downloadRawPDF(data)"
+						class="btn btn-sm btn-primary waves-effect waves-light">Raw Data </button>
+					
+					<a [routerLink]="[this.commonDocumentStatusValue]" *ngIf="routeback!=null" href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/cancel.png"
+							alt="Cancel" placement="bottom" ngbTooltip="Cancel"></a>
+					<a *ngIf="routeback==null" href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/cancel.png"
+							alt="Cancel" placement="bottom" ngbTooltip="Cancel" (click)="closeDetailView()"></a>
+					<!-- <a [routerLink]="[this.commonDocumentStatusValue]" style="cursor:pointer;font-weight: bold" *ngIf="routeback!=null"
+						class="ti-close">&nbsp;&nbsp;</a>
+					<a style="cursor:pointer;font-weight: bold" *ngIf="routeback==null" class="ti-close"
+						(click)="closeDetailView()">&nbsp;&nbsp;</a> -->
+				</div>
+			</div>
+			<!-- <app-stepperprogress></app-stepperprogress> -->
+		
+		<app-form-esign-verification  #formVerification></app-form-esign-verification>
+		<ng-container *ngIf="pdfView && pdfURL">
+			<br>
+			<ngb-tabset #formDataListTab="ngbTabset" *ngIf="isMapping" class="md-tabs" [activeId]="nextId"
+				(tabChange)="toggle($event.nextId,data)">
+		
+				<ngb-tab *ngFor="let groupPart of data.formDataList; let f = index " id="{{f}}" class="col-md-2">
+					<ng-template ngbTabTitle>
+						<a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary">
+							<h5 class="card-header-text">{{groupPart.formName}}
+								<span class="capitalize messages text-danger" *ngIf="!groupPart.publishedflag">(Not -
+									Published)</span>
+								<span class="capitalize messages text-success"
+									*ngIf="groupPart.publishedflag">(Published)</span>
+							</h5>
+						</a>
+					</ng-template>
+					<ng-template ngbTabContent></ng-template>
+				</ngb-tab>
+			</ngb-tabset>
+			<br>
+			<div class="col-sm-12">
+				<a role="button"><img *ngIf="!forumFlag" class="image-radius rounded-0 img-30 float-right"
+					src="assets/icon/png-icons/forum.png" alt="Forum" placement="bottom" ngbTooltip="Forum" (click)="forumFlag=!forumFlag;"></a>
+				<div class="row pl-5 pr-2">
+					<ng-template #infoForForum>
+					<div> Use the following symbol for document reference :<br>@ - User<br>* - Section<br># - Document</div>
+					</ng-template>
+					<div *ngIf="forumFlag" class="col-sm-12 text-right p-0">
+					  <a  [ngbPopover]="infoForForum" triggers="mouseenter:mouseleave" container="body">
+						<i class="icofont icofont-info-square info"></i>
+					  </a>
+					  <a   role="button" (click)="forumFlag=!forumFlag;" container="body" triggers="mouseenter:mouseleave"
+						[ngbPopover]="forumFlag?'Collapse':'Expand'"> <i
+						  [ngClass]="forumFlag?'fa fa-minus-circle':'fa fa-plus-circle'"
+						  aria-hidden="true"></i></a>
+					</div>
+					<div  [ngClass]="forumFlag?'col-sm-8':'col-sm-12'" [ngStyle]="{'overflow': 'auto','max-height':this.height}">
+					  <pdf-viewer style="display: block;" #ApprovalPDFViewerComponent [src]="pdfURL" [page]="pageVariable"
+						[show-all]="showAll" (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom" [stick-to-page]="true"
+						(error)="onError($event)"></pdf-viewer>
+					</div>
+					<div *ngIf="forumFlag" class="col-sm-4" [ngStyle]="{'overflow': 'auto','max-height':this.height}">
+					  <app-document-forum #forumView [isDocumentWorkFlow]="true" [chapter]="this.outLineList" [documentList]="this.commentsDocumentsList"></app-document-forum>
+					</div>
+				  </div>
+			</div>
+		
+		</ng-container>
+		<ng-container *ngIf="!pdfView">
+		<app-view-form  [inputField]='this.popupdata' (createTask)="createTask($event,data)"></app-view-form>  
+		<ngb-tabset #formDataListTab="ngbTabset" *ngIf="isMapping" class="md-tabs" [activeId]="nextId"  (tabChange)="toggle($event.nextId,data)" >
+
+			<ngb-tab *ngFor="let groupPart of data.formDataList; let f = index " id="{{f}}" class="col-md-2">
+				<ng-template ngbTabTitle>
+					<a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary">
+						<h5 class="card-header-text">{{groupPart.formName}}
+							<span class="capitalize messages text-danger" *ngIf="!groupPart.publishedflag">(Not - Published)</span>
+							<span class="capitalize messages text-success" *ngIf="groupPart.publishedflag">(Published)</span></h5>
+					</a>
+				</ng-template>
+
+				<ng-template ngbTabContent>
+
+					<div class="row">
+						<div class="col-sm-12">
+							<app-view-form [inputField]='groupPart.formDataArray' (createTask)="createTask($event,data,groupPart)" ></app-view-form>
+						</div>
+					</div>
+				</ng-template>
+			</ngb-tab>
+		</ngb-tabset>
+	    </ng-container>
+		<app-individual-audit-trail #auditTrailFormGroup  [permission]="individualconstants" [id]="individualId"></app-individual-audit-trail>
+		<br>
+		<hr>
+		<app-document-forum></app-document-forum>
+	</ng-container>
+
+	
+</app-card>
+
+<app-modal-basic #draftPdfPreview [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+	<div class="app-modal-header">
+		<button type="button" class="close basic-close-light-box" (click)="draftPdfPreview.hide(); this.viewpdf=false;">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="app-modal-body">
+		<app-draft-pdf *ngIf="viewpdf" [permissionConstant]="this.adminComponent.taskDocType" [draftIds]="this.draftIds"></app-draft-pdf>
+	</div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+<app-document-status-comment-log #documentcomments></app-document-status-comment-log>
+<div *ngIf="this.constants">
+	<app-individual-document-forum #forumView [constant]="this.adminComponent.taskDocType" [documentList]="this.commentsDocumentsList"></app-individual-document-forum>
+</div>
+
+<app-external-form-modal #externalFormModal></app-external-form-modal>
+

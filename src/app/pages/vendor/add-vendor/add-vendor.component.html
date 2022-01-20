@@ -1,0 +1,86 @@
+<div class="row">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-6">
+          <i class="icofont icofont-law-document bg-c-blue"></i>
+          <div class="d-inline">
+            <h4 class="strong">Vendor Documents</h4>
+            <span *ngIf="this.model.id==0">Add Vendor Documents</span>
+            <span *ngIf="this.model.id!=0">Vendor Documents : {{this.model.vendorCode}}</span>
+          </div>
+        </div>
+        <div class="col-sm-6">
+          <div style="text-align: right;">
+            <button *ngIf="this.model.id ==0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();saveAndGoto(vendorForm.valid);">Save</button>
+            <button *ngIf="this.model.id!=0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();openSuccessUpdateSwal(vendorForm.valid);">Update</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="onClickClose()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="col-sm-12">
+    <br><br><br>
+    <app-card>
+      <form #vendorForm="ngForm">
+        <table id="add-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Document Name<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <input autofocus="autofocus" type="text" id="requirement" class="form-control" [(ngModel)]="model.documentName" name="documentName"
+                      #documentName="ngModel" placeholder="Document Name" required/>
+                    <div class="messages text-danger"
+                      *ngIf="(documentName.touched || submitted) && documentName.errors?.required">Document Name can't be blank</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">File Upload:</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ng-container *ngIf="model.fileName =='' ">
+                      <input type="file" name="file" required (change)="onSingleFileUpload($event)"
+                        [(ngModel)]='uploadSingleFile' accept=".pdf,.docx" #file="ngModel" />
+                      <h6 style="font-size: 12px"><span class="asterisk required">*Note:</span>Upload .pdf,.doc,.docx files only</h6>
+                      <div class="messages text-danger" *ngIf="submitted && ( file.errors?.required && (model.fileName==''))">Please Upload File</div>
+                      <div class="messages text-danger" *ngIf="(this.fileValidationMessage!='')">{{this.fileValidationMessage}}</div>
+                    </ng-container>
+                    <a style="cursor:pointer;font-weight: bold" *ngIf="model.fileName!=''" ngbTooltip="download"
+                      (click)="downloadFileOrView(model,false)">{{model.fileName}}&nbsp;&nbsp;</a>
+                    <a style="cursor:pointer;font-weight: bold" *ngIf="model.fileName!=''"
+                      ngbTooltip="delete" (click)="deleteUploadedFile(model)"><span
+                        class="asterisk ti-close"></span>&nbsp;&nbsp;</a>
+                    <a style="cursor:pointer;font-weight: bold; font-size: 20px;"
+                      *ngIf="model.fileName!=''" ngbTooltip="view"
+                      (click)="downloadFileOrView(model,true)"><i
+                        class="icofont icofont-eye-alt size"></i></a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="this.inputField">
+          <app-form-extended #formExtendedId [(inputField)]='inputField' [documentId]="this.helper.VENDOR_VALIDATION_VALUE"
+            [(submitted)]='submitted'></app-form-extended>
+        </div>
+      </form>
+      <div class="form-group row" style="text-align: center;" id="fileMainUploadId"></div>
+    </app-card>
+  </div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

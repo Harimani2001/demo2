@@ -1,0 +1,97 @@
+<app-card>
+  <br><br><br>
+  <table id="add-table" class="table w-100">
+    <tbody>
+      <tr>
+        <td>
+          <div class="row">
+            <div class="col-sm-2">
+              <strong class="strong">Category<span class="asterisk required">*</span> :</strong>
+            </div>
+            <div class="col-sm-10">
+              <select class="form-control" name="categoryName" [(ngModel)]="this.category"
+                (ngModelChange)="onChangeCategory($event);">
+                <option value="projectWizard">Project Wizard</option>
+                <option value="templateLibrary">Template Library</option>
+              </select>
+            </div>
+          </div>
+        </td>
+
+        <td *ngIf="this.category === 'projectWizard'">
+          <div class="row">
+            <div class="col-sm-3">
+              <strong class="strong">Project Wizard<span class="asterisk required">*</span> :</strong>
+            </div>
+            <div class="col-sm-9">
+              <angular2-multiselect name="projectWizard" [data]="this.projectList" id="projectId"
+                [disabled]="!(this.projectSetup && this.projectSetup.modal.id==0)"
+                (ngModelChange)="onChangeProject($event);" [(ngModel)]="this.project" required
+                [settings]="dropdownSettings"> </angular2-multiselect>
+            </div>
+          </div>
+        </td>
+        <td *ngIf="this.category === 'templateLibrary'">
+          <div class="row">
+            <div class="col-sm-3">
+              <strong class="strong">Template Library<span class="asterisk required">*</span> :</strong>
+            </div>
+            <div class="col-sm-9">
+              <angular2-multiselect name="templateName" [data]="this.templateLibList" id="templateId"
+                (ngModelChange)="onChangeTemplateLib($event);" required [(ngModel)]="this.templateLib"
+                [settings]="dropdownSettings"> </angular2-multiselect>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="form-group row">
+    <div
+      *ngIf="this.category === 'projectWizard' && this.selectedProject !='' && this.projectSetup && this.projectSetup.modal.id==0"
+      class="col-sm-12">
+      <span style="cursor: pointer;color: blue;"><u class="black" (click)="modalLarge.show();">Click here to copy
+          data</u></span>
+    </div>
+    <div class="col-sm-12 p-0">
+      <app-add-projectsetup #projectForWizard></app-add-projectsetup>
+    </div>
+  </div>
+</app-card>
+
+<app-modal-basic #modalLarge [dialogClass]="'modal-md'" class="modal-dialog">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select Documents</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" style="height: 400px; overflow-y: scroll;">
+    <div class="dt-desc" style="padding: 0px;">
+      <div class="table-responsive" *ngFor="let document of this.documents;">
+        <h6>{{document.name}}</h6>
+        <table class="table">
+          <tr *ngFor="let row of document.list;let i=index">
+            <td>
+              <div class="checkbox-fade fade-in-primary">
+                <label>
+                  <input value="{{row['check']}}" name="{{row['key']}}"
+                    (click)="addData(i,document.list,document.name);" [(ngModel)]="row.check" type="checkbox"
+                    class="form-control">
+                  <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                </label>
+              </div>
+            </td>
+            <td>{{row.value}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-primary" (click)="modalLarge.hide();onClosePopup();">Submit</button>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

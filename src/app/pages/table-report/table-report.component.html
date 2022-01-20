@@ -1,0 +1,87 @@
+<div *ngIf="this.docId==='113'">
+  <br>
+  <div class="row">
+    <div class="col-sm-1"></div>
+    <div class="col-sm-11">
+      <table>
+        <thead>
+          <caption style="width: fit-content;">Severity</caption>
+        </thead>
+        <tfoot>
+          <tr>
+            <th></th>
+            <th class="text-center" *ngFor="let el of elements; let i=index;">{{i+1}}</th>
+            <th>
+              <caption class="text-right">Occurence</caption>
+            </th>
+          </tr>
+        </tfoot>
+        <tbody>
+          <tr *ngFor="let el of elements; let i=index;">
+            <th class="text-center">{{this.createMarix-i}}</th>
+            <ng-container *ngFor="let el of elements; let j=index;">
+              <ng-template #popContent>
+                
+                <div><b>Total :</b>&nbsp; {{this.total}}</div>
+                <div><b>Draft :</b>&nbsp; {{this.drapt}}</div>
+                <div><b>In Progress :</b>&nbsp;{{this.inProgress}} </div>
+                <div><b>Completed :</b>&nbsp;{{this.completed}} </div>
+              </ng-template>
+              <td class="text-center" style=" width:100px;height:60px;border: 1px solid black;" container="body"
+                [ngbPopover]="popContent" (mouseenter)="getPopUpData(this.createMarix-i,j+1)" triggers="mouseenter:mouseleave"
+                [ngStyle]="{'background-color': getColorForRiskTable(this.createMarix-i,j+1,this.createMarix)}"><strong class="riskCount"
+                  style="color: black;">{{getRiskCount(this.createMarix-i,j+1)}}</strong><br>{{getPriority(this.createMarix-i,j+1,this.createMarix)}}</td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="this.docId==='107'">
+  <br>
+  <div class="row">
+    <div class="col-sm-1"></div>
+    <div class="col-sm-11">
+      <table class="table-responsive">
+        <thead>
+          <caption style="width: fit-content;float: right;">Category</caption>
+        </thead>
+        <tfoot>
+          <tr>
+            <th></th>
+            <th class="text-center" *ngFor="let p of priorityList;">{{p}}</th>
+            <th>
+              <caption class="text-right">Priority</caption>
+            </th>
+          </tr>
+        </tfoot>
+        <tbody>
+          <tr *ngFor="let cat of categoryList;">
+            <th class="text-left" container="body">{{cat}}</th>
+            <!-- <th class="text-left" style="text-overflow: ellipsis;overflow: hidden;max-width: 50px;" container="body"
+            [ngbPopover]="popContent" triggers="mouseenter:mouseleave">{{cat}}<ng-template #popContent>
+              <div>{{cat}}</div>
+            </ng-template>
+          </th> -->
+            <ng-container *ngFor="let p of priorityList;">
+              <ng-template #popContent>
+                <div><b>Total :</b>&nbsp; {{this.total}}</div>
+                <div><b>Draft :</b>&nbsp; {{this.drapt}}</div>
+                <div><b>In Progress :</b>&nbsp;{{this.inProgress}} </div>
+                <div><b>Completed :</b>&nbsp;{{this.completed}} </div>
+              </ng-template>
+              <td class="text-center" style=" width:100px;height:60px;border: 1px solid black;" container="body"
+                [ngbPopover]="popContent" (mouseenter)="getUrsPopUpData(p,cat)" triggers="mouseenter:mouseleave"
+                [ngStyle]="{'background-color': getColorForUrsTable(p)}"><strong class="riskCount"
+                  style="color: black;">{{getUrsCount(p,cat)}}</strong></td>
+            </ng-container>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

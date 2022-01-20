@@ -1,0 +1,98 @@
+<div *ngIf="pdfSrc" class="row">
+    <!--button-->
+    <div *ngIf="!hideButton" class="col-sm-12">
+        <div  class="row">
+            <div class="col-sm-3">
+                <div class="row">
+                    <label class="col-sm-6">Show all pages</label>
+                    <div class="col-sm-6"> <label class="switch"><input type="checkbox" name="showAll" (change)="stickToPage=true"
+                                [(ngModel)]="showAll" />
+                            <span class="slider round"></span></label></div>
+                    <label *ngIf="showAll" class="col-sm-6">Show outline</label>
+                    <div *ngIf="showAll" class="col-sm-6"> <label class="switch"><input type="checkbox" name="isOutlineShown"
+                                [(ngModel)]="isOutlineShown" />
+                            <span class="slider round"></span></label></div>
+                </div>
+            </div>
+            <div class="col-sm-9">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <h4 class="strong">{{fileName}}</h4>
+                    </div>
+                    <div class="col-sm-8  text-right">
+                        <a class="btn" role="button" role="button" (click)="incrementZoom(-0.1)"> <i class="icofont icofont-minus"></i></a>
+                        <input type="number" class="col-sm-2" min="0"  [(ngModel)]="zoom" />
+                        <a class="btn" role="button" (click)="incrementZoom(0.1)"> <i class="icofont icofont-plus"></i></a>
+                        <a class="btn" role="button" (click)="originalSize=true"> <i class="icofont icofont-resize"></i>
+                            Orginal Size</a>
+                        <a class="btn" role="button" (click)="rotate(-90)"> <i class="icofont icofont-refresh"></i>
+                            Rotate</a>
+                        <button class="btn btn-link" (click)="downloadPDFFromView(pdfSrc,fileName)"><i
+                                class="icofont icofont-download-alt"></i>Download</button>
+                    
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="row" *ngIf="showAll || !showAll">
+                            <button (click)="incrementPage(-1)" type="button" class="col-sm-2 pt-1 pl-0  btn btn-link">
+                                Previous</button>
+                            <input class="col-sm-1" type="text" placeholder="Page" min="1" (keypress)="onlyNumber($event)"
+                                [(ngModel)]="pageString" (ngModelChange)="setPageNumber(pageString)" />
+                            <label *ngIf="pdf" class="col-sm-2 pt-2 pr-0">of {{ pdf.numPages }}</label>
+                            <button (click)="incrementPage(1)" class="col-sm-2 pl-0 pt-1 btn btn-link" type="button">
+                                Next</button>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <!-- <label class="col-sm-4">Search</label>
+                            <div class="col-sm-8">
+                                <input class="form-control" placeholder="Search..." [(ngModel)]="pdfQuery"
+                                    (ngModelChange)="searchQueryChanged(pdfQuery)" />
+                            </div> -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--View -->
+        <div class="row">
+            <div class="col-sm-3">
+                <div class="row">
+                    <div class="col-sm-12" [ngStyle]="{'overflow': 'auto','max-height':this.heightOutline}"
+                        *ngIf="showAll && isOutlineShown">
+                        <ul *ngFor="let item of outline" class="list-group">
+                            <li style="border:0" class="list-group-item"><a
+                                    (click)="navigateTo(item.dest)">{{ item.title }}</a>
+                                <ul *ngFor="let child of item.items" class="list-group">
+                                    <li style="border:0" class="list-group-item"><a (click)="navigateTo(child.dest)">
+                                            {{ child.title }}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div [class]="(showAll && isOutlineShown)?'well well-md container col-sm-9':'well well-md container col-sm-12'"
+                [ngStyle]="{'overflow': 'auto','max-height':this.height}">
+                <pdf-viewer #PdfViewerComponent [src]="pdfSrc" [(page)]="page" [rotation]="rotation"
+                    [original-size]="originalSize" [show-all]="showAll" [fit-to-page]="fitToPage"
+                    (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom" [stick-to-page]="stickToPage"
+                    [render-text]="renderText" [external-link-target]="'blank'" [autoresize]="autoresize"
+                    (error)="onError($event)" (on-progress)="onProgress($event)" (page-rendered)="pageRendered($event)"
+                    style="display: block;"></pdf-viewer>
+            </div>
+        </div>
+
+    </div>
+    <div *ngIf="hideButton" [class]="'well well-md container col-sm-12'" [ngStyle]="{'overflow': 'auto','max-height':this.height}">
+        <pdf-viewer #PdfViewerComponent [src]="pdfSrc" [(page)]="page" [rotation]="rotation" [original-size]="originalSize"
+            [show-all]="showAll" [fit-to-page]="fitToPage" (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom"
+            [stick-to-page]="stickToPage" [render-text]="renderText" [external-link-target]="'blank'"
+            [autoresize]="autoresize" (error)="onError($event)" (on-progress)="onProgress($event)"
+            (page-rendered)="pageRendered($event)" style="display: block;"></pdf-viewer>
+    </div>
+</div>

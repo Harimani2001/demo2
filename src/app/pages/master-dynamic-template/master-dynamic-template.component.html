@@ -1,0 +1,322 @@
+<div >
+  <br><br>
+    <app-card   [classHeader]="true">
+<ngb-tabset #t="ngbTabset">
+<ngb-tab>
+    <ng-template ngbTabTitle >
+        <div style="cursor: pointer" (click)="loadTemplate()">Dynamic Template Configuration</div>
+    </ng-template>
+		<ng-template ngbTabContent>
+			<div class="row">
+				<div class="col-sm-12">
+            <br>
+            <!--START:TABLE VIEW FOR MASTER TEMPLATE-->
+      <div *ngIf="!formFlag" class="row">
+          <div class="col-sm-12">
+            <app-card [title]="'Master Template Details'" [classHeader]="true">
+        
+              <div>
+                <button type="button" class="btn btn-primary"  type="button" class="btn btn-primary" (click)="loadForm()">
+                  <i class="icofont icofont-plus-circle"></i>
+                  Add Master Template</button>
+              </div>
+              <div class="row">
+                  <div class="col-xs-12 col-sm-12 col-sm-12 col-md-6">
+                    <div>
+                    </div>
+                  </div>
+                  <div class="col-xs-12 col-sm-12 col-md-6">
+                    <div style="text-align: right;">
+                      <label>Search:
+                        <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search" placeholder="">
+                      </label>
+                    </div>
+                  </div>
+                </div>
+        
+                <ngb-tabset #t1="ngbTabset" >
+                    <ngb-tab>
+                        <ng-template ngbTabTitle >
+                            <div>Unpublished Master Dynamic Template</div>
+                        </ng-template>
+                        <ng-template ngbTabContent>
+                            <ngx-datatable #myTable class="data-table expandable" [rows]='unPublishedTemplateList | dynamicTemplateFilterPipe : filterQuery' [limit]="10" [columnMode]="'force'" [headerHeight]="50"
+                            [footerHeight]="50" [rowHeight]="'auto'" (page)="onPage($event)">
+                            <ngx-datatable-column name="Serial Number">
+                              <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                                <strong class = "fontStyle">{{row['$$index']+1}}</strong>
+                              </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="Template Name">
+                              <ng-template let-row="row" ngx-datatable-cell-template>
+                                <strong class = "fontStyle">{{row['templateName']}}</strong>
+                              </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="File Name">
+                              <ng-template let-row="row" ngx-datatable-cell-template>
+                                <strong class = "fontStyle">{{row['fileName']}}</strong>
+                              </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="Action">
+                              <ng-template let-row="row" ngx-datatable-cell-template>
+                             
+                                <a href="javascript:;" (click)="loadTemplateToEdit(row.id)" class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+                                  <i  class="icofont icofont-edit"></i>
+                                </a>
+                                <a  href="javascript:;" class="m-r-15 crm-action-delete text-muted text-danger"  (click)="deleteTemplateSwal(row.id);" placement="top" ngbTooltip="Delete">
+                                  <i  class="icofont icofont-bin"></i>
+                                </a>
+                                
+                                
+                              </ng-template>
+                            </ngx-datatable-column>
+                    
+                          </ngx-datatable>
+                        </ng-template>
+                      </ngb-tab>
+
+                      <ngb-tab>
+                          <ng-template ngbTabTitle >
+                              <div>Published Master Dynamic Template</div>
+                          </ng-template>
+                          <ng-template ngbTabContent>
+                              <ngx-datatable #myTable class="data-table expandable" [rows]='publishedTemplateList | dynamicTemplateFilterPipe : filterQuery' [limit]="10" [columnMode]="'force'" [headerHeight]="50"
+                              [footerHeight]="50" [rowHeight]="'auto'" (page)="onPage($event)">
+                              <ngx-datatable-column name="Serial Number">
+                                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                                  <strong class = "fontStyle">{{row['$$index']+1}}</strong>
+                                </ng-template>
+                              </ngx-datatable-column>
+                              <ngx-datatable-column name="Template Name">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                  <strong class = "fontStyle">{{row['templateName']}}</strong>
+                                </ng-template>
+                              </ngx-datatable-column>
+                              <ngx-datatable-column name="File Name">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                  <strong class = "fontStyle">{{row['fileName']}}</strong>
+                                </ng-template>
+                              </ngx-datatable-column>
+                              <ngx-datatable-column name="Action">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                               
+                                  <a href="javascript:;" (click)="loadTemplateToEdit(row.id)" class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="View">
+                                    <i  class="icofont icofont-edit"></i>
+                                  </a>
+                                  
+                                </ng-template>
+                              </ngx-datatable-column>
+                      
+                            </ngx-datatable>
+                          </ng-template>
+                        </ngb-tab>
+                    </ngb-tabset>
+            </app-card>
+          </div>
+        </div>
+        <!--END: TABLE VIEW FOR MASTER TEMPLATE-->
+        <form *ngIf="formFlag" #dynamicTemplate="ngForm" class="well well-lg">
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">Template Name
+                <span class="asterisk">*</span>
+              </label>
+              <div class="col-sm-6">
+                <input type="text" [disabled]="masterDynamicTemplate.publishedFlag" [(ngModel)]="masterDynamicTemplate.templateName" class="form-control" name="titledata" placeholder="abc" #titledata="ngModel" (ngModelChange)="showNext()"
+                 required>
+                <div class="messages text-danger" *ngIf="(titledata.touched || submitted) && titledata.errors?.required">Template Name can't be blank</div>
+                <div class="messages text-danger" *ngIf="this.validationMessage!=''">{{this.validationMessage}}</div>
+              </div>
+            </div>
+      
+            <div class="form-group row">
+              <label class="col-sm-2 col-form-label">File Upload
+                <span class="asterisk">*</span>
+              </label>
+              <div *ngIf="!masterDynamicTemplate.publishedFlag" class="col-sm-6">
+              <input type="file"  name="file" required  (change)="onSingleFileUpload($event)" [(ngModel)]='uploadSingleFile'  accept=".pdf,.doc,.docx" #file="ngModel">
+             <div class="col-sm-10" *ngIf="singleFileUploadFlag" class="spinner-border spinner-border-sm text-primary" role="status">
+                 <span class="sr-only">Loading...</span></div>
+                <h6 style="font-size: 12px"><span class="asterisk required">*Note:</span> Upload .pdf,.doc,.docx files only</h6>
+            <div class="messages text-danger" *ngIf="(file.touched || submitted) && ( file.errors?.required && (masterDynamicTemplate.fileName==''))">File Upload can't be blank</div>
+            <div class="messages text-danger" *ngIf="(this.fileValidationMessage!='')">  {{this.fileValidationMessage}}</div>
+            <a style="cursor:pointer;font-weight: bold" *ngIf="masterDynamicTemplate.fileName!='' " ngbTooltip="download" (click)="downloadFileOrView(masterDynamicTemplate,false)">{{masterDynamicTemplate.fileName}}</a> &nbsp;&nbsp; 
+             <a style="cursor:pointer;font-weight: bold" *ngIf="masterDynamicTemplate.fileName!=''"ngbTooltip="delete" (click)="deleteUploadedFile()"><span  class="asterisk ti-close"></span></a>&nbsp;&nbsp;
+             <a style="cursor:pointer;font-weight: bold" *ngIf="masterDynamicTemplate.fileName!=''"  ngbTooltip="view" (click)="downloadFileOrView(masterDynamicTemplate,true)"><span  class="ti-layers"></span></a>
+            </div>
+            <div *ngIf="masterDynamicTemplate.publishedFlag" class="col-sm-6">
+              <a style="cursor:pointer;font-weight: bold" *ngIf="masterDynamicTemplate.fileName!='' " ngbTooltip="download" (click)="downloadFileOrView(masterDynamicTemplate,false)">{{masterDynamicTemplate.fileName}}</a> &nbsp;&nbsp; 
+              <a style="cursor:pointer;font-weight: bold" *ngIf="masterDynamicTemplate.fileName!=''"  ngbTooltip="view" (click)="downloadFileOrView(masterDynamicTemplate,true)"><span  class="ti-layers"></span></a>
+            </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-6 col-form-label">Levels For Workflow
+                <span class="asterisk required">*</span>
+                </label>
+                <div class="col-sm-6">
+                    <ng-select required [disabled]="masterDynamicTemplate.publishedFlag" [ngClass]="'ng-select'" name="work" [options]="workFlowOptions" [multiple]="true" [(ngModel)]="masterDynamicTemplate.workFlowLevels"  #rounds="ngModel" ></ng-select>
+               
+                    <div class="messages text-danger" *ngIf="(rounds.touched || submitted) && rounds.errors?.required">
+                        Levels For Workflow can't be blank</div>
+                  </div>
+            </div>
+           
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label">Active
+                </label>
+                <div class="col-sm-6">
+                    <ui-switch ng-model="all" name="activeFlag" [disabled]="masterDynamicTemplate.publishedFlag" [(ngModel)]="masterDynamicTemplate.activeFlag" (change)="masterDynamicForm.activeFlag=!masterDynamicForm.activeFlag" class="js-small" color="#3498DB" switchColor="#fff" size="small">
+                      </ui-switch>
+                </div>
+            </div>
+            <div class="form-group row" style="text-align: center;" id="fileUploadIdMasterTemplate"></div>
+            <div class="col-sm-12" style="text-align: center;">
+
+              <div *ngIf="!masterDynamicTemplate.publishedFlag"><button *ngIf="masterDynamicTemplate.id==0" type="button" class="btn btn-success"
+                (click)="$event.preventDefault();saveData(dynamicTemplate.valid);"><i class="icofont icofont-papers"></i>Save</button>
+              <button *ngIf="masterDynamicTemplate.id!=0" type="button" class="btn btn-success"
+                (click)="$event.preventDefault();saveData(dynamicTemplate.valid);"><i
+                  class="icofont icofont-papers"></i>Update</button>
+                  <button *ngIf="masterDynamicTemplate.id!=0" type="button" class="btn btn-secondary"
+                  (click)="$event.preventDefault();goToWorkFlowConfig(masterDynamicTemplate.id)">
+                  <i class="icofont icofont-bubble-right"></i>Next</button>
+              <button *ngIf="masterDynamicTemplate.id!=0" type="button" class="btn btn-warning"
+                (click)="deleteTemplateSwal(masterDynamicTemplate.id);"><i class="icofont icofont-bin"></i>Delete</button>
+              <button type="button" class="btn btn-danger" (click)="loadTemplate()"><i
+                  class="icofont icofont-close"></i>Cancel</button>
+                </div>
+                <button *ngIf="masterDynamicTemplate.publishedFlag" type="button" class="btn btn-danger" (click)="loadTemplate()"><i
+                  class="icofont icofont-close"></i>Cancel</button>
+            </div>
+      
+          </form>
+				</div>
+			</div>
+		</ng-template>
+  </ngb-tab>
+  
+  <ngb-tab >
+      <ng-template ngbTabTitle >
+          <div id="workFlowId" style="cursor: pointer" (click)="this.loadTemplate();">Dynamic Template Workflow Configuration</div>
+      </ng-template>
+      <ng-template ngbTabContent>
+        <div class="row">
+          <div class="col-sm-12">
+            <app-card  [title]="'Dynamic Template Workflow Configuration'" [classHeader]="true">
+
+                <div class="col-sm-6 col-xl-4 m-b-30">
+                    <button type="button" class="btn btn-primary" (click)="addNewLevel(workFlowDto.masterDynamicTemplateId)">
+                      <i class="icofont icofont-plus-circle"></i>Add </button><br>
+                    </div>
+
+
+                    <form #workFlowConfig="ngForm" novalidate>
+                    
+                    
+                        <div class="form-group row">
+                            <label class="col-sm-2 col-form-label">Template
+                              <span class="asterisk">*</span>
+                            </label>
+                            <div class="col-sm-6">
+                                <select #template="ngModel" name="select" class="form-control"
+                                id="menuList" required [(ngModel)]="workFlowDto.masterId"
+                                (ngModelChange)="loadNumberOfLevelsForMasterDynamicTemplate(workFlowDto.masterId)">
+                                <option selected [value]="0">Select</option>
+                                <option *ngFor="let template of unPublishedTemplateList" [value]="template.id">{{template.templateName}}</option>
+                              </select>
+                              <div class="messages text-danger" *ngIf="(template.touched || submitted) && workFlowDto.masterId==0">
+                                  Please select the template</div>
+                            </div>
+                          </div>
+
+                          <div class="form-group row">
+                              <label class="col-sm-2 col-form-label">Level
+                                <span class="asterisk">*</span>
+                              </label>
+                              <div class="col-sm-6">
+                                  <select #level="ngModel" name="level" class="form-control" id="levelId" required
+                          [(ngModel)]="workFlowDto.workFlowLevelId">
+                          <option selected [value]="0">Choose your level</option>
+                          <option *ngFor="let level of levelList" [value]="level.key">{{level.value}}</option>
+                        </select>
+                        <div class="messages text-danger" *ngIf="(template.touched || submitted) && workFlowDto.workFlowLevelId==0">Please select the level</div>
+                              </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <label class="col-sm-2 col-form-label">Roles
+                                  <span class="asterisk">*</span>
+                                </label>
+                                <div class="col-sm-6">
+                                    <ng-select [ngClass]="'ng-select'" name="roleId" required #userRole="ngModel" [options]="roleList" [multiple]="true"
+                                    [(ngModel)]="roleIds" rounds="ngModel" (ngModelChange)="this.loadUser(roleIds);"></ng-select>
+                                  <div class="messages text-danger" *ngIf="(userRole.touched || submitted)&& userRole?.errors?.required">Please select
+                                    atleast one role</div>
+                                </div>
+                              </div>
+                              <div class="form-group row">
+                                  <label class="col-sm-2 col-form-label">Users
+                                    <span class="asterisk">*</span>
+                                  </label>
+                                  <div class="col-sm-6">
+                                      <ng-select [ngClass]="'ng-select'" name="user" required #user="ngModel" [options]="userList" [multiple]="true"
+                                      [(ngModel)]="workFlowDto.users" rounds="ngModel"></ng-select>
+                                    <div class="messages text-danger" *ngIf="(user.touched || submitted) && user.errors?.required">Please select atleast
+                                      one user</div>
+                                  </div>
+                                </div>
+                      <div class="form-group row">
+                        <div class="col-sm-12" style="text-align: center;">
+                          <button *ngIf="workFlowDto.id==0" type="button" class="btn btn-success"
+                            (click)="$event.preventDefault();saveWorkFlowData(workFlowConfig.valid);"><i
+                              class="icofont icofont-papers"></i>Save</button>
+                          <button *ngIf="workFlowDto.id!=0" type="button" class="btn btn-success"
+                            (click)="$event.preventDefault();saveWorkFlowData(workFlowConfig.valid);"><i
+                              class="icofont icofont-papers"></i>Update</button>
+                          <button type="button" class="btn btn-danger" [routerLink]="['/Masterdatasetup']" routerLinkActive="active"><i
+                              class="icofont icofont-close"></i>Cancel</button>
+                        </div>
+                      </div>
+                    </form>
+                    <br>
+<ngx-datatable #myTable class="data-table expandable" [rows]='masterWorkFLowConfigData | projectsetupFilter : filterQuery' [limit]="10" [columnMode]="'force'"
+  [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+  <ngx-datatable-column name="Sl No." [width]="50">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      <strong>{{row['$$index']+1}}</strong>
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column style="font-weight: bold;" name="Form Name">
+    <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+      <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['masterName']}}</strong>
+    </ng-template>
+  </ngx-datatable-column>
+  <ngx-datatable-column name="Level Name">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['workFlowLevelName']}}</strong>
+    </ng-template>
+  </ngx-datatable-column>
+
+  <ngx-datatable-column name="Action">
+    <ng-template let-row="row" ngx-datatable-cell-template>
+      <a href="javascript:;" routerLinkActive="active"  (click)="editLevel(row);" class="m-r-15 crm-action-edit text-muted text-primary"  placement="top" ngbTooltip="Edit">
+        <i  class="icofont icofont-edit"></i>
+      </a>
+      <!-- <a href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" (click)="deleteTemplateSwal(row);" placement="top" ngbTooltip="DeActivate">
+        <i  class="icofont icofont-close-squared"></i>
+      </a> -->
+    </ng-template>
+  </ngx-datatable-column>
+</ngx-datatable>
+            </app-card>
+          </div>
+        </div>
+      </ng-template>
+    </ngb-tab>
+  </ngb-tabset>
+  </app-card>
+    
+  
+ 
+ 
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

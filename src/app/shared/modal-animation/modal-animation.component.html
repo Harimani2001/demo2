@@ -1,0 +1,11 @@
+<div class="md-modal" [ngClass]="modalClass" id="{{modalID}}">
+  <div style="opacity: 1"  class="md-content" [ngClass]="contentClass">
+    <ng-content></ng-content>
+  </div>
+  <div *ngIf="this.animationSpinnerFlag" class="loading">Loading&#8230;</div>
+</div>
+<div *ngIf="(backDrop); else backDropOver" class="md-overlay"></div>
+<ng-template #backDropOver>
+  <div class="md-overlay" (click)="close(modalID)"></div>
+</ng-template>
+<div *ngIf="this.animationSpinnerFlag" class="loading">Loading&#8230;</div>

@@ -1,0 +1,151 @@
+<div class="row">
+  <div class="col-sm-12">
+    <!-- Basic Form Inputs card start -->
+    <app-card [title]="'Search'">
+      <form #search="ngForm">
+
+          <div class="input-group">
+            <label style="margin: 1%"> Document <span class="asterisk">&nbsp;*&nbsp;</span></label>
+            <div id="styled-select">
+              <select name="select" class="form-control input-sm full-data-search" id="apiConfigurationId"
+                style="height: 45px; size: 50px;" required [(ngModel)]="projectPlanModal.documentConstantName"
+                [disabled]="blockdocument" name="document" #document="ngModel">
+                <option value="0" selected>Select Document</option>
+                <option *ngFor="let doc of selectdocument" [ngValue]="doc.key">{{doc.value}}</option>
+              </select>
+              <div class="messages text-danger" *ngIf="(submitted) && document.errors?.required">select any document</div>
+            </div>&nbsp;&nbsp;&nbsp;
+            <div>
+              <input type="text" placeholder="Search" aria-label="Search" style="width: 300px; height: 42px;" #code
+                [(ngModel)]="this.searchValue" [ngModelOptions]="{standalone: true}">&nbsp;&nbsp;
+              <button (click)="onSearchChange()" type="button" class="btn btn-outline-info"><i
+                  class="fa fa-search"></i>Search</button>
+                  <div class="messages text-danger" *ngIf="this.isClicked && projectPlanModal.documentConstantName==''">Please select the document</div>
+            </div>
+          </div><br>
+          <div id="resultStats" class="input-group" *ngIf="sizeOfList > 0 || sizeOfList == 0">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;About:&nbsp;&nbsp;{{this.sizeOfList}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Result:&nbsp;&nbsp;{{this.timeforMethodCall}}
+            </div> 
+          
+      </form>
+    </app-card>
+    <!-- <div class="cardList"> -->
+        
+    <ng-container *ngFor="let urs of ursModel" ng-if="ursModel > 0">
+    <a [routerLink]="['/URS/view-urs']" [queryParams]="{ id: urs.id,status:'/search'}">
+    <app-card title="">
+      <b>URS Id: </b><label>{{urs.ursCode}}</label><br>
+      <b>URS : </b><label>{{urs.ursName}}</label><br>
+      <b>Priority : </b><label>{{urs.priorityName}}</label><br>
+      <b>Category : </b><label>{{urs.categoryName}}</label><br>
+      <b>Published Status : </b><label>{{urs.publishedStatus}}</label><br>
+      <b>Document Status : </b><label>{{urs.status}}</label><br>
+        <!-- <b>Description: </b><label><div class="blog-post" [innerHtml]="urs.description"></div></label> -->
+      </app-card>
+    </a>
+    </ng-container>
+
+    <ng-container *ngFor="let spec of specModel" ng-if="specModel > 0">
+      <a [routerLink]="['/sp-master']" [queryParams]="{ id: spec.id,status:'/search'}">
+      <app-card title="">
+        <b>Specification Id: </b><label>{{spec.spCode}}</label><br>
+        <b>Type : </b><label>{{spec.spTypeValue}}</label><br>
+        <b>Published Status : </b><label>{{spec.publishedStatus}}</label><br>
+        <b>Document Status : </b><label>{{spec.status}}</label><br>
+        </app-card>
+      </a>
+    </ng-container>
+
+    <ng-container *ngFor="let df of dfData" ng-if="dfData > 0">
+      <a>
+        <app-card title="">
+          <b>Incident Description: </b><a [routerLink]="['/df/view-df']" [queryParams]="{ id: df.id,status:'/search'}">{{df.discrepancyDescription}}</a><br>
+          <b>Action Taken : </b><label>{{df.actionTaken}}</label><br>
+          <b>Result for Action : </b><label>{{df.resultForAction}}</label><br>
+          <b>Status : </b><label>{{df.dfStatus}}</label><br>
+          <b>Category : </b><label>{{df.documentCode}}</label><br>
+          <b *ngIf="df.testCaseName != null && (df.documentCode==='IQTC')">Test Case Code : </b><a *ngIf="df.testCaseName != null && (df.documentCode==='IQTC')" [routerLink]="['/iqtc/view-iqtc']" [queryParams]="{ id: df.testCaseId,status:'/search'}">{{df.testCaseName}}</a>
+          <b *ngIf="df.testCaseName != null && (df.documentCode==='PQTC')">Test Case Code : </b><a *ngIf="df.testCaseName != null && (df.documentCode==='PQTC')" [routerLink]="['/pqtc/view-pqtc']" [queryParams]="{ id: df.testCaseId,status:'/search'}">{{df.testCaseName}}</a>
+          <b *ngIf="df.testCaseName != null && (df.documentCode==='OQTC')">Test Case Code : </b><a *ngIf="df.testCaseName != null && (df.documentCode==='OQTC')" [routerLink]="['/oqtc/view-oqtc']" [queryParams]="{ id: df.testCaseId,status:'/search'}">{{df.testCaseName}}</a>
+        </app-card>
+      </a>
+    </ng-container>
+
+    <ng-container *ngFor="let vsr of vsrModel" ng-if="vsrModel > 0">
+      <a href="Summary-Report/create-summary-report/{{vsr.id}}">
+        <app-card title="">
+          <b>Objective : </b><label>{{vsr.objectiveAndPurpose}}</label><br>
+          <b>Scope : </b><label>{{vsr.scope}}</label><br>
+          <b>Summary : </b><label>{{vsr.validationSummary}}</label><br>
+          <b>Validation Exp Date : </b><label>{{vsr.validationExpiryDate}}</label><br>
+        </app-card>
+      </a>
+    </ng-container>
+
+    <ng-container *ngFor="let tem of templateModel" ng-if="templateModel > 0">
+      <a href="newDynamicTemplate?id={{tem.id}}&exists=true">
+        <app-card title="">
+          <b>Template name : </b><label>{{tem.templateName}}</label><br>
+          <b>Template code : </b><label>{{tem.dynamicTemplateCode}}</label><br>
+          <b>File name : </b><label>{{tem.fileName}}</label><br>
+        </app-card>
+      </a>
+    </ng-container>
+
+    <ng-container *ngFor="let testcase of iqtcModel" ng-if="iqtcModel > 0">
+      <a href=""    (click)="$event.preventDefault();   viewTestcase(testcase.url)">
+        <app-card title="" class="iqtc">
+          <b>Test Case Id:</b><label>{{testcase.testCaseCode}}</label><br>
+          <b>Test Case Type:</b><label>{{testcase.testCaseType}}</label><br>
+          <b>Status:</b><label>{{testcase.status}}</label><br>
+          <b>Document Status:</b><label>{{testcase.approvedStatus}}</label>
+        </app-card>
+      </a>
+    </ng-container>
+
+        <ng-container *ngFor="let risk of riskModel" ng-if="riskModel > 0">
+          <a [routerLink]="['/riskAssessment']" [queryParams]="{ id: risk.id,status:'/search'}">
+            <app-card title="" class="risk">
+              <b>RiskFactor:</b><label>{{risk.riskFactor}}</label><br>
+              <b>RiskScenario:</b><label>{{risk.riskScenario}}</label><br>
+              <b>Priority:</b><label>{{risk.priority}}</label><br>
+              <b>Published Status:</b><label>{{risk.publishedStatus}}</label><br>
+              <b>Document Status:</b><label>{{risk.status}}</label><br>
+              <b>Probable Cause Of Risk:</b><label>{{risk.probableCauseOfRisk}}</label><br>
+              </app-card>
+            </a>
+            </ng-container> 
+
+            <ng-container *ngFor="let vendor of vendorModel" ng-if="vendorModel > 0">
+              <a [routerLink]="['/vendor/view-vendor']" [queryParams]="{ id: vendor.id,status:'/search'}">
+                <app-card title="" class="vendor">
+                  <b>VendorCode:</b><label>{{vendor.vendorCode}}</label><br>
+                  <b>Project Name:</b><label>{{vendor.projectName}}</label><br>
+                  <b>Reviewer:</b><label>{{vendor.reviewer}}</label><br>
+                  <b>Approver:</b><label>{{vendor.approver}}</label><br>
+                  <b>Document Status:</b><label>{{vendor.status}}</label><br>
+                  <b>Document Name:</b><label>{{vendor.documentName}}</label><br>
+                </app-card>
+              </a>
+            </ng-container> 
+
+                <ng-container *ngFor="let master of dynamicFormData" ng-if="this.dynamicFormData.length > 0">
+                  <a style="cursor: pointer;color: #007bff;" (click)="urlRedirect(master)">
+                    <app-card title="" class="master">
+                      <b>Template : </b><label> {{master.templateName}}</label><br>
+                      <b>Dynamic form code : </b><label> {{master.dynamicFormCode}}</label><br>
+                      <!-- <b>Structure : </b> -->
+                      <!-- <div *ngFor="let form of master.formData">
+                        <label>{{form.type}} : {{form.label}}</label><br>
+                        <label> {{form.label}} </label><br>
+                      </div> -->
+                  
+                      <!-- <app-view-form [inputField]='this.dynamicFormData'></app-view-form><br> -->
+                      </app-card>
+                  </a>
+                    
+                </ng-container> 
+    <!-- </div> -->
+  </div>
+</div>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

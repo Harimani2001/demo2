@@ -1,0 +1,352 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="col-sm-12" id="float-action">
+        <app-card>
+          <div class="row">
+            <div class="col-sm-8" *ngIf="projectSelectionFlag">
+              <label>Documents Sequence :</label>
+              <i *ngIf="!projectPlanData.flowFormGroupSettingsDTO" class="fa fa-align-justify" aria-hidden="true"><label
+                  class="m-l-5">Parallel</label></i>
+              <i *ngIf="projectPlanData.flowFormGroupSettingsDTO" class="fa fa-long-arrow-right"
+                aria-hidden="true"><label class="m-l-5">Sequential</label></i>
+              <label class="m-l-40">Start Date : <span>{{this.projectStartDate |
+                  date:this.datePipeFormat}}</span></label>
+              <label class="m-l-40">End Date : <span>{{this.projectEndDate | date:this.datePipeFormat}}</span></label>
+            </div>
+
+            <div class="col-sm-4 text-right" *ngIf="projectSelectionFlag">
+              <a *ngIf="permissionModal.userInWorkFlow && permissionModal.exportButtonFlag" href="javascript:"
+                class="m-r-15"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/csvExport.png"
+                  alt="CSV Export" placement="bottom" ngbTooltip="CSV Export" (click)="excelExport()"></a>
+              <a *ngIf="!showExpansion" href="javascript:" class="m-r-15"><img
+                  class="image-radius rounded-0 img-25 img-height" src="assets/icon/png-icons/expandAll.png" alt="Expand All"
+                  placement="bottom" ngbTooltip="Expand All" (click)="expandAll();"></a>
+              <a *ngIf="showExpansion" href="javascript:" class="m-r-15"><img
+                  class="image-radius rounded-0 img-25 img-height" src="assets/icon/png-icons/collapseAll.png"
+                  alt="Collapse All" placement="bottom" ngbTooltip="Collapse All" (click)="collapseAll();"></a>
+              <a href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25 img-height"
+                  src="assets/icon/png-icons/emailAndNotify.png" alt="Email Plan" placement="bottom" ngbTooltip="Email Plan"
+                  (click)="loadAllUsersOnProject();sendMailModal.show()"></a>
+              <a *ngIf="this.permissionModal.createButtonFlag" href="javascript:" class="m-r-15"><img
+                  class="image-radius rounded-0 img-25 img-height" src="assets/icon/png-icons/save.svg" alt="Save"
+                  placement="bottom" ngbTooltip="Save" (click)="$event.preventDefault();onSave();"></a>
+              <a href="javascript:"><img class="image-radius rounded-0 img-25" src="assets/icon/png-icons/cancel.png"
+                  alt="Cancel" placement="bottom" ngbTooltip="Cancel" [routerLink]="['/MainMenu']"
+                  routerLinkActive="active"></a>
+            </div>
+          </div>
+        </app-card>
+      </div>
+      <br><br><br>
+
+      <div class="row" *ngIf="projectSelectionFlag">
+        <ng-container *ngFor="let data of projectPlanData.child; let i=index;">
+          <expansion-panels-container class="w-100">
+            <expansion-panel #myExpansionPanel class="expand-panel">
+              <expansion-panel-title>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <label>{{i+1}}.</label>
+                    <a href="javascript:" (click)="getDescription(data.id); addDescription.show();">
+                      <img *ngIf="data.documentSatus === 'draft'" class="image-radius img-25"
+                        src="assets/icon/png-icons/doc_draft.png" alt="draft">
+                      <img *ngIf="data.documentSatus === 'inProgress'" class="image-radius img-25"
+                        src="assets/icon/png-icons/doc_inprogress.png" alt="inProgress">
+                      <img *ngIf="data.documentSatus === 'completed'" class="image-radius img-25"
+                        src="assets/icon/png-icons/doc_completed.png" alt="completed">
+                      {{data.itemName}}</a>
+                  </div>
+                  <div class="col-sm-3">
+                    <label>
+                      <strong class="strong">Target Date : </strong>
+                      <label
+                        *ngIf="data.displayStartTargetDate">{{data.displayStartTargetDate|date:this.datePipeFormat}}</label>
+                      <label *ngIf="data.displayEndTargetDate"> -
+                        {{data.displayEndTargetDate|date:this.datePipeFormat}}</label>
+                    </label>
+                  </div>
+                  <div class="col-sm-3">
+                    <label>
+                      <strong class="strong">Actual Date : </strong>
+                      <label>{{data.actualStartTargetDate|date:this.datePipeFormat}}</label>
+                      <label *ngIf="data.actualEndTargetDate"> -
+                        {{data.actualEndTargetDate|date:this.datePipeFormat}}</label>
+                    </label>
+                  </div>
+                </div>
+              </expansion-panel-title>
+
+              <expansion-panel-content>
+                <div class="row">
+                  <div class="col-sm-12">
+                    <div class="box">
+                      <ul class="timeline timeline-horizontal">
+                        <li class="timeline-item" *ngFor="let level of data.child; let j=index; let length=count;">
+                          <div class="timeline-badge primary">
+                            <i *ngIf="level.statusType != '' && level.statusType != 'A'"
+                              class="icofont icofont-check text-white bg-success"></i>
+                            <i *ngIf="level.statusType === '' || level.statusType === 'A'"
+                              class="icofont icofont-close text-white bg-danger"></i>
+                          </div>
+                          <div class="timeline-panel">
+                            <div class="timeline-heading">
+                              <a href="javascript:"
+                                (click)="getLevelDescription(data.id, level.id, level.mappingId); levelDescription.show();">{{level.itemName}}</a>
+
+                              <a class="float-right" href="javascript:;"><img class="img-15" placement="bottom"
+                                  triggers="mouseenter:mouseleave"
+                                  (click)="loadLevelUsers(data.itemName, level.itemName, level.selectedUsers); sendMailModal.show(); selectUserModal.hide();"
+                                  ngbTooltip="Email Plan" src="assets/icon/png-icons/notification-settings-icon.png"
+                                  alt=""></a>
+
+                              <a class="float-right m-r-10" href="javascript:;"><img class="img-15" placement="bottom"
+                                  triggers="mouseenter:mouseleave"
+                                  (click)="getUsers(data.id, level.id, level.mappingId); selectUserModal.show();"
+                                  ngbTooltip="Change Users" src="assets/icon/png-icons/addUser.png" alt=""></a>
+                            </div>
+                            <div class="timeline-body m-t-10" style="font-family: 'Times New Roman', Times, serif;">
+                              <table id="showLeveltable">
+                                <tr>
+                                  <td class="w-40"><strong class="strong">Assigned to :</strong></td>
+                                  <td class="text-overflow-dots" style="max-width: 60px;">
+                                    {{level.commaSaperatedSelectedUsers}}</td>
+                                </tr>
+
+                                <tr>
+                                  <td><strong class="strong">SLA/Days :</strong></td>
+                                  <td>
+                                    <input type="number" min="1" max="31" name="sla-{{i}}{{j}}"
+                                      [readonly]="data.documentFreezeFlag"
+                                      (keypress)="onlyNumber($event, data, level, i)"
+                                      (ngModelChange)="onChangeSla($event, data, level, i)" [(ngModel)]="level.sla"
+                                      #sla="ngModel" style="width: 50px;" />
+                                  </td>
+                                </tr>
+
+                                <tr>
+                                  <td><strong class="strong">Target Start Date :</strong></td>
+                                  <td>
+                                    <my-date-picker (keypress)="$event.preventDefault();"
+                                      *ngIf="projectPlanData.flowFormGroupSettingsDTO" id="targetStartDate-{{i}}{{j}}"
+                                      name="targetStartDate-{{i}}{{j}}"
+                                      (ngModelChange)="onChangeTargetStartDate($event, data, level, i);"
+                                      [(ngModel)]="level.startTargetDate" placeholder="Target Start Date"
+                                      [options]="myDatePickerOptions" [disabled]="!(i==0&&j==0)">
+                                    </my-date-picker>
+                                    <my-date-picker (keypress)="$event.preventDefault();"
+                                      *ngIf="!projectPlanData.flowFormGroupSettingsDTO" id="targetStartDate-{{i}}{{j}}"
+                                      name="targetStartDate-{{i}}{{j}}"
+                                      (ngModelChange)="onChangeTargetStartDate($event, data, level, i);"
+                                      [(ngModel)]="level.startTargetDate" placeholder="Target Start Date"
+                                      [options]="myDatePickerOptions" [disabled]="!(j==0)">
+                                    </my-date-picker>
+                                  </td>
+                                </tr>
+
+                                <tr>
+                                  <td><strong class="strong">Target End Date :</strong></td>
+                                  <td>
+                                    <my-date-picker (keypress)="$event.preventDefault();" id="targetEndDate-{{i}}{{j}}"
+                                      name="targetEndDate-{{i}}{{j}}" [(ngModel)]="level.endTargetDate"
+                                      (ngModelChange)="onChangeTargetEndDate($event, data, level, i, j);"
+                                      placeholder="Target End Date" [options]="myDatePickerOptions">
+                                    </my-date-picker>
+                                  </td>
+                                </tr>
+
+                                <tr>
+                                  <td><strong class="strong">Actual Date :</strong></td>
+                                  <td>{{level.actualStartTargetDate|date:this.datePipeFormat}} -
+                                    {{level.actualEndTargetDate|date:this.datePipeFormat}}</td>
+                                </tr>
+
+                                <tr>
+                                  <td><strong class="strong">Approve/Esign :</strong></td>
+                                  <td>{{level.levelType}}</td>
+                                </tr>
+
+                                <tr>
+                                  <td><strong class="strong">Status :</strong></td>
+                                  <td>
+                                    <label
+                                      [ngClass]="level.status == 'Completed on time' ? 'text-success' : 'text-danger'">{{level.status}}</label>
+                                  </td>
+                                </tr>
+                              </table>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              </expansion-panel-content>
+            </expansion-panel>
+          </expansion-panels-container>
+        </ng-container>
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic id="modal-lg-50" #selectUserModal [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Select Users</strong></h5>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Users</label>
+          <div class="col-sm-10" *ngIf="this.projectSelectionFlag">
+            <label class="messages text-danger" *ngIf="this.usersFlag">* Please select atleast one user</label>
+            <span *ngFor="let data of projectPlanData.child; let i=index;">
+              <span *ngFor="let level of data.child; let j=index;">
+                <angular2-multiselect
+                  *ngIf="(data.id===this.currentDoc)&&(level.id===this.currentLevel)&&(level.mappingId===this.mappingId)"
+                  name="user-{{i}}{{j}}" [data]="level.user" id="user" [(ngModel)]="level.selectedUsers"
+                  [settings]="dropdownSettings" (ngModelChange)="onUserChange($event)">
+                </angular2-multiselect>
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button *ngIf="!this.usersFlag" class="btn btn-success" (click)="selectUserModal.hide();">Update</button>
+        <button class="btn btn-danger" (click)="deselectUsers();selectUserModal.hide();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic id="modal-lg-50" #addDescription [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Add Description</strong></h5>
+    <button type="button" class="close basic-close-light-box" (click)="addDescription.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Description</label>
+          <div class="col-sm-10" *ngIf="this.projectSelectionFlag">
+            <span *ngFor="let data of projectPlanData.child;">
+              <textarea *ngIf="data.id===this.currentDoc" style="width:-webkit-fill-available"
+                [(ngModel)]="data.description" name="discreption" [attr.rows]="3"></textarea>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button *ngIf="!this.desciptionFlag" class="btn btn-success" (click)="addDescription.hide();">Save</button>
+        <button *ngIf="this.desciptionFlag" class="btn btn-success" (click)="addDescription.hide();">Update</button>
+        <button class="btn btn-danger" (click)="cancelDescription();addDescription.hide();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic id="modal-lg-50" #sendMailModal [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Email Plan</strong></h5>
+    <button type="button" class="close basic-close-light-box" (click)="cancelEmail();sendMailModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Users <span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <span>
+              <angular2-multiselect name="users" [data]="userList" id="users" required #users="ngModel"
+                [(ngModel)]="selectedUsersForEmail" [settings]="dropdownSettings">
+              </angular2-multiselect>
+              <div class="messages text-danger" *ngIf="users.touched && users.errors?.required">Users can't be blank
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Remarks</label>
+          <div class="col-sm-10">
+            <span>
+              <textarea style="width:-webkit-fill-available" [(ngModel)]="remarksForEmail" name="remarks"
+                #remarks="ngModel" [attr.rows]="3"></textarea>
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button class="btn btn-success" (click)="sendEmail();sendMailModal.hide()">Send</button>
+        <button class="btn btn-danger" (click)="cancelEmail();sendMailModal.hide();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic id="modal-lg-50" #levelDescription [hideHeader]="false" [hideFooter]="false"
+  [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Add Level Instructions</strong></h5>
+    <button type="button" class="close basic-close-light-box" (click)="levelDescription.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div *ngIf="this.projectSelectionFlag" class="app-modal-body">
+    <span *ngFor="let data of projectPlanData.child;">
+      <span *ngFor="let level of data.child;">
+        <div *ngIf="(data.id===this.currentDoc)&&(level.id===this.currentLevel)&&(level.mappingId===this.mappingId)"
+          class="row">
+          <div class="col-sm-12">
+            <div class="form-group row">
+              <label class="col-sm-8 col-form-label">Instructions</label>
+              <div class="col-sm-12">
+                <ckeditor [config]="configOfCkEditior" name="levelDiscreption" required [(ngModel)]="level.description"
+                  #ckeditor="ngModel" style="width:-webkit-fill-available"></ckeditor>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="(data.id===this.currentDoc)&&(level.id===this.currentLevel)&&(level.mappingId===this.mappingId)"
+          class="form-group row">
+          <label class="col-sm-8 col-form-label">User Responsibility</label>
+          <div class="col-sm-12">
+            <textarea class="form-control max-textarea" rows="2" [(ngModel)]="level.responsibility"
+              name="responsibility"></textarea>
+          </div>
+        </div>
+      </span>
+    </span>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button *ngIf="!this.levelDesciptionFlag" class="btn btn-success"
+          (click)="levelDescription.hide();">Save</button>
+        <button *ngIf="this.levelDesciptionFlag" class="btn btn-success"
+          (click)="levelDescription.hide();">Update</button>
+        <button class="btn btn-danger" (click)="cancelLevelDescription();levelDescription.hide();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

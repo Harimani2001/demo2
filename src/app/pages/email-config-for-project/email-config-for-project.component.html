@@ -1,0 +1,81 @@
+<br>
+<div class="row">
+  <div class="col-lg-4" *ngFor="let json of jsonArray;let i = index">
+    <div class="ng-tns-c6-1 card ng-trigger ng-trigger-cardClose" ng-reflect-klass="card  " style="opacity: 1;">
+      <div class="card-header ng-tns-c6-1">
+        <h5 class="ng-tns-c6-1">{{json.permissionTitle}} &nbsp;&nbsp;
+          <div class="checkbox-fade fade-in-primary">
+            <label>
+              <input type="checkbox" [checked]="json.deleteFlag"
+                (change)="documentWiseEmailAlertFollowUpDisable($event.target.checked,json)" />
+              <span class="cr" style="margin-bottom: -12px;"><i
+                  class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+            </label>
+          </div>
+        </h5>
+        <span class="ng-tns-c6-1"></span>
+        <div class="card-header-right">
+          <ul class="list-unstyled card-option">
+            <li class="ng-tns-c6-1"><i class="icofont icofont-simple-left"></i></li>
+          </ul>
+        </div>
+      </div>
+      <div class="ng-tns-c6-1 ng-trigger ng-trigger-cardToggle">
+        <div class="card-body" ng-reflect-klass="card-body">
+          <div style="overflow-x:auto;">
+            <table style="width: 100%;">
+              <tr *ngFor="let level of json.levels;">
+                <td class="td-content">
+                  <strong>{{level.workFlowLevelName}} &nbsp;&nbsp;
+                    <div class="checkbox-fade fade-in-primary">
+                      <label>
+                        <input type="checkbox" [checked]="level.flag"
+                          (change)="levelWiseEmailAlertFollowUpDisable($event.target.checked,level,json)" />
+                        <span class="cr" style="margin-bottom: -12px;"><i
+                            class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                      </label>
+                    </div>
+                  </strong><br>
+                  <table style="width: 100%;" class="table table-striped table-bordered ">
+                    <thead>
+                      <th>User</th>
+                      <th>Email Alert</th>
+                      <th>Follow Up</th>
+                    </thead>
+                    <tr *ngFor="let user of level.users;">
+                      <td class="td-content">
+                        &nbsp;&nbsp;&nbsp; <span [ngStyle]="{'background-color': getColors(i) }" class="badge"><i
+                            style="color: white;" class="icofont icofont-user"></i></span>&nbsp;&nbsp;&nbsp;
+                        {{user.userName}}</td>
+                      <td>
+                        <div class="checkbox-fade fade-in-primary">
+                          <label>
+                            <input type="checkbox" [checked]="user.emailAlertFlag"
+                              (change)="toCheckAllUserSelectedThenCheckLevel($event.target.checked,user,true,json.levels,json)" />
+                            <span class="cr" style="margin-bottom: -12px;"><i
+                                class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                          </label>
+                        </div>
+                      </td>
+                      <td>
+                        <div class="checkbox-fade fade-in-primary">
+                          <label>
+                            <input type="checkbox" [checked]="user.followUpFlag"
+                              (change)="toCheckAllUserSelectedThenCheckLevel($event.target.checked,user,false,json.levels,json)" />
+                            <span class="cr" style="margin-bottom: -12px;"><i
+                                class="cr-icon icofont icofont-ui-check txt-success"></i></span>
+                          </label>
+                        </div>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

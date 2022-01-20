@@ -1,0 +1,36 @@
+#modal-lg-60 .modal-lg {
+    max-width: 60%;
+}
+.sig-container canvas {
+    border-style: solid;
+    border-width: 1px;
+  }
+  
+  .sig-container canvas {
+    background-repeat: no-repeat;
+    background-position-y: 95%;
+    background-image: url(/assets/sign-here.png);
+    size: 20px;
+  }
+  
+  .sig-container-image {
+    height: 400px;
+    width: 700px;
+  }
+  
+  
+  .sig-container canvas {
+    border-style: solid;
+    border-width: 1px;
+  }
+  
+  .sig-container canvas {
+    background-image: url(/assets/sign-here.png);
+    background-repeat: no-repeat;
+    background-position-y: 95%;
+  }
+  
+  .sig-container-image {
+    height: 400px;
+    width: 700px;
+  }

@@ -1,0 +1,656 @@
+<div class="row">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-2">
+          <select name="select" class="form-control" id="locationId" name="locationName"
+            (ngModelChange)="onChangeLocation($event);" [(ngModel)]="this.location">
+            <option value="0" disabled>Select Location</option>
+            <option *ngFor="let location of locationsList" [value]="location.id">{{location.name}}</option>
+          </select>
+        </div>
+
+        <div class="col-sm-2">
+          <angular2-multiselect *ngIf="tabName!='boardView'" name="projectName" style="width: 100%;"
+            [data]="this.projectList" id="projectId" (ngModelChange)="onChangeProject($event);"
+            [(ngModel)]="this.project" [settings]="projectDropdownSettings">
+          </angular2-multiselect>
+        </div>
+
+        <div class="col-sm-5 p-t-5">
+          <label *ngIf="tabName!='boardView' && detailViewData" class="m-r-20"><strong class="strong">Validation Status
+              : </strong>
+            <span class="bg-yellow">{{detailViewData.validationStatus ? detailViewData.validationStatus :
+              'N/A'}}</span></label>
+          <label *ngIf="tabName!='boardView' && detailViewData"><strong class="strong">System Status : </strong>
+            <span class="bg-yellow">{{detailViewData.systemStatus ? detailViewData.systemStatus : 'N/A'}}</span></label>
+        </div>
+
+        <div class="col-sm-3 text-right" style="margin-top: -5px;">
+          <a href="javascript:" class="m-r-20"
+            [ngStyle]="{'border-bottom' : tabName == 'boardView' ? '2px solid' : ''}"><img
+              class="image-radius rounded-0 img-30 img-pb-4" src="assets/icon/png-icons/dashboardView.png"
+              alt="Dashboard" placement="bottom" ngbTooltip="Dashboard" (click)="changeview('boardView')"></a>
+
+          <a href="javascript:" class="m-r-20"
+            [ngStyle]="{'border-bottom' : tabName == 'tableView' ? '2px solid' : ''}"><img
+              class="image-radius rounded-0 img-25 img-pb-4" src="assets/icon/png-icons/tableView.png" alt="Table View"
+              placement="bottom" ngbTooltip="Project Status" (click)="changeview('tableView')"></a>
+
+          <a href="javascript:" class="m-r-20"
+            [ngStyle]="{'border-bottom' : tabName == 'graphView' ? '2px solid' : ''}"><img
+              class="image-radius rounded-0 img-25 img-pb-4" src="assets/icon/png-icons/graphView.png" alt="Graph View"
+              placement="bottom" ngbTooltip="Analytics" (click)="changeview('graphView')"></a>
+
+          <a href="javascript:" class="m-r-20"
+            [ngStyle]="{'border-bottom' : tabName == 'detailView' ? '2px solid' : ''}"><img
+              class="image-radius rounded-0 img-25 img-pb-4" src="assets/icon/png-icons/detailView.png" alt="Statistics"
+              placement="bottom" ngbTooltip="Statistics" (click)="changeview('detailView')"></a>
+
+          <a href="javascript:" class="m-r-20"
+            [ngStyle]="{'border-bottom' : tabName == 'taskView' ? '2px solid' : ''}"><img
+              class="image-radius rounded-0 img-25 img-pb-4" src="assets/icon/png-icons/tasks.png" alt="My Task"
+              placement="bottom" ngbTooltip="My Task" (click)="changeview('taskView')"></a>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+<br><br><br>
+
+<app-card *ngIf="tabName=='boardView' && boardViewData">
+  <div class="row">
+    <div class="col-sm-2">
+      <div class="showMyLabelCard w-185 pointer">
+        <div href="javascript:">
+          <img class="boardImg image-radius rounded-0 img-40" src="assets/icon/png-icons/location.png"
+            style="width:15%;height:15%;display: inline;">
+          <h6 style="display: inline;" class="darkblue">Locations - {{boardViewData.userCount}}</h6>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-2">
+      <div class="showMyLabelCard w-185 pointer"
+        (click)="this.showProjectCount=!this.showProjectCount;this.showEquipmentCount=false; projectCountOnType='';">
+        <div href="javascript:"><img class="boardImg image-radius rounded-0 img-40"
+            src="assets/icon/png-icons/equipment.png" style="width:15%;height:15%;display: inline;">
+          <h6 style="display: inline;" class="darkblue">Projects - {{boardViewData.projCount}}</h6>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-2">
+      <div class="showMyLabelCard w-185 pointer"
+        (click)="this.showEquipmentCount=!this.showEquipmentCount;this.showProjectCount=false">
+        <div href="javascript:"><img class="boardImg image-radius rounded-0 img-40"
+            src="assets/icon/png-icons/changeControl.png" style="width:15%;height:15%;display: inline;">
+          <h6 style="display: inline;" class="darkblue">Equipments - {{boardViewData.eqpCount}}</h6>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-2">
+      <div class="showMyLabelCard w-185 pointer">
+        <div href="javascript:"><img class="boardImg image-radius rounded-0 img-40"
+            src="assets/icon/png-icons/department.png" style="width:15%;height:15%;display: inline;">
+          <h6 style="display: inline;" class="darkblue">Departments - {{boardViewData.deptCount}}</h6>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-2">
+      <div class="showMyLabelCard w-185 pointer">
+        <div href="javascript:"><img class="boardImg image-radius rounded-0 img-40"
+            src="assets/icon/png-icons/users.png" style="width:15%;height:15%;display: inline;">
+          <h6 style="display: inline;" class="darkblue">Users - {{boardViewData.userCount}}</h6>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showProjectCount" class="m-t-10">
+    <br>
+    <div class="row">
+      <div class="col-sm-4">
+        <div class="strong">Total projects : {{boardViewData.projCount}}</div>
+        <canvas baseChart [data]="chartProjectTypeValues" [labels]="this.chartProjectTypeLables"
+          [options]="this.pieChartOptions" [chartType]="'pie'" [colors]="this.chartProjectTypeColors"
+          (chartClick)="chartClicked($event)" width="350px" height="120px">
+        </canvas>
+      </div>
+    </div>
+
+    <div *ngIf="projectCountOnType" class="m-t-10">
+      <div>Project Type > <Label class="strong">{{projectType}} : {{projectCount}}</Label></div>
+      <div class="row">
+        <div class="col-sm-2 pointer" *ngFor="let key of this.objectKeys(this.projectCountOnType);">
+          <div class="showCard" (click)="navigateToInventory(key)">
+            <div class="card-header-title" [ngStyle]="{'background-color': getBgColor(key)}">{{key}}</div>
+            <h3 class="darkblue text-center m-t-25 m-b-25">{{this.projectCountOnType[key]}}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showEquipmentCount" class="m-t-10">
+    <br>
+    <div class="strong">Total equipments : {{boardViewData.eqpCount}}</div>
+    <div class="row">
+      <div class="col-sm-2" *ngFor="let key of this.objectKeys(this.boardViewData.equipmentCount);">
+        <div class="showCard">
+          <div class="card-header-title" [ngStyle]="{'background-color': getBgColor(key)}">{{key}}</div>
+          <h3 class="darkblue text-center m-t-25 m-b-25">{{this.boardViewData.equipmentCount[key]}}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-card>
+
+<app-card *ngIf="tabName=='tableView' && summaryData">
+  <div class="card border-primary mb-3" *ngFor="let details of summaryData">
+    <div class="card-header">
+      {{details.projectName}}&nbsp;&nbsp;-->&nbsp;&nbsp;{{details.projectCode?details.projectCode:'N/A'}}</div>
+    <div class="card-body text-dark" style="margin-top: -40px;">
+      <ngb-tabset #versiont="ngbTabset" (tabChange)="onTabChange($event.nextId,details)">
+        <ngb-tab *ngFor="let versionData of details.versionList;let f = index" id="{{f}}">
+          <ng-template ngbTabTitle>
+            <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary">
+              <h5 class="card-header-text">{{versionData.versionName}}</h5>
+            </a>
+          </ng-template>
+          <ng-template ngbTabContent>
+            <br>
+            <div class="col-md-12" *ngIf="versionData.documents?.length > 0">
+              <app-card [blockClass]="'marketing-card'">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Document Name</th>
+                        <th>
+                          <a href="javascript:"><img class="image-radius rounded-0 img-18"
+                              src="assets/icon/png-icons/draft.png" alt=""></a>&nbsp;Draft
+                        </th>
+                        <th>
+                          <a href="javascript:"><img class="image-radius rounded-0 img-18"
+                              src="assets/icon/png-icons/published.png" alt=""></a>&nbsp;Published
+                        </th>
+                        <th>
+                          <a href="javascript:"><img class="image-radius rounded-0 img-15"
+                              src="assets/icon/png-icons/in-progress.png" alt=""></a>&nbsp;In Progress
+                        </th>
+                        <th>
+                          <a href="javascript:"><img class="image-radius rounded-0 img-18"
+                              src="assets/icon/png-icons/completed.png" alt=""></a>&nbsp;Completed
+                        </th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody *ngFor="let documentData of versionData.documents">
+                      <tr>
+                        <td>
+                          <div class="table-contain">
+                            <h6>{{documentData.documentName}}</h6>
+                            <p class="text-muted">{{documentData.lastUpdatedTime}}&nbsp;<span
+                                *ngIf="documentData.lastUpdatedTime">|</span>&nbsp;{{documentData.lastUpdatedBy}}
+                            </p>
+                          </div>
+                        </td>
+                        <td>
+                          <p class="text-muted text-secondary text-size1">{{documentData.draft}}</p>
+                        </td>
+                        <td>
+                          <p class="m-l-10 text-info text-size1">{{documentData.published}}</p>
+                        </td>
+                        <td>
+                          <p class="m-l-10 text-c-yellow text-size1">{{documentData.inProgress}}</p>
+                        </td>
+                        <td>
+                          <p class="m-l-10 text-c-green text-size1">{{documentData.completed}}</p>
+                        </td>
+                        <td>
+                          <a *ngIf="showAction(documentData.documentType)" container="body" href="javascript:;"
+                            (click)="checkdocumentIslockOrNot(documentData.documentType, versionData.versionId)"
+                            placement="top" class="m-r-15 crm-action-edit" ngbTooltip="Document Freeze">
+                            <i
+                              class="{{documentData.freezeFlagIcon ? 'icofont summary-icon icofont-unlock' : 'icofont summary-icon icofont-unlocked'}}"></i>
+                          </a>
+                          <a *ngIf="(documentData.draft > 0 || documentData.published > 0) && versionData.active"
+                            container="body" href="javascript:;" (click)="urlRedirect(documentData.documentUrl)"
+                            class="m-r-15 crm-action-edit" placement="top" ngbTooltip="View Document">
+                            <i class="icofont summary-icon icofont-eye-alt"></i>
+                          </a>
+                          <a *ngIf="showAction(documentData.documentType) && documentData.canPdfDownload && versionData.active"
+                            container="body" href="javascript:;"
+                            (click)="downloadPdf(documentData.documentType,documentData.documentName,versionData)"
+                            class="crm-action-edit" placement="top" ngbTooltip="Download PDF">
+                            <i class="icofont summary-icon icofont-download"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </app-card>
+            </div>
+            <div class="card" *ngIf="versionData.documents.length == 0">
+              <div class="card-header"><strong>
+                  <p style="text-align: center; color: #2E5894;">
+                    <font size="3">No records found</font>
+                  </p>
+                </strong></div>
+            </div>
+          </ng-template>
+        </ngb-tab>
+      </ngb-tabset>
+    </div>
+  </div>
+</app-card>
+
+<app-card *ngIf="tabName=='graphView' && summaryData">
+  <div class="card border-primary mb-3" *ngFor="let details of summaryData">
+    <div class="card-header">
+      {{details.projectName}}&nbsp;&nbsp;-->&nbsp;&nbsp;{{details.projectCode?details.projectCode:'N/A'}}</div>
+    <div class="card-body text-dark" style="margin-top: -40px;">
+      <ngb-tabset #versiont="ngbTabset" (tabChange)="onTabChange($event.nextId,details)">
+        <ngb-tab *ngFor="let versionData of details.versionList;let f = index" id="{{f}}">
+          <ng-template ngbTabTitle>
+            <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary">
+              <h5 class="card-header-text">{{versionData.versionName}}</h5>
+            </a>
+          </ng-template>
+          <ng-template ngbTabContent>
+            <br>
+            <div class="col-md-12" *ngIf="versionData.documents?.length != 0">
+              <app-card [title]="''" [headerContent]="'Lorem ipsum dolor sit amet, consectetur adipisicing elit'">
+                <google-chart *ngIf="!versionData.nodataInChartFlag" [data]="versionData.comboChartData">
+                </google-chart>
+                <div *ngIf="versionData.nodataInChartFlag" class="card-header">
+                  <strong>
+                    <p style="text-align: center; color: #2E5894;">
+                      <font size="3">No records found</font>
+                    </p>
+                  </strong>
+                </div>
+              </app-card>
+            </div>
+          </ng-template>
+        </ngb-tab>
+      </ngb-tabset>
+    </div>
+  </div><br>
+
+  <div *ngIf="filteredDocumentSummaryList.length > 0">
+    <h5 class="m-b-10">Run-wise Test Case Summary</h5>
+    <div class="row col-sm-12" style="overflow: auto;">
+      <ng-container *ngFor="let doc of filteredDocumentSummaryList; let i=index;">
+        <div class="list-wrapper-custom-css"
+          *ngIf="doc.documentType == '108' || doc.documentType == '109' || doc.documentType == '110' || doc.documentType == '207' || doc.documentType == '208'">
+          <div class="card-block">
+            <h4 class="card-title-content"><strong class="strong">{{doc.documentName}}</strong></h4>
+            <div class="show-list-cards">
+              <div class="row card-body p-t-0">
+                <ng-container>
+                  <span><strong class="strong m-r-5">Test Run:</strong>{{doc['testRunName']}} </span>
+                  <canvas baseChart [data]="pieChartViewTestCase(doc)" [labels]="donaltChartLabel(doc)" [legend]="true"
+                    [options]="this.donutChartOptions" [chartType]="'doughnut'"
+                    [colors]="this.pieChartColorsForTestCase">
+                  </canvas>
+                </ng-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</app-card>
+
+<div *ngIf="tabName=='detailView' && detailViewData">
+  <div class="section group" *ngIf="detailViewData">
+    <div class="col span_1_of_2">
+      <table class="table m-0" style="border: none;">
+        <tbody>
+          <tr>
+            <th class="headerFont" scope="row" style="padding: 7px 20px;width:35%">Change Control No</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">{{detailViewData.ccfNo ? detailViewData.ccfNo : 'N/A'}}</span>
+            </td>
+          </tr>
+          <tr>
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Gamp Category</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">{{detailViewData.gampCategory ? detailViewData.gampCategory : 'N/A'}}
+              </span>
+            </td>
+          </tr>
+          <tr style="padding: 0px;">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Release Date</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">{{detailViewData.releaseDate ? detailViewData.releaseDate :
+                'N/A'}}</span>
+            </td>
+          </tr>
+          <tr>
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Next Review Date</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">{{detailViewData.nextReviewDate ? detailViewData.nextReviewDate :
+                'N/A'}}</span>
+            </td>
+          </tr>
+          <tr>
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Team Size</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">{{detailViewData.projectTeamSize}}</span>
+            </td>
+          </tr>
+          <tr>
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Total Tasks</th>
+            <td class="tdFont" style="padding: 7px 20px" class="headerFont">
+              <b> : </b><span class="darkblue">{{detailViewData.taskCount ? detailViewData.taskCount : 'N/A'}}</span>
+            </td>
+          </tr>
+          <tr>
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Checklist</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">{{detailViewData.checkListCount ? detailViewData.checkListCount :
+                'N/A'}}</span>
+            </td>
+          </tr>
+          <tr>
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Total Douments</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">{{totalDocumentCount}}</span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('134')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">DF</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{this.iqtcCount.dfCount + this.oqtcCount.dfCount + this.oqtcCount.dfCount + this.ioqtcCount.dfCount +
+                this.opqtcCount.dfCount}}</span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('137')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">VSR Status</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{detailViewData.vsrStatus ? detailViewData.vsrStatus : 'N/A'}}
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="col span_1_of_2">
+      <table class="table m-0" style="border: none;">
+        <tbody style="border: none;">
+          <tr *ngIf="individualPermissionsResult('107')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px;width:35%">Requirement</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{detailViewData.specCount}}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('200')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Specification</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{detailViewData.specCount}}
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('113')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Risk</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{detailViewData.riskCount}}
+              </span>
+            </td>
+          </tr>
+          <tr
+            *ngIf="individualPermissionsResult('108') || individualPermissionsResult('110') 
+          || individualPermissionsResult('109') || individualPermissionsResult('207') || individualPermissionsResult('208')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Test Case</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">{{detailViewData.testCaseCount}}</span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('108')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">IQTC</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{this.iqtcCount.testCaseCount}}&nbsp;
+                <label style="color: black;">Pass :</label> <span
+                  class="green">{{this.iqtcCount.passCount}}</span>&nbsp;
+                <label style="color: black;">Fail :</label> <span
+                  class="deepPink">{{this.iqtcCount.failCount}}</span>&nbsp;
+                <label style="color: black;">In-progress :</label> <span
+                  class="text-primary">{{this.iqtcCount.inProgressCount}}</span>
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('110')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">OQTC</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{this.oqtcCount.testCaseCount}}&nbsp;
+                <label style="color: black;">Pass :</label> <span
+                  class="green">{{this.oqtcCount.passCount}}</span>&nbsp;
+                <label style="color: black;">Fail :</label> <span
+                  class="deepPink">{{this.oqtcCount.failCount}}</span>&nbsp;
+                <label style="color: black;">In-progress :</label> <span
+                  class="text-primary">{{this.oqtcCount.inProgressCount}}</span>
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('109')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">PQTC</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{this.pqtcCount.testCaseCount}}&nbsp;
+                <label style="color: black;">Pass :</label> <span
+                  class="green">{{this.pqtcCount.passCount}}</span>&nbsp;
+                <label style="color: black;">Fail :</label> <span
+                  class="deepPink">{{this.pqtcCount.failCount}}</span>&nbsp;
+                <label style="color: black;">In-progress :</label> <span
+                  class="text-primary">{{this.pqtcCount.inProgressCount}}</span>
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('207')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">IOQTC</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{this.ioqtcCount.testCaseCount}}&nbsp;
+                <label style="color: black;">Pass :</label> <span
+                  class="green">{{this.ioqtcCount.passCount}}</span>&nbsp;
+                <label style="color: black;">Fail :</label> <span
+                  class="deepPink">{{this.ioqtcCount.failCount}}</span>&nbsp;
+                <label style="color: black;">In-progress :</label> <span
+                  class="text-primary">{{this.ioqtcCount.inProgressCount}}</span>
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('208')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">OPQTC</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{this.opqtcCount.testCaseCount}}&nbsp;
+                <label style="color: black;">Pass :</label> <span
+                  class="green">{{this.opqtcCount.passCount}}</span>&nbsp;
+                <label style="color: black;">Fail :</label> <span
+                  class="deepPink">{{this.opqtcCount.failCount}}</span>&nbsp;
+                <label style="color: black;">In-progress :</label> <span
+                  class="text-primary">{{this.opqtcCount.inProgressCount}}</span>
+              </span>
+            </td>
+          </tr>
+          <tr *ngIf="individualPermissionsResult('201')">
+            <th class="headerFont" scope="row" style="padding: 7px 20px">Unscripted</th>
+            <td class="tdFont" style="padding: 7px 20px">
+              <b> : </b><span class="darkblue">
+                {{detailViewData.unScriptedCount}}&nbsp;
+                <label style="color: black;">Pass :</label> <span class="green">0</span>&nbsp;
+                <label style="color: black;">Fail :</label> <span class="deepPink">0</span>&nbsp;
+                <label style="color: black;">In-progress :</label> <span class="text-primary">0</span>
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <br>
+</div>
+
+<app-card *ngIf="tabName=='taskView' && taskViewData">
+  <div class="table-responsive">
+    <table id="dtBasicExample" class="table table-striped table-bordered " [mfData]="taskViewData" #mf="mfDataTable"
+      [mfRowsOnPage]="2">
+      <tbody>
+        <ng-container *ngFor="let m of mf.data; let i = index;">
+          <tr>
+            <th colspan="6">{{m.name}}</th>
+          </tr>
+          <tr width="100%">
+            <th>Task Id</th>
+            <th>Title</th>
+            <th>Created Date</th>
+            <th>Due Date</th>
+            <th>Remaining</th>
+          </tr>
+          <tr *ngFor="let row of m.dto ; let i=index;">
+            <td>{{row['taskCode']}}</td>
+            <td>
+              <p class="text-c-blue"
+                style="cursor: pointer !important; font-family:'Roboto', sans-serif; font-size: 18px;"
+                (click)="routeView(row);">
+                <a href="javascript:"></a>
+                {{row['title']}}
+              </p>
+            </td>
+            <td>{{row['updatedDate']}}</td>
+            <td>{{row['dueDate']}}</td>
+            <td>{{row['remaingDays']}}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="6">
+            <mfBootstrapPaginator></mfBootstrapPaginator>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</app-card>
+
+<app-modal-basic #freezemodal [hideFooter]="true" [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Revision of Document</h4>
+    <button type="button" class="close basic-close-light-box" (click)="freezemodal.hide();loaddata();close();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div *ngIf="this.freezeData" class="app-modal-body">
+    <ng-container *ngIf="this.freezeData.newRevisionDocuments.length>0 || this.freezeData.documentLock;else nodata">
+      <div class="row">
+        <div class="col-sm-12" style="text-align: right;">
+          <a *ngIf="this.freezeData.draftList.length>0" href="javascript:"
+            (click)="loadRecordView(this.freezeData.draftList);">
+            View draft
+          </a> &nbsp;&nbsp;&nbsp;
+          <a *ngIf="this.freezeData.newRevisionDocuments.length>0" href="javascript:"
+            (click)="loadRecordView(this.freezeData.newRevisionDocuments);">
+            View completed
+          </a>
+        </div>
+        <div class="col-sm-12">
+          <textarea [(ngModel)]="this.freezeData.documentLockComments" id="documentApprovalComment"
+            placeholder="please enter the comments to lock or un-lock " name="description" class="form-control" rows="3"
+            cols="40"> </textarea>
+        </div>
+        <div class="col-sm-8">
+          <br>
+          <ng-container *ngIf="this.freezeData.documentLock && this.freezeData.documentLockComments">
+            <div class="row">
+              <label class="form-control-label col-sm-12">Select next revision</label>
+              <div class="col-sm-12  pl-5">
+                <label class="radio-inline" *ngIf="this.freezeData.revisionVersionZero">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    [value]="this.freezeData.revisionVersionZero" />{{this.freezeData.revisionVersionZero}}</label>
+                &nbsp; &nbsp;
+                <label class="radio-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    [value]="this.freezeData.revisionVersionTwo" />{{this.freezeData.revisionVersionTwo}}</label> &nbsp;
+                &nbsp;
+                <label class="radio-inline">
+                  <input class="form-check-input" type="radio" [(ngModel)]="this.freezeData.selectedVersion" name="opt"
+                    checked
+                    [value]="this.freezeData.revisionVersionOne" />{{this.freezeData.revisionVersionOne}}</label>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+        <div class="col-sm-12 text-center">
+          <button
+            *ngIf="(null!=this.freezeData.selectedVersion || !this.freezeData.documentLock)&& this.freezeData.documentLockComments"
+            (click)="saveDocumentLockAndUnlock()" class="btn btn-primary btn-sm pointer" type="button"><i
+              class="icofont icofont-save"></i>
+            {{this.freezeData.documentLock?'Unlock Document':'Lock Document'}} </button>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #nodata>
+      <div class="text-center col-sm-12">
+        <h5>No new item created</h5>
+      </div>
+    </ng-template>
+    <hr>
+    <div *ngIf="this.documentlockDataLogs.length>0"
+      [ngClass]="(this.freezeData.newRevisionDocuments.length>0 || this.freezeData.documentLock)? 'dy-width-300':'dy-width-400'">
+      <h5>Document Lock Log</h5><br>
+      <div *ngFor="let item of this.documentlockDataLogs">
+        <div><b>Status : {{item.status?'Locked':'Un-Locked'}} </b>&nbsp;</div>
+        <div><b>Revision : {{item.revision}} </b>&nbsp;</div>
+        <div><b> <i class="{{item.status?' fa fa fa-lock ':'fa fa-unlock'}}"></i> By :</b>&nbsp;{{item.userName}} </div>
+        <div><b><i class="{{item.status?' fa fa fa-lock ':'fa fa-unlock'}}"></i> Time :</b>&nbsp; {{item.createdTime}}
+        </div>
+        <div><b>Comments :</b> {{item.comments}} </div>
+        <hr>
+      </div>
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic class="reset-this" #revisionDocs container="body" [hideHeader]="true" [hideFooter]="true"
+  [dialogClass]="'modal-md'">
+  <div *ngIf="null!=this.freezeData" class="app-modal-body" style="height: 300px; overflow-y: scroll;">
+    <button type="button" class="close basic-close-light-box" (click)="revisionDocs.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <div *ngIf="null!=this.freezeData && this.viewList.length>0" class="overflow-container" slimScroll
+      railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+      allowPageScroll="false">
+      <h5>Newly Added Records</h5><br>
+      <table class="table table-framed">
+        <tr>
+          <th>#</th>
+          <th>Document Code </th>
+          <th>Title/Desc(if any) </th>
+        </tr>
+        <tr *ngFor="let n of this.viewList;let c=index">
+          <td>{{c+1}} </td>
+          <td>{{n.documentCode}}</td>
+          <td>{{n.name}} </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

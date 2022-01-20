@@ -1,0 +1,81 @@
+<br>
+
+
+<div class="container">
+  <form style="justify-content-center" class="navbar-form navbar-right mt-1 col-4">
+    <div class="form-inline my-2 my-lg-0">
+      <input class="form-control mr-sm-2" placeholder="Search...." type="search" placeholder="Search"
+        aria-label="Search" [(ngModel)]="searchString" (ngModelChange)="onSearch()" name="searchString">
+    </div>
+  </form>
+  <br>
+  <div class="row">
+    <div ng-repeat="i in [0, 1, 2,3,4]" *ngFor="let category of searchData;let i = index" class="col-sm-3">
+      <div class="card   ">
+        <div class="embed-responsive embed-responsive-16by9">
+
+          <img class="card-img-top embed-responsive-item" alt="Card image cap" *ngIf="category.icon !=null"
+            [src]="category.icon">
+        </div>
+        <div class="card-body ">
+          <h5 class="card-title ">{{category.category}}</h5>
+        </div>
+        <div style="overflow-x:auto;">
+          <ul *ngFor="let subCategory of category.subCategoryList;" class="list-group list-group-flush">
+            <li class="list-group-item"> <span [ngStyle]="{'background-color': getColors(i) }" class="badge"><i
+                  style="color: white;" class="icofont icofont-ui-file"></i> </span><small>
+                {{subCategory.subCategoryName}}</small>
+
+              <a style="float:right;" container="body" href="javascript:;"
+                class="m-r-15 crm-action-view text-muted text-warning"
+                (click)="modalLarge.show();loadContent(subCategory)" data-ng-open="modalSmall" placement="top"
+                ngbTooltip="View">
+                <i style="font-size: 20px" class="icofont icofont-resize view"></i>
+              </a>
+            </li>
+
+          </ul>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<app-modal-basic style="height: 100%;" #modalLarge [dialogClass]="'modal-lg'" class="modal-dialog">
+  <div class="app-modal-header">
+    <h4 class="modal-title">{{contentHeading}}</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+    <div class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="400px"
+      size="9px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div style="height: 400px;" >
+      <div class="row">
+        <div class="col-sm">
+          <p class="text-muted" [innerHtml]="content">
+          </p>
+        </div>
+        <div class="col-sm">
+          <app-file-upload-for-doc #fileupload [multiple]=true [onlyView]=true [documentId]="this.receivedId"
+            [update]="this.isUpdate" [documentCode]="this.helper.KNOWLEDGEBASE"></app-file-upload-for-doc>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="modalLarge.hide();">Close</button>
+  </div>
+</app-modal-basic>

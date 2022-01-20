@@ -1,0 +1,148 @@
+<div class="row">
+    <div class="col-sm-12">
+        <app-card [title]="'Dynamic Templates'" [classHeader]="true" *ngIf="!this.showButtonFlag">
+            <div class="col-sm-6 col-xl-4 m-b-30">
+              <select name="select" class="form-control" id="dynamicMenuList" (change)="dynamicMenuChanged($event.target.value)">
+               
+                <option *ngFor="let data of dynamicMenu;let i=index" [value]="data.code">{{data.value}}</option>
+              </select>
+            <br>
+                <!-- <button type="button" class="btn btn-primary" (click)="showCard()">New</button> -->
+            
+            </div>
+          </app-card>
+      <app-card  [title]="'Dynamic Templates'" *ngIf="this.showButtonFlag">
+        <div style="text-align: left;">
+          <button type="button" class="btn btn-primary" (click)="modalLarge.show();resetBuk();">
+            <i class="icofont icofont-clip"></i>File Import
+          </button>
+        </div>
+        <br>
+        <br>
+        <form #risk="ngForm">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Title
+              <span class="asterisk">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" [disabled]=true [(ngModel)]="dynamicTemplateModel.tittle" class="form-control" name="titledata" placeholder="abc" #titledata="ngModel"
+               required>
+              <div class="messages text-danger" *ngIf="(titledata.touched || submitted) && titledata.errors?.required">Title Name can't be blank</div>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Body </label>
+            <div class="col-sm-10">
+              <ui-switch (click)="toggleEditordata();" class="js-small" color="#3498DB" switchColor="#fff" size="small" unchecked>
+              </ui-switch>
+              <div class="text-success" *ngIf="editorSwap === false">Enable Advance Editor</div>
+              <div class="text-danger" *ngIf="editorSwap === true">Disable Advance Editor</div>
+              <div *ngIf="editorSwap === true">
+                <quill-editor [(ngModel)]="dynamicTemplateModel.body" [options]="editorConfig" (blur)="onEditorBlured($event)" (focus)="onEditorFocused($event)"
+                 (ready)="onEditorCreated($event)" (change)="onContentChanged($event)" name="bodydata">
+                </quill-editor>
+              </div>
+              <textarea *ngIf="editorSwap === false" [(ngModel)]="dynamicTemplateModel.body" class="form-control max-textarea" maxlength="50" rows="4"
+               name="street"></textarea>
+              <br>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <div class="col-sm-5"></div>
+            <div class="col-sm-4">
+              <div class="col-sm-10">
+                <button *ngIf="this.showButtonFlag"  type="button"  class="btn btn-success" (click)="$event.preventDefault();onUpdate(risk.valid);">
+                  Update
+                  <span *ngIf="this.isLoading" class="ti-reload rotate-refresh"></span>&nbsp;
+                </button>
+                <button *ngIf="!this.showButtonFlag" type="button" class="btn btn-success" (click)="$event.preventDefault();onsubmit(risk.valid);">
+                  Save
+                  <span *ngIf="this.isLoading" class="ti-reload rotate-refresh"></span>&nbsp;
+                </button>
+        
+                <button type="button" class="btn btn-danger" [disabled]="isLoading" [routerLink]="['/dynamicTemplate/view-dynamicTemplate']" routerLinkActive="active">Cancel</button>
+              </div>
+            </div>
+            <div class="col-sm-6"></div>
+          </div>
+        </form>
+      </app-card>
+    </div>
+  </div>
+
+  <app-modal-basic #modalLarge [dialogClass]="'modal-lg'">
+    <div class="loading-spinner" *ngIf="spinnerFlag">
+      <span class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing&#8230;</span>
+    </div>
+    <div class="app-modal-header">
+      <h4 class="modal-title">Import Documents</h4>
+      <button type="button" class="close basic-close" (click)="modalLarge.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body">
+      <div class="row">
+        <div class="col-sm-12">
+          <!-- <div><button class="btn btn-primary"(click)="sampleURSDownload();" style="float: right;" ><i class="icofont icofont-download-alt"></i>Sample Download</button></div> -->
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="sub-title">Single File</div>
+          <label class="custom-file">
+            <input type="file" ng2FileSelect [uploader]="uploader" accept=".doc,.txt" (change)="extractURSFile($event);" class="custom-file-input">
+            <span class="custom-file-control"></span>
+          </label>
+        </div>
+      </div>
+      <div class="col-sm-12">
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th width="50%">Name</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of uploader.queue">
+                <td>
+                  <strong>{{uploader.queue[0]?.file?.name }}</strong>
+                </td>
+
+                <td class="text-center">
+                  <span *ngIf="item.isSuccess">
+                    <i class="fa fa-check"></i>
+                  </span>
+                  <span *ngIf="item.isCancel">
+                    <i class="fa fa-ban"></i>
+                  </span>
+                  <span *ngIf="item.isError">
+                    <i class="fa fa-times"></i>
+                  </span>
+                </td>
+                <td nowrap>
+                  <button type="button" class="btn btn-warning btn-sm" (click)="item.cancel()" [disabled]="!item.isUploading">
+                    <span class="fa fa-ban"></span> Cancel
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" (click)="item.remove()">
+                    <span class="fa fa-trash"></span> Remove
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <div style="color: darkgreen" *ngIf="this.validationMessage!=''">{{this.validationMessage}}</div>
+        </div>
+      </div>
+    </div>
+    <div class="app-modal-footer">
+      <button type="button" class="btn btn-default waves-effect" (click)="modalLarge.hide();">Close</button>
+    </div>
+  </app-modal-basic>

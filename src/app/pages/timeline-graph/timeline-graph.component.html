@@ -1,0 +1,93 @@
+<div class="col-md-12">
+  <app-card [title]="'Timeline-Graph'" [blockClass]="'p-t-20'">
+    <div class="card-notification  " *ngFor="let activites of documentList">
+      <div class="card-noti-conatin">
+        <h4 class="strong">{{activites.documentName}}</h4>
+        <div class="dy-ui">
+        <table id="dtBasicExample" class="table-striped table-bordered">
+        <thead>
+          <tr >
+            <th >Exp Start </th>
+            <th >Exp End </th> 
+            <th *ngFor = "let column of activites.list">
+             {{column.levelName}}
+           </th> 
+            <th >Actual Start </th>
+             <th >Actual End</th> 
+             <th >Status</th> 
+           </tr> 
+          </thead>
+           <tbody>
+           <tr >
+            <td>{{activites.expStartDate }}</td>
+            <td>{{activites.expEndDate }}</td>
+            <td *ngFor = "let column of activites.list">
+              <span *ngIf="column.status!=''" >{{column.status}}<br></span>
+              <span *ngIf="column.count ==0 && column.updatedDate!=''">{{column.updatedDate}}<br></span>
+              <span *ngIf="column.count ==0 && column.status==''" style="color: green;">&#10004;</span>
+              <span *ngIf="column.count !=0">{{column.count}}</span>
+            </td>
+            <td>{{activites.actualStartDate }}</td>
+            <td>{{activites.actualEndDate }}</td>
+            <td>{{activites.dateDiff}}</td>
+          </tr>
+        </tbody>
+        </table>
+        <br>
+      </div>
+        <!-- <div class="row">
+          <div class="col-xs-2 col-sm-1.5" style="text-align: center;">
+            <div id="text1">
+                <label>Expected <br> Start date</label>
+            </div>
+            <div id="text2">
+                <label>{{activites.expStartDate | date: 'dd-MM-yyyy'}}</label>
+            </div>
+        </div>
+        <div class="col-xs-2 col-sm-2" style="text-align: center;">
+          <div id="text1">
+              <label>Expected <br> End date</label>
+          </div>
+          <div id="text2">
+              <label>{{activites.expEndDate | date: 'dd-MM-yyyy'}}</label>
+          </div>
+         </div>
+         <div class="col-xs-2 col-sm-1" *ngFor="let data of activites.list" style="text-align: center;">
+          <div id="text1">
+              <label>{{data.levelName}}</label>
+          </div>
+          <div id="text2">
+            <p *ngIf="data.count ==0" style="color: green;" > &#10004;</p>
+            <p *ngIf="data.count !=0">{{data.count}}</p>
+          </div>
+         </div>
+         <div class="col-xs-2 col-sm-2" style="text-align: center;">
+          <div id="text1">
+              <label>Actual <br> Start date</label>
+          </div>
+          <div id="text2">
+              <label>{{activites.actualStartDate | date: 'dd-MM-yyyy'}}</label>
+          </div>
+         </div>
+         <div class="col-xs-2 col-sm-2" style="text-align: center;">
+          <div id="text1">
+              <label>c</label>
+          </div>
+          <div id="text2">
+              <label>{{activites.actualEndDate | date: 'dd-MM-yyyy'}}</label>
+          </div>
+         </div>
+         <div class="col-xs-2 col-sm-2" style="text-align: center;">
+          <div id="text1">
+              <label>Status</label>
+          </div>
+          <div id="text2">
+              <label>{{activites.dateDiff}}</label>
+          </div>
+         </div>
+        </div> -->
+      </div>
+    </div>
+  </app-card>
+  <div *ngIf="spinner" class="loading">Loading&#8230;</div>
+</div>

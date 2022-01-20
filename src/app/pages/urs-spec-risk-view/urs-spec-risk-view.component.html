@@ -1,0 +1,49 @@
+<div class="form-group row" *ngIf="dataList && this.dataList.length>0">
+  <div class="col-sm-12">
+    <div class="dt-desc table-responsive" style="padding: 0px; max-height: 200px;">
+      <div>
+        <table class="table-striped table-bordered" style="width: 100%;table-layout: fixed;">
+          <thead>
+            <tr style="width: 100%">
+              <th style="width: 5%;">Sl. No</th>
+              <th style="width: 20%;">Code</th>
+              <th style="width: 20%;">Description</th>
+              <th style="width: 20%;">Testing Required</th>
+              <th style="width: 20%;">Testing Method</th>
+              <th style="width: 20%;">Parent/Child Data</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of this.dataList ; let i = index" style="vertical-align: top;">
+              <td>{{i+1}}</td>
+              <td>
+                <a  href="javascript:;" (click)="redirect(u);">{{u.code}}</a>
+                <!-- <div style="width:100%">
+                  <textarea class="multiple-textarea" [rows]="(u.code.length/20)+1" [innerHtml]="u.code"></textarea>
+                </div> -->
+              </td>
+              <td>
+                <div style="width:100%" *ngIf="u.description != null">
+                  <textarea class="multiple-textarea overflow-hidden" [rows]="(u.description.length/60)+1"
+                    [innerHtml]="u.description"></textarea>
+                </div>
+              </td>
+              <td>
+                {{u.testingRequiredText?u.testingRequiredText:'N/A'}}
+              </td>
+              <td>
+                {{u.testingMethod?u.testingMethod:'N/A'}}
+              </td>
+              <td>
+                <div style="width:100%" *ngIf="u.parentOrChildData != null">
+                  <textarea class="multiple-textarea" [rows]="(u.parentOrChildData.length/20)+1"
+                    [innerHtml]="u.parentOrChildData"></textarea>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

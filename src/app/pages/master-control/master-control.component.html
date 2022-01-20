@@ -1,0 +1,152 @@
+<div *ngIf="tableViewFlag" class="row">
+	<div class="col-sm-12">
+		<app-card [title]="'Form Extend Configuration View'">
+			<div class="row" class="col-sm-12">
+				<button *ngIf="permisionModal.createButtonFlag" class="btn btn-primary"
+					(click)=createFormExtendForStatic(true)>
+					<i class="icofont icofont-plus-circle"></i>Add
+				</button>
+			</div><br>
+			<div class="form-group row">
+				<label class="col-sm-5">
+					<select class="form-control col-sm-6" name="projectName" [(ngModel)]="projectId" style="color: red;"
+						#project="ngModel" (ngModelChange)="loadFormExtendDocumentsOfTheProject(projectId);">
+						<option value="">--Select--</option>
+						<option value="0">Global Modules</option>
+						<option *ngFor="let project of projectList" [ngValue]="project.id">{{project.projectName}}
+						</option>
+					</select>
+				</label>
+				<label class="col-sm-6" style="text-align: right;">
+					<label> Search :
+						<input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+							class="form-control input-sm full-data-search" placeholder="search"></label><br>
+				</label>
+			</div>
+			<ngx-datatable #myTable class="data-table dt-chk "
+				[rows]='listOfDocForProject | formExtendFilter : filterQuery' [limit]="rowsOnPage"
+				[columnMode]="'force'" [headerHeight]="50" [footerHeight]="50" [rowHeight]='"auto"'
+				[loadingIndicator]='loading' [scrollbarH]="true">
+				
+				<ngx-datatable-column style="font-weight: bold;" name="Serial No">
+					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+						<strong>{{row['$$index']+1}}</strong>
+					</ng-template>
+				</ngx-datatable-column>
+				<ngx-datatable-column style="font-weight: bold;" name="Document Name">
+					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+						<strong>{{row['documentName']}}</strong>
+					</ng-template>
+				</ngx-datatable-column>
+				<ngx-datatable-column style="font-weight: bold;" name="Created Time">
+					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+						<strong>{{row['displayCreatedTime']}}</strong>
+					</ng-template>
+				</ngx-datatable-column>
+				<ngx-datatable-column style="font-weight: bold;" name="Updated By">
+					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+						<strong>{{row['updatedByName']}}</strong>
+					</ng-template>
+				</ngx-datatable-column>
+				<ngx-datatable-column style="font-weight: bold;" name="Updated Time">
+					<ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+						<strong>{{row['displayUpdatedTime']}}</strong>
+					</ng-template>
+				</ngx-datatable-column>
+				<ngx-datatable-column name="Action">
+					<ng-template let-row="row" ngx-datatable-cell-template>
+						<a *ngIf="permisionModal.updateButtonFlag" container="body" href="javascript:;"
+							class="m-r-15 crm-action-edit text-muted text-primary" (click)="viewRowDetails(row); createFormExtendForStatic(false)"
+							placement="top" ngbTooltip="Edit">
+							<i class="icofont icofont-edit edit"></i>
+						</a>
+						<a *ngIf="permisionModal.deleteButtonFlag" container="body" href="javascript:;"
+							class="m-r-15 crm-action-delete text-muted text-danger" (click)="openSuccessCancelSwal();"
+							placement="top" ngbTooltip="Delete">
+							<i class="icofont icofont-bin bin"></i>
+						</a>
+						<a *ngIf="permisionModal.viewButtonFlag" container="body" href="javascript:;"
+							class="crm-action-view text-muted text-warning" (click)="viewRowDetails(row);"
+							placement="top" ngbTooltip="View">
+							<i class="icofont icofont-resize view"></i>
+						</a>
+					</ng-template>
+				</ngx-datatable-column>
+			</ngx-datatable>
+		</app-card>
+	</div>
+</div>
+
+<div *ngIf="!tableViewFlag && !this.viewIndividualData " class="row">
+	<div class="col-sm-12">
+		<app-card [title]="'Form Extend Configuration'">
+			<app-form-extend-master [formExtend]='this.formExtend' (onHide)="changeHide($event)">
+			</app-form-extend-master>
+		</app-card>
+	</div>
+</div>
+
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData==true">
+	<div>
+		<div><br>
+			<h4>&nbsp;&nbsp;Details
+				<div style="float: right;">
+					<button *ngIf="permisionModal.updateButtonFlag" type="submit"
+						class="btn btn-sm btn-primary waves-effect waves-light m-r-10"
+						(click)="createFormExtendForStatic(false)">Edit</button>
+					<button *ngIf="permisionModal.deleteButtonFlag" type="button"
+						class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+						(click)="openSuccessCancelSwal()">Delete</button>
+					<button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+						(click)="this.viewIndividualData=false; this.tableViewFlag=true;">Cancel</button>
+				</div>
+			</h4>
+		</div>
+		<br>
+		<squeezebox [multiple]="true">
+			<sb-item class="accordion-panel" [collapsed]="false">
+				<sb-item-head class="accordion-heading accordion-msg">Document Name</sb-item-head>
+				<sb-item-body class="accordion-content">
+					<div class="accordion-desc">
+						<p>{{formExtend.documentName}}</p>
+					</div>
+				</sb-item-body>
+			</sb-item>
+			<sb-item class="accordion-panel" [collapsed]="false">
+				<sb-item-head class="accordion-heading accordion-msg">Created Time</sb-item-head>
+				<sb-item-body class="accordion-content">
+					<div class="accordion-desc">
+						<p>{{formExtend['displayCreatedTime']}}</p>
+					</div>
+				</sb-item-body>
+			</sb-item>
+			<sb-item class="accordion-panel" [collapsed]="false">
+				<sb-item-head class="accordion-heading accordion-msg">Updated By</sb-item-head>
+				<sb-item-body class="accordion-content">
+					<div class="accordion-desc">
+						<p>{{formExtend['updatedByName']}}</p>
+					</div>
+				</sb-item-body>
+			</sb-item>
+			<sb-item class="accordion-panel" [collapsed]="false">
+				<sb-item-head class="accordion-heading accordion-msg">Updated Time</sb-item-head>
+				<sb-item-body class="accordion-content">
+					<div class="accordion-desc">
+						<p>{{formExtend['displayUpdatedTime']}}</p>
+					</div>
+				</sb-item-body>
+			</sb-item>
+		</squeezebox>
+		<div class="accordion-panel">
+			<label class="accordion-heading accordion-msg" style="color: #014c8c;">Preview of Extend Form</label>
+			<div class="accordion-content">
+				<div class="accordion-desc">
+					<app-form-preview [inputField]='this.popupdata'></app-form-preview>
+				</div>
+			</div>
+		</div>
+		<br>
+	</div>
+</app-card>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

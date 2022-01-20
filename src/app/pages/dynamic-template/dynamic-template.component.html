@@ -1,0 +1,462 @@
+<!-- doc sign end -->
+<div *ngIf="!this.viewIndividualData">
+  <app-card id="individual-header-card">
+      <div class="row">
+        <div class="col-sm-2">
+          <h5 class="strong">{{dynamicTemplate.templateName}}</h5>
+          <span *ngIf="dynamicTemplate.id!=0">Id :
+            {{dynamicTemplate.dynamicTemplateCode}}{{dynamicTemplate.revisionNumber}}</span>
+        </div>
+        <div class="col-sm-4">
+          <form #formId="ngForm">
+            <div  class="form-group"  *ngIf="!this.dynamicTemplate.publishedflag">
+              <div style="font-size: 11px;">
+                <input #fileuploaddiv type="file" name="file" required (change)="onSingleFileUpload($event)"
+                  [(ngModel)]='uploadSingleFile' accept=".pdf,.doc,.docx" #file="ngModel">
+                <span class="asterisk required">*Note:</span> Upload .pdf,.doc,.docx file only
+                <div class="messages text-danger"
+                  *ngIf="submitted && ( file.errors?.required && (dynamicTemplate.fileName==''))">
+                  File Upload can't be blank</div>
+                <div class="messages text-danger" *ngIf="(this.fileValidationMessage!='')">
+                  {{this.fileValidationMessage}}</div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="col-sm-2" *ngIf="this.dynamicTemplate.publishedflag">
+          <app-stepperprogress [isIcon]="true"></app-stepperprogress>
+        </div>
+        <div [ngClass]="(this.dynamicTemplate.publishedflag)?'col-sm-4':'col-sm-6'" style="text-align: right;">
+            <a *ngIf="dynamicTemplate.id!=0" href="javascript:"><img class="image-radius rounded-0 img-25 m-r-20"
+                src="assets/icon/png-icons/info.png" alt="Table of Content" placement="bottom" ngbTooltip="Info"
+                (click)="loadTaskData(); templateInfoModal.show();"></a>
+            
+            <img *ngIf="dynamicTemplate.id!=0" class="m-r-10 image-radius rounded-0 pointer img-25  m-r-20"
+              src="assets/icon/png-icons/forum.png" alt="Forum" placement="bottom" ngbTooltip="Forum"
+              (click)="commentsSwitch=!commentsSwitch">
+
+          <a *ngIf="permissionModel.userInWorkFlow" href="javascript:"><img class="image-radius rounded-0 img-25 m-r-20"
+            src="assets/icon/png-icons/menu.png" alt="Table of Content" placement="bottom" ngbTooltip="Table of Content"
+            (click)="onClickTableOfContent(dynamicTemplate.permissionConstant)"></a>
+
+              <a role="button"   *ngIf="permissionModel.userInWorkFlow && this.permissionModel.exportButtonFlag && viewPdfPreview && this.draftIds && this.draftIds.length>0"
+                style="cursor:pointer;font-weight: bold"><img class="image-radius rounded-0 img-25 m-r-20"
+                src="assets/icon/png-icons/pdfDownload.svg" alt="pdfExport" placement="bottom" ngbTooltip="pdf Export"
+                (click)="this.viewpdf=true; draftPdfPreview.show();"></a>
+
+                <a role="button"  *ngIf="dynamicTemplate.fileName!='' && dynamicTemplate.id!=0" style="cursor:pointer;font-weight: bold"><img class="image-radius rounded-0 img-25 m-r-20"
+                  src="assets/icon/png-icons/revision.svg" alt="Revision" placement="bottom" ngbTooltip="Revision"
+                  (click)="revisionForDocument(dynamicTemplate);"></a>
+
+          <!-- <button
+            *ngIf="this.permissionModel.exportButtonFlag && viewPdfPreview && this.draftIds && this.draftIds.length>0"
+            [disabled]="!permissionModel.userInWorkFlow"
+            class="btn btn-sm btn-primary waves-effect waves-light m-r-10"
+            (click)="this.viewpdf=true; draftPdfPreview.show()">PDF export</button> -->
+          <button *ngIf="!this.dynamicTemplate.publishedflag" type="button"
+            class="btn btn-sm btn-info  waves-effect waves-light m-r-10"
+            (click)="downloadFileOrView(this.dynamicTemplate, false);">Download</button>
+
+          <button *ngIf="dynamicTemplate.id==0 && !this.dynamicTemplate.publishedflag" type="button"
+            class="btn btn-sm btn-success  waves-effect waves-light m-r-10"
+            [disabled]="!this.permissionModel.createButtonFlag"
+            (click)="$event.preventDefault();saveDynamicTemplateData(formId.valid);">Save</button>
+
+          <button *ngIf="dynamicTemplate.id!=0 && !this.dynamicTemplate.publishedflag" type="button"
+            [disabled]="!this.permissionModel.updateButtonFlag"
+            (click)="$event.preventDefault();openSuccessCancelSwal();"
+            class="btn btn-sm btn-success  waves-effect waves-light m-r-10">Update</button>
+
+          <button
+            *ngIf="dynamicTemplate.id!=0 && !this.dynamicTemplate.publishedflag && !isWorkflowDocumentOrderSequence"
+            type="button" [disabled]="!this.permissionModel.publishButtonFlag" (click)="publishDynamicTemplateData();"
+            class="btn btn-sm btn-primary  waves-effect waves-light m-r-10">Publish</button>
+
+          <button type="button"
+            (click)="verify(dynamicTemplate.permissionConstant,this.dynamicTemplate.dynamicTemplateCode,dynamicTemplate.id);"
+            *ngIf="dynamicTemplate.id!=0 && !this.dynamicTemplate.publishedflag && permissionModel.workFlowButtonFlag"
+            class="btn btn-sm btn-warning  waves-effect waves-light m-r-10">Verify</button>
+
+          <button *ngIf="dynamicTemplate.id==0" type="button"
+            class="btn btn-sm btn-danger  waves-effect waves-light m-r-10" [routerLink]="[this.routeback]"
+            routerLinkActive="active">Cancel</button>
+
+          <button *ngIf="dynamicTemplate.id!=0 && !this.dynamicTemplate.publishedflag" type="button"
+            [disabled]="!permissionModel.deleteButtonFlag"
+            (click)="deleteTemplateSwal(dynamicTemplate,dynamicTemplate.id);"
+            class="btn btn-sm btn-danger  waves-effect waves-light m-r-10">Delete</button>
+
+            <!-- <a *ngIf="dynamicTemplate.fileName!='' && dynamicTemplate.id!=0" style="cursor:pointer;font-weight: bold"
+            ngbTooltip="Revision" placement="bottom" (click)="revisionForDocument(dynamicTemplate);"><span
+              class="ti-arrow-circle-left">&nbsp;&nbsp;</span></a> -->
+
+            <a *ngIf="dynamicTemplate.id!=0 && routeback!=null" [routerLink]="[this.routeback]"><img class="image-radius rounded-0 img-25 m-r-20"
+              src="assets/icon/png-icons/close.png" alt="Table of Content" placement="bottom" ngbTooltip="close"
+              ></a>
+          <!-- <a *ngIf="dynamicTemplate.id!=0 && routeback!=null" [routerLink]="[this.routeback]"
+            style="cursor:pointer;font-weight: bold" class="ti-close">&nbsp;&nbsp;</a> -->
+        </div>
+      </div>
+  </app-card>
+    <div class="row">
+      <div [ngClass]="(commentsSwitch)?'col-sm-9':'col-sm-12'">
+        <!-- <div style="text-align: center;" id="fileUploadIdDynamicTemplate"></div> -->
+        <pdf-viewer style="display: block;" #ApprovalPDFViewerComponent [src]="pdfURL" [page]="pageVariable"
+          [show-all]="showAll" (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom"
+          [stick-to-page]="true" (error)="onError($event)"></pdf-viewer>
+      </div>
+      <div *ngIf="commentsSwitch" class="col-sm-3">
+        <ng-template #infoForForum>
+          <div> Use the following symbol for document reference :<br>@ - User<br>* - Section<br># - Document</div>
+          </ng-template>
+          <div *ngIf="commentsSwitch" class="col-sm-12 text-right p-0">
+            <a [ngbPopover]="infoForForum" triggers="mouseenter:mouseleave" container="body">
+              <i class="icofont icofont-info-square info"></i>
+            </a>
+            <a role="button" (click)="changeGroupingFlag();" [ngbPopover]="groupingFlag ? 'Group View' : 'Normal View'"
+             triggers="mouseenter:mouseleave" container="body">
+              <i [ngClass]="groupingFlag ? 'fa fa-object-ungroup info' : 'fa fa-object-group info'"></i>
+            </a>
+            <a role="button" (click)="commentsSwitch=!commentsSwitch;" container="body" triggers="mouseenter:mouseleave"
+              [ngbPopover]="commentsSwitch?'Collapse':'Expand'"> <i
+                [ngClass]="commentsSwitch?'fa fa-minus-circle':'fa fa-plus-circle'"
+                aria-hidden="true"></i></a>
+          </div>
+        <app-document-forum [chapter]="this.outLineList" [documentList]="this.commentsDocumentsList"
+          [isDocumentWorkFlow]="true"></app-document-forum>
+      </div>
+    </div>    
+    <div class="row">
+      <div class="col-sm-12">
+        <app-individual-audit-trail #auditSingleView [permission]="dynamicTemplate.permissionConstant"
+          [id]="dynamicTemplate.id"></app-individual-audit-trail>
+        </div>
+    </div>
+
+</div>
+<app-form-esign-verification #formVerification></app-form-esign-verification>
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualData==true">
+  <div><br>
+    <h4>&nbsp;&nbsp;Revision Form Document
+      <div style="float: right;">
+        <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="onClickViewClose();">&nbsp;&nbsp;</a>
+      </div>
+    </h4>
+  </div>
+  <div><br>
+    <div class="table-group row col-sm-12">
+      <label class="col-sm-2">Source File
+        <span class="asterisk">*</span>
+      </label>
+      <div class="col-sm-4">
+        <select name="select" class="form-control" required [(ngModel)]="sourceFile" name="sourceFile"
+          (change)="getFileNameForRevisionRight($event)" #sourceFileModel="ngModel">
+          <option value="">Select Document</option>
+          <option *ngFor="let left of leftRevisionArray ; let lindex = index" [value]="left.filePath">
+            R-{{lindex+1}}&nbsp;{{left.fileName}}</option>
+        </select>
+      </div>
+
+      <label class="col-sm-2 col-form-label">Compare File
+        <span class="asterisk">*</span>
+      </label>
+
+      <div class="col-sm-4">
+        <select name="select" class="form-control" required [(ngModel)]="compareFile" name="compareFile"
+          (change)="getFileNameForRevisionLeft($event)" #compareFileModel="ngModel">
+          <option value="">Select Document</option>
+          <option *ngFor="let right of rightRevisionArray ; let rindex=index" [value]="right.filePath">
+            R-{{rindex+1}}&nbsp;{{right.fileName}}</option>
+        </select>
+      </div>
+    </div><br>
+    <div class="form-group row col-sm-12" style="text-align: center;">
+      <button type="button" class="btn btn-primary" (click)="$event.preventDefault();compareTwoFile()"><span>
+          <i *ngIf="modalSpinner" class="spinner-border spinner-border-sm"></i>Compare</span>&nbsp; </button>
+      <div class="messages text-danger" *ngIf="sourceFile === '' || compareFile === '' ">
+        {{this.revisionValidationMessage}}
+      </div>
+      <div *ngIf="modalSpinner" class="loading">Loading&#8230;</div>
+    </div>
+  </div>
+  <hr>
+  <div id="overflowCompareId" class="overflow-container" style="visibility: hidden !important" slimScroll
+    railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+    allowPageScroll="false">
+
+    <div style="text-align:center" class="table-group">
+      <iframe width="600px" height="800px" id="sourceFileId"></iframe>
+      <iframe width="600px" height="800px" id="compareFileId"></iframe>
+    </div>
+
+  </div>
+  &nbsp;&nbsp;<br><br><br>
+</app-card>
+
+<!--REVISION OF DOCUMENTS-->
+<app-modal-basic #modalRevision [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="modalRevision.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Revision Form Document</h5><br>
+    <div><br>
+      <div class="table-group row col-sm-12">
+        <label class="col-sm-2">Source File
+          <span class="asterisk">*</span>
+        </label>
+        <div class="col-sm-4">
+          <select name="select" class="form-control" required [(ngModel)]="sourceFile" name="sourceFile"
+            #sourceFileModel="ngModel">
+            <option *ngFor="let left of leftRevisionArray ; let lindex = index" [value]="left.filePath">
+              R-{{lindex+1}}&nbsp;{{left.fileName}}</option>
+          </select>
+        </div>
+
+        <label class="col-sm-2 col-form-label">Compare File
+          <span class="asterisk">*</span>
+        </label>
+
+        <div class="col-sm-4">
+          <select name="select" class="form-control" required [(ngModel)]="compareFile" name="compareFile"
+            #compareFileModel="ngModel">
+            <option *ngFor="let right of rightRevisionArray ; let rindex=index" [value]="right.filePath">
+              R-{{rindex+1}}&nbsp;{{right.fileName}}</option>
+          </select>
+        </div>
+      </div><br>
+      <div class="form-group row col-sm-12" style="text-align: center;">
+        <button type="button" class="btn btn-primary" (click)="$event.preventDefault();compareTwoFile()"><span>
+            <i *ngIf="modalSpinner" class="spinner-border spinner-border-sm"></i>Compare</span>&nbsp; </button>
+        <div class="messages text-danger" *ngIf="sourceFile=='' || compareFile=='' ">{{this.revisionValidationMessage}}
+        </div>
+        <div *ngIf="modalSpinner" class="loading">Loading&#8230;</div>
+      </div>
+    </div>
+    <hr>
+    <div id="overflowCompareId" class="overflow-container" style="visibility: hidden !important" slimScroll
+      railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6"
+      allowPageScroll="false">
+
+      <h5>Compare View</h5><br>
+
+      <div style="text-align:center" class="table-group">
+        <iframe width="600px" height="800px" id="sourceFileId"></iframe>
+        <iframe width="600px" height="800px" id="compareFileId"></iframe>
+      </div>
+
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #templateInfoModal [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-body" style="height: 400px; overflow-y: scroll;">
+    <button type="button" class="close basic-close-light-box" (click)="templateInfoModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <app-card>
+      <div class="row">
+        <div class="col-sm-4 pr-0 text-left">
+          <h6><label class="strong">Status:</label>{{dynamicTemplate.status}}</h6>
+        </div>
+        <div class="col-sm-4 pr-0 text-left">
+          <h6><label class="strong">Updated By:</label>{{dynamicTemplate.lastUpdatedByName}}</h6>
+        </div>
+        <div class="col-sm-4 pr-0 text-left">
+          <h6><label class="strong">Updated Time:</label>{{dynamicTemplate.displayUpdatedTime}}</h6>
+        </div>
+      </div>
+      <hr style="border: 1px solid black;"><br>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="page-header-title">
+            <div class="d-inline">
+              <h4 class="strong">Project Plan</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <br>
+          <table cellpadding="5" class="table">
+            <thead class="strong">
+              <tr>
+                <th>Level Name</th>
+                <th>Target Start Date</th>
+                <th>Target End Date</th>
+                <th>Actual Start Date</th>
+                <th>Actual End Date</th>
+                <th>AssignedTo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let level of this.projectPlan">
+                <td>{{level.itemName}}</td>
+                <td>{{level.startTargetDate}}</td>
+                <td>{{level.endTargetDate}}</td>
+                <td>{{level.actualStartTargetDate|date:this.datePipeFormat}}</td>
+                <td>{{level.actualEndTargetDate|date:this.datePipeFormat}}</td>
+                <td style="width:max-content ;">
+                  <span *ngFor="let user of level.selectedUsers">{{user.itemName}}<br></span>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <hr style="border: 1px solid black;"><br>
+      <div class="row">
+        <div class="col-sm-6">
+          <div class="page-header-title">
+            <div class="d-inline">
+              <h4 class="strong">Tasks</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="row">
+          <div class="col-sm-12">
+            <br>
+            <div *ngIf="pendingTaskList.length == 0">
+              <strong>&nbsp;&nbsp;No Data</strong>
+            </div>
+            <div class="table-responsive" *ngIf="pendingTaskList.length != 0">
+              <table class="table">
+                <tr class="header-bg">
+                  <th>Task Id</th>
+                  <th>Priority</th>
+                  <th>Description</th>
+                  <th>Due Date</th>
+                  <th>Status</th>
+                  <th>Time Duration</th>
+                  <th>Timer</th>
+                  <th>Assigned To</th>
+                  <th>Action</th>
+                </tr>
+                <tr *ngFor="let row of pendingTaskList">
+                  <td>
+                    <a class="link" (click)="redirect(row)">{{row.taskCode}}</a>
+                  </td>
+                  <td> {{row.priority}}</td>
+                  <td> {{row.taskTitle}}</td>
+                  <td> {{row.dueDate |date:this.datePipeFormat}}</td>
+                  <td> {{row.status}}</td>
+                  <td> {{row.timeDuration}}</td>
+                  <td>
+                    <a *ngIf="row.status != 'Closed' && row.startTimerFlag == 'Y'" container="body" href="javascript:;"
+                      class="crm-action-view text-muted text-warning" (click)="startTime(row);"
+                      data-ng-open="modalSmall" placement="top" ngbTooltip="Start">
+                      <i class="icofont icofont-wall-clock view"></i></a>
+                    &nbsp;
+                    <a *ngIf="row.status != 'Closed' && row.endTimerFlag == 'Y'" container="body" href="javascript:;"
+                      class="crm-action-view text-muted text-warning" (click)="endTime(row);" data-ng-open="modalSmall"
+                      placement="top" ngbTooltip="Stop">
+                      <i class="icofont icofont-wall-clock bin"></i></a>
+                  </td>
+                  <td>
+                    <label (click)="getLevelUsers(row);selectUserModal.show();"
+                      class="text-c-blue">{{row.selectedUserNames}}</label>
+                  </td>
+                  <td>
+                    <a href="javascript:;" (click)="editTask(row)"
+                      class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+                      <i class="icofont icofont-edit edit"></i></a>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic class="modal-lg" #selectUserModal [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Re-Assign Users</strong></h5>
+    <button type="button" class="close basic-close-light-box" (click)="selectUserModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="form-group row">
+          <label class="col-sm-8 col-form-label">Assigned To<span class="asterisk required">*</span></label>
+          <div class="col-sm-10">
+            <ng-select [disabled]="!this.isUserInWorkFlow" name="users" [ngClass]="'ng-select'"
+              [(ngModel)]="this.assignedUsers" [options]="this.docLevelUserList" [multiple]="true">
+            </ng-select>
+            <div class="messages text-danger" *ngIf="this.assignedUsers.length==0">Assigned to is Required</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!this.isUserInWorkFlow" class="row"><span class="asterisk">&nbsp;&nbsp;&nbsp;*</span>Note: User is not
+      in workflow to Re-assign users</div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+    <div class="row">
+      <div style="text-align: center;" class="col-sm-12">
+        <button class="btn btn-success" [disabled]="!this.isUserInWorkFlow || this.assignedUsers.length==0"
+          (click)="reAssignUsers();selectUserModal.hide();">Save</button>
+        <button class="btn btn-danger" (click)="selectUserModal.hide();">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #draftPdfPreview [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="onClickHide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <app-draft-pdf *ngIf="viewpdf" [permissionConstant]="this.dynamicTemplate.permissionConstant"
+      [draftIds]="this.draftIds"></app-draft-pdf>
+  </div>
+</app-modal-basic>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+
+
+
+  <app-modal-basic #allUserApprovalModal [dialogClass]="'modal-lg all-user-approval-comment'" [hideHeader]="false" [hideFooter]="false">
+    <div class="app-modal-header">
+      <h4 class="modal-title">All User Approval</h4>
+      <button type="button" class="close basic-close" (click)="allUserApprovalModal.hide();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body">
+      <div class="row">
+        <div class="col-sm-12" *ngIf="userApprovalList.length!=0">
+          <table  id="all-user-approval-table" class="table table-striped table-bordered w-100">
+            <thead>
+              <tr>
+                <th class="w-10">Sr. No</th>
+                <th class="w-20">Action By</th>
+                <th class="w-20">Created Time</th>
+                <th class="w-50">Comments</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of userApprovalList;let i=index">
+                <td>{{i+1}}</td>
+                <td>{{u.user}}</td>
+                <td>{{u.dateTime}}</td>
+                <td><p class="fs-15 text-justify text-break">{{u.comments}}</p></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-12" *ngIf="userApprovalList.length==0">
+          <label class="form-control-label">No comments</label>
+        </div>
+      </div>
+    </div>
+  </app-modal-basic>
+

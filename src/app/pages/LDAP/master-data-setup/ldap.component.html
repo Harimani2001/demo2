@@ -1,0 +1,154 @@
+<app-card>
+    <app-card>
+        <div class="page-header-title">
+            <i class="icofont icofont-settings-alt bg-c-orenge"></i>
+            <div class="d-inline">
+                <h4>LDAP Settings</h4>
+            </div>
+        </div>
+    </app-card>
+    
+    <form #formdata="ngForm" novalidate>
+        <div class="col-sm-12">
+        <div class="row container">
+            <label class="col-sm-4 text-right" for="ldapTypeId">LDAP Type<span class="asterisk required">*</span></label>
+            <div class="col-sm-8">
+                <select class="form-control" required  name="type"
+                 [(ngModel)]="model.type"  #type="ngModel" id="ldapTypeId">
+                    <option value="localAD">Local AD</option>
+                    <option value="azureAD">Azure AD</option>
+                </select>
+                <div class="messages text-danger" *ngIf="(type.touched || submitted) && type.errors?.required">Please enter LDAP Type</div>
+            </div>
+        </div><br>
+        <ng-container *ngIf="model.type=='localAD'">
+            <div class="row container">
+                <label  class="col-sm-4 text-right"  for="hostNameId">Host Name<span class="asterisk required">*</span></label>
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" [(ngModel)]="model.hostName" #hostName="ngModel"
+                        (blur)="validateIPAddress(model.hostName)" name="hostNameName" id="hostNameId" maxlength="16"
+                        placeholder="127.0.0.1" required>
+                    <div class="messages text-danger" *ngIf="(hostName.touched || submitted) && hostName.errors?.required">
+                        Please enter Host name</div>
+                    <div class="messages text-danger" *ngIf="this.hostNameValidMessage">{{hostNameValidMessage}}</div>
+                </div>
+            </div><br>
+            <div class="row container">
+                <label class="col-sm-4 text-right" for="clientUserNameId">Client User Name<span class="asterisk required">*</span></label>
+                <div class="col-sm-8">
+                    <input type="text" [(ngModel)]="model.clientUserName" #clientUserName="ngModel" class="form-control"  name="clientUserNameName"
+                        id="clientUserNameId" maxlength="16" placeholder="User Name in your windows system" required>
+                    <div class="messages text-danger"
+                        *ngIf="(clientUserName.touched || submitted) && clientUserName.errors?.required">
+                        Please enter Client User Name</div>
+                </div>
+            </div><br>
+            <div class="row container">
+                <label class="col-sm-4 text-right" for="clientPasswordId">Client Password<span class="asterisk required">*</span></label>
+                <div class="col-sm-8">
+                    <input [type]="passwordVisible?'password':'text'" [(ngModel)]="model.clientPassword" #clientPassword="ngModel"
+                        class="form-control" name="clientPassword" id="clientPasswordId" maxlength="100"
+                        placeholder="Password given in windows system" required>
+                    <span [class]="passwordVisible?'icofont icofont-eye-blocked errspan':'icofont icofont-eye-alt errspan'"  (click)="passwordVisible=!passwordVisible"></span>
+                    <div class="messages text-danger" *ngIf="(clientPassword.touched || submitted) && clientPassword.errors?.required">
+                        Please enter Client Password</div>
+                </div>
+            </div><br>
+        </ng-container>
+        <ng-container *ngIf="model.type=='azureAD'">
+            <div class="row container">
+                <label class="col-sm-4 text-right" for="tenantIdId">Tenant Id<span class="asterisk required">*</span></label>
+                <div class="col-sm-8">
+                    <input type="text" [(ngModel)]="model.tenantId" #tenantId="ngModel" class="form-control"  name="tenantId"
+                        id="tenantIdId" maxlength="199" placeholder="Tenant Id given by Microsoft Azure" required>
+                    <div class="messages text-danger"
+                        *ngIf="(tenantId.touched || submitted) && tenantId.errors?.required">
+                        Please enter Tenant Id</div>
+                </div>
+            </div><br>
+            <div class="row container">
+                <label class="col-sm-4 text-right" for="clientIdId">Client Id<span class="asterisk required">*</span></label>
+                <div class="col-sm-8">
+                    <input type="text" [(ngModel)]="model.clientId" #clientId="ngModel" class="form-control" name="clientId" id="clientIdId"
+                        maxlength="199" placeholder="Client Id given by Microsoft Azure" required>
+                    <div class="messages text-danger"
+                        *ngIf="(clientId.touched || submitted) && clientId.errors?.required">
+                        Please enter Client Id</div>
+                </div>
+            </div><br>
+            <div class="row container">
+                <label  class="col-sm-4 text-right" for="clientSecretIdId">Client Secret Id<span class="asterisk required">*</span></label>
+                <div class="col-sm-8">
+                    <input type="text" [(ngModel)]="model.clientSecretId" #clientSecretId="ngModel" class="form-control" name="clientSecretId"
+                        id="clientSecretIdId" maxlength="199" placeholder="Client Secret Id given by Microsoft Azure" required>
+                    <div class="messages text-danger"
+                        *ngIf="(clientSecretId.touched || submitted) && clientSecretId.errors?.required">
+                        Please enter Client Secret Id</div>
+                </div>
+            </div><br>
+        </ng-container>
+        <div class="row container">
+            <label class="col-sm-4 text-right" for="">Active Flag<span class="asterisk required">*</span></label>
+            <div class="col-sm-8">
+                <ui-switch 
+                    (click)="model.activeFlag=!model.activeFlag"
+                    id="ui-switch" [checked]="model.activeFlag" name="activeFlag"
+                    class="js-small" color="#3498DB" switchColor="#fff" size="small">
+                </ui-switch>
+            </div>
+        </div><br>
+        <div class="row container">
+            <div class="col-sm-12 text-center">
+                <button *ngIf="!this.model.id && permission.createButtonFlag" class="btn btn-success"
+                    (click)="save(formdata)">Save</button>
+                <button *ngIf="this.model.id  && permission.updateButtonFlag" class="btn btn-success"
+                    (click)="save(formdata)">Update</button>
+                <button *ngIf="formdata.valid" class="btn btn-warning" (click)="openTestADSetUp()"> Test LDAP Setting </button>
+                <button type="button" class="btn btn-warning" [routerLink]="['/MainMenu']" routerLinkActive="active">
+                    <i class="icofont icofont-close"></i>Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+    </form>
+</app-card>
+
+<app-modal-basic #testADSetup [dialogClass]="'modal-md'" class="modal-dialog">
+    <div class="app-modal-header">
+        <h4 class="modal-title">Test LDAP Setting</h4>
+        <button type="button" class="close basic-close" (click)="closeTestADSetup()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="app-modal-body">
+        <div *ngIf="testADBuilder" class="row">
+           <form [formGroup]="testADBuilder">
+            <div class="row pt-1">
+                <label class="col-sm-6">Please enter your Email Id or User Name</label>
+                <div class="col-sm-6">
+                  <input class="form-control" size="49" formControlName="emailOrUserName" type="email" autocomplete="new-password"
+                    placeholder="Email Id Or User Name" required />
+                  <label class="text-danger"
+                    *ngIf="(testADBuilder.get('emailOrUserName').touched || this.submitted) && testADBuilder.get('emailOrUserName').hasError('required')">
+                    <span>Email Id or User Name can't be blank</span></label>
+                </div>
+              </div>
+              <div class="row pt-1">
+                <label class="col-sm-6"> Please enter your Password</label>
+                <div class="col-sm-6">
+                  <input class="form-control" size="49" formControlName="password" type="password" placeholder="password"
+                    name="password" autocomplete="new-password" required />
+                  <label class="text-danger"
+                    *ngIf="(testADBuilder.get('password').touched || this.submitted) && testADBuilder.get('password').hasError('required')">
+                    <span>Password can't be blank</span></label>
+                </div>
+              </div>
+           </form>
+        </div>
+    </div>
+    <div class="app-modal-footer">
+        <button type="button" class="btn btn-primary waves-effect" (click)="testSetup()">Send Request
+            Setting</button>&nbsp;
+        <button type="button" class="btn btn-danger waves-effect" (click)="closeTestADSetup()">Cancel</button>
+    </div>
+</app-modal-basic>

@@ -1,0 +1,588 @@
+<div class="row" *ngIf="tableView && !viewDFDetails">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row col-sm-12">
+        <div class="col-sm-6">
+          <a *ngIf="isSelectedPublishData" href="javascript:" class="m-l-10"><img class="image-radius rounded-0 img-25"
+              src="assets/icon/png-icons/published.png" alt="Publish" placement="bottom" ngbTooltip="Publish"
+              (click)="publishData()"></a>
+        </div>
+        <div class="col-sm-6 float-right text-right">
+          <a *ngIf="this.search" href="javascript:" class="m-r-15"><img class="image-radius rounded-0 img-25"
+              src="assets/icon/png-icons/search.png" alt="Search" placement="bottom" ngbTooltip="Search"
+              (click)="this.showSearch=!this.showSearch"></a>
+          <input *ngIf="this.search && this.showSearch" type="search" [(ngModel)]="filterQuery"
+            (ngModelChange)="this.helper.setPaginator(table)" class="form-control input-sm full-data-search m-r-15"
+            placeholder="Search">
+
+          <a *ngIf="permisionModal.createButtonFlag" href="javascript:" [routerLink]="['/df/add-df']"
+            routerLinkActive="active"><img class="image-radius rounded-0 img-27" src="assets/icon/png-icons/addDoc.png"
+              alt="Add DF" placement="bottom" ngbTooltip="Add DF"></a>
+        </div>
+      </div>
+      <br>
+      <ngb-tabset #discrepancyTab="ngbTabset"
+        (tabChange)="tabChange($event.nextId);">
+
+        <ngb-tab id="summary" title="Summary">
+          <ng-template ngbTabContent>
+
+            <ng-container *ngFor="let chartData of  this.data">
+              <app-card>
+                <div class="row">
+                  <div class="col-sm-6">
+                    <div class="page-header-title">
+                      <div class="d-inline">
+                        <h4 class="strong">{{chartData.name}}</h4>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-6" style="text-align: right;">
+                    <a container="body" *ngIf="!chartData.flag" href="javascript:;"
+                      (click)="chartData.flag = !chartData.flag" class="m-r-15 crm-action-edit text-muted text-primary"
+                      placement="top" ngbTooltip="Expand">
+                      <i style="font-size: 25px;color: black;" class="icofont icofont-circled-down"></i>
+                    </a>
+                    <a container="body" *ngIf="chartData.flag" href="javascript:;"
+                      (click)="chartData.flag = !chartData.flag" class="m-r-15 crm-action-edit text-muted text-primary"
+                      placement="top" ngbTooltip="Hide"><i style="font-size: 25px;color: black;"
+                        class="icofont icofont-circled-up"></i>
+                    </a>
+                  </div>
+                </div>
+                <div *ngIf="chartData.flag">
+
+                  <div class="col-sm-12">
+                    <ng-container *ngFor="let testCase of chartData.data">
+                      <div class="row">
+                        <div class="table-allign">
+                          <span>{{testCase.Name}}</span>
+                          <table class="table">
+                            <tr class="header-bg">
+                              <th>Draft</th>
+                              <th>Published</th>
+                              <th *ngIf="chartData.workFlow">In Progress</th>
+                              <th>Completed</th>
+                            </tr>
+                            <tr>
+                              <td>{{testCase.Draft}}</td>
+                              <td>{{testCase.Publish}}</td>
+                              <td *ngIf="chartData.workFlow">{{testCase.inProgress}}</td>
+                              <td>{{testCase.Completed}}</td>
+                            </tr>
+                          </table>
+                        </div>
+                        <div [ngStyle]="{'width':'350px,height:150px'}">
+                          <canvas baseChart [data]="pieChartView(testCase,chartData.workFlow)"
+                            [labels]="chartData.workFlow ? pieChartLabelsWithWorkFlow:pieChartLabelsWithNoWorkFlow"
+                            [options]="this.pieChartOptions" [chartType]="this.pieChartType"
+                            [colors]="chartData.workFlow ? this.pieChartWithWorkFlow:this.pieChartWithNoWorkFlow"></canvas>
+                        </div>
+                      </div>
+                    </ng-container>
+                  </div>
+                  <div class="list-wrapper-custom-css">
+                    <div class="card-block">
+                      <h4 class="card-title">Severity Vs Status</h4>
+                      <div class="list-cards">
+                        <div class="row card-body">
+                          <google-chart [data]="chartData['comboChartData']"></google-chart>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- <div [ngStyle]="{'display': 'flex'}">
+                <div *ngFor="let category of chartData.data">
+                  <div class="card dfView-list-wrapper">
+                    <div class="card-block list" [ngStyle]="{'background-color':category.category=='Minor'? '#ccffe6':category.category=='Major'?'#ffff99':'#ff9999'}">
+                      <h4 class="card-title">{{category.category}}</h4>
+                      <div class="dfView-list-cards" >
+                        <div class="p-b-10" *ngFor="let df of category.dfList;">
+                          <expansion-panels-container>
+                            <expansion-panel class="exapndDF">
+                              <expansion-panel-title >
+                                {{df.category}}-{{df.documentCount}}<br>
+                                <a *ngIf="df.documentCount>0"   href="javascript:void(0)" (click)="detailedView.show();loadDetailedView(df)">View more</a>
+                              </expansion-panel-title>
+                            </expansion-panel>
+                          </expansion-panels-container>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div> -->
+                </div>
+              </app-card>
+            </ng-container>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="onGoing" title="Pending">
+          <ng-template ngbTabContent>
+            <ngx-datatable [scrollbarH]="true" id="customTable" #myTable class="data-table dt-chk"
+              [rows]='publishedData | auditFilter : filterQuery' [headerHeight]="50" [footerHeight]="50"
+              [rowHeight]="'auto'">
+              <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+                  <div class="dt-desc">
+                    <table class="table-striped table-bordered">
+                      <tr>
+                        <th colspan="3"><strong>Description</strong></th>
+                      </tr>
+                    </table>
+                    <br>
+                  </div>
+                </ng-template>
+              </ngx-datatable-row-detail>
+
+              <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false"
+                [draggable]="false" [resizeable]="false">
+                <ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+                  <div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+                    <label *ngIf="!filterQuery && publishedData.length !=0 " container="body" placement="right"
+                      triggers="mouseenter:mouseleave" ngbPopover="Select All">
+                      <input type="checkbox" [checked]="selectAll" (click)="selectAllDataForSubmit($event)" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                </ng-template>
+
+                <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                  let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label container="body" placement="right" triggers="mouseenter:mouseleave"
+                      ngbPopover="{{(row.dfStatus=='Resolved'||row.dfStatus=='N.A')?'Click to select':'Status has not been resolved'}}">
+                      <input [disabled]="!(row.dfStatus=='Resolved'||row.dfStatus=='N.A')" type="checkbox"
+                        name="{{row['testCaseCode']}}" [checked]="row.publishFlag"
+                        (change)="row.publishFlag=!row.publishFlag;onChangePublishData();" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="150" [sortable]="true" name="ID">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['documentCode']}}</ng-template>
+              </ngx-datatable-column>
+
+              <!-- <ngx-datatable-column [width]="150" [sortable]="true" name="Test Run Name">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['testRunName']}}</ng-template>
+              </ngx-datatable-column> -->
+
+              <ngx-datatable-column [width]="150" [sortable]="true" name="Test Case ID">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['testCaseName']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="300" [sortable]="true" name="Incident Description">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['discrepancyDescription']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [sortable]="true" name="DF Status">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['dfStatus']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="250" [sortable]="true" name="Action Taken">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['actionTaken']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="250" [sortable]="true" name="Result for the Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['resultForAction']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="200" [sortable]="true" name="Is Re-test Required ">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['reTestFlag']==true?"Yes":"No"}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="200" [sortable]="true" name="New Version Required">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-container *ngIf="row.reTestFlag">
+                    {{row['createNewVersion']==true?"Yes":"No"}}
+                  </ng-container>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Action" [frozenRight]="true" [width]="200">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-template #popContent>
+                    <span class="text-left">
+                      <div><b>Status :</b>&nbsp; {{row['discrepancyDescription']}}</div>
+                      <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                      <div><b>Created On :</b>&nbsp;{{row['createdTime']| date:'dd-MM-yyyy HH:mm a'}}</div>
+                    </span>
+                  </ng-template>
+                  <a *ngIf="permisionModal.updateButtonFlag" container="body" href="javascript:;"
+                    routerLinkActive="active" [routerLink]="['/df/add-df',row.id]"
+                    class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+                    <i class="icofont icofont-edit edit"></i>
+                  </a>
+                  <a *ngIf="permisionModal.deleteButtonFlag" container="body" href="javascript:;"
+                    class="m-r-15 crm-action-delete text-muted text-danger" (click)="openSuccessCancelSwal(row,row.id);"
+                    placement="top" ngbTooltip="Delete">
+                    <i class="icofont icofont-bin bin"></i>
+                  </a>
+                  <a *ngIf="permisionModal.viewButtonFlag" container="body" href="javascript:;"
+                    class="m-r-15 crm-action-view text-muted text-warning" (click)="viewDF(row.id);"
+                    data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                    <i class="icofont icofont-resize view"></i>
+                  </a>
+                  <a container="body" *ngIf="permisionModal.viewButtonFlag && (row.imageList.length > 0)"
+                    href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" placement="top"
+                    (click)="ViewFileList(row.imageList,true)" ngbTooltip="View Images">
+                    <i style="font-size: 25px;color: blue;" class="icofont icofont-image"></i>
+                  </a>
+                  <a container="body" *ngIf="permisionModal.viewButtonFlag && (row.videoList.length > 0)"
+                    href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" placement="top"
+                    (click)="ViewFileList(row.videoList,false)" ngbTooltip="View Videos">
+                    <i style="font-size: 25px;color: blue;" class="icofont icofont-ui-video-play"></i>
+                  </a>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="completed" title="Published">
+          <ng-template ngbTabContent>
+            <ngx-datatable [scrollbarH]="true" id="customTable" #myTable class="data-table dt-chk"
+              [rows]='completedData | auditFilter : filterQuery' [headerHeight]="50" [footerHeight]="50"
+              [rowHeight]="'auto'">
+              <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow>
+                <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+                  <div class="dt-desc">
+                    <table class="table-striped table-bordered">
+                      <tr>
+                        <th colspan="3"><strong>Description</strong></th>
+                      </tr>
+                    </table>
+                    <br>
+                  </div>
+                </ng-template>
+              </ngx-datatable-row-detail>
+
+              <ngx-datatable-column [width]="150" [sortable]="true" name="ID">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['documentCode']}}</ng-template>
+              </ngx-datatable-column>
+
+              <!-- <ngx-datatable-column [width]="150" [sortable]="true" name="Test Run Name">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['testRunName']}}</ng-template>
+              </ngx-datatable-column> -->
+
+              <ngx-datatable-column [width]="150" [sortable]="true" name="Test Case ID">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['testCaseName']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="300" [sortable]="true" name="Incident Description">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['discrepancyDescription']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [sortable]="true" name="DF Status">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['dfStatus']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="250" [sortable]="true" name="Action Taken">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['actionTaken']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="250" [sortable]="true" name="Result for the Action">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['resultForAction']}}</ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="200" [sortable]="true" name="Is Re-test Required ">
+                <ng-template let-row="row" ngx-datatable-cell-template>{{row['reTestFlag']==true?"Yes":"No"}}
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column [width]="200" [sortable]="true" name="New Version Required">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-container *ngIf="row.reTestFlag">
+                    {{row['createNewVersion']==true?"Yes":"No"}}
+                  </ng-container>
+                </ng-template>
+              </ngx-datatable-column>
+
+              <ngx-datatable-column name="Action" [frozenRight]="true" [width]="140">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <ng-template #popContent>
+                    <span class="text-left">
+                      <div><b>Status :</b>&nbsp; {{row['discrepancyDescription']}}</div>
+                      <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                      <div><b>Created On :</b>&nbsp;{{row['createdTime']| date:'dd-MM-yyyy HH:mm a'}}</div>
+                    </span>
+                  </ng-template>
+                  <a container="body" href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"
+                    (click)="viewDF(row.id);" data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                    <i class="icofont icofont-resize view"></i>
+                  </a>
+                  <a container="body" *ngIf="permisionModal.viewButtonFlag && (row.imageList.length > 0)"
+                    href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" placement="top"
+                    (click)="ViewFileList(row.imageList,true)" ngbTooltip="View Images">
+                    <i style="font-size: 25px;color: blue;" class="icofont icofont-image"></i>
+                  </a>
+                  <a container="body" *ngIf="permisionModal.viewButtonFlag && (row.videoList.length > 0)"
+                    href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" placement="top"
+                    (click)="ViewFileList(row.videoList,false)" ngbTooltip="View Videos">
+                    <i style="font-size: 25px;color: blue;" class="icofont icofont-ui-video-play"></i>
+                  </a>
+                </ng-template>
+              </ngx-datatable-column>
+            </ngx-datatable>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="approve" title="Approve / PDF View">
+          <ng-template ngbTabContent>
+            <div class="row" *ngIf="hideCategory">
+              <label class="form-control-label col-sm-1 pt-2 p-r-0">Category</label>
+              <div class=" col-sm-1.5 p-l-0">
+                <select name="select" class="form-control" [(ngModel)]="category" (change)="onChangeDocument()">
+                  <option *ngFor="let doc of this.dfDropDown" [ngValue]="doc.key">{{doc.value}}</option>
+                </select>
+              </div>
+            </div>
+            <app-individual-document-workflow #workFlowForDF
+              (onClose)="tabChange('completed');">
+            </app-individual-document-workflow>
+          </ng-template>
+        </ngb-tab>
+
+        <ngb-tab id="audit" title="Audit Trail">
+          <ng-template ngbTabContent>
+            <app-audit-trail-view #auditView [permission]="this.helper.DISCREPANCY_VALUE"></app-audit-trail-view>
+          </ng-template>
+        </ngb-tab>
+
+      </ngb-tabset>
+    </app-card>
+  </div>
+</div>
+
+
+<app-card *ngIf="viewDFDetails">
+  <div *ngFor="let data of popupDFData; let in = index">
+    <div class="col-sm-12" id="float-action">
+      <app-card>
+        <div class="row">
+          <div class="col-sm-4 d-inline">
+            <h5 class="strong">&nbsp;&nbsp;Discrepancy Form Code : </h5>
+            <span style="font-size: 14px;">{{data.documentCode}}</span>
+          </div>
+          <div  class="col-sm-3">
+            <app-stepperprogress *ngIf="data.publishedflag" [isIcon]="true"></app-stepperprogress>
+          </div>
+          <div class="col-sm-5" style="text-align: right;">
+            <button *ngIf="(permisionModal.updateButtonFlag && !data.publishFlag)" type="submit"
+              [routerLink]="['/df/add-df',data.id]"
+              class="btn btn-sm btn-primary  waves-effect waves-light m-r-10">Edit</button>
+            <button
+              *ngIf="permisionModal.publishButtonFlag && !data.publishFlag && (data.dfStatus=='Resolved'|| data.dfStatus=='N.A')"
+              type="button" class="btn btn-sm btn-warning  waves-effect waves-light m-r-10"
+              (click)="SinglepublishData(data)">Publish
+            </button>
+            <button *ngIf="(permisionModal.deleteButtonFlag && !data.publishFlag)" type="button"
+              class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="openSuccessCancelSwal(data,in)">Delete</button>
+            <button *ngIf="routeback==null" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="enableTableView(); fileFlag=true">Cancel</button>
+            <button *ngIf="routeback!=null" type="button" [routerLink]="[this.commonDocumentStatusValue]"
+              class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+
+    <div *ngIf="data.publishFlag">
+      <br><br>
+      <!-- <app-stepperprogress></app-stepperprogress> -->
+    </div>
+
+    <div *ngIf="!data.publishFlag"><br><br></div>
+    <div class="row">
+      <div class="col-sm-12">
+        <table id="add-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td>
+                <div><strong class="strong">Linked Test Case Id : </strong>
+                  <a style="color: blue" (click)="onClickTestCase(data.documentType,data.testCaseId,data.id)"
+                    title="Click to view">{{data.testCaseName}}</a>
+                </div>
+              </td>
+              <td>
+                <div><strong class="strong">Issue Category : </strong>{{data.category}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div><strong class="strong">Incident Description : </strong>{{data.discrepancyDescription}}</div>
+              </td>
+              <td>
+                <div><strong class="strong">Status : </strong>{{data.dfStatus}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div><strong class="strong">Investigation : </strong>{{data.investigation}}</div>
+              </td>
+              <td>
+                <div><strong class="strong">Root cause : </strong>{{data.rootCause}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div><strong class="strong">Action to be taken : </strong>{{data.actionTaken}}</div>
+              </td>
+              <td>
+                <div><strong class="strong">Result for the action : </strong>{{data.resultForAction}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div><strong class="strong">Proposed Solution/Immediate Solution : </strong>{{data.solution}}</div>
+              </td>
+              <td>
+                <div><strong class="strong">Comments : </strong>{{data.discrepancyComments}}</div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div><strong class="strong">Request Number : </strong>{{data.requestNo}}</div>
+              </td>
+              <td>
+                <div><strong class="strong">Is Re-test Required : </strong>{{data.reTestFlag?"Yes":"No" }}
+                  <br>
+                  <ng-container *ngIf="data.reTestFlag">
+                    <strong class="strong">New Version Required :
+                    </strong>{{data.createNewVersion?"Yes":"No" }}
+                  </ng-container>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div *ngIf="data.executionFlag && data.checklist && data.checklist.length != 0" class="form-group row">
+          <strong class="strong m-l-20">CheckList : </strong><br><br>
+          <div *ngFor="let item of data.checklist; let i = index">
+            <div class="row">
+              <div class="col-sm-4" style="padding-left: 40px;">
+                <div class="checkbox-fade fade-in-primary">
+                  <label>
+                    {{i+1}} :{{item.checklistName}}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="data.imageList && data.imageList.length > 0" class="form-group row">
+          <strong class="strong m-l-20">Screenshot Image : </strong><br><br>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="dt-desc" style="padding: 0px;padding-left: 1%; overflow-x:auto;">
+                <div class="dt-desc dy-ui">
+                  <table class="table-striped table-bordered" style="width: 100%;">
+                    <thead>
+                      <th>Sl. No</th>
+                      <th>File Name</th>
+                      <th>Action</th>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let file of data.imageList ; let i = index ">
+                        <td>{{i+1}}</td>
+                        <td><label>{{file.fileName}}</label></td>
+                        <td>
+                          <a container="body" href="javascript:;" class="crm-action-view text-muted text-warning"
+                            (click)="view(file.filePath,true)" data-ng-open="modalSmall" placement="top"
+                            ngbTooltip="View">
+                            <i style="font-size: 20px" class="icofont icofont-eye-alt"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="data.videoList.length > 0" class="form-group row">
+          <strong class="strong m-l-20">Recorded Video : </strong><br><br>
+          <div class="row">
+            <div class="col-sm-12">
+              <div class="dt-desc" style="padding: 0px;padding-left: 1%; overflow-x:auto;">
+                <div class="dt-desc dy-ui">
+                  <table class="table-striped table-bordered" style="width: 100%;">
+                    <thead>
+                      <th>Sl. No</th>
+                      <th>File Name</th>
+                      <th>Action</th>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let file of data.videoList ; let i = index ">
+                        <td>{{i+1}}</td>
+                        <td><label>{{file.fileName}}</label></td>
+                        <td>
+                          <a container="body" href="javascript:;" class="crm-action-view text-muted text-warning"
+                            (click)="view(file.filePath,false)" data-ng-open="modalSmall" placement="top"
+                            ngbTooltip="View">
+                            <i style="font-size: 20px" class="icofont icofont-eye-alt"></i>
+                          </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="data.urlChecklist && data.urlChecklist.length != 0" class="row ">
+          <div class="col-sm-12"><strong class="strong">Reference</strong></div>
+          <div class="col-sm-12">
+            <table id="testcase-table-urlList" class="table">
+              <thead class="panel-heading">
+                <tr class="w-100">
+                  <td class="w-10"><label class="strong">S No.</label></td>
+                  <td class="w-40"><label class="strong">Title</label></td>
+                  <td class="w-40"><label class="strong">URL</label></td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of data.urlChecklist; let i = index">
+                  <td class="w-10">{{i+1}}</td>
+                  <td class="w-40">{{item.title}}</td>
+                  <td class="w-40">{{item.url}}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+
+        <div *ngIf="this.fileFlag" class="form-group row">
+          <strong class="strong m-l-20">View Uploaded Files : </strong><br><br>
+          <app-file-upload-for-doc #fileupload [uniqueCodeForAudit]="data.testCaseName" [multiple]='false'
+            [onlyView]='true' [documentCode]="this.helper.DISCREPANCY_VALUE"></app-file-upload-for-doc>
+        </div>
+
+      </div>
+    </div>
+
+    <app-individual-audit-trail [permission]="this.helper.DISCREPANCY_VALUE" [id]="data.id">
+    </app-individual-audit-trail>
+  </div>
+</app-card>
+
+<app-imageview #viewImageComponent (closingView)='closeView()'></app-imageview>
+
+<app-video-viewer #viewVideoComponent (closeVideo)='closeView()'></app-video-viewer>
+
+<app-view-testcase-file-list #viewFileOfTestCase></app-view-testcase-file-list>
+
+
+<div id="kaushik" *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

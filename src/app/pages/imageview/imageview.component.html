@@ -1,0 +1,16 @@
+<app-modal-basic #modalImageViewer [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div style="max-height: 500px;" class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="closeView()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Screenshot Image</h5>
+    <br>
+    <hr>
+    <div slimScroll railVisible="true" railColor="#004a6d" width="100%" height="500px" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+      <div style="height: 400px;">
+        <img style="height:100%; width:100%" [src]="imageURL" />
+      </div>
+      
+    </div>
+  </div>
+</app-modal-basic>

@@ -1,0 +1,30 @@
+
+<button *ngIf="!isIcon" placement="top" container="body" triggers="mouseenter:mouseleave"
+            ngbPopover="action" (click)="openMyModal('effect-9')"  class="btn bg-c-green p-0 m-0 btn-comment ">workflow</button>
+<a role="button" *ngIf="isIcon"><img class="image-radius rounded-0 img-25 m-r-20 float-right"
+  src="assets/icon/png-icons/esign.png" alt="Forum" placement="bottom" ngbTooltip="Approve" (click)="openMyModal('effect-9')"></a>
+
+<app-modal-animation #indidualWorkflowmodal  [modalID]="'effect-9'" [modalClass]="'md-effect-9'" style="font-size: 13px;">
+  <h3>Workflow Action</h3>
+  <div class="container">
+    <div class="row justify-content-md-center">
+      <div >
+        <textarea id="approvalCommentId" placeholder="Please provide your comments to make the decision" [(ngModel)]="comments" rows="4" cols="50%" maxlength="480"></textarea>
+      </div>
+    </div>
+    <div class="row justify-content-md-center m-t-10">
+    
+      <div class="col-sm-2">
+        <div *ngIf="comments"><button style="font-size: 15px;" class="btn btn-primary"
+            (click)="approve($event);closeMyModal('effect-9')"><i class="icofont icofont-check-circled"></i>Approve</button>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div *ngIf="comments"><button style="font-size: 15px;" (click)="reject($event);closeMyModal('effect-9')"
+            class="btn btn-danger"><i class="icofont icofont-close-circled"></i>Reject</button></div>
+      </div>
+    </div>
+    </div>
+  <button (click)="closeMyModal('effect-9');" aria-label="Close" class="md-close-btn"><i class="icofont icofont-ui-close"></i></button>
+</app-modal-animation>
+<div *ngIf="indiSpinnerFlag" class="loading">Loading&#8230;</div>

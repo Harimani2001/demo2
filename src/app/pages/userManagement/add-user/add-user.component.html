@@ -1,0 +1,291 @@
+<div class="row">
+  <div class="col-sm-12">
+    <app-card [title]="employeeModel.id==0?'Add User':'Edit User'" [headerContent]="''">
+      <form #employeeform="ngForm" novalidate>
+        <div class="form-group row">
+          <label class="col-sm-2 col-form-label"> User Type : {{employeeModel.loginType}}</label>
+        </div>
+
+        <table id="add-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Email<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9" *ngIf="employeeModel.id !=0">
+                    <input type="text" class="form-control" id="email" placeholder="ex- abc@abc.com" name="email"
+                      [(ngModel)]="employeeModel.email" (ngModelChange)="checkEmail()" #emails="ngModel" required
+                      [pattern]="helper.email_pattern" readonly>
+                  </div>
+                  <div class="col-sm-9" *ngIf="employeeModel.id ==0">
+                    <input type="text" class="form-control" id="email" placeholder="ex- abc@abc.com" name="email"
+                      [(ngModel)]="employeeModel.email" (ngModelChange)="checkEmail()" #emails="ngModel" required
+                      [pattern]="helper.email_pattern">
+                    <div class="messages text-danger" *ngIf="emailValadationMessage != ''">{{emailValadationMessage}}
+                    </div>
+                    <div class="messages text-danger" *ngIf="(emails.touched || submitted) && emails.errors?.required">
+                      Email can't be blank</div>
+                    <div class="messages text-danger" *ngIf="emails.errors?.pattern">
+                      {{addUserErrorTypes.emailNumberPatternValidation}}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">User Name<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div *ngIf="this.isEmailExists" class="col-sm-9">
+                    <input type="text" class="form-control" id="empName" name="empName"
+                      [(ngModel)]="employeeModel.userName" #empUserName="ngModel" readonly>
+                  </div>
+                  <div *ngIf="!this.isEmailExists" class="col-sm-9">
+                    <input type="text" class="form-control" id="empName" name="empName" placeholder="ex- johnjoseph123"
+                      [(ngModel)]="employeeModel.userName" (ngModelChange)="checkUserNameIsExits()"
+                      #empUserName="ngModel" required>
+                    <div class="messages text-danger"
+                      *ngIf="(empUserName.touched || submitted) && empUserName.errors?.required">
+                      {{addUserErrorTypes.userNameValidation}}</div>
+                    <div class="messages text-danger" *ngIf="empUserName?.errors?.pattern">
+                      {{addUserErrorTypes.userNamePatternValidation}}</div>
+                    <div class="messages text-danger" *ngIf="this.valadationMessage!=''">{{this.valadationMessage}}
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">First Name<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="firstName" name="firstName"
+                      placeholder="ex- John Joseph" [(ngModel)]="employeeModel.firstName" #firstName="ngModel" required>
+                    <div class="messages text-danger"
+                      *ngIf="(firstName.touched || submitted) && firstName.errors?.required">
+                      {{addUserErrorTypes.firstNameValidation}}</div>
+                    <div class="messages text-danger" *ngIf="firstName?.errors?.pattern">
+                      {{addUserErrorTypes.firstNamePatternValidation}}</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Last Name<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="LastName" name="lastName" placeholder="ex- John Joseph"
+                      [(ngModel)]="employeeModel.lastName" #lastName="ngModel" required>
+                    <div class="messages text-danger"
+                      *ngIf="(lastName.touched || submitted) && lastName.errors?.required">
+                      {{addUserErrorTypes.lastNameValidation}}</div>
+                    <div class="messages text-danger" *ngIf="lastName?.errors?.pattern">
+                      {{addUserErrorTypes.lastNamePatternValidation}}</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Mobile Number :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="mobile" placeholder="xxx-xx-xxxx" name="mobile"
+                      [(ngModel)]="employeeModel.phoneNo" (keypress)="onlyNumber($event)">
+                    <!-- <input type="text" class="form-control" id="mobile" placeholder="xxx-xx-xxxx" name="mobile"
+                      [(ngModel)]="employeeModel.phoneNo" minlength="10" maxlength="10" #mobile="ngModel"
+                      pattern="^[6789]\d{9}$" (keypress)="onlyNumber($event)"> -->
+                    <!-- <div class="messages text-danger" *ngIf="(mobile.touched || submitted) && mobile.errors?.pattern">{{addUserErrorTypes.mobileNumberPatternValidation}}</div> -->
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Designation :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <input type="text" class="form-control" id="designation" name="designation" maxlength="100"
+                      placeholder="ex- System Admin" [(ngModel)]="employeeModel.designation" #designation="ngModel">
+                    <div class="messages text-danger" *ngIf="designation?.errors?.pattern">
+                      {{addUserErrorTypes.designationPatternValidation}}</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Location<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select [disabled]="isDisabled || employeeModel.userExistsInWorkflow" name="location" id="location"
+                      class="form-control" [(ngModel)]="employeeModel.locationId" required #locationName="ngModel"
+                      (ngModelChange)="loadDepartmentOnLocation($event); employeeModel.departmentId = 0;">
+                      <option value="">Select Location</option>
+                      <option *ngFor="let location of locationsList" [value]="location.id">{{location.name}}</option>
+                    </select>
+                    <div class="messages text-danger"
+                      *ngIf="(locationName.touched || submitted) && (locationName?.errors?.required || employeeModel.location==0)">
+                      Please select Location</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Department<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select name="select" class="form-control" id="department" required
+                      [(ngModel)]="employeeModel.departmentId" name="department" #department="ngModel"
+                      [disabled]="employeeModel.locationId=='' || isDisabled || employeeModel.userExistsInWorkflow">
+                      <option value="">Choose your Department</option>
+                      <option *ngFor="let department of departmentList" [value]="department.id">
+                        {{department.departmentName}}</option>
+                    </select>
+                    <div class="messages text-danger"
+                      *ngIf="(department.touched || submitted) && (department?.errors?.required || employeeModel.departmentId==0)">
+                      Department name is required </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Manager :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <angular2-multiselect class="form-control" name="managerName" [data]="this.managerList"
+                      id="managerId" [(ngModel)]="employeeModel.manager" [settings]="managerDropdownSettings">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">HOD :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <label class="switch">
+                      <input type="checkbox" name="hodFlag" [(ngModel)]="employeeModel.hodFlag" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Role<span class="asterisk required">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select [disabled]="isDisabled || employeeModel.userExistsInWorkflow" name="select"
+                      #userRole="ngModel" class="form-control" id="userRole" required [(ngModel)]="employeeModel.role"
+                      name="userRole">
+                      <option value="">Choose your Role</option>
+                      <option *ngFor="let role of roles" [value]="role.code">{{role.value}}</option>
+                    </select>
+                    <div class="messages text-danger"
+                      *ngIf="(userRole.touched || submitted)&& userRole?.errors?.required">Role is required</div>
+                    <div class="messages text-danger" *ngIf="isRoleMessage">Role is required</div>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Active Flag :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <label class="switch">
+                      <input type="checkbox" name="activeFlag" [(ngModel)]="employeeModel.activeFlag"
+                        (ngModelChange)="onDeActive(employeeModel.id)" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="col-sm-10">
+          <div class="alert alert-success" *ngIf="successMessage != ''">{{successMessage}}</div>
+          <div class="alert alert-success" *ngIf="errorMessage != ''">{{errorMessage}}</div>
+        </div>
+
+        <div class="form-group row">
+          <div style="text-align: center;" class="col-sm-12">
+            <button *ngIf="this.employeeModel.id!=0" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();onEditEmployeeSubmit(employeeform.form.valid)">Update</button>
+            <button *ngIf="this.employeeModel.id==0 && !isValidationMessage" type="button"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();saveAndGoto(employeeform.form.valid)">Save</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              [routerLink]="['/userManagement/view-user']" routerLinkActive="active">Cancel</button>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-sm-2"></div>
+          <div class="col-sm-10 messages text-danger" *ngIf="licenceMsg.length>0">{{licenceMsg}}</div>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #alertMessage>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Please check!</h4>
+  </div>
+  <div class="app-modal-body" style="max-height: 400px; overflow-y: scroll;">
+    <label>This User is mapped in the below Documents: </label>
+    <br>
+    <table class="table table-bordered w-100">
+      <thead>
+        <tr class="lightGary">
+          <th>Project Name</th>
+          <th>Document Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of this.moduleNames;let i = index">
+          <td>{{row.key}}</td>
+          <td>{{row.value}}</td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+    <label>Kindly release User from above mentioned Documents to proceed further.</label>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect " (click)="alertMessage.hide()">OK</button>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

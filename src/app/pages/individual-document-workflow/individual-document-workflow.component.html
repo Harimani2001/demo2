@@ -1,0 +1,480 @@
+<div *ngIf="showModal" [ngClass]="fullScreen?'basic modal fade in':''" tabindex="-1" style="display: block; opacity: 1;"
+  [style.display]="showModal ? 'block':'none' ">
+  <div [ngClass]="fullScreen?'m-0 modal-dialog modal-lg':''" [ngStyle]="{'max-width':fullScreen ? '100%':''}" >
+    <div class="modal-content container" style="margin-top:0px">
+      <div class="row" *ngIf="viewpdf && pdfSrc">
+         <div class="col-sm-12">
+          <div class="row well well-sm ">
+            <div class="col-sm-6">
+              <span *ngIf="this.workflowJobStatus" style="color: red;">
+                Workflow is in Progress
+              </span>
+            </div>
+            <div class="col-sm-6">
+           
+              <a role="button"  *ngIf="isShowClose"><img class="image-radius rounded-0 img-30 float-right"
+                src="assets/icon/png-icons/close.png" alt="Forum" placement="bottom" ngbTooltip="Close"
+                (click)="onCloseModal()"></a>
+
+              <a role="button"  *ngIf="!this.workflowJobStatus"><img class="image-radius rounded-0 img-30 float-right m-r-20"
+                src="assets/icon/png-icons/export.png" alt="Forum" placement="bottom" ngbTooltip="External Approval"
+                (click)="externalApprovalmodal.show();onClickExternalApproval(this.previewdoc)"></a>
+
+              <a role="button"><img class="image-radius rounded-0 img-30 float-right m-r-20"
+                src="assets/icon/png-icons/workflow-new.png" alt="Forum" placement="bottom" ngbTooltip="Work Flow"
+                (click)="loadStepperData(); modalLargeWorkFlowProjectSummary.show();"></a>
+               
+                <a role="button"><img class="image-radius rounded-0 img-30 float-right m-r-20"
+                  src="assets/icon/png-icons/menu-new.png" alt="Forum" placement="bottom" ngbTooltip="Outline"
+                  (click)="forumFlag=false; isOutlineShown=!isOutlineShown;"></a>
+                
+                  <a role="button"><img style="width: 22px;height: 26px; padding-top: 4px;" class="image-radius rounded-0 img-30 float-right  m-r-20"
+                  src="assets/icon/png-icons/full-screen.png" alt="Forum" placement="bottom" ngbTooltip="Full screen"
+                  (click)="onClickFullscreen();"></a>
+                
+                  <a role="button"><img *ngIf="!forumFlag"  class="image-radius rounded-0 img-30 float-right  m-r-20"
+                    src="assets/icon/png-icons/forum.png" alt="Forum" placement="bottom" ngbTooltip="Forum"
+                    (click)="forumFlag=true; isOutlineShown=false"></a>
+
+                    <a *ngIf="this.content.description" role="button"><img class="image-radius rounded-0 img-30 float-right m-r-20"
+                      src="assets/icon/png-icons/info.png" alt="Forum" placement="bottom" ngbTooltip="Instructions"
+                      (click)="levelDescription.show();"></a>
+
+                  <a role="button" *ngIf="!this.workflowJobStatus"><img class="image-radius rounded-0 img-30 float-right m-r-20"
+                  src="assets/icon/png-icons/esign.png" alt="Forum" placement="bottom" ngbTooltip="Approve"
+                  (click)="getdata(this.previewdoc);"></a>
+             
+            </div>
+          </div>
+          </div>
+        <div class="col-sm-12">
+          <div  class="row pl-5 pr-2">
+            <ng-template #infoForForum>
+            <div> Use the following symbol for document reference :<br>@ - User<br>* - Section<br># - Document</div>
+            </ng-template>
+            <div *ngIf="forumFlag" class="col-sm-12 text-right p-0">
+              <a (click)="forumFlag=!forumFlag;" [ngbPopover]="infoForForum" triggers="mouseenter:mouseleave" container="body">
+                <i class="icofont icofont-info-square info"></i>
+              </a>
+              <a role="button" (click)="changeGroupingFlag();" [ngbPopover]="groupingFlag ? 'Group View' : 'Normal View'"
+               triggers="mouseenter:mouseleave" container="body">
+                <i [ngClass]="groupingFlag ? 'fa fa-object-ungroup info' : 'fa fa-object-group info'"></i>
+              </a>
+              <a role="button" (click)="forumFlag=!forumFlag;" container="body" triggers="mouseenter:mouseleave"
+                [ngbPopover]="forumFlag?'Collapse':'Expand'"> <i
+                  [ngClass]="forumFlag?'fa fa-minus-circle':'fa fa-plus-circle'"
+                  aria-hidden="true"></i></a>
+            </div>
+            <div *ngIf="isOutlineShown" class="col-sm-3">
+              <strong>Outline</strong>
+              <ul *ngFor="let item of outline" class="list-group">
+                <li style="border:0" class="list-group-item"><a style="cursor: pointer;" 
+                        (click)="navigateTo(item.dest)">{{ item.title }}</a>
+                    <ul *ngFor="let child of item.items" class="list-group">
+                        <li style="border:0; cursor: pointer;" class="list-group-item"><a (click)="navigateTo(child.dest)">
+                                {{ child.title }}</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+          </div>
+            <div  [ngClass]="(forumFlag || isOutlineShown)?'col-sm-9':'col-sm-12'" [ngStyle]="{'overflow': 'auto','max-height':this.height}">
+              <pdf-viewer style="display: block;" #ApprovalPDFViewerComponent [src]="pdfSrc" [page]="pageVariable"
+                [show-all]="showAll" (after-load-complete)="afterLoadComplete($event)" [zoom]="zoom" [stick-to-page]="true"
+                (error)="onError($event)"></pdf-viewer>
+            </div>
+            <div *ngIf="forumFlag" class="col-sm-3" [ngStyle]="{'overflow': 'auto','max-height':this.height}">
+              <app-document-forum #forumView [constant]="this.permissionConstant" [isDocumentWorkFlow]="true"
+                [documentList]="this.commentsDocumentsList" [chapter]="this.outLineList"></app-document-forum>
+            </div>
+          </div>
+        </div>
+      
+      </div>
+     
+    </div>
+  </div>
+  <div class="row" *ngIf="this.currentLevelData && this.spinnerFlag">
+    <div class="col-sm-12" style="text-align: center;margin: 10px;">
+      <h5>PDF is loading, Please wait!</h5>
+  </div>
+  </div>
+</div>
+ <div class="row" *ngIf="!viewpdf && !this.spinnerFlag">
+        <div class="col-sm-12" style="text-align: center;margin: 10px;">
+          <h5 *ngIf="(this.currentLevelData && !this.currentLevelData.permission);else other_content">You don't have permission to do this action.</h5>
+          <ng-template #other_content> <h5>No pending items to view</h5></ng-template>
+  </div>
+</div>
+
+
+<div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic #modalLarge [dialogClass]="'modal-lg'" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="loading-spinner" *ngIf="spinnerFlag">
+    <span
+      class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing&#8230;</span>
+  </div>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Document Decision</h4>
+    <button type="button" class="close basic-close" (click)="modalLarge.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+
+    </div>
+    <div class="row">
+
+      <div class="col-sm-12">
+      </div>
+    </div>
+    <div class="col-sm-12">
+      <app-card [title]="''" [classHeader]="false" [blockClass]="'table-border-style'">
+        <div class="table-responsive" style="height: 200px; overflow-y: scroll;">
+          <table class="table table-framed">
+            <tr>
+              <th>Sl.No</th>
+              <th>Type </th>
+              <th>Id </th>
+              <th>Document Title </th>
+
+            </tr>
+            <tr *ngFor="let n of this.filteredData;let c=index">
+              <td>{{c+1}} </td>
+              <td>{{n.docName}} </td>
+              <td>{{n.documentCode}} {{n.revisionNumber}}</td>
+              <td>{{n.documentTitle}}</td>
+
+            </tr>
+          </table>
+        </div>
+      </app-card>
+      <div class="col-sm-12">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm">
+            </div>
+            <div class="container">
+              <div class="row justify-content-md-center">
+                <div class="col-md-auto">
+                  <textarea  id="documentApprovalComment" placeholder="Please provide your comments to make the decision" [(ngModel)]="comments"
+                    rows="4" cols="50%" maxlength="480"></textarea>
+                </div>
+              </div>
+              <div class="row justify-content-md-center m-t-10" *ngIf="filteredData.length >0">
+                <div class="col-sm col-lg-2">
+                  <div *ngIf="comments!=null && comments!=''"><button class="btn btn-primary"
+                      (click)="modalLarge.hide();approve()"><i
+                        class="icofont icofont-check-circled"></i>Approve</button></div>
+                </div>
+                <div class="col-sm col-lg-2 ">
+                  <div *ngIf="comments!=null && comments!=''"><button (click)="modalLarge.hide();reject()"
+                      class="btn btn-danger"><i class="icofont icofont-close-circled"></i>Reject</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      
+    </div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #esignmodal [dialogClass]="'modal-lg'" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="loading-spinner" *ngIf="spinnerFlag">
+    <span
+      class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing&#8230;</span>
+  </div>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Document Decision</h4>
+    <button type="button" class="close basic-close" (click)="esignmodal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+
+    </div>
+    <div class="row">
+
+      <div class="col-sm-12">
+      </div>
+    </div>
+    <div class="col-sm-12">
+      <app-card [title]="''" [classHeader]="false" [blockClass]="'table-border-style'">
+        <div class="table-responsive" style="height: 200px; overflow-y: scroll;">
+          <table class="table table-framed">
+            <tr>
+              <th>id </th>
+              <th>Type </th>
+              <th>Id </th>
+              <th>Document Title </th>
+            </tr>
+            <tr *ngFor="let n of filteredApprovalData;let c=index">
+              <td>{{c+1}} </td>
+              <td>{{n.docName}} </td>
+              <td>{{n.documentCode}} {{n.revisionNumber}}</td>
+              <td>{{n.documentTitle}}</td>
+            </tr>
+          </table>
+        </div>
+      </app-card>
+      <div class="col-sm-12" *ngIf="filteredApprovalData.length>0">
+        <div class="container">
+          <div class="row">
+            <div class="col-sm">
+            </div>
+            <div class="container">
+              <app-documentsign #documentSign *ngIf="this.esignActionData.length>0" [data]="this.esignActionData" (onClose)="esignFinished()">
+              </app-documentsign>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>
+
+
+<app-modal-basic #externalApprovalmodal [dialogClass]="'modal-md'" [hideHeader]="false" [hideFooter]="false">
+  <div class="app-modal-header">
+    <h4 class="modal-title">External Approval</h4>
+    <button type="button" class="close basic-close" (click)="externalApprovalmodal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <form [formGroup]="onExternalApprovalForm">
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Name
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="name" id="nameId" class="form-control" placeholder="name" formControlName="name" maxlength="50"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('name').touched && onExternalApprovalForm.get('name').hasError('required')">{{externalApprovalErrorTypes.nameValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Email
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" name="code" id="emailId" class="form-control" placeholder="email" formControlName="email" maxlength="50"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('email').touched && onExternalApprovalForm.get('email').hasError('required')">{{externalApprovalErrorTypes.emailValidation}}</div>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('email').hasError('pattern')">{{externalApprovalErrorTypes.emailPatternValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Validity (Days)
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" formControlName="validity"/>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('validity').touched && onExternalApprovalForm.get('validity').hasError('required')">{{externalApprovalErrorTypes.validityValidation}}</div>
+            </div>
+          </div>
+          <div class="form-group row">
+            <label class="col-sm-10 col-form-label">Remarks
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+            <textarea rows="3" class="form-control" formControlName="remarks"></textarea>
+              <div class="messages text-danger" *ngIf="onExternalApprovalForm.get('remarks').touched && onExternalApprovalForm.get('remarks').hasError('required')">{{externalApprovalErrorTypes.remarksValidation}}</div>
+            </div>
+          </div>
+          <br>
+          <div class="form-group row">
+            <div class="col-sm-12 text-center">
+              <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="onClickSave();">Submit for Approval</button>
+              <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="externalApprovalmodal.hide();">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+</app-modal-basic>
+
+
+  <app-modal-basic #allUserApprovalModal [dialogClass]="'modal-lg all-user-approval-comment'" [hideHeader]="false" [hideFooter]="false">
+    <div class="app-modal-header">
+      <h4 class="modal-title">All User Approval</h4>
+      <button type="button" class="close basic-close" (click)="allUserApprovalModal.hide();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body">
+      <div class="row">
+        <div class="col-sm-12" *ngIf="userApprovalList.length!=0">
+          <table  id="all-user-approval-table" class="table table-striped table-bordered w-100">
+            <thead>
+              <tr>
+                <th class="w-10">Sr. No</th>
+                <th class="w-20">Action By</th>
+                <th class="w-20">Created Time</th>
+                <th class="w-50">Comments</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of userApprovalList;let i=index">
+                <td>{{i+1}}</td>
+                <td>{{u.user}}</td>
+                <td>{{u.dateTime}}</td>
+                <td><p class="fs-15 text-justify text-break">{{u.comments}}</p></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-sm-12" *ngIf="userApprovalList.length==0">
+          <label class="form-control-label">No comments</label>
+        </div>
+      </div>
+    </div>
+  </app-modal-basic>
+
+  <app-modal-basic #modalLargeWorkFlowProjectSummary [dialogClass]="'modal-lg'" [hideClickOutSide]="true"
+  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow Configuration</h4>
+    <button type="button" class="close basic-close" (click)="modalLargeWorkFlowProjectSummary.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;" class="app-modal-body">
+    <div style="max-height: 300px !important;" class="col-sm slimScrollDiv">
+      <div class="dt-desc dy-width-300">
+        <ng-container>
+          <ul class="progress-indicator">
+            <li *ngFor="let data of this.stepperData;"  class=" {{ data.currentLevel?' current  ':(data.workFlowCompleted)?'completed':'pending' }}">
+              <label>
+                <span style="white-space: pre-line;" class="bubble"></span>
+                <div  style="text-align: left;" class="strong"><a role="button" *ngIf="data.workFlowCompleted"><img style="width: 25px; height: 25px;" class="image-radius rounded-0 img-30 m-r-10"
+                  src="assets/icon/png-icons/checked.png" alt="Forum" placement="bottom" ngbTooltip="External Approval"></a> {{data.levelName}} : {{data.type}}<br>
+                  <span *ngIf="data.allUserApproval">(All User Approval)</span><br>
+                  <div><b class="black"><u>Users</u></b>
+                    <div *ngIf="data.allUserApproval && data.userApprovalList.length > 0">
+                      <li *ngFor="let user of data.userApprovalList;let i = index ">
+                        {{i+1}}.{{user.user}}&nbsp;
+                        <div *ngIf="!data.pendingDocumentsFlag && user.comments" class="black"><b>Comments : </b> {{user.comments}}</div>
+                        <div *ngIf="!data.pendingDocumentsFlag && user.dateTime" class="black"><b>Date : </b> {{user.dateTime}}</div>
+                      </li>
+                    </div>
+                    <div *ngIf="data.allUserApproval && data.userApprovalList.length == 0">
+                      <li *ngFor="let user of data.userArray;let i = index ">{{i+1}}.{{user}}</li>
+                    </div>
+                    <div *ngIf="!data.allUserApproval">
+                      <li *ngFor="let user of data.userArray;let i = index ">{{i+1}}.{{user}}
+                        <div *ngIf="!data.pendingDocumentsFlag && data.comments!=null && data.comments !='not applicable' && data.createdUserName === user" class="black"><b>Comments :</b> {{data.comments}}</div>
+                        <div *ngIf="!data.pendingDocumentsFlag && data.createdTime!=null && data.createdTime !='not applicable' && data.createdUserName === user" class="black"><b>Created Time :</b>&nbsp;{{data.createdTime}}</div>
+                      </li>
+                    </div>
+                  </div>
+                  <div *ngIf="data.externalApprovalList.length >0">
+                    <b class="black"><u>External Approval</u></b>
+                    <li *ngFor="let user of data.externalApprovalList;let i = index ">
+                      {{i+1}}.{{user.user}}
+                      <div *ngIf="!data.pendingDocumentsFlag && user.comments" class="black"><b>Comments : </b> {{user.comments}}</div>
+                      <div *ngIf="!data.pendingDocumentsFlag && user.dateTime" class="black"><b>Date : </b> {{user.dateTime}}</div>
+                    </li>
+                    <br>
+                  </div>
+                <div *ngIf="data.currentLevel" class="text-danger">
+                  Pending for Approval
+                  <br>
+                </div>
+                <div>
+                 <a href="javascript:;" style="text-decoration: underline;" (click)="loadLevelHistory(data)">View History</a>
+                </div>
+    </div>
+    </label>
+    </li>
+    </ul><br><br>
+    </ng-container>
+  </div>
+  </div>
+  <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div class="app-modal-footer">
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #levelDescription [hideFooter]="true" [dialogClass]="'modal-lg padding'" [headerStyle]="true">
+  <div class="app-modal-header">
+    <h5 class="font-header" *ngIf="content"><strong>Instruction {{content.levelName}}</strong></h5>
+    <button type="button" class="close basic-close" (click)="levelDescription.hide();flag=true">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" style="max-height: 140px !important;overflow: auto;">
+    <div class="col-sm-12">
+      <p class="text-muted" *ngIf="content" style="width:-webkit-fill-available" [innerHtml]="content.description">
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #levelHistroyModal [dialogClass]="'modal-lg'" [hideClickOutSide]="true" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title strong">Workflow History</h4>
+    <button type="button" class="close basic-close" (click)="levelHistroyModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+   <div *ngIf="this.levelApprovalHistory.length == 0">No History found</div>
+   <div *ngIf="this.levelApprovalHistory.length > 0">
+    <ngx-datatable [scrollbarH]="true" #myTable id="childCustomTable"
+    class="data-table dt-chk" style="overflow: unset!important;"
+    [rows]='levelApprovalHistory' [limit]="5" [columnMode]="'force'" [headerHeight]="50"
+    [footerHeight]="50" [rowHeight]="'auto'">
+
+    <ngx-datatable-column name="Name">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['userName']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+
+    <ngx-datatable-column name="Department">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['department']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Date">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['date']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Comments">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['comments']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+    <ngx-datatable-column name="Status">
+      <ng-template let-row="row" ngx-datatable-cell-template>
+        <strong
+          style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+      </ng-template>
+    </ngx-datatable-column>
+
+  </ngx-datatable>
+   </div>
+                    
+  </div>
+</app-modal-basic>

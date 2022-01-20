@@ -1,0 +1,432 @@
+  <ngb-tabset #tabRef="ngbTabset" (tabChange)="resetFilter()" >
+    <ngb-tab (click)="changetab=false" title="Workflow Setup" id="tab1">
+       <ng-template ngbTabContent>
+        <div class="container">
+        <div class="col-sm-12">
+          <label style="float: right;"> Search :
+            <input type="search" (input)="filtermodule()"  [(ngModel)]="filterQuery" class="form-control input-sm full-data-search" placeholder="search">
+          </label><br>
+<br>
+<br>
+        <div *ngFor="let item of data;let i = index" class=" commonworkflow-card hover-border-8 card text-center ">
+          <div class="card-header">
+            {{item.documentName}}
+          </div>
+
+          <div class="card-body">
+            <ul   class=" progress-indicator " >
+              <i placement="top" *ngIf="!item.exists && modal.createButtonFlag"  (click)="addNewWorkflow(item.documentFlows, item)"  ngbPopover="Add Level" triggers="mouseenter:mouseleave"  class="  icofont icofont-plus-circle icofont-2x completed icononhovereffect" style=" line-height:0;padding-top: 10px;"></i>
+
+              <ng-container>
+
+               <li  *ngFor="let d of item.documentFlows; let i = index"  (mouseleave)="p1.close()" class="completed"  >
+                 <ng-template #popoverStepper>
+                   <div class="container ">
+                     <div class="row">
+
+                       <div class="col-sm-12">
+                         <a *ngIf="i!=0 && !item.exists && modal.updateButtonFlag"  (click)="moveUpOrDown(item.documentFlows,i,true)"  container="body" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="swap left">
+                           <i class=" text-warning icofont icofont-arrow-left  size"></i>
+                         </a>
+
+                         <a  *ngIf="modal.updateButtonFlag" container="body" (click)="editLevelOfDocument(d, item)"  placement="top" triggers="mouseenter:mouseleave" ngbTooltip="edit">
+                           <i  class=" text-primary  icofont icofont-edit size"></i>
+                         </a>
+
+                         <a *ngIf="!item.exists && modal.deleteButtonFlag"   container="body" (click)="deleteLevelOfDocumentSwal(d.id,true,false)" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="delete">
+                           <i class=" text-danger icofont icofont-ui-delete size"></i>
+                         </a>
+                         <a *ngIf="item.exists" container="body">Workflow Exists</a>
+
+                         <a  *ngIf="!item.exists && i!=(item.documentFlows.length-1) && modal.updateButtonFlag" (click)="moveUpOrDown(item.documentFlows,i,false)"  container="body" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="swap right">
+                           <i class=" text-warning icofont icofont-arrow-right size"></i>
+                         </a>
+                       </div>
+
+                     </div>
+                   </div>
+                   </ng-template>
+
+                 <span placement="top" #p1="ngbPopover" (mouseenter)="p1.open()"  [ngbPopover]="popoverStepper"class="bubble" ></span>
+
+                 <ng-template #showmoreusers>
+                  <ul class="list-group"  *ngFor="let usr of d.userArray">
+                    <li class="list-group-item">{{usr}}</li>
+                  </ul>
+                  </ng-template>
+                 <i class="icofont icofont-ui-user-group" placement="left"
+                 triggers="mouseenter:mouseleave" [ngbPopover]="showmoreusers" >  </i>{{d.levelName}}<br>
+                </li>
+
+            </ng-container>
+
+      </ul>
+          </div>
+          <!-- <div >
+            2 days ago
+          </div> -->
+          <div class="card-footer text-muted" *ngIf="item.requireProjectSetup">Project Related</div>
+        </div>
+
+</div>
+  </div>
+
+  <app-modal-basic #modalWorkFlowSetting id="modal-lg-60" [dialogClass]="'modal-lg'" [hideHeader]="false" [hideFooter]="false" class="modal-dialog modal-dialog-scrollable">
+
+    <div class="app-modal-header">
+      <h5 class="font-header"><strong>Document Name : </strong>{{documentName}}</h5>
+      <button type="button" id="close" name="close" class="close basic-close"
+        (click)="modalWorkFlowSetting.hide();this.loaddata();createLevel=false">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body" style="height: 430px; overflow-y: scroll;" >
+      <div  class="container" [ngClass]="add?'':'dy-width-400 x-scroll-hide'" >
+      <div *ngIf="add " class="form-group row"></div>
+      <div class="form-group row">
+        <div   class="row">
+          <div *ngIf="add " class="col-sm-12">
+            <div class="container m-0">
+              <div class="form-group row">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-sm-12">
+
+                      <div *ngIf="createLevel">
+                        <div class="row">
+                          <div class="col-sm-9">
+                            Level Name<span class="asterisk">*</span>  
+                              <input class="form-control" [(ngModel)]="levelName" placeholder="Level name" style="padding-top: 0px; height: 37px;" maxlength="15" type="text">
+                          </div>
+                        </div>
+                      </div>
+                      <div *ngIf="!createLevel" class="row">
+                      <div class="col-sm-5">
+                        <label class="col-sm-8 p-l-0" for="level">Select Levels<span class="asterisk">*</span> </label>
+                        <ng-select [ngClass]="'ng-select'" [options]="this.workflowLevelList" aria-placeholder="Select Level" id="level" (ngModelChange)="validateSave()" [disabled]="this.freezeFlagForLevel"
+                          [multiple]="false" [(ngModel)]="levelId" name="level" rounds="ngModel" required>
+                        </ng-select>
+                        <p *ngIf="!this.freezeFlagForLevel && levelId == '' && this.createLevelPermission" style="cursor: pointer !important ;float:right;text-decoration: underline;" (click)="createLevel=true;this.levelName=null;this.validateSave();"
+                        class="p-l-20 p-t-10 m-b-0 text-c-blue">Create Level</p>
+                      </div>
+
+                      <ng-container *ngFor="let item of workflowSettingsList">
+                        <div *ngIf="item.mainPageCheck && this.levelId.length!=0" class="col-sm-2.5" style="padding-top:44px">{{item.settingsName}}
+                          <ui-switch class="js-small" [disabled]="this.freezeFlagForLevel" (change)="diableOtherSetting(item,workflowSettingsList)" color="#93BE52" switchColor="#fff"
+                            defaultBgColor="#F56482" size="small" [checked]="item.check"></ui-switch>
+                        </div>&nbsp;&nbsp;&nbsp;
+                      </ng-container>
+
+                      <div *ngFor="let item of workflowSettingsList">
+                        <ng-container *ngFor="let s of item.flowSubSettings">
+
+                          <div class="col-sm-12" *ngIf="item.check && this.levelId.length!=0" style="padding-top:44px">
+                            <label>&nbsp;&nbsp;&nbsp;{{s.subSettingsName}}</label>
+                              <ui-switch class="js-small"
+                                (click)="disableOtherSubSetting(s,item.flowSubSettings);" color="#93BE52"
+                                switchColor="#fff" defaultBgColor="#F56482" size="small" [checked]="s.check"></ui-switch>
+                      &nbsp;<span *ngIf="s.check">
+                              <select [(ngModel)]="s.subSettingsvalue" (change)="setSLAToAll(s.subSettingsvalue,workflowSettingsList)" name="days" class="List of days">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                                <option value="24">24</option>
+                                <option value="25">25</option>
+                                <option value="26">26</option>
+                                <option value="27">27</option>
+                                <option value="28">28</option>
+                                <option value="29">29</option>
+                                <option value="30">30</option>
+                                <option value="31">31</option>
+                              </select>Day<ng-container *ngIf="s.subSettingsvalue!='1'">s</ng-container>
+                            </span>
+                          </div>
+                        </ng-container>
+                      </div>
+                      
+                    </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+               <div *ngIf="this.levelId.length!=0">
+                <div class="form-group row">
+                  <div class="col-sm-12">
+                    Do you require all user approval?
+                    <ui-switch name="all_user_workflow" id="all_user_workflow_id" class="js-small" [disabled]="this.freezeFlagForLevel"
+                      (change)="this.saveModal.allUserApproval=!this.saveModal.allUserApproval" color="#93BE52" switchColor="#fff"
+                      defaultBgColor="#F56482" size="small" [checked]="this.saveModal.allUserApproval"></ui-switch>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Departments<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="department" [data]="this.departments" id="departmentId" (ngModelChange)="this.loadUser($event); validateSave()"
+                        [(ngModel)]="departmentId" rounds="ngModel" required [settings]="dropdownSettingsDept"> </angular2-multiselect>
+                  </div>
+                </div>
+
+              <div class="form-group row">
+                <label class="col-sm-4 col-form-label">Roles<span class="asterisk">*</span></label>
+                <div class="col-sm-11">
+                  <angular2-multiselect name="roles" [data]="this.roles" id="rolesId" (ngModelChange)="onChangeRoles($event); validateSave()"
+                    [(ngModel)]="rolesId" rounds="ngModel" required [settings]="dropdownSettingsRole"> </angular2-multiselect>
+                </div>
+              </div>
+              
+              <div class="form-group row ">
+                <label class="col-sm-8 col-form-label">Users<span class="asterisk">*</span> 
+                  &nbsp; &nbsp; &nbsp; &nbsp;<i href="javascript:;"> <img class="img-20" placement="top" triggers="mouseenter:mouseleave" (click)="loadNotification(this.usersId, true);"
+                         ngbTooltip="Email/Notification Settings" src="assets/icon/png-icons/notification-settings-icon.png"  alt="">
+                  </i>
+                </label>
+                <div class="col-sm-11">
+              <angular2-multiselect name="users" [data]="this.users" id="usersId" (ngModelChange)="onChangeusers($event); loadNotification($event,false)"
+                    [(ngModel)]="usersId" rounds="ngModel" required [settings]="dropdownSettings"> </angular2-multiselect>
+              </div>
+              </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div style="width: 100%;" class="app-modal-footer">
+      <div class="row">
+      <div style="text-align: right;" class="col-sm-12">
+        <button [disabled]="this.modalWorkFlowSetting.govalMainSpinnerFlag" *ngIf="this.validSave && add && !createLevel" (click)="saveLevelData()" type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+        <button *ngIf="!createLevel" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"  (click)="modalWorkFlowSetting.hide();this.loaddata();">Cancel</button>
+      
+        <button *ngIf="createLevel" type="button" [disabled]="this.levelName==null || this.levelName==''" (click)="createWorkflowLevel()" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+        <button *ngIf="createLevel" (click)="createLevel=false" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+      </div>
+    </div>
+  </div>
+  </app-modal-basic>
+
+<app-modal-basic #emailNotificationSettings
+                 [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Email Notification Settings</h4>
+    <button type="button"
+            class="close basic-close"
+            (click)="emailNotificationSettings.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px !important;"  class="app-modal-body ">
+    <div style=" overflow-x: hidden !important;" class="container dy-width-400" >
+      <div class="table-responsive">
+        <table class="table table-framed">
+          <thead>
+            <tr><th>#</th><th>User Name</th> <th style="text-align: center;">Action</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of notificationModalList;let i = index" >
+              <th scope="row">{{i+1}}</th>
+              <td>{{item.userName}}</td>
+              <td style="text-align: center;">
+                <div class="border-checkbox-section">
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox"
+                           type="checkbox"
+                           (change)="item.notification=!item.notification"
+                          [checked]="item.notification"
+                           id="checkbox0{{i}}">
+                    <label class="border-checkbox-label"
+                           for="checkbox0{{i}}">Notification</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox"
+                           type="checkbox"
+                           (change)="item.email=!item.email"
+                           [checked]="item.email"
+                           id="checkbox1{{i}}">
+                    <label class="border-checkbox-label"
+                           for="checkbox1{{i}}">Email</label>
+                  </div>
+                  <div class="border-checkbox-group border-checkbox-group-success">
+                    <input class="border-checkbox"
+                           type="checkbox"
+                           (change)="item.followUp=!item.followUp"
+                           [checked]="item.followUp"
+                           id="checkbox2{{i}}">
+                    <label class="border-checkbox-label"
+                           for="checkbox2{{i}}">Email follow-up</label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button"
+            class="btn btn-default waves-effect "
+            (click)="emailNotificationSettings.hide()">Submit</button>
+  </div>
+</app-modal-basic>
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<app-modal-basic #copyConfigurationModal [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Copy Configuration</h4>
+    <button type="button"
+            class="close basic-close"
+            (click)="copyConfigurationModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 350px;overflow: scroll;" class="app-modal-body">
+      <div>
+          <ng-container *ngFor="let copy of this.copyConfigurationList; let i=index">
+            <div class="row">
+              <label class="col-sm-2"> {{i+1}}</label>&nbsp;
+              <div class="col-sm-8">
+                <div class="border-checkbox-section">
+                  <div class="border-checkbox-group border-checkbox-group-primary">
+                    <input class="border-checkbox" type="checkbox" (change)="copy.configuration=!copy.configuration"
+                      [checked]="copy.configuration" id="checkbox{{i}}">
+                    <label class="border-checkbox-label" for="checkbox{{i}}">{{copy.value}}</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+      </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect " (click)="copyConfigurationModal.hide()">Close</button>
+    <button *ngIf="this.copyConfigurationList.length!=0" type="button" class="btn btn-success waves-effect " (click)="applyConfigurationSwal(this.copyConfigurationList,true)">Apply</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #copyLevelConfigurationModal [dialogClass]="'modal-md'">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Copy Level Configuration</h4>
+    <button type="button" class="close basic-close" (click)="copyLevelConfigurationModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+        <div class="row">
+          <div *ngIf="levelConfigurationToBeApplied!=null" class="col-sm-12">
+          <label> <span class="strong" ><b>{{levelConfigurationToBeApplied.levelName}}</b> configuration will be copied for below selected levels</span>
+          </label>
+          </div>
+        </div>
+        <div class="row">
+        <div class="col-sm-12">
+          <div *ngIf="createLevel">
+            <div  class="row col-sm-12">
+              <input class="form-control" [(ngModel)]="levelName" placeholder="Level name" style="padding-top: 0px; height: 37px;" maxlength="15" type="text">
+            </div>
+          </div>
+
+          <div *ngIf="!createLevel" class="row">
+          <label style="padding: 2%;" class="col-sm-4" for="level">Select Levels<span class="asterisk">*</span> </label>
+          <div class="col-sm-8">
+            <ng-select [ngClass]="'ng-select'" [options]="this.workflowLevelList" aria-placeholder="Select Level" id="level"
+              [multiple]="true" [(ngModel)]="levelId" name="roles" rounds="ngModel" required>
+            </ng-select>
+            <p  *ngIf="this.createLevelPermission" style="cursor: pointer !important ;float:right;text-decoration: underline;" (click)="createLevel=true;this.levelName=null"
+            class="p-l-20 p-t-10 m-b-0 text-c-blue">Create Level</p>
+          </div>
+          <div  style="border: 0 !important;" class="form-control col-sm-3"></div>
+        </div>
+        </div>
+      </div>
+        </div>
+  <div class="app-modal-footer">
+    <button *ngIf="this.levelId.length!=0 && !createLevel" type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="applyConfigurationSwal(this.levelId,false)">Apply</button>
+    <button *ngIf="!createLevel" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="copyLevelConfigurationModal.hide()">Close</button>
+  
+    <button *ngIf="createLevel" type="button" [disabled]="this.levelName==null || this.levelName==''" (click)="createWorkflowLevel()" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+    <button *ngIf="createLevel" (click)="createLevel=false" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic id="modal-lg-60" #newModalWorkFlowSetting [dialogClass]="'modal-lg'" [hideHeader]="false"
+  [hideFooter]="false" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header" style="display: inline-flex;">
+        <h5 class="font-header"><strong>Document Name : </strong>{{documentName}}</h5>
+        <button type="button" id="close" name="close" class="close basic-close"
+        (click)="newModalWorkFlowSetting.hide();this.loaddata();clearSection();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+  </div>
+  <div class="app-modal-body" style="height: 300px;">
+    <div>
+        <div class="row">
+          <div class="col-sm-5">
+            Level Name
+            <select name="newLevel" class="form-control" [(ngModel)]="newLevel">
+            <option value="0">Select Level</option>
+            <option *ngFor="let level of this.workflowLevelList" [value]="level.value">{{level.label}}</option>
+          </select>
+          </div>
+          <div class="col-sm-5">
+            Users
+            <angular2-multiselect [data]="this.addNewUsers" [(ngModel)]="selectedNewUsers" [settings]="newUserDropdownSettings">
+                <c-search>
+                    <ng-template>
+                        <input type="text" [(ngModel)]="newUserInput" (keyup)="onNewUsersSearch($event)" placeholder="Search Users"/>
+                    </ng-template>
+                </c-search>
+                <c-item>
+                    <ng-template let-item="item">
+                        <label>{{item.itemName}}</label>
+                    </ng-template>
+                </c-item>
+            </angular2-multiselect>
+          </div>
+          <div class="col-sm-2 m-t-30">
+            <a  *ngIf="newLevel !=0 && selectedNewUsers.length > 0" href="javascript:"><img class="image-radius rounded-0 img-27 img-height m-r-10"
+            src="assets/icon/png-icons/save.svg" alt="Save Users" placement="bottom" ngbTooltip="Save"
+            (click)="saveNewLevelUsers()"></a>
+           
+          </div>
+        </div>
+    </div>
+    
+  </div>
+</app-modal-basic>
+
+
+       </ng-template>
+    </ngb-tab>
+
+    <ngb-tab title="Level Configuration" id="tab2">
+      <ng-template ngbTabContent>
+        <app-workflow-levels></app-workflow-levels>
+      </ng-template>
+    </ngb-tab>
+
+  </ngb-tabset>
+
+
+

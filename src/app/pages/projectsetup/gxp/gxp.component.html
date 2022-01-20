@@ -1,0 +1,884 @@
+<div class="row">
+  <div class="col-sm-12" [ngStyle]="{'pointer-events': !freezeFlag ? 'all':'none'}">
+    <table class="table w-100 gxp-table" id="GxP_Impact_Assessment">
+      <tbody>
+        <tr class="bg-grey">
+          <td colspan="4">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Section:- 1 GxP Applicability Assessment</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-grey">
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Sr. No.</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-70">
+            <div class="row">
+              <div class="col-sm-12 text-center">
+                <strong>GxP Applicability Checklist</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Yes</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>No</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <ng-container *ngFor="let q of this.sectionOne; let in=index">
+          <tr>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <strong>{{q.srNumber}}</strong>
+                </div>
+              </div>
+            </td>
+            <td class="w-70">
+              <div class="row">
+                <div class="col-sm-12">
+                  <label class="form-label">{{q.question}}</label>
+                </div>
+              </div>
+            </td>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="GxP_Impact_Assessment_Yes_{{in}}" [checked]="q.answer=='Y'"
+                    (change)="q.answer=(q.answer=='Y')?'N':'Y';setGXPOrNot()">
+                </div>
+              </div>
+            </td>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="GxP_Impact_Assessment_No_{{in}}" [checked]="q.answer=='N'"
+                    (change)="q.answer=(q.answer=='Y')?'N':'Y';setGXPOrNot()">
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+        <tr class="bg-grey">
+          <td colspan="4">
+            <div class="row" style="pointer-events: none;">
+              <div class="col-sm-12">
+                <strong  class="form-label">Applicability Criteria and Results : </strong>If answer to any of the questions in above section is
+              </div>
+              <div class="col-sm-1">
+                  Yes
+              </div>
+              <div class="col-sm-11">
+                <input readonly type="checkbox" name="gxp" id="GxP" [checked]="this.model.sectionFirst=='GxP'"/> <strong class="form-label">GxP</strong>
+            </div>
+              <div class="col-sm-1">
+                  Otherwise
+              </div>
+              <div class="col-sm-11">
+                <input readonly type="checkbox" name="nongxp" id="Non_GxP" [checked]="this.model.sectionFirst=='Non-GxP'"/> <strong class="form-label">Non-GxP</strong>
+            </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div class="row">
+              <div class="col-sm-1">
+                <strong class="form-label">Remarks<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-11">
+                <textarea class="w-100" [(ngModel)]="this.model.section1Remarks"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div [ngStyle]="{'pointer-events': !freezeFlag ? 'all':'none'}"  class="col-sm-12"><br>
+    <table class="table w-100 gxp-table">
+        <tbody>
+            <tr class="bg-grey">
+                <td colspan="4">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <strong>Section:- 2 System Classification</strong>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="bg-grey">
+              <td class="w-10">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <strong>Sr. No.</strong>
+                  </div>
+                </div>
+              </td>
+                <td class="w-70">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <strong >Classification Checklist</strong>
+                        </div>
+                    </div>
+                </td>
+               
+                <td class="w-10">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <strong >Yes</strong>
+                        </div>
+                    </div>
+                </td>
+                <td class="w-10">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <strong >No</strong>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <ng-container *ngFor="let q of this.sectionFive; let in=index">
+                <tr>
+                  <td class="w-10">
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <strong>{{q.srNumber}}</strong>
+                      </div>
+                    </div>
+                  </td>
+                    <td class="w-70">
+                        <div class="row">
+                            <div class="col-sm-12">
+                              <label class="form-label">{{q.question}}</label>  
+                            </div>
+                        </div>
+                    </td>
+                    <td class="w-10">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input type="checkbox" name="answer-{{in}}" id="answerId-{{in}}" [checked]="q.answer=='Y'" (change)="q.answer=(q.answer=='Y')?'N':'Y';setSectionFive(q,$event,true)">
+                            </div>
+                        </div>
+                    </td>
+                    <td class="w-10">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input type="checkbox" name="answer-{{in}}" id="answerId-{{in}}"  [checked]="q.answer=='N'" (change)="q.answer=(q.answer=='N')?'Y':'N';setSectionFive(q,$event,false)">
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </ng-container>
+            <tr class="bg-grey">
+              <td colspan="4">
+                <div class="row" style="pointer-events: none;">
+                  <div class="col-sm-12">
+                    <strong  class="form-label">Applicability Criteria and Results : </strong>If answer to any of the questions in above section is
+                  </div>
+                  <div class="col-sm-4">
+                    Yes for Question No. 1 and No for Question No.2
+                  </div>
+                  <div class="col-sm-8">
+                    <input readonly type="checkbox" name="pdName" id="pdNameId" [checked]="this.model.gdprConclusion=='OPEN System'"/> <strong class="form-label">OPEN System</strong>
+                </div>
+                  <div class="col-sm-4">
+                    Yes for Question No. 2 and No for Question No.1
+                  </div>
+                  <div class="col-sm-8">
+                    <input readonly type="checkbox" name="sdName" id="sdNameId"  [checked]="this.model.gdprConclusion=='CLOSED System'"/> <strong class="form-label"> CLOSED System</strong>
+                </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="4">
+                <div class="row">
+                  <div class="col-sm-1">
+                    <strong class="form-label">Remarks<span class="asterisk required">*</span>:</strong>
+                  </div>
+                  <div class="col-sm-11">
+                    <textarea class="w-100" [(ngModel)]="this.model.section5Remarks"></textarea>
+                  </div>
+                </div>
+              </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+  <div *ngIf="this.model.sectionFirst"
+    [ngStyle]="{'pointer-events': this.model.sectionFirst == 'GxP' && !freezeFlag ? 'all':'none'}" class="col-sm-12">
+    <br>
+    <table class="table w-100 gxp-table" id="ERES_Assessment">
+      <tbody>
+        <tr class="bg-grey">
+          <td colspan="4">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Section:- 3 ERES Assessment</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-grey">
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Sr. No.</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-70">
+            <div class="row">
+              <div class="col-sm-12 text-center">
+                <strong>ERES Assessment Checklist</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Yes</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>No</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <ng-container *ngFor="let q of this.sectionTwo; let in=index">
+          <tr>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <strong>{{q.srNumber}}</strong>
+                </div>
+              </div>
+            </td>
+            <td class="w-70">
+              <div class="row">
+                <div class="col-sm-12">
+                  <label class="form-label">{{q.question}}</label>
+                </div>
+              </div>
+            </td>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="ERES_Assessment_Yes_{{in}}" [checked]="q.answer=='Y'"
+                    (change)="q.answer=(q.answer=='Y' && q.answer!='')?'N':'Y';onChangeERESOrNot($event,q)">
+                </div>
+              </div>
+            </td>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="ERES_Assessment_No_{{in}}" [checked]="q.answer=='N'"
+                    (change)="q.answer=(q.answer=='N' && q.answer!='')?'Y':'N';onChangeERESOrNot($event,q)">
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+        <tr class="bg-grey">
+          <td colspan="4">
+            <div class="row" style="pointer-events: none;">
+              <div class="col-sm-12">
+                <strong  class="form-label">Applicability Criteria and Results : </strong>If answer to any of the questions in above section is
+              </div>
+              <div class="col-sm-4">
+                No for Question No.(1 and 2) and No for Question No.3
+              </div>
+              <div class="col-sm-8">
+                <input readonly type="checkbox" id="Non_ERES_Relevant" [checked]="this.model.sectionSecond=='Non ERES Relevant'"/> <strong class="form-label">Non ERES Relevant</strong>
+            </div>
+              <div class="col-sm-4">
+                Yes for Question No.(1 or 2) and No for Question No.3
+              </div>
+              <div class="col-sm-8">
+                <input readonly type="checkbox" id="ER_Relevant" [checked]="this.model.sectionSecond=='ER Relevant'"/> <strong class="form-label">ER Relevant</strong>
+            </div>
+            <div class="col-sm-4">
+              Yes for Question No.(1 or 2) and Yes for Question No.3
+              </div>
+              <div class="col-sm-8">
+                <input readonly type="checkbox" id="ERES_Relevant" [checked]="this.model.sectionSecond=='ERES Relevant'"/> <strong class="form-label">ERES Relevant</strong>
+              </div>
+              <div class="col-sm-4">
+                Otherwise
+              </div>
+              <div class="col-sm-8">
+                <input readonly type="checkbox" id="NA" [checked]="this.model.sectionSecond=='NA'"/> <strong class="form-label">NA</strong>
+            </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div class="row" [ngStyle]="{'pointer-events': !freezeFlag ? 'all':'none'}">
+              <div class="col-sm-1">
+                <strong class="form-label">Remarks<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-11">
+                <textarea class="w-100" [(ngModel)]="this.model.section2Remarks"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="this.model.sectionFirst"
+    [ngStyle]="{'pointer-events': this.model.sectionFirst == 'GxP' && !freezeFlag ? 'all':'none'}" class="col-sm-12">
+    <br>
+    <table class="table w-100 gxp-table" id="System_GAMP_Category_Classification">
+      <tbody>
+        <tr class="bg-grey">
+          <td colspan="4">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Section:- 4 GAMP Category Classification</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-grey">
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>GAMP Category</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-70">
+            <div class="row">
+              <div class="col-sm-12 text-center">
+                <strong>Software Category Checklist</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Yes</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>No</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <ng-container *ngFor="let q of this.sectionThree; let in=index">
+          <tr>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <strong>{{q.srNumber}}</strong>
+                </div>
+              </div>
+            </td>
+            <td class="w-70">
+              <div class="row">
+                <div class="col-sm-12">
+                  <label class="form-label">{{q.question}}</label>
+                </div>
+              </div>
+            </td>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="System_GAMP_Category_Classification_Yes_{{in}}" [checked]="q.answer=='Y'"
+                    (change)="q.answer=(q.answer=='Y')?'N':'Y';setGAMPCategory(q,$event,true)">
+                </div>
+              </div>
+            </td>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="System_GAMP_Category_Classification_No_{{in}}" [checked]="q.answer=='N'"
+                    (change)="q.answer=(q.answer=='Y')?'N':'Y';setGAMPCategory(q,$event,false)">
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+        <tr>
+          <td colspan="4" class="bg-grey">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong style="pointer-events: none;" class="form-label">Conclusion:- 
+                <ng-container *ngFor="let c of this.gampCategoriesList; let in = index;">
+                  <input readonly type="checkbox" id="Category_{{in < 1 ? (in+1) : (in+2)}}"
+                    [checked]="this.model.sectionThree==c.id" />&nbsp;{{c.gampName}}
+                </ng-container>
+                <input readonly type="checkbox" id="NA"
+                  [checked]="this.model.sectionThree=='NA'" />&nbsp;NA
+                </strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div class="row" [ngStyle]="{'pointer-events': !freezeFlag ? 'all':'none'}">
+              <div class="col-sm-1">
+                <strong class="form-label">Remarks<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-11">
+                <textarea class="w-100" [(ngModel)]="this.model.section3Remarks"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="this.model.sectionFirst"
+    [ngStyle]="{'pointer-events': this.model.sectionFirst == 'GxP' && !freezeFlag ? 'all':'none'}" class="col-sm-12">
+    <br>
+    <table class="table w-100 gxp-table" id="System_level_Risk_Assessment">
+      <tbody>
+        <tr class="bg-grey">
+          <td colspan="4">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Section:- 5 Criticality Assessment</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-grey">
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Sr. No.</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-70">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Criticality Checklist</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Yes</strong>
+              </div>
+            </div>
+          </td>
+          <td class="w-10">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>No</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <ng-container *ngFor="let q of this.sectionFour; let in=index">
+          <tr>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <strong>{{q.srNumber}}</strong>
+                </div>
+              </div>
+            </td>
+            <td class="w-70">
+              <div class="row">
+                <div class="col-sm-12">
+                  <label class="form-label">{{q.question}}</label>
+                </div>
+              </div>
+            </td>
+            <!-- <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="{{q.uniqueId}}" [checked]="q.answer=='Y'"
+                    (change)="setSectionFour(q,$event)"> &nbsp;{{q.uniqueId}}
+                </div>
+              </div>
+            </td> -->
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="Risk_Assessment_Yes_{{in}}" [checked]="q.answer=='Y'"
+                    (change)="q.answer=(q.answer=='Y')?'N':'Y';setSystemRisk();">
+                </div>
+              </div>
+            </td>
+            <td class="w-10">
+              <div class="row">
+                <div class="col-sm-12">
+                  <input type="checkbox" id="Risk_Assessment_No_{{in}}" [checked]="q.answer=='N'"
+                    (change)="q.answer=(q.answer=='N')?'Y':'N';setSystemRisk();">
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+        <!-- <tr>
+          <td colspan="4" class="bg-grey">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong style="pointer-events: none;" class="form-label">Conclusion:-
+                <ng-container *ngFor="let c of this.sectionFour; let in=index">
+                  <input readonly type="checkbox" id="{{c.uniqueId}}"
+                    [checked]="c.answer=='Y'" />&nbsp;{{c.uniqueId}}
+                </ng-container>
+                <input readonly type="checkbox" id="NA"
+                  [checked]="this.model.sectionFour=='NA'" />&nbsp;NA
+                </strong>
+              </div>
+            </div>
+          </td>
+        </tr> -->
+        <tr class="bg-grey">
+          <td colspan="4">
+            <div class="row" style="pointer-events: none;">
+              <div class="col-sm-12">
+                <strong  class="form-label">Applicability Criteria and Results : </strong>If answer to any of the questions in above section is
+              </div>
+              <div class="col-sm-1">
+                  Yes
+              </div>
+              <div class="col-sm-11">
+                <input readonly type="checkbox" name="high" id="High" [checked]="this.model.sectionFour=='High'"/> <strong class="form-label">High Critical</strong>
+            </div>
+              <div class="col-sm-1">
+                  Otherwise
+              </div>
+              <div class="col-sm-11">
+                <input readonly type="checkbox" name="low" id="Low" [checked]="this.model.sectionFour=='Low'"/> <strong class="form-label">Low Critical</strong>
+            </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div class="row" [ngStyle]="{'pointer-events': !freezeFlag ? 'all':'none'}">
+              <div class="col-sm-1">
+                <strong class="form-label">Remarks<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-11">
+                <textarea class="w-100" [(ngModel)]="this.model.section4Remarks"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- <div style="pointer-events: none;" class="col-sm-12">
+    <br>
+    <table class="table w-100 gxp-table" id="Overall_System_Risk">
+      <tbody>
+        <tr class="bg-grey">
+          <td colspan="4">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Section:- 6 Overall System Risk</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr class="bg-grey">
+          <td rowspan="2" class="w-10">
+            <div class="row">
+              <div class="col-sm-12 text-center">
+                <strong>GAMP5 Category <br> (From Section 4) </strong>
+              </div>
+            </div>
+          </td>
+          <td colspan="3" class="w-70">
+            <div class="row">
+              <div class="col-sm-12 text-center">
+                <strong>System Criticality (From Section 5)</strong>
+              </div>
+            </div>
+          </td>
+
+        </tr>
+        <tr class="bg-grey">
+          <ng-container *ngFor="let c of this.sectionFour; let in=index">
+            <td class="w-20">
+              <div class="row">
+                <div class="col-sm-12">
+                  <strong>{{c.uniqueId}}</strong>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+        </tr>
+        <ng-container *ngFor="let q of this.matrixList; let i=index">
+          <tr>
+            <td class="w-30">
+              <div class="row">
+                <div class="col-sm-12">
+                  <strong>{{q.gampName}}</strong>
+                </div>
+              </div>
+            </td>
+            <ng-container *ngFor="let c of q.list; let j=index">
+              <td class="w-20">
+                <div class="row">
+                  <div class="col-sm-12">
+                    <input type="checkbox" name="naName" id="category_{{i}}_{{j}}" [checked]="c.checked" />&nbsp;
+                    <label for="{{c.orderId}}" class="form-label">{{c.value}}</label>
+                  </div>
+                </div>
+              </td>
+            </ng-container>
+          </tr>
+        </ng-container>
+        <tr>
+          <td colspan="4" class="bg-grey">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong style="pointer-events: none;" class="form-label">Conclusion:- </strong>
+                <ng-container *ngFor="let c of this.matrixConclusionList; let in=index">
+                  <input readonly type="checkbox" id="{{c.value}}"
+                    [checked]="c.key==this.model.sectionFive" />&nbsp;<strong>{{c.value}}</strong>
+                </ng-container>
+                <input readonly type="checkbox" id="NA"
+                  [checked]="this.model.sectionFive=='NA'" />&nbsp;<strong>NA</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="4">
+            <div class="row" [ngStyle]="{'pointer-events': this.model.sectionFirst == 'GxP' && !freezeFlag ? 'all':'none'}">
+              <div class="col-sm-1">
+                <strong class="form-label">Remarks<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-11">
+                <textarea class="w-100" [(ngModel)]="this.model.section6Remarks"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div> -->
+  <div style="pointer-events: none;" class="col-sm-12">
+    <br>
+    <table class="table w-100 gxp-table" id="summary">
+      <tbody>
+        <tr class="bg-grey">
+          <td colspan="2">
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Summary</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>GxP Applicability</strong>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <strong style="pointer-events: none;" class="form-label">
+                  <input readonly type="checkbox" id="GxP" [checked]="this.model.sectionFirst=='GxP'"/>&nbsp;GxP
+                  <input readonly type="checkbox" id="Non_GxP" [checked]="this.model.sectionFirst=='Non-GxP'"/>&nbsp;Non-GxP
+              </strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>System Classification</strong>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <strong style="pointer-events: none;" class="form-label">
+                  <input readonly type="checkbox" name="pdName" id="pdNameId" [checked]="this.model.gdprConclusion=='OPEN System'" />&nbsp;OPEN System
+                  <input readonly type="checkbox" name="sdName" id="sdNameId"  [checked]="this.model.gdprConclusion=='CLOSED System'" />&nbsp;CLOSED System
+              </strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>ERES Assessment</strong>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <input readonly type="checkbox" id="Non_ERES_Relevant"
+                  [checked]="this.model.sectionSecond=='Non ERES Relevant'" />&nbsp;<strong>Non ERES
+                  Relevant</strong>
+                <input readonly type="checkbox" id="ER_Relevant"
+                  [checked]="this.model.sectionSecond=='ER Relevant'" />&nbsp;<strong>ER
+                  Relevant</strong>
+                <input readonly type="checkbox" id="ERES_Relevant"
+                  [checked]="this.model.sectionSecond=='ERES Relevant'" />&nbsp;<strong>ERES
+                  Relevant</strong>
+                <input readonly type="checkbox" id="NA"
+                  [checked]="this.model.sectionSecond=='NA'" />&nbsp;<strong>NA</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>System GAMP Category Classification</strong>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <ng-container *ngFor="let c of this.gampCategoriesList; let in = index;">
+                  <input readonly type="checkbox" id="Category_{{in < 1 ? (in+1) : (in+2)}}"
+                    [checked]="this.model.sectionThree==c.id" />&nbsp;<strong>{{c.gampName}}</strong>
+                </ng-container>
+                <input readonly type="checkbox" id="NA"
+                  [checked]="this.model.sectionThree=='NA'" />&nbsp;<strong>NA</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <strong>Criticality Assessment</strong>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="row">
+              <div class="col-sm-12">
+                <input readonly type="checkbox" name="gxp" id="High" [checked]="this.model.sectionFour=='High'"/> <strong class="form-label">High Critical</strong>
+                <input readonly type="checkbox" name="nongxp" id="Low" [checked]="this.model.sectionFour=='Low'"/> <strong class="form-label">Low Critical</strong>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <div class="row" [ngStyle]="{'pointer-events': !freezeFlag ? 'all':'none'}">
+              <div class="col-sm-1">
+                <strong class="form-label">Remarks<span class="asterisk required">*</span>:</strong>
+              </div>
+              <div class="col-sm-11">
+                <textarea class="w-100" [(ngModel)]="this.model.section6Remarks"></textarea>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<app-form-esign-verification #formVerification></app-form-esign-verification>
+
+<app-modal-basic #infoGxPDocument>
+  <div class="app-modal-header">
+    <h5 class="modal-title">Recommended Validation Deliverables</h5>
+    <button type="button" class="close basic-close" (click)="infoGxPDocument.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body dy-width-500">
+    <p>Validation deliverables considering the criticality assessment and software GAMP {{this.categoryName}} are
+      listed below</p>
+    <ul class="list-group" *ngFor="let row of this.documentList;let i = index">
+      <li class="list-group-item">
+        <label> {{i+1 }} . {{row.name}} </label>
+      </li>
+    </ul>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect " (click)="infoGxPDocument.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #copyPdfSettingsModal [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-md'"
+  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h5 class="font-header"><strong>Import Settings</strong></h5>
+    <button type="button" class="close basic-close" (click)="closeCopyPdfSettingsModal()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <ngx-datatable [scrollbarH]="false" #myTable class="data-table dt-chk" style="overflow: unset!important;"
+          [rows]='this.ImportprojectsList' [columnMode]="'force'" [headerHeight]="50" [footerHeight]="50"
+          [rowHeight]="'auto'">
+
+          <ngx-datatable-column name="Project Name">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong
+                style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['value']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+
+          <ngx-datatable-column name="Action" [width]="50">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+
+              <a container="body" href="javascript:;" (click)="onClickCopy(row)"
+                placement="top" ngbTooltip="Import">
+                <i class="icofont icofont-copy"></i>
+              </a>
+
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </div>
+      <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+    </div>
+  </div>
+</app-modal-basic>

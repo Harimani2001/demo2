@@ -1,0 +1,16 @@
+.bg-gray{
+    background-color:#d1e0e0;
+    border-bottom: 1px solid white;
+}
+.bg-white{
+    background-color:white;
+}
+
+.bg-pink{
+    background-color:#ff99cc;
+    border-bottom: 1px solid white;
+}
+
+.flatpickr-calendar.open {
+    z-index: 9999999999;
+}

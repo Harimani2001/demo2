@@ -1,0 +1,1069 @@
+<ngb-tabset #pdfTab="ngbTabset" (tabChange)="onChangeTab($event.nextId)">
+    <ngb-tab id="tab-1">
+        <ng-template ngbTabTitle>Common Styles</ng-template>
+        <ng-template ngbTabContent>
+            <app-pdf-preferences-default-pdf  [document]='false'></app-pdf-preferences-default-pdf>
+        </ng-template>
+    </ngb-tab>
+    <ngb-tab id="tab-2">
+        <ng-template ngbTabTitle>Document Settings</ng-template>
+        <ng-template ngbTabContent>
+            <app-pdf-preferences-default-pdf [document]='true' [docId]='this.documentId'></app-pdf-preferences-default-pdf>
+        </ng-template>
+    </ngb-tab>
+    <ngb-tab id="tab-5">
+        <ng-template ngbTabTitle>PDF Chapters</ng-template>
+        <ng-template ngbTabContent>
+            <app-pdf-chapter></app-pdf-chapter>
+        </ng-template>
+    </ngb-tab>
+    <ngb-tab id="tab-3">
+        <ng-template ngbTabTitle>Custom Settings</ng-template>
+        <ng-template ngbTabContent>
+            <app-card *ngIf="!this.viewData" [title]="'Customize your PDF'" [classHeader]="true">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <select name="select" class="form-control" id="docList"
+                            [(ngModel)]="this.customDtoModel.docType"
+                            (change)="docChanged(this.customDtoModel.docType)">
+                            <option disabled value="">Select Document</option>
+                            <option *ngFor="let document of documentListForCustom;let i=index" [value]="document.key">
+                                {{document.value}}</option>
+                        </select>
+                        
+                    </div>
+                    <div class="col-sm-6">
+                            <div class="form-group ">
+                                    <label class="col-form-label">Selecting Variables for CSV Export?
+                                    </label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    <label class="switch">
+                                        <input type="checkbox" name="activeFlag" [(ngModel)]="this.isCsvVariables"
+                                            name="projectsetupFlag" />
+                                        <span class="slider round"></span>
+                                    </label>
+                                </div>
+                        </div>
+                    <div class="col-sm-6">
+                        <button *ngIf="pdfViewIcon" type="button" class="btn btn-primary" (click)="pdfView();">Sample
+                            Preview</button>
+                    </div>
+                </div>
+            </app-card>
+            <app-card [title]="''" [classHeader]="true" *ngIf="this.customDtoModel.docType&&!this.viewData">
+                <div class="row well well-lg" *ngIf="(this.customDtoModel.docType!='100')">
+                    <div class="col-sm-2"><label class="col-form-label" ><b>Project Variables :
+                            </b></label></div>
+                    <div class="col-sm-10">
+                        <label *ngFor="let item of this.customDtoModel.projectSetupVariables" style="padding-top: 0.5%">
+                            <span title="Copy to clipboard" class="ml-2 badge badge-pill badge-primary"
+                                (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+item.key+'@',item.value,'project')">
+                                {{item.value}} </span>
+                               
+                        </label>
+                        <label style="padding-top: 0.5%">
+                            <span title="Copy to clipboard" class="ml-2 badge badge-pill badge-primary"
+                            (click)="copyInputMessage('@'+this.customDtoModel.docType+'.documentNumber@','Document Number','')">
+                            Document Number</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="row well well-lg" *ngIf="(this.customDtoModel.docType!='100' && this.customDtoModel.docType!='137')">
+                    <div class="col-sm-2"><label class="col-form-label" ><b>VSR Variables :
+                            </b></label></div>
+                    <div class="col-sm-10">
+                        <label *ngFor="let item of this.customDtoModel.vsrVariables" style="padding-top: 0.5%">
+                            <span title="Copy to clipboard" class="ml-2 badge badge-pill badge-primary"
+                                (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+item.key+'@',item.value,'vsr')">
+                                    {{item.value}}</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="row well well-lg " *ngIf="isDocument">
+                    <div class="col-sm-4">
+                        <input type="radio" name="single"
+                            [checked]="this.customDtoModel.singleDocument" (change)="onChangeSingle()" />&nbsp;Single Document &nbsp;&nbsp;&nbsp;
+                        <ng-container *ngIf="(this.customDtoModel.docType!='100' && this.customDtoModel.docType!='137' && this.customDtoModel.docType!='128' && this.customDtoModel.docType!='191'
+                        && this.customDtoModel.mappingId!='Template')">
+                            <input type="radio" name="multiple"
+                                [checked]="this.multipleDoc" (change)="onChangeMultiple()"/>&nbsp;Multiple Document
+                        </ng-container>
+                    </div>
+                    <div class="col-sm-12" *ngIf="this.customDtoModel.singleDocument">
+                        <div class="col-sm-2">
+                            <label class="col-form-label">Variables : </label>
+                        </div>
+                        <div class="col-sm-10">
+                        <label *ngFor="let item of this.customDtoModel.documentVariable" style="padding-top: 0.5%">
+                            <span title="Copy to clipboard" class="ml-2 badge badge-pill badge-primary"
+                                (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+item.key+'@',item.value,'variable')">
+                              {{item.value}} </span>
+                        </label>
+                        </div>
+                        <div class="row" *ngIf="this.customDtoModel.singleDocument 
+                                         && this.customDtoModel.docType!='100' && extendedForm !=''">
+                            <div class="col-sm-12">
+                                <label class="col-form-label">Extended Form Variables :
+                                </label>
+                            </div>
+                            <div class="col-sm-12">
+                            <table class="pdf-setting-table">
+                                <thead>
+                                    <tr>
+                                        <th>Labels</th>
+                                        <th>Names</th>
+                                        <th>Description</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let data of extendedForm">
+                                        <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                            <span *ngIf="data.label != undefined" title="Copy to clipboard"
+                                                (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',this.customDtoModel.docType,'varaiable')">
+                                                @{{this.customDtoModel.docType}}.<label [innerHtml]="data.label"></label>@</span>
+                                        </td>
+                                        <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                            <span *ngIf="data.name != undefined" title="Copy to clipboard"
+                                                (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',this.customDtoModel.docType,'varaiable')">
+                                                @{{this.customDtoModel.docType}}.{{data.name}}@</span>
+                                        </td>
+                                        <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                            <span *ngIf="data.description != undefined" title="Copy to clipboard"
+                                                (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',this.customDtoModel.docType,'varaiable')">
+                                                @{{this.customDtoModel.docType}}.{{data.description}}@</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-12" *ngIf="this.multipleDoc">
+                        <div class="col-sm-12">
+                            <label class="col-form-label">Select Variables :
+                                <span class="asterisk">*</span>
+                            </label>
+                            <div class="form-group">
+                                <ng-select [ngClass]="'ng-select'" [options]="multipleOptionList" [multiple]="true"
+                                    [(ngModel)]="this.customDtoModel.selectedDocumentVariable" name="multi" rounds="ngModel" required
+                                    #multi="ngModel" (ngModelChange)="onChangeMultiSelect()">
+                                </ng-select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12" *ngIf="selectedColumns.length > 0">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <label class="col-form-label">Reference View : </label>
+                                        <div class="form-group overflow-auto">
+                                            <table class="pdf-setting-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th title="Copy to clipboard" *ngFor="let column of selectedColumns"
+                                                            (click)="copyInputMessage(column.label,column.label,'reference')">
+                                                            {{column.label}}
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td *ngFor="let column of selectedColumns" style="padding: 10px;" (click)="copyInputMessage(column.value,column.label,'reference')">
+                                                            {{column.value}}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div *ngIf="isShowExcelDetails">
+                                    <p class="text-danger"> Note: Please fill the below details for Reference to fill the table data
+                                        in uploaded file</p>
+                                    <div class="row">
+                                        <div class="col-sm-2">
+                                            Sheet No:
+                                            <select name="select" class="form-control" [(ngModel)]="sheetName">
+                                                <option disabled value="">Select SheetName</option>
+                                                <option *ngFor="let document of sheetNamesList" [value]="document.key">
+                                                    {{document.value}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-2">
+                                            Row No: <input class="form-control" type="number" [(ngModel)]="rowNo">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                   
+                </div>
+               
+                <div *ngIf="!isDocument">
+                    <div *ngFor="let item of this.inputField">
+                        <app-card [title]="''" [classHeader]="true">
+                           
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <p> Note:<span class="text-danger"> Names will copied for more accuracy mapping.</span></p>
+                                    <span><b>Form Name : </b> {{item.name}} &nbsp;&nbsp;&nbsp;
+                                        <a href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning pointer"
+                                            (click)="viewRowDetails(item.form);" data-ng-open="modalSmall" placement="top"
+                                            ngbTooltip="View Form">
+                                            <i  class="icofont icofont-resize"></i>
+                                        </a>
+                                    </span><br>
+                                    <span><b>Variables : </b></span>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <table class="pdf-setting-table">
+                                        <thead> <tr ><th>Labels</th><th>Names</th> <th>Description</th></tr> </thead>
+                                        <tbody>
+                                            <tr *ngFor="let data of item.form">
+                                                <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                                    <span *ngIf="data.label != undefined" title="Copy to clipboard"
+                                                        (click)="copyInputMessage('@'+item.id+'.'+data.name+'@',data.label,'form')">
+                                                        @{{item.id}}.<label [innerHtml]="data.label"></label>@</span>
+                                                </td>
+                                                <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                                    <span *ngIf="data.name != undefined" title="Copy to clipboard"
+                                                        (click)="copyInputMessage('@'+item.id+'.'+data.name+'@',data.name,'form')">
+                                                        @{{item.id}}.{{data.name}}@</span>
+                                                </td>
+                                                <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                                    <span *ngIf="data.description != undefined" title="Copy to clipboard"
+                                                        (click)="copyInputMessage('@'+item.id+'.'+data.name+'@',data.name,'form')">
+                                                        @{{item.id}}.{{data.description}}@</span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div><br>
+                                <div class="col-sm-12">
+                                    <ng-container *ngFor="let d of item.form">
+                                        <div class="dt-desc dy-ui" *ngIf="d.type==='table'">
+                                            <br>
+                                            <span>
+                                                <b>Table :</b> {{d.name}}<br>
+                                                <b>Table Variables: </b>
+                                            </span>
+                                            <br>
+                                            <table class="pdf-setting-table">
+                                                <thead>
+                                                    <tr>
+                                                        <ng-container *ngFor="let c of d.columns">
+                                                            <th *ngIf="c.type!='hidden'" title="Copy to clipboard" (click)="copyInputMessage(c.name,c.name,'table',c)"><label
+                                                                    [innerHtml]="c.label"></label></th>
+                                                        </ng-container>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <ng-container *ngFor="let c of d.columns">
+                                                            <td *ngIf="c.type!='hidden'" style="padding: 10px;" (click)="copyInputMessage(c.name,c.name,'table',c)">{{c.name}}
+                                                            </td>
+                                                        </ng-container>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div *ngIf="isShowExcelDetails">
+                                                <p class="text-danger"> Note: Please fill the below details for
+                                                    Reference to fill the table data in uploaded file</p>
+                                                <div class="row">
+                                                    <div class="col-sm-2">
+                                                        Sheet No:
+                                                        <select name="select" class="form-control"
+                                                            [(ngModel)]="d.sheetNo"
+                                                            (ngModelChange)="onChangeSheetAndRowNo()">
+                                                            <option disabled value="">Select SheetName</option>
+                                                            <option *ngFor="let document of sheetNamesList"
+                                                                [value]="document.key">
+                                                                {{document.value}}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-sm-2">
+                                                        Row No: <input class="form-control" type="number"
+                                                            [(ngModel)]="d.rowNo"
+                                                            (ngModelChange)="onChangeSheetAndRowNo()">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </ng-container>
+                                </div>
+                            </div>
+                        </app-card>
+                    </div>
+                        <div class="well well-lg" *ngFor="let item of this.linkedInputFeild;let li= index">
+                            <app-card [title]="''" [classHeader]="true">
+                                <div class="row">
+                                    <br>
+                                    <span><b>Form Reference Name : </b> {{item.name}} &nbsp;&nbsp;&nbsp;
+                                        <a href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning pointer"
+                                            (click)="viewRowDetails(item.form);" data-ng-open="modalSmall" placement="top"
+                                            ngbTooltip="View Form">
+                                            <i  class="icofont icofont-resize"></i>
+                                        </a>
+                                    </span><br>
+                                </div>
+                                <div class="row">
+                                    <div class="checkbox-fade fade-in-primary col-sm-6">
+                                        <label>
+                                            <input type="checkbox" class="form-control" name="inTableMasterLinkedForm" [checked]="item.table"
+                                                (change)="item.table=!item.table;loadLinkedFormTable(item,li)">
+                                            <span class="cr">
+                                                <i class="cr-icon icofont icofont-ui-check txt-success"></i>
+                                            </span>
+                                            <span>Table View</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div *ngIf="item.table">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="col-form-label">Select Variables : <span class="asterisk">*</span> </label>
+                                            <div class="form-group ">
+                                                <ng-select [ngClass]="'ng-select'" [options]="item.tableList" [multiple]="true"
+                                                    [(ngModel)]="this.customDtoModel.selectedLinkedFormVariable[li].selectedVariables"
+                                                    name="multieWorkflow" rounds="ngModel" required #selectedLinkedFormVariable="ngModel"
+                                                    (ngModelChange)="onChangeLinkedFormMultiSelect(item,this.customDtoModel.selectedLinkedFormVariable[li])">
+                                                </ng-select>
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                    <div *ngIf="item.selectedLinkedFormColumns.length > 0">
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <label class="col-form-label">Reference View : </label>
+                                                <div class="form-group overflow-auto">
+                                                    <table class="pdf-setting-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th title="Copy to clipboard" *ngFor="let column of item.selectedLinkedFormColumns"
+                                                                    (click)="copyInputMessage(column.label,column.label,'reference')">
+                                                                    {{column.label}}
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <td *ngFor="let column of item.selectedLinkedFormColumns" style="padding: 10px;"
+                                                                    (click)="copyInputMessage(column.value,column.value,'reference')">
+                                                                    {{column.value}}
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ng-container *ngIf="!item.table">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <p> Note:<span class="text-danger"> Names will copied for more accuracy mapping.</span></p>
+                                            <span><b>Variables : </b></span>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <table class="pdf-setting-table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Labels</th>
+                                                        <th>Names</th>
+                                                        <th>Description</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let data of item.form">
+                                                        <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'"
+                                                            style="padding: 10px;">
+                                                            <span *ngIf="data.label != undefined" title="Copy to clipboard"
+                                                                (click)="copyInputMessage('@'+item.id+'.'+data.name+'@',data.label,'table',data)">
+                                                                @{{item.id}}.<label [innerHtml]="data.label"></label>@</span>
+                                                        </td>
+                                                        <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'"
+                                                            style="padding: 10px;">
+                                                            <span *ngIf="data.name != undefined" title="Copy to clipboard"
+                                                                (click)="copyInputMessage('@'+item.id+'.'+data.name+'@',data.name,'table',data)">
+                                                                @{{item.id}}.{{data.name}}@</span>
+                                                        </td>
+                                                        <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'"
+                                                            style="padding: 10px;">
+                                                            <span *ngIf="data.description != undefined" title="Copy to clipboard"
+                                                                (click)="copyInputMessage('@'+item.id+'.'+data.name+'@',data.description,'table',data)">
+                                                                @{{item.id}}.{{data.description}}@</span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div><br>
+                                        <div class="col-sm-12">
+                                            <ng-container *ngFor="let d of item.form">
+                                                <div class="dt-desc dy-ui" *ngIf="d.type==='table'">
+                                                    <br>
+                                                    <span>
+                                                        <b>Table :</b> {{d.name}}<br>
+                                                        <b>Table Variables: </b>
+                                                    </span>
+                                                    <br>
+                                                    <table class="pdf-setting-table">
+                                                        <thead>
+                                                            <tr>
+                                                                <ng-container *ngFor="let c of d.columns">
+                                                                    <th *ngIf="c.type!='hidden'" title="Copy to clipboard"
+                                                                        (click)="copyInputMessage(c.name,c.label,'table',c)"><label [innerHtml]="c.label"></label>
+                                                                    </th>
+                                                                </ng-container>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr>
+                                                                <ng-container *ngFor="let c of d.columns">
+                                                                    <td *ngIf="c.type!='hidden'" style="padding: 10px;"
+                                                                        (click)="copyInputMessage(c.name,c.name,'table',c)">{{c.name}}
+                                                                    </td>
+                                                                </ng-container>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                            
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </app-card>
+                        </div>
+                </div>
+                   <div>
+                    <div class="well well-lg" *ngIf="this.customDtoModel.equipmentVariables.length >0">
+                        <div class="row">
+                            <div class="col-sm-2"><label class="col-form-label"
+                                    ><b>Equipment Variables :
+                                    </b></label></div>
+                            <div class="col-sm-10">
+                                <label *ngFor="let item of this.customDtoModel.equipmentVariables"
+                                    style="padding-top: 0.5%">
+                                    <span title="Copy to clipboard" class="ml-2 badge badge-pill badge-primary"
+                                        (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+item.key+'@',item.value,'equipment')">
+                                        {{item.value}} </span>
+                                </label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row" *ngIf="equipmentExtendedForm !='' && equipmentExtendedForm != undefined">
+                            <br>
+                            <p class="col-sm-12"> Note:<span class="text-danger"> Names will copied for more
+                                    accuracy mapping.</span></p>
+                            <br>
+                            <div class="col-sm-12">
+                                <label class="col-form-label"><b>Extended Form Variables :
+                                    </b></label>
+
+                                <table class="pdf-setting-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Labels</th>
+                                            <th>Names</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let data of equipmentExtendedForm">
+                                            <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'"
+                                                style="padding: 10px;">
+                                                <span *ngIf="data.label != undefined" title="Copy to clipboard"
+                                                    (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',data.label,'eqForm')">
+                                                    @{{this.customDtoModel.docType}}.<label [innerHtml]="data.label"></label>@</span>
+                                            </td>
+                                            <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'"
+                                                style="padding: 10px;">
+                                                <span *ngIf="data.name != undefined" title="Copy to clipboard"
+                                                    (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',data.name,'eqForm')">
+                                                    @{{this.customDtoModel.docType}}.{{data.name}}@</span>
+                                            </td>
+                                            <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'"
+                                                style="padding: 10px;">
+                                                <span *ngIf="data.description != undefined"
+                                                    title="Copy to clipboard"
+                                                    (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',data.name,'eqForm')">
+                                                    @{{this.customDtoModel.docType}}.{{data.description}}@</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="well well-lg" *ngIf="this.customDtoModel.batchVariables.length >0  && !isDocument">
+                        <div class="row">
+                            <div class="col-sm-2"><label class="col-form-label" ><b>Batch Variables : </b></label></div>
+                            <div class="col-sm-10">
+                                <label *ngFor="let item of this.customDtoModel.batchVariables" style="padding-top: 0.5%">
+                                    <span title="Copy to clipboard" class="ml-2 badge badge-pill badge-primary"
+                                        (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+item.key+'@',item.value,'batch')">{{item.value}}</span>
+                                </label>
+                            </div>
+                        </div>
+                      
+                        <div class="row" *ngIf="batchExtendedForm !='' && batchExtendedForm != undefined && !isDocument ">
+                            <br>
+                            <p class="col-sm-12"> Note:<span class="text-danger"> Names will copied for more
+                                    accuracy mapping.</span></p>
+                            <br>
+                            <div class="col-sm-12">
+                                <label class="col-form-label"><b>Extended Form Variables :
+                                    </b></label>
+                        
+                                <table class="pdf-setting-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Labels</th>
+                                            <th>Names</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let data of batchExtendedForm">
+                                            <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                                <span *ngIf="data.label != undefined" title="Copy to clipboard"
+                                                    (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',data.label,'bathForm')">
+                                                    @{{this.customDtoModel.docType}}.<label [innerHtml]="data.label"></label>@</span>
+                                            </td>
+                                            <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                                <span *ngIf="data.name != undefined" title="Copy to clipboard"
+                                                    (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',data.name,'batchForm')">
+                                                    @{{this.customDtoModel.docType}}.{{data.name}}@</span>
+                                            </td>
+                                            <td *ngIf="data.type != 'header' && data.type != 'table' && data.type !='hidden'" style="padding: 10px;">
+                                                <span *ngIf="data.description != undefined" title="Copy to clipboard"
+                                                    (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+data.name+'@',data.name,'batchForm')">
+                                                    @{{this.customDtoModel.docType}}.{{data.description}}@</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                
+                    <div class="well well-lg" *ngIf="this.customDtoModel.cleanRoomVariables.length >0">
+                        <div class="row">
+                            <div class="col-sm-2"><label class="col-form-label"
+                                    ><b>Cleanroom Variables :
+                                    </b></label></div>
+                            <div class="col-sm-10">
+                                <label *ngFor="let item of this.customDtoModel.cleanRoomVariables"
+                                    style="padding-top: 0.5%">
+                                    <span title="Copy to clipboard" class="ml-2 badge badge-pill badge-primary"
+                                        (click)="copyInputMessage('@'+this.customDtoModel.docType+'.'+item.key+'@',item.value,'cleanRoom')">
+                                        {{item.value}} </span>
+                                </label>
+                            </div>
+                        </div>
+                        </div>
+                        <br>
+
+                </div>
+                
+                <div *ngIf="!this.multipleDoc">
+                    <div class="row">
+                        <div class="col-sm-12">Individual Work Flow Variables</div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12 ">
+                            <ng-container *ngFor="let individual of this.customDtoModel.individualWorkFlowVariables">
+                                <div class="well well-lg">
+                                <div *ngIf="!isDocument" class="row">
+                                    <div class="col-sm-12 strong">{{individual.documentName}}</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-2">{{individual.levelName}}</div>
+                                    <div class="col-sm-10">
+                                        <label *ngFor="let level of individual.list" style="padding-top: 0.5%">
+                                            <span title="Copy to clipboard" class="ml-2 badge badge-pill badge-primary"
+                                                (click)="copyInputMessage(level.key,level.value,'workflow')">
+                                                {{level.value}}</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            </ng-container>
+
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row" *ngIf="this.isMultiWorkFlow">
+                    <div class="checkbox-fade fade-in-primary col-sm-6">
+                        <label>
+                            <input type="checkbox" class="form-control" name="workflow"
+                                [checked]="this.customDtoModel.workFlow"
+                                (change)="this.customDtoModel.workFlow=!this.customDtoModel.workFlow;changeWorkFlow();">
+                            <span class="cr">
+                                <i class="cr-icon icofont icofont-ui-check txt-success"></i>
+                            </span>
+                            <span>Workflow Data</span>
+                        </label>
+                    </div>
+                </div>
+                <div *ngIf="this.customDtoModel.workFlow">
+
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <label class="col-form-label">Select Variables : <span class="asterisk">*</span> </label>
+                            <div class="form-group ">
+                                <ng-select [ngClass]="'ng-select'" [options]="workFlowOptionList" [multiple]="true"
+                                    [(ngModel)]="this.customDtoModel.selectedWorkFlowVariables" name="multieWorkflow"
+                                    rounds="ngModel" required #multiesign="ngModel"
+                                    (ngModelChange)="onChangeWorkFlowMultiSelect()">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="selectedWorkFlowColumns.length > 0">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="col-form-label">Reference View : </label>
+                                <div class="form-group overflow-auto">
+                                    <table class="pdf-setting-table">
+                                        <thead>
+                                            <tr>
+                                                <th title="Copy to clipboard" *ngFor="let column of selectedWorkFlowColumns"
+                                                    (click)="copyInputMessage(column.label,column.label,'reference')">
+                                                    {{column.label}}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td *ngFor="let column of selectedWorkFlowColumns" style="padding: 10px;"
+                                                    (click)="copyInputMessage(column.value,column.value,'reference')">
+                                                    {{column.value}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="isShowExcelDetails">
+                            <p class="text-danger"> Note: Please fill the below details for Reference to fill the table
+                                data
+                                in uploaded file</p>
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    Sheet No:
+                                    <select name="select" class="form-control" [(ngModel)]="workFlowSheetName">
+                                        <option disabled value="">Select SheetName</option>
+                                        <option *ngFor="let document of sheetNamesList" [value]="document.key">
+                                            {{document.value}}</option>
+                                    </select></div>
+                                <div class="col-sm-2">
+                                    Row No: <input type="number" class="form-control" [(ngModel)]="workFlowRowNo">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <br>
+<div>
+                <div class="row">
+                    <div class="checkbox-fade fade-in-primary col-sm-6">
+                        <label>
+                            <input type="checkbox" class="form-control" name="freezeHistory"
+                                [checked]="this.customDtoModel.freezeHistory"
+                                (change)="this.customDtoModel.freezeHistory=!this.customDtoModel.freezeHistory;changeFreezeHistory();">
+                            <span class="cr">
+                                <i class="cr-icon icofont icofont-ui-check txt-success"></i>
+                            </span>
+                            <span>Document Freeze History</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div *ngIf="this.customDtoModel.freezeHistory">
+
+                    <div class="row">
+
+                        <div class="col-sm-6">
+                            <label class="col-form-label">Select Variables : <span class="asterisk">*</span> </label>
+                            <div class="form-group ">
+                                <ng-select [ngClass]="'ng-select'" [options]="frezzeHistoryOptionList" [multiple]="true"
+                                    [(ngModel)]="this.customDtoModel.selectedFreezeHistoryVariables" name="frezzeHistory"
+                                    rounds="ngModel" required #multiesign="ngModel"
+                                    (ngModelChange)="onChangeFreezeHistoryMultiSelect()">
+                                </ng-select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="selectedFreezeHistoryColumns.length > 0">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="col-form-label">Reference View : </label>
+                                <div class="form-group overflow-auto">
+                                    <table class="pdf-setting-table">
+                                        <thead>
+                                            <tr>
+                                                <th title="Copy to clipboard"
+                                                    *ngFor="let column of selectedFreezeHistoryColumns"
+                                                    (click)="copyInputMessage(column.label,column.label,'reference')">
+                                                    {{column.label}}
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td *ngFor="let column of selectedFreezeHistoryColumns"
+                                                    style="padding: 10px;"(click)="copyInputMessage(column.value,column.value,'reference')">
+                                                    {{column.value}}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+</div>
+                <br>
+                <div class="row">
+                    <div class="checkbox-fade fade-in-primary col-sm-6">
+                        <label>
+                            <input type="checkbox" class="form-control" name="ispassword" [checked]="this.isPassword"
+                                (change)="this.isPassword=!this.isPassword;onChangePassword()">
+                            <span class="cr">
+                                <i class="cr-icon icofont icofont-ui-check txt-success"></i>
+                            </span>
+                            <span>Password</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="row" *ngIf="this.isPassword">
+                    <div class="col-sm-6">
+                        <label class="col-form-label">Password</label>&nbsp;&nbsp;&nbsp;
+                        <div class="form-group ">
+                            <span class="fa fa-file-pdf-o form-control-feedback"></span>
+                            <input type="text" class="form-control" maxlength="50" placeholder="Pdf password"
+                                [(ngModel)]="this.customDtoModel.password" name="password">
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="checkbox-fade fade-in-primary col-sm-6">
+                        <label>
+                            <input type="checkbox" class="form-control" name="iswater" [checked]="this.isWaterMark"
+                                (change)="this.isWaterMark=!this.isWaterMark;onChangeWorterMark()">
+                            <span class="cr">
+                                <i class="cr-icon icofont icofont-ui-check txt-success"></i>
+                            </span>
+                            <span>Watermark</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="row" *ngIf="this.isWaterMark">
+                    <div class="col-sm-6">
+                        <label class="col-form-label">Watermark</label>&nbsp;&nbsp;&nbsp;
+                        <div class="form-group ">
+                            <span class="fa fa-paint-brush form-control-feedback"></span>
+                            <input type="text" class="form-control" maxlength="50" placeholder="Pdf watermark"
+                                [(ngModel)]="this.customDtoModel.watermark" name="watermark">
+                        </div>
+                    </div>
+                </div>
+               
+                <br>
+                <div class="row">
+                    <div  class="col-sm-12">Customized File Name</div><br>
+                    <div class="col-sm-6">
+                        <label class="col-form-label">File Name</label>&nbsp;&nbsp;&nbsp;
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="Customize file name"
+                                [(ngModel)]="this.customDtoModel.customisedFileName" name="fileName"><div class="col-sm-6"><a class="btn btn-link strong" role="button" (click)="helpModal.show()"><u>Help</u></a></div>
+                        </div>
+                    </div>
+                    </div>
+                
+                    <div class="row">
+                    <div  class="col-sm-12"> Report Number</div><br>
+                    <div class="col-sm-6">
+                        <div class="row">
+                            <div class="col-sm-6">Preview :<a class="btn btn-link strong" role="button" (click)="documentFormating.show()"><u>Select Format</u></a></div>
+                            <div class="col-sm-6">{{this.customDtoModel.prefix}}-
+                                <ng-container let *ngFor="let s of sequenceNumberLimitArray">X</ng-container>-{{this.customDtoModel.suffix}}</div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="container">
+                            <label>
+                                <span title="Copy to clipboard" class="badge badge-pill badge-primary"
+                                    (click)="copyInputMessage('@'+this.customDtoModel.docType+'.reportNumber@','Report Number','')">
+                                    Report Number</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label"><strong>Preview in Bulk Approval</strong></label>
+                    <label class="switch"><input type="checkbox" name="useInBulkApprovalFlag" [(ngModel)]="this.customDtoModel.useInBulkApprovalFlag" /><span
+                        class="slider round"></span></label>
+                  </div>
+                  <div class="row">
+                    <div  class="col-sm-12">Template Name</div><br>
+                    <div class="col-sm-5">
+                        <div class="input-group">
+                            <input type="text" class="form-control" placeholder="name"
+                                [(ngModel)]="this.csvModel.csvTemplateName" name="fileName"><div class="col-sm-6" *ngIf="this.selectedvariables.length >0"><a class="btn btn-link strong" role="button" (click)="variableModal.show()"><u>View Variables</u></a></div>
+                        </div>
+                    </div>
+                   
+                    </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-10">
+                        <label class="col-form-label">Document File(docx)</label>&nbsp;&nbsp;&nbsp;
+                        <input #myFile type='file' (change)="selectFile($event)"
+                            accept=".DOCX,.docx">
+                        <a *ngIf="pdfViewIcon" style="cursor:pointer;font-weight: bold" ngbTooltip="Download File"
+                            (click)="downloadFileOrView(this.customDtoModel.filePath,false,this.customDtoModel.fileName)">{{ this.customDtoModel.fileName}}</a>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a *ngIf="pdfViewIcon" style="cursor:pointer;font-weight: bold" ngbTooltip="View File"
+                            (click)="downloadFileOrView(this.customDtoModel.filePath,true,this.customDtoModel.fileName);">
+                            <span class="ti-eye"></span>
+                        </a>
+                    </div>
+                </div>
+                <br>
+                <p *ngIf="fileValidation!=''" class="text-danger"> {{this.fileValidation}}</p>
+                <p *ngIf="isExcelFile" class="text-danger"> Please fill the above details to Continue....</p>
+                <div class="row">
+                    <div class="col-sm-4" *ngIf="this.modal.createButtonFlag">
+                        <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                            (click)="saveCustomSettings();">Save</button>
+                    </div>
+                    <div class="col-sm-4" *ngIf="isExcelFile && isFileExists">
+                        <button type="button" class="btn btn-primary" (click)="validateFile()">
+                            Validate File
+                        </button>
+                    </div>
+                </div>
+            </app-card>
+            <app-card *ngIf="this.viewData">
+                <div><br>
+                    <h4>&nbsp;&nbsp;Form View
+                        <div style="float: right;">
+                            <a style="cursor:pointer;font-weight: bold" class="ti-close"
+                                (click)="this.viewData=false">&nbsp;&nbsp;</a>
+                        </div>
+                    </h4>
+                </div>
+                <div>
+                    <app-form-preview style="pointer-events: none;" [inputField]='jsonInputField'></app-form-preview>
+                </div>
+            </app-card>
+        </ng-template>
+    </ngb-tab>
+    <ngb-tab id="tab-4">
+        <ng-template ngbTabTitle>Form Reference</ng-template>
+        <ng-template ngbTabContent>
+            <app-masterform-link></app-masterform-link>
+        </ng-template>
+    </ngb-tab>
+</ngb-tabset>
+
+
+
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+<ng2-toasty position='bottom-right'></ng2-toasty>
+
+<!-- Document Formating-->
+<app-modal-basic #documentFormating [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+    <div class="app-modal-header">
+        <h4 class="modal-title">
+          Report Number Formatting
+        </h4>
+        <button type="button" class="close basic-close" (click)="documentFormating.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="app-modal-body">
+        <div class="container">
+       <div class="row">
+           <div class="col-sm-8">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" placeholder="Prefix" [(ngModel)]="this.customDtoModel.prefix" name="prefix" />
+                    </div>
+                    <div class="col-sm-4 text-center">-<ng-container let *ngFor="let s of sequenceNumberLimitArray">X</ng-container>-</div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" placeholder="Suffix" [(ngModel)]="this.customDtoModel.suffix" name="suffix" />
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-6">Serial Number Length
+                    <br><label><p class="text-danger">Please enter a value between 3 to 20</p></label>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="number" min="3" max="20"  class="form-control" placeholder="-XXXXXX-" [(ngModel)]="this.customDtoModel.sequenceNumberLimit" name="sequenceNumberLimit" (keypress)="onlyNumber($event)" (ngModelChange)="newArraySequenceNumber(this.customDtoModel.sequenceNumberLimit)" />
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-6">Serial Number Start From
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="number" min="0" [disabled]="disableSequenceStart"  class="form-control"  [(ngModel)]="this.customDtoModel.sequenceNumberStartFrom" name="sequenceNumberStartFrom" (keypress)="onlyNumber($event)"  />
+                        </div>
+                    </div>
+                </div>
+           </div>
+           <div class="col-sm-4">
+              <div class="well well-lg row ">
+                <table class="row">
+                    <thead class="col-sm-12">
+                        <tr class="row">
+                            <th class="col-sm-6">Element</th>
+                            <th class="col-sm-6">Element Code</th>
+                        </tr>
+                    </thead>
+                    <tbody class="col-sm-12">
+                        <tr class="row">
+                            <td class="col-sm-6">Day</td>
+                            <td class="col-sm-6"> <span title="Copy to clipboard" class="badge badge-pill badge-primary"
+                                (click)="copyInputMessage('[DD]','Day','')">
+                                [DD]</span></td>
+                        </tr>
+                        <tr class="row">
+                            <td class="col-sm-6">Month</td>
+                            <td class="col-sm-6"> <span title="Copy to clipboard" class="badge badge-pill badge-primary"
+                                (click)="copyInputMessage('[MM]','Month','')">
+                                [MM]</span></td>
+                        </tr>
+                        <tr class="row">
+                            <td class="col-sm-6">Year</td>
+                            <td class="col-sm-6"> <span title="Copy to clipboard" class="badge badge-pill badge-primary"
+                                (click)="copyInputMessage('[YYYY]','Year','')">
+                                [YYYY]</span></td>
+                        </tr>
+                        <tr class="row">
+                            <td class="col-sm-6">Hour</td>
+                            <td class="col-sm-6"> <span title="Copy to clipboard" class="badge badge-pill badge-primary"
+                                (click)="copyInputMessage('[hh]','Hour','')">
+                                [hh]</span></td>
+                        </tr>
+                        <tr class="row">
+                            <td class="col-sm-6">Minute</td>
+                            <td class="col-sm-6"> <span title="Copy to clipboard" class="badge badge-pill badge-primary"
+                                (click)="copyInputMessage('[mm]','Month','')">
+                                [mm]</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+              </div> 
+         </div>
+       </div>
+    <div class="row">
+        <div class="col-sm-2"> Preview : </div>
+        <div class="col-sm-10">
+            {{this.customDtoModel.prefix}}-
+            <ng-container let *ngFor="let s of sequenceNumberLimitArray">X</ng-container>-{{this.customDtoModel.suffix}}
+        </div>
+    </div>
+    </div>
+    </div>
+    <div class="app-modal-footer">
+        <button type="button" class="btn btn-default waves-effect" (click)="documentFormating.hide()">Submit</button>
+    </div>
+</app-modal-basic>
+
+<app-modal-basic #variableModal [dialogClass]="'modal-md'" class="modal-dialog">
+    <div class="app-modal-header">
+            <div *ngIf="csvSaveSpinner" class="loading">Loading&#8230;</div>
+        <h4 class="modal-title">
+                Selected Variable:
+        </h4>
+        <button type="button" class="close basic-close" (click)="variableModal.hide()">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="app-modal-body varaiable">
+        <div class="container table-responsive">
+            <table class="table table-striped table-bordered" style="margin-bottom: 0">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Selected Variables</th>
+                    <th scope="col">Remove</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let variable of this.selectedLables;let i = index;">
+                    <th scope="row">{{i + 1}}</th>
+                    <td>{{variable}}</td>
+                    <td><i class="fa fa-times" aria-hidden="true" style="color: red; text-align: center;" (click) ="removeVar(i,variable);"></i></td>
+                  </tr>
+                </tbody>
+              </table>
+    </div>
+    </div>
+    <div class="app-modal-footer">
+        <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+            (click)="saveCsvTemplatesVariables();">Save</button>
+        <button type="button" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+            (click)="variableModal.hide();">Close</button>
+    </div>
+</app-modal-basic>
+
+<app-modal-basic #helpModal [dialogClass]="'modal-lg'" class="modal-dialog">
+        <div class="app-modal-header">
+            <h4 class="modal-title">
+                    User guide to create a file name:
+            </h4>
+            <button type="button" class="close basic-close" (click)="helpModal.hide()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="app-modal-body">
+            <div class="container">
+       <p> 1. One or more form variables can take part in file name formation except Table data.</p>
+       <p> 2. User can enter any number of variables, strings, special chars which is seperated by ",".</p>
+       <p> 3. As we are using "," as a seperator, we cannot have "," in the file name.</p>
+       <p> 4. XXX can be used to get the running Serial number.If the running serial number is 10, and if you define xxx in the file name part, then in the output, it will come as 010.</p>  
+        <p> 5. Date and Time variables can also be used in File name formation. In Report Number Preview field,  Click Select Format and copy the variables as required.</p>
+        <p> 6. Please make sure to add a variable which has unique value just to differentiate it from the rest of the files.Running serial number can be used for this purpose.</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example: Variable1,-,String,-,Variable2,-,[MM],-,[YYYY],-,XXXXX</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Variable1 => Cust name</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String    => ABC</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Variable2 => Equip name</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MM] => Month</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[YYYY] => Year</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Running serial number => 1</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The resultant file name will be Cust name-ABC-Equip name-07-2020-00001</p>
+        </div>
+        </div>
+        <div class="app-modal-footer">
+            <button type="button" class="btn btn-default waves-effect" (click)="helpModal.hide()">Submit</button>
+        </div>
+</app-modal-basic>
+
+

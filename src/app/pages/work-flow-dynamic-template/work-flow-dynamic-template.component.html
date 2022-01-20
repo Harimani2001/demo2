@@ -1,0 +1,256 @@
+<div>
+    <app-card [title]="'Master Dynamic Template Workflow'" *ngIf="!(this.viewUnpublishedData || this.viewPublishedData) ">
+      <br>
+      <div style="text-align: right;">
+          <label > Search :
+          <input type="search"
+          [(ngModel)]="filterQuery"(ngModelChange)="this.helper.setPaginator(table)"
+          class="form-control input-sm full-data-search" placeholder="search"></label><br>
+          </div>
+        <ngb-tabset #t="ngbTabset">
+        <ngb-tab title="Un-Published Master Template" id="tab-selectbyid1">                 
+        <ng-template ngbTabContent>
+          <!-- info card start -->
+          <div class="card">
+            <div class="card-body user-desc">
+  
+              <br>
+              <ngx-datatable #myTable class="data-table dt-chk"
+                [rows]='unPublishedMasterTemplateList | workFlowFilter : filterQuery'
+                [limit]="rowsOnPage" [headerHeight]="50" [footerHeight]="50"
+                [rowHeight]="'auto'">
+             
+              <ngx-datatable-column  name="Id">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">TEMPLATE-00{{row['masterDynamicTemplateDTO'].id}}</strong> </ng-template> </ngx-datatable-column> <ngx-datatable-column
+                [resizeable]="true"  name="Template Name">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['masterDynamicTemplateDTO'].templateName}}</strong> </ng-template> </ngx-datatable-column>
+              <ngx-datatable-column
+              name="Action"> <ng-template let-row="row"
+              ngx-datatable-cell-template>
+                <a  href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"  (click)="modalOverflow.show();loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info" >
+                  <i  class="icofont icofont-info-square"></i>
+                </a>
+              <a *ngIf="permissionModel.viewButtonFlag" href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" (click)="this.viewUnpublishedData=true;viewRowDetails(row);" data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                <i  class="icofont icofont-resize"></i>
+              </a>
+           
+            </ng-template> </ngx-datatable-column>
+               </ngx-datatable>
+              <br>
+            </div>
+          </div>       
+        </ng-template> </ngb-tab>
+  
+           
+  
+          <ngb-tab title="Published Master Template" id="tab-selectbyid2">
+        <ng-template ngbTabContent>
+        <div class="m-t-15">
+          <div class="card">
+            <div class="card-body user-desc">
+              <ngx-datatable #myTable class="data-table dt-chk"
+                [rows]='publishedMasterTemplateList | workFlowFilter : filterQuery'
+                [limit]="rowsOnPage" [headerHeight]="50" [footerHeight]="50"
+                [rowHeight]="'flex'">
+                 <ngx-datatable-column
+                [resizeable]="true" [sortable]="true" name="Id">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">TEMPLATE-00{{row['masterDynamicTemplateDTO'].id}}</strong> </ng-template> </ngx-datatable-column> 
+              <ngx-datatable-column
+                [resizeable]="true" [sortable]="true" name="Template Name">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['masterDynamicTemplateDTO'].templateName}}</strong> </ng-template> </ngx-datatable-column> 
+              <ngx-datatable-column
+              name="Action"> <ng-template let-row="row"
+              ngx-datatable-cell-template>
+                <a  href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right"  (click)="modalOverflow.show();loadDocumentCommentLog(row)"placement="top" ngbTooltip="Info"  >
+                  <i  class="icofont icofont-info-square"></i>
+                </a>
+              <a  href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning" (click)="viewRowDetailsOfPublished(row);" data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                <i  class="icofont icofont-resize"></i>
+              </a>
+        
+            </ng-template> </ngx-datatable-column>
+               </ngx-datatable>
+              <br>
+  
+            </div>
+          </div>
+        </div>
+        </ng-template> </ngb-tab>
+      </ngb-tabset> 
+    </app-card>
+   
+  </div>
+  <app-card *ngIf="this.viewPublishedData">
+      <div><br><h4>&nbsp;&nbsp;Published Master Template View
+       <div style="float: right;"  >
+       <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewPublishedData=false;">&nbsp;&nbsp;</a> 
+       </div>&nbsp;&nbsp;
+       </h4>
+       <br><br>
+       <squeezebox [multiple]="true" > 
+        <sb-item class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg">Template</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+                <p>{{dto['masterDynamicTemplateDTO'].templateName}}</p>  
+            </div>
+          </sb-item-body>
+        </sb-item>
+        <sb-item class="accordion-panel" (onToggled)="isNavbarCollapsed = false" [collapsed]="isNavbarCollapsed">
+          <sb-item-head class="accordion-heading accordion-msg"  >File</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+                  <div class="col-sm-6">
+                      <a style="cursor:pointer;font-weight: bold"  ngbTooltip="download" (click)="downloadFileOrView(dto['masterDynamicTemplateDTO'],false)">{{dto['masterDynamicTemplateDTO'].fileName}}</a> &nbsp;&nbsp; 
+                      <a style="cursor:pointer;font-weight: bold"  ngbTooltip="view" (click)="downloadFileOrView(dto['masterDynamicTemplateDTO'],true)"><span  class="ti-layers"></span></a>
+                      <a style="cursor:pointer;font-weight: bold"  ngbTooltip="Revision" (click)="revisionForDocument(dto['masterDynamicTemplateDTO']);modalRevision.show();"><span  class="ti-eye"></span></a>
+                    </div><br><br>
+                  <div class=" form-group row" style="text-align: center;" id="fileUploadIdTemplateWorkFlow"></div>
+            </div>
+          </sb-item-body>
+        </sb-item>
+      </squeezebox>
+     </div>
+    </app-card>
+  
+  
+  
+  <app-card *ngIf="this.viewUnpublishedData" [blockClass]="'accordion-block scale-accordion'">
+    <div ><br><h4>&nbsp;&nbsp;Un-Published Master Template View
+        <div style="float: right;"  >
+            <button  [disabled]="(!permissionModel.approvedButtonFlag)?'disabled':''" type="submit" class="btn btn-outline-success btn-success btn-round"  (click)="changeStatus(this.dto,'true')">Aprove</button>
+          &nbsp;&nbsp;<button [disabled]="(!permissionModel.approvedButtonFlag)?'disabled':''"  type="button"  class="btn btn-outline-danger btn-danger btn-round" (click)="changeStatus(this.dto,'false')">Decline</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <a style="cursor:pointer;font-weight: bold" class="ti-close" (click)="this.viewUnpublishedData=false;window.scrollTo(0,0);">&nbsp;&nbsp;</a> 
+        </div>&nbsp;&nbsp;
+        </h4>
+        <br><br>
+        <squeezebox [multiple]="true" > 
+        <sb-item class="accordion-panel" [collapsed]="false">
+          <sb-item-head class="accordion-heading accordion-msg">Template</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+                <p>{{dto['masterDynamicTemplateDTO'].templateName}}</p>  
+            </div>
+          </sb-item-body>
+        </sb-item>
+        <sb-item class="accordion-panel" (onToggled)="isNavbarCollapsed = false" [collapsed]="isNavbarCollapsed">
+          <sb-item-head class="accordion-heading accordion-msg"  >File</sb-item-head>
+          <sb-item-body class="accordion-content">
+            <div class="accordion-desc">
+                <div *ngIf="dto['masterDynamicTemplateDTO'].fileName=='' " class="col-sm-6">
+                    <input   type="file"  name="file" required  (change)="onSingleFileUpload($event)" [(ngModel)]='uploadSingleFile'  accept=".pdf,.doc,.docx" #file="ngModel">
+                   <div class="col-sm-10" *ngIf="singleFileUploadFlag" class="spinner-border spinner-border-sm text-primary" role="status">
+                       <span class="sr-only">Loading...</span></div>
+                      <label  style="font-size: 12px"><span class="asterisk required">*Note:</span> Upload .pdf,.doc,.docx files only</label>
+                  <div  class="messages text-danger" *ngIf="(file.touched || submitted) && ( file.errors?.required && (dto['masterDynamicTemplateDTO'].fileName==''))">File Upload can't be blank</div>
+                  </div>
+                  <div *ngIf="dto['masterDynamicTemplateDTO'].fileName!='' " class="col-sm-6">
+                      <a style="cursor:pointer;font-weight: bold"  ngbTooltip="download" (click)="downloadFileOrView(dto['masterDynamicTemplateDTO'],false)">{{dto['masterDynamicTemplateDTO'].fileName}}</a> &nbsp;&nbsp; 
+                      <a style="cursor:pointer;font-weight: bold"  ngbTooltip="delete" (click)="deleteUploadedFile()"><span  class="asterisk ti-close"></span></a>&nbsp;&nbsp;
+                      <a style="cursor:pointer;font-weight: bold"  ngbTooltip="view" (click)="downloadFileOrView(dto['masterDynamicTemplateDTO'],true)"><span  class="ti-layers"></span></a>
+                      <a style="cursor:pointer;font-weight: bold"  ngbTooltip="Revision" (click)="revisionForDocument(dto['masterDynamicTemplateDTO']);modalRevision.show();"><span  class="ti-eye"></span></a>
+                  </div>
+                  <div class="form-group row" style="text-align: center;" id="fileUploadIdTemplateWorkFlow"></div>
+            </div>
+          </sb-item-body>
+        </sb-item>
+
+
+      </squeezebox>
+      </div> 
+        <br><br>
+
+    <br>
+   
+   </app-card>
+  
+  
+   <app-modal-basic #modalOverflow [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+      <div class="app-modal-body">
+        <button type="button" class="close basic-close-light-box" (click)="modalOverflow.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h5>Form Current Status</h5><br>
+        <div ><br>
+          <div><b>Form Present Level :</b>&nbsp;{{presentLevel}}</div>
+          <div><b>Form Present Status :</b>&nbsp;<span style="background-color:	#FFFF00">{{presentStatus}}</span></div>
+          <div><b>Form Created By :</b>&nbsp; {{presentCreatedBy}}</div>
+          <div><b>Form Last Modified On : </b>{{presentModifiedDate | date:'dd-MM-yy hh:mm a'}}</div>
+        </div>
+        <hr>
+        <div class="overflow-container" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+         
+          <h5>Form  Status Log</h5><br>
+         
+          <div *ngFor="let log of workFlowLog ;let in = index">
+            <div><b>{{in+1}}</b></div>
+            <div><b>Document Level :</b>&nbsp;{{log.levelName}}</div>
+            <div><b>Document Status :</b>&nbsp;{{log.status}}</div>
+            <div><b>Document Comments :</b>{{log.comment}}</div>
+            <div><b>Commented By :</b>&nbsp; {{log.user}}</div>
+            <div><b>Commented On :</b>{{log.createdTime | date:'dd-MM-yy hh:mm a'}}</div>
+            <hr>
+      
+          </div> <div *ngIf="this.modalSpinner" class="loader"></div>
+        </div>
+      </div>
+      </app-modal-basic>
+
+
+
+
+<!--REVISION OF DOCUMENTS-->  
+<app-modal-basic #modalRevision [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="modalRevision.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Revision Form Document</h5><br>
+    <div ><br>
+      <div class="table-group row col-sm-12">
+        <label class="col-sm-2">Source File
+          <span class="asterisk">*</span>
+        </label>
+        <div class="col-sm-4">
+          <select  name="select" class="form-control"  required   [(ngModel)]="sourceFile"
+            name="sourceFile" #sourceFileModel="ngModel">
+            <option *ngFor="let left of leftRevisionArray ; let lindex = index" [value]="left.filePath">R-{{lindex+1}}&nbsp;{{left.fileName}}</option>
+          </select>
+        </div>
+
+        <label class="col-sm-2 col-form-label">Compare File
+          <span class="asterisk">*</span>
+        </label>
+
+        <div class="col-sm-4">
+          <select  name="select" class="form-control"  required   [(ngModel)]="compareFile"
+            name="compareFile" #compareFileModel="ngModel">
+            <option *ngFor="let right of rightRevisionArray ; let rindex=index" [value]="right.filePath">R-{{rindex+1}}&nbsp;{{right.fileName}}</option>
+          </select>
+        </div>
+      </div><br>
+      <div class="form-group row col-sm-12"  style="text-align: center;">
+          <button  type="button"   class="btn btn-primary"  (click)="$event.preventDefault();compareTwoFile()"><span>
+              <i *ngIf="modalSpinner" class="spinner-border spinner-border-sm"></i>Compare</span>&nbsp;  </button>
+        <div class="messages text-danger" *ngIf="sourceFile=='' || compareFile=='' " >{{this.revisionValidationMessage}}</div>
+        <div *ngIf="modalSpinner" class="loading">Loading&#8230;</div>
+      </div>
+    </div>
+    <hr>
+    <div id="overflowWorkFlowCompareId" class="overflow-container" style="visibility: hidden !important" slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+     
+      <h5>Compare View</h5><br>
+     
+      <div style="text-align:center" class="table-group">
+        <iframe width="600px" height="800px" id="workFlowSourceFileId"></iframe>
+        <iframe width="600px" height="800px" id="workFlowCompareFileId"></iframe>
+      </div>
+     
+    </div>
+  </div>
+  </app-modal-basic>   
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

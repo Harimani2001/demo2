@@ -1,0 +1,28 @@
+
+
+
+table#dtBasicExample {
+    width:100%;
+    border-collapse: collapse;
+    }
+    
+    table#dtBasicExample td {
+    white-space: inherit;
+    width: auto;
+    text-align: center;
+    font-size: 12px;
+    font-weight:normal ;
+    background-color: white;
+    }
+
+    table#dtBasicExample th {
+        white-space: inherit;
+        width: auto;
+        text-align: center;
+        font-size:12px;
+        font-weight:normal ;
+        /* background-color: darkturquoise; */
+        color:#082654;
+            }
+
+

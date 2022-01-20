@@ -1,0 +1,211 @@
+<app-modal-basic id="modal-lg-60" #individualDocumentWorkflowModal [dialogClass]="'modal-lg'" [hideHeader]="false"
+  [hideFooter]="false" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header" style="width: 100%">
+    <div style="display: inline-flex;">
+      <h5 class="font-header">Workflow Setup</h5>
+      <button *ngIf="!add &&  this.documentFlows.length>1 && this.switchButtonColorFlag" 
+        (click)="updateLevelOrderOfDocument(this.documentFlows);this.switchButtonColorFlag=false;"
+        type="button" class="btn btn-primary p-t-3 p-b-3">Update Order </button>
+      <button type="button" class="close basic-close" (click)="individualDocumentWorkflowModal.hide(); onClosePopUpModel();clearSection();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div *ngIf="!this.freezeFlagForLevel && this.addButtonFlag">
+      <div class="row">
+        <div class="col-sm-5">
+          Level Name
+          <select name="newLevel" class="form-control" [(ngModel)]="newLevel">
+          <option value="0">Select Level</option>
+          <option *ngFor="let level of this.workflowLevelList" [value]="level.value">{{level.label}}</option>
+        </select>
+        </div>
+        <div class="col-sm-5">
+          Users
+          <angular2-multiselect [data]="this.addNewUsers" [(ngModel)]="selectredNewUsers" [settings]="newUserDropdownSettings">
+              <c-search>
+                  <ng-template>
+                      <input type="text" [(ngModel)]="newUserInput" (keyup)="onNewUsersSearch($event)" placeholder="Search Users"/>
+                  </ng-template>
+              </c-search>
+              <c-item>
+                  <ng-template let-item="item">
+                      <label>{{item.itemName}}</label>
+                  </ng-template>
+              </c-item>
+          </angular2-multiselect>
+        </div>
+        <div class="col-sm-2 m-t-30">
+          <a  *ngIf="newLevel !=0 && selectredNewUsers.length > 0" href="javascript:"><img class="image-radius rounded-0 img-27 img-height m-r-10"
+          src="assets/icon/png-icons/save.svg" alt="Save Users" placement="bottom" ngbTooltip="Save"
+          (click)="saveNewLevelUsers()"></a>
+          <button *ngIf="!this.freezeFlagForLevel && this.addButtonFlag" style="text-align: center;"
+            class="btn btn-primary btn-outline-primary btn-icon" ngbTooltip="Add More Level" placement="top"
+            container="body" triggers="mouseenter:mouseleave" (click)="addNewLevelForDocument(this.documentFlows)"><i
+              class="icofont icofont-plus-circle"></i></button>
+        </div>
+      </div>
+  </div>
+  </div>
+  <div class="app-modal-body" [ngClass]="this.documentFlows.length > 0?'':'dy-height-400'">
+    <div class="container">
+      <div class="form-group row">
+        <div class="row">
+          <div *ngIf="add " class="col-sm-12">
+            <div class="container m-0">
+              <div class="form-group row">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-sm-12">
+                      <div *ngIf="createLevel">
+                        <div class="row">
+                          <div class="col-sm-9">
+                            Level Name<span class="asterisk">*</span>
+                            <input class="form-control" [(ngModel)]="levelName" placeholder="Level name"
+                              style="padding-top: 0px; height: 37px;" maxlength="15" type="text">
+                          </div>
+                        </div>
+                      </div>
+                      <div *ngIf="!createLevel" class="row">
+                        <div class="col-sm-5">
+                          <label class="col-sm-8 p-l-0" for="level">Select Levels<span class="asterisk">*</span>
+                          </label>
+                          <ng-select [ngClass]="'ng-select'" [options]="this.workflowLevelList"
+                            aria-placeholder="Select Level" id="level" (ngModelChange)="validateSave()"
+                            [disabled]="this.freezeFlagForLevel" [multiple]="false" [(ngModel)]="levelId" name="level"
+                            rounds="ngModel" required>
+                          </ng-select>
+                          <p *ngIf="!this.freezeFlagForLevel && levelId.length == 0"
+                            style="cursor: pointer !important ;float:right;text-decoration: underline;"
+                            (click)="createLevel=true;this.levelName=null;this.validateSave();"
+                            class="p-l-20 p-t-10 m-b-0 text-c-blue">Create Level</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="this.levelId!=0">
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Locations<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="locations" [data]="this.locationsList" id="locationId"
+                      (ngModelChange)="this.loadDepartments($event);validateSave()" [(ngModel)]="locationId"
+                      rounds="ngModel" required [settings]="locationDropdownSettings"> </angular2-multiselect>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Departments<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="departments" [data]="this.departments" id="departmentId"
+                      (onDeSelectAll)="onRoleDeSelect($event)" (onDeSelect)="onRoleDeSelect([$event])"
+                      (ngModelChange)="this.loadUser(this.rolesId,$event, true);validateSave()"
+                      [(ngModel)]="departmentId" rounds="ngModel" required [settings]="dropdownSettings">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <label class="col-sm-4 col-form-label">Roles<span class="asterisk">*</span></label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="roles" [data]="this.roles" id="rolesId"
+                      (ngModelChange)="this.loadUser($event,this.departmentId, true);validateSave()"
+                      [(ngModel)]="rolesId" rounds="ngModel" required [settings]="dropdownSettings">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+                <div class="form-group row ">
+                  <label class="col-sm-8 col-form-label">Users<span class="asterisk">*</span>
+                  </label>
+                  <div class="col-sm-11">
+                    <angular2-multiselect name="users" [data]="this.users" id="usersId"
+                      (ngModelChange)="validateSave();" [(ngModel)]="usersId" rounds="ngModel" required
+                      [settings]="dropdownSettings"> </angular2-multiselect>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="!add" style="text-align: center;" class="col">
+            <div style="cursor: pointer;margin-left: 5%;margin-right: 5%;" dnd-sortable-container
+              [sortableData]="this.documentFlows" droppable [dropScope]="[]" (onDrop)="onadd($event)">
+              <div class="panel-body ">
+                <li [draggable] dnd-sortable [sortableIndex]="i" *ngFor="let item of this.documentFlows; let i = index"
+                  [dragData]="item" [dragEnabled]="!this.freezeFlagForLevel" class="list-group-item">
+                  <div style="text-align: left" class="container ">
+                    <div class="row">
+                      <label class="col-sm-4"><strong class="strong">Level :</strong> {{item.levelName}}</label>
+                      <div class="col-sm-5" *ngIf="!item.isEditUsers">
+                        <label><strong class="strong">Users: </strong><span style="cursor: pointer;" (click)="onClickEditUsers(item);" ngbTooltip="Click to Edit">{{item.userArray}}</span></label>
+                      </div>
+                      <div class="col-sm-5" *ngIf="item.isEditUsers">
+                        <angular2-multiselect [data]="this.newUsers"
+                          [(ngModel)]="item.selectedUsers" [settings]="userDropdownSettings">
+                              <c-search>
+                                  <ng-template>
+                                      <input type="text" [(ngModel)]="userInput" (keyup)="onUsersSearch($event,item.levelId)" placeholder="Search Users"/>
+                                  </ng-template>
+                              </c-search>
+                              <c-item>
+                                  <ng-template let-item="item">
+                                      <label>{{item.itemName}}</label>
+                                  </ng-template>
+                              </c-item>
+                          </angular2-multiselect>
+                        </div>
+                      <div class="col-sm-3">
+                        <a  *ngIf="item.isEditUsers  && item.selectedUsers.length > 0" class="m-r-5" container="body" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Save Users"
+                        (click)="saveNewUsers(item);">
+                        <i class="icofont icofont-save"></i>
+                        </a>
+                        <a *ngIf="i!=0 && !this.freezeFlagForLevel" container="body" placement="top"
+                          triggers="mouseenter:mouseleave" ngbTooltip="Move Up"
+                          (click)="moveUpOrDown(this.documentFlows,i,true)">
+                          <i class="icofont icofont-arrow-up "></i>
+                        </a>
+                        <a *ngIf="i!=(this.documentFlows.length-1) && !this.freezeFlagForLevel" container="body"
+                          placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Move Down"
+                          (click)="moveUpOrDown(this.documentFlows,i,false)">
+                          <i class="icofont icofont-arrow-down "></i>
+                        </a>
+                        <a container="body" *ngIf="!this.freezeFlagForLevel" placement="top"
+                          triggers="mouseenter:mouseleave" ngbTooltip="Delete"
+                          (click)="deleteLevelOfDocumentSwal(item.id)">
+                          <i class="icofont icofont-bin "></i>
+                        </a>
+                        <a container="body" placement="top" triggers="mouseenter:mouseleave" ngbTooltip="Edit"
+                          (click)="editLevelOfDocument(item); this.addButtonFlag=false;">
+                          <i class="icofont icofont-edit "></i>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-sm-12">
+                        <label><strong class="strong">Order:</strong> {{item.orderId}}</label>
+                      </div>
+                    </div>
+                  </div>
+                  <i style="font-size:500%" class="icofont icofont-long-arrow-down d-flex justify-content-center "></i>
+                </li>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="this.spinnerFlag" class="loading">Loading&#8230;</div>
+  </div>
+  <div style="width: 100%;" class="app-modal-footer">
+
+    <div class="row">
+      <div style="text-align: right;" class="col-sm-12">
+        <button *ngIf="this.validSave && add && !createLevel" (click)="saveLevelData();clearSection()" type="button"
+          class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+        <button *ngIf="add && !createLevel" (click)="this.loadDataForFlow(); this.addButtonFlag=true;clearSection()" type="button"
+          class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+        <button *ngIf="createLevel" type="button" [disabled]="this.levelName==null || this.levelName==''"
+          (click)="createWorkflowLevel();clearSection()" class="btn btn-sm btn-success waves-effect waves-light m-r-10">Save</button>
+        <button *ngIf="createLevel" (click)="createLevel=false;clearSection()" type="button"
+          class="btn btn-sm btn-danger waves-effect waves-light m-r-10">Cancel</button>
+      </div>
+    </div>
+  </div>
+</app-modal-basic>

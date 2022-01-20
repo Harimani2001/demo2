@@ -1,0 +1,760 @@
+<div class="col-sm-12">
+    <app-card *ngIf="tableViewFlag">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="row">
+            <div class="col-sm-6">
+              <ng-container *ngIf="formCountFlag;else else_message">
+                <button [disabled]="(!permissionModel.createButtonFlag)  " type="button" class="btn btn-primary" type="button"
+                  class="btn btn-primary" (click)="newForm()">
+                  <i class="icofont icofont-plus-circle"></i>
+                  Create Form</button>
+                <button type="button" class="btn btn-primary" type="button" class="btn btn-primary"
+                  (click)="formGroupingModal.show();loadAllFormMappingData();">
+                  <i class="icofont icofont-file-document"></i>
+                  Form Mapping</button>
+                <button [disabled]="(!permissionModel.importButtonFlag)" type="button" class="btn btn-primary" type="button" class="btn btn-primary"
+                  (click)="formImportModal.show();resetBulk();">
+                  <img src="assets/icon/png-icons/import-white.png" alt="Forum"
+                    placement="top" width="24" height="20"/>
+                  Import Form
+                </button>
+              </ng-container>
+              <ng-template #else_message>
+                <div  [innerHtml]='this.formCountMsg'></div>
+              </ng-template>
+            </div>
+            <div class="col-sm-2 pr-0 pl-0"  *ngIf="tabName!='audit'">
+              <label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Location </label>
+              <form class="form-inline">
+                <div class="col-sm-12 pr-0 ">
+                  <div id="inputgroup" class="input-group">
+                    <select name="selectLocation" class="form-control"
+                    [(ngModel)]="defaultLocation"
+                      (change)="onChangeLocation($event.srcElement.value)">
+                      <option value="">Select Location</option>
+                      <option *ngFor="let loc of locationList" [value]="loc.id">{{loc.name}}</option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+
+            <div class="col-sm-2 pr-0 pl-0"  *ngIf="tabName!='audit'">
+              <label class="col-form-label">&nbsp;&nbsp;&nbsp;Select Department </label>
+              <form class="form-inline">
+                <div class="col-sm-12 pr-0 ">
+                  <div id="inputgroup" class="input-group">
+                    <select name="selectLocation" class="form-control"
+                    [(ngModel)]="defaultDepartment"
+                      (change)="loadMasterFormForWorkFlow($event.srcElement.value)">
+                      <option value="">Select Department</option>
+                      <option *ngFor="let dept of deptList" [value]="dept.displayOrder">{{dept.value}}</option>
+                    </select>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="col-sm-2" style="padding-top: 35px;">
+              <ng-container *ngIf="tabName!='audit'">
+                <input type="search" [(ngModel)]="filterQuery" id="searchId" (ngModelChange)="this.helper.setPaginator(table)"
+                class="form-control" placeholder="Search">
+              </ng-container>
+            </div>
+            <!-- <div class="col-sm-2"  *ngIf="tabName!='audit'"></div> -->
+          </div>
+          <br>
+        </div>
+
+        <div class="col-sm-12">
+          <ngb-tabset #masterFormTab="ngbTabset" [(activeId)]="tabName" (tabChange)="tabChange($event.nextId);">
+            <ngb-tab id="all-forms">
+              <ng-template ngbTabTitle>
+                <div>All Forms</div>
+              </ng-template>
+              <ng-template ngbTabContent>
+                <br>
+                <ngx-datatable #myTable id="customTable" class="data-table dt-chk" [rows]='allMasterFormList | workFlowFilter : filterQuery'
+                  [limit]="rowsOnPage" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [scrollbarH]="true" [columnMode]="'force'">
+                  <ngx-datatable-column name="Id">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">FORM-00{{row['masterDynamicFormDTO'].id}}</strong> </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true" name="Form Name">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">{{row['masterDynamicFormDTO'].templateName}}</strong> </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true" name="Entry Type">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">
+                        <ng-container *ngIf="row['masterDynamicFormDTO'].multipleEntryFlag">Mutiple Entry</ng-container>
+                        <ng-container *ngIf="!row['masterDynamicFormDTO'].multipleEntryFlag">Single Entry</ng-container>
+                      </strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true" name="Form Type">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">
+                        <ng-container>{{row['masterDynamicFormDTO'].formType}}</ng-container>
+                      </strong>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true"  name="Department">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong class="fontStyle">{{row['masterDynamicFormDTO'].departmentName}}</strong> </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true"  name="Owner">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <span *ngIf="!row.isEditDocumentOwner" class="fontStyle" title="Click to Edit" (click)="row.isEditDocumentOwner = !row.isEditDocumentOwner; editDocumentOwner(row);">{{row['masterDynamicFormDTO'].templateOwnerName}}</span> 
+                    <div class="row" *ngIf="row.isEditDocumentOwner && row.firstLevelFlag">
+                      <div class="col-sm-10">
+                        <select #level="ngModel" name="templateOwner" class="form-control" id="ownerId" required
+                        [(ngModel)]="row.masterDynamicFormDTO.templateOwnerId" (ngModelChange)="onChangeDocumentOwner($event,row);">
+                        <option disabled [value]="0">Choose Owner</option>
+                        <option *ngFor="let owner of templateOwnerList" [value]="owner.key">{{owner.value}}</option>
+                      </select>
+                      </div>
+                      <div class="col-sm-2 close">
+                        <i class="icofont icofont-close" (click)="row.isEditDocumentOwner = !row.isEditDocumentOwner;"></i>
+                      </div>
+                    </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true"  name="Effective Date">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <span *ngIf="!row.isEditEffectiveDate" class="fontStyle" title="Click to Edit" (click)="row.isEditEffectiveDate = !row.isEditEffectiveDate; editEffectiveDate(row);">{{row['masterDynamicFormDTO'].effectiveDate}}</span> 
+                      <div class="row" *ngIf="row.isEditEffectiveDate">
+                        <div class="col-sm-10">
+                          <my-date-picker (keypress)="$event.preventDefault();" [disabled]="!row.firstLevelFlag " #date name="{{row['masterDynamicFormDTO'].id}}"
+                            (click)="openBtnClicked()" [options]="myDatePickerOptions" placeholder="Select Next Review Date"
+                            [(ngModel)]="row.masterDynamicFormDTO.newEffectiveDate" (ngModelChange)="onChangeEffectiveDate($event,row);">
+                          </my-date-picker>
+                        </div>
+                        <div class="col-sm-2 close">
+                          <i class="icofont icofont-close" *ngIf="row.masterDynamicFormDTO.effectiveDate" (click)="row.isEditEffectiveDate = !row.isEditEffectiveDate;"></i>
+                        </div>
+                      </div> 
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true"  name="Next Review Date">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                      <span *ngIf="!row.isEditReviewDate" class="fontStyle" title="Click to Edit" (click)="row.isEditReviewDate = !row.isEditReviewDate; editReviewDate(row);">{{row['masterDynamicFormDTO'].nextReviewDate}}</span> 
+                      <div class="row" *ngIf="row.isEditReviewDate">
+                        <div class="col-sm-10">
+                          <my-date-picker (keypress)="$event.preventDefault();" [disabled]="!row.firstLevelFlag " #date1 name="{{row['masterDynamicFormDTO'].id}}"
+                            (click)="openBtnClicked()" [options]="myDatePickerOptions" placeholder="Select Next Review Date"
+                            [(ngModel)]="row.masterDynamicFormDTO.newReviewDate" (ngModelChange)="onChangeReviewDate($event,row);">
+                          </my-date-picker>
+                        </div>
+                        <div class="col-sm-2 close">
+                          <i class="icofont icofont-close" *ngIf="row.masterDynamicFormDTO.nextReviewDate" (click)="row.isEditReviewDate = !row.isEditReviewDate;"></i>
+                        </div>
+                      </div>
+                    </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true"  name="Remaining">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong class="fontStyle">{{row['masterDynamicFormDTO'].remainingDays}} {{row['masterDynamicFormDTO'].remainingDays !=''?'Days':''}}</strong> </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column [resizeable]="true"  name="Version">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                    <strong class="fontStyle">{{row['masterDynamicFormDTO'].version}}</strong> </ng-template>
+                  </ngx-datatable-column>
+                  <ngx-datatable-column name="Action" [frozenRight]="true" [width]="230">
+                    <ng-template let-row="row" ngx-datatable-cell-template>
+                        <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right" container="body"
+                        (click)="modalOverflow.show();loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info">
+                        <i  class="icofont icofont-info-square info"></i>
+                      </a>
+                      <a  href="javascript:;" *ngIf="permissionModel.updateButtonFlag && row.firstLevelFlag" container="body"
+                        (click)="loadTemplateToEdit(row['masterDynamicFormDTO'].id)"
+                        class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Edit">
+                        <i  class="icofont icofont-edit edit"></i>
+                      </a>
+                      <a  href="javascript:;" *ngIf="permissionModel.exportButtonFlag" class="m-r-15 crm-action-edit text-muted text-primary" container="body"
+                       (click)="exportFormJSON(row['masterDynamicFormDTO']);" placement="top" ngbTooltip="Export">
+                      <img src="assets/icon/png-icons/export-blue.png" alt="Forum"
+                        placement="top" width="22.17" height="20"/>
+                      </a>
+                      <a *ngIf="permissionModel.deleteButtonFlag && row.firstLevelFlag " href="javascript:;" container="body"
+                        class="m-r-15 crm-action-delete text-muted text-danger"
+                        (click)="deleteTemplateSwal(row['masterDynamicFormDTO']);" placement="top" ngbTooltip="Delete">
+                        <i  class="icofont icofont-bin bin"></i>
+                      </a>
+                      <a *ngIf="permissionModel.viewButtonFlag" href="javascript:;" container="body"
+                        class="m-r-15 crm-action-view text-muted text-warning" (click)="viewRowDetails(row,'');"
+                        data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                        <i  class="icofont icofont-resize view"></i>
+                      </a>
+                    </ng-template>
+                  </ngx-datatable-column>
+                </ngx-datatable>
+              </ng-template>
+            </ngb-tab>
+    
+            <ngb-tab id="pending-forms">
+              <ng-template ngbTabTitle>
+                <div>Pending Forms</div>
+              </ng-template>
+              <ng-template ngbTabContent>
+                <br>
+                <ngx-datatable #myTable class="data-table dt-chk" id="customTable"
+                [rows]='unPublishedMasterFormList | workFlowFilter : filterQuery'  [scrollbarH]="true" 
+                [limit]="rowsOnPage" [headerHeight]="50" [footerHeight]="50" [columnMode]="'force'"
+                [rowHeight]="'auto'">
+             
+              <ngx-datatable-column  name="Id">
+              <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">FORM-00{{row['masterDynamicFormDTO'].id}}</strong> </ng-template> </ngx-datatable-column> 
+              <ngx-datatable-column [resizeable]="true"  name="Form Name">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                <strong class="fontStyle">{{row['masterDynamicFormDTO'].templateName}}</strong> </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column [resizeable]="true" name="Entry Type">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong class="fontStyle">
+                    <ng-container *ngIf="row['masterDynamicFormDTO'].multipleEntryFlag">Mutiple Entry</ng-container>
+                    <ng-container *ngIf="!row['masterDynamicFormDTO'].multipleEntryFlag">Single Entry</ng-container>
+                  </strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column [resizeable]="true" name="Form Type">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                  <strong class="fontStyle">
+                    {{row['masterDynamicFormDTO'].formType}}
+                  </strong>
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column [resizeable]="true"  name="Departments">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                <strong class="fontStyle">{{row['masterDynamicFormDTO'].departmentName}}</strong> </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column [resizeable]="true"  name="Owner">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                <span class="fontStyle" >{{row['masterDynamicFormDTO'].templateOwnerName}}</span> 
+                </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column [resizeable]="true"  name="Effective Date">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                <strong class="fontStyle">{{row['masterDynamicFormDTO'].effectiveDate}}</strong> </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column [resizeable]="true"  name="Next Review Date">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                <strong class="fontStyle">{{row['masterDynamicFormDTO'].nextReviewDate}}</strong> </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column [resizeable]="true"  name="Remaining">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                <strong class="fontStyle">{{row['masterDynamicFormDTO'].remainingDays}} {{row['masterDynamicFormDTO'].remainingDays !=''?'Days':''}}</strong> </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column [resizeable]="true"  name="Version">
+                <ng-template let-row="row" ngx-datatable-cell-template>
+                <strong class="fontStyle">{{row['masterDynamicFormDTO'].version}}</strong> </ng-template>
+              </ngx-datatable-column>
+              <ngx-datatable-column name="Action" [frozenRight]="true" [width]="150">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right" container="body"
+                      (click)="modalOverflow.show();loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info">
+                      <i  class="icofont icofont-info-square info"></i>
+                    </a>
+                    <a  href="javascript:;" *ngIf="permissionModel.exportButtonFlag" class="m-r-15 crm-action-info text-muted text-primary" placement="right" container="body"
+                      placement="top" ngbTooltip="Export" (click)="exportFormJSON(row['masterDynamicFormDTO']);">
+                      <img src="assets/icon/png-icons/export-blue.png" alt="Forum"
+                        placement="top" width="22.17" height="20"/>
+                    </a>
+                    <a *ngIf="permissionModel.viewButtonFlag" href="javascript:;" container="body"
+                      class="m-r-15 crm-action-view text-muted text-warning"
+                      (click)="viewRowDetails(row,'true');" data-ng-open="modalSmall"
+                      placement="top" ngbTooltip="View">
+                      <i  class="icofont icofont-resize view"></i>
+                    </a>
+                  </ng-template>
+                </ngx-datatable-column>
+                  
+                </ngx-datatable>
+                <br>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab id="approved-forms">
+              <ng-template ngbTabTitle>
+                <div>Approved Forms</div>
+              </ng-template>
+              <ng-template ngbTabContent>
+                <br>
+                  <ngx-datatable #myTable class="data-table dt-chk" id="customTable" [rows]='publishedMasterFormList | workFlowFilter : filterQuery'
+                   [columnMode]="'force'" [limit]="rowsOnPage" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [scrollbarH]="true" >
+                    <ngx-datatable-column [resizeable]="true" [sortable]="true" name="Id">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong class="fontStyle">FORM-00{{row['masterDynamicFormDTO'].id}}</strong> </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true" [sortable]="true" name="Form Name">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong class="fontStyle">{{row['masterDynamicFormDTO'].templateName}}</strong> </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true" name="Entry Type">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong class="fontStyle">
+                          <ng-container *ngIf="row['masterDynamicFormDTO'].multipleEntryFlag">Mutiple Entry</ng-container>
+                          <ng-container *ngIf="!row['masterDynamicFormDTO'].multipleEntryFlag">Single Entry</ng-container>
+                        </strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true" name="Form Type">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <strong class="fontStyle">
+                          {{row['masterDynamicFormDTO'].formType}}
+                        </strong>
+                      </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true"  name="Departments">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">{{row['masterDynamicFormDTO'].departmentName}}</strong> </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true"  name="Owner">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                      <span class="fontStyle">{{row['masterDynamicFormDTO'].templateOwnerName}}</span> 
+                      </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true"  name="Effective Date">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">{{row['masterDynamicFormDTO'].effectiveDate}}</strong> </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true"  name="Next Review Date">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">{{row['masterDynamicFormDTO'].nextReviewDate}}</strong> </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true"  name="Remaining">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">{{row['masterDynamicFormDTO'].remainingDays}} {{row['masterDynamicFormDTO'].remainingDays !=''?'Days':''}}</strong> </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column [resizeable]="true"  name="Version">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                      <strong class="fontStyle">{{row['masterDynamicFormDTO'].version}}</strong> </ng-template>
+                    </ngx-datatable-column>
+                    <ngx-datatable-column name="Action" [frozenRight]="true" [width]="200">
+                      <ng-template let-row="row" ngx-datatable-cell-template>
+                        <a href="javascript:;" class="m-r-15 crm-action-info text-muted text-primary" placement="right" container="body"
+                          (click)="modalOverflow.show();loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info">
+                          <i  class="icofont icofont-info-square info"></i>
+                        </a> 
+                        <a *ngIf="permissionModel.createButtonFlag && formCountFlag" href="javascript:;" (click)="cloneOfMasterForm(row['masterDynamicFormDTO'])" container="body"
+                          class="m-r-15 crm-action-edit text-muted text-primary" placement="top" ngbTooltip="Copy">
+                          <i  class="icofont icofont-copy copy"></i>
+                        </a>
+                        <a  href="javascript:;" *ngIf="permissionModel.exportButtonFlag" class="m-r-15 crm-action-info text-muted text-primary" placement="right" container="body"
+                         placement="top" ngbTooltip="Export" (click)="exportFormJSON(row['masterDynamicFormDTO']);">
+                         <img src="assets/icon/png-icons/export-blue.png" alt="Forum"
+                            placement="top" width="22.17" height="20">
+                        </a>
+                        <a *ngIf="permissionModel.viewButtonFlag" href="javascript:;" container="body"
+                          class="m-r-15 crm-action-view text-muted text-warning" (click)="viewRowDetails(row,'false');"
+                          data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                          <i  class="icofont icofont-resize view"></i>
+                        </a>
+                      </ng-template>
+                    </ngx-datatable-column>
+                  </ngx-datatable>
+              </ng-template>
+            </ngb-tab>
+            <ngb-tab id="audit" title="Audit Trail">
+              <ng-template ngbTabContent>
+                <app-audit-trail-view #auditView [permission]="this.helper.MASTER_DYNAMIC_FORM"></app-audit-trail-view>
+              </ng-template>
+            </ngb-tab>
+            
+          </ngb-tabset>
+        </div>
+      </div>
+
+    
+    </app-card>
+  </div>
+
+<!--END: TABLE VIEW FOR MASTER TEMPLATE-->
+<div id="tabular">
+  <app-card *ngIf="!tableViewFlag && !viewData">
+
+      <ngb-tabset #t1="ngbTabset">
+          <ngb-tab>
+            <ng-template ngbTabTitle>
+              <div style="cursor: pointer">Create Forms</div>
+            </ng-template>
+            <ng-template ngbTabContent>
+              <br>
+                <app-dynamic-forms (onClose)="this.ngOnInit();"></app-dynamic-forms>
+            </ng-template>
+          </ngb-tab>
+  
+          <ngb-tab>
+            <ng-template ngbTabTitle>
+              <div id="workFlowSetUpId">Set Up Workflow</div>
+            </ng-template>
+            <ng-template ngbTabContent>
+              <br><br>
+              <app-work-flow-configuration-dynamic-form  (onClose)="this.ngOnInit();"></app-work-flow-configuration-dynamic-form>
+              <br>
+            </ng-template>
+          </ngb-tab>
+        </ngb-tabset>
+      </app-card> 
+ </div>
+
+ <app-card *ngIf="this.viewData">
+  <div class="row">
+    <div class="col-sm-12" id="float-action">
+      <app-card>
+        <div class="row">
+          <div class="page-header-title col-sm-4">
+            <i class="icofont icofont-file-document bg-c-blue"></i>
+            <div class="d-inline">
+              <h5 class="strong">{{dto['masterDynamicFormDTO'].templateName}}</h5><br>
+                <span>Form Code : FORM-00{{dto['masterDynamicFormDTO'].id}}</span>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            Effective Date:
+            <my-date-picker (keypress)="$event.preventDefault();" #date name="newEffectiveDate"
+            (click)="openBtnClicked()" [options]="myDatePickerOptions" placeholder="Select Next Review Date"
+            [(ngModel)]="dto.masterDynamicFormDTO.newEffectiveDate" (ngModelChange)="onChangeEffectiveDate($event,dto);">
+          </my-date-picker>
+          </div>
+          <div class="col-sm-2">
+            Next Review Date:
+            <my-date-picker (keypress)="$event.preventDefault();" #date1 name="newReviewDate"
+            (click)="openBtnClicked()" [options]="myDatePickerOptions" placeholder="Select Next Review Date"
+            [(ngModel)]="dto.masterDynamicFormDTO.newReviewDate" (ngModelChange)="onChangeReviewDate($event,dto);">
+          </my-date-picker>
+          </div>
+          <div class="col-sm-4 text-right">
+            <button type="submit" class="btn btn-sm btn-primary waves-effect waves-light m-r-10"
+              *ngIf="permissionModel.updateButtonFlag && viewType=='' && this.dto.firstLevelFlag"
+              (click)="loadTemplateToEdit(this.dto['masterDynamicFormDTO'].id)">Edit</button>
+            <button *ngIf="permissionModel.deleteButtonFlag && viewType=='' && this.dto.firstLevelFlag" type="button"
+              class="btn btn-sm btn-danger  waves-effect waves-light m-r-10"
+              (click)="deleteTemplateSwal(this.dto['masterDynamicFormDTO'])">Delete</button>
+            <button *ngIf="viewType=='true'" type="submit"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="changeStatus(this.dto,'true')">Approve</button>
+            <button *ngIf="viewType=='true'" type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="changeStatus(this.dto,'false')">Decline</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              (click)="viewTable()">Cancel</button>
+          </div>
+        </div>
+      </app-card>
+    </div>
+  </div>
+  <br><br><br><br>
+  <div class="row">
+    <div class="col-sm-12">
+      <table id="add-table" class="table w-100">
+        <tbody>
+          <tr>
+            <td>
+              <div><strong class="strong">Entry Type : </strong>
+                <label *ngIf="dto['masterDynamicFormDTO'].multipleEntryFlag">Mutiple Entry</label>
+                <label *ngIf="!dto['masterDynamicFormDTO'].multipleEntryFlag">Single Entry</label>
+              </div>
+            </td>
+            <td>
+              <div><strong class="strong">Form Type : </strong>{{dto['masterDynamicFormDTO'].formType}}</div>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div><strong class="strong">Departments : </strong>{{dto['masterDynamicFormDTO'].departmentName}}</div>
+            </td>
+            <td>
+              <div><strong class="strong">Form Owner : </strong>{{dto['masterDynamicFormDTO'].templateOwnerName}}</div>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div><strong class="strong">Prefix For Item Id : </strong>{{dto['masterDynamicFormDTO'].prefix}}</div>
+            </td>
+            <td>
+              <div><strong class="strong">Suffix For Item Id : </strong>{{dto['masterDynamicFormDTO'].suffix}}</div>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              <div><strong class="strong">Effective Date : </strong>{{dto['masterDynamicFormDTO'].effectiveDate}}</div>
+            </td>
+            <td>
+              <div><strong class="strong">Next Review Date : </strong>{{dto['masterDynamicFormDTO'].nextReviewDate}}</div>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              <div><strong class="strong">Version : </strong>{{dto['masterDynamicFormDTO'].version}}</div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+  <div>
+    <span *ngIf="pdfSettingFlag" style="float: right;"><img
+        (click)="documentPreview(this.dto['masterDynamicFormDTO'].permissionConstant,false);" placement="top"
+        container="body" ngbTooltip="Preview" style="height: 35px; width: 35px;" class="pointer"
+        src="/assets/images/pdf.png"><br><br></span>
+    
+    <app-form-preview [inputField]='inputField'></app-form-preview>
+  </div>
+  <app-individual-audit-trail [permission]="this.helper.MASTER_DYNAMIC_FORM" [id]="this.dto['masterDynamicFormDTO'].id">
+  </app-individual-audit-trail>
+</app-card>
+
+ <div>
+ <app-modal-basic class="reset-this" #modalOverflow container="body" [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-md'">
+    <div class="app-modal-body">
+        <button type="button" class="close basic-close-light-box" (click)="modalOverflow.hide()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h5>Form Current Status</h5><br>
+        <div><br>
+          <div><b>Form Status :</b>&nbsp;
+             <span *ngIf="presentStatus && presentLevel && finalStatus!='Published'" style="background-color:	#FFFF00">{{presentStatus}} in {{presentLevel}}</span>
+             <span *ngIf="finalStatus=='Published'" style="background-color:	#FFFF00">{{finalStatus}}</span></div>
+          <div *ngIf="presentLevel !=''&& finalStatus!='Published'"><b>Form Present Level :</b>&nbsp;{{presentLevel}}</div>
+          <div *ngIf="presentStatus !=''&& finalStatus!='Published'"><b>Form Present Level Status :</b>&nbsp;{{presentStatus}}</div>
+          <div *ngIf="presentCreatedBy !=''"><b>Form Created By :</b>&nbsp; {{presentCreatedBy}}</div>
+          <div *ngIf="presentModifiedDate !=''"><b>Form Last Modified On : </b>{{presentModifiedDate }}</div>
+        </div>
+        <hr>
+        <div style="max-height: 350px !important;"></div>
+        <div slimScroll railVisible="true" railColor="#004a6d" width="100%" height="350px"
+          size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+    
+          <h5>Form Status Log</h5><br>
+          <div *ngFor="let log of workFlowLog ;let in = index">
+            <div><b>{{in+1}}</b></div>
+            <div><b>Form Level :</b>&nbsp;{{log.levelName}}</div>
+            <div><b>Form Status :</b>&nbsp;{{log.status}}</div>
+            <div><b>Comments :</b>{{log.comment}}</div>
+            <div><b>Commented By :</b>&nbsp; {{log.user}}</div>
+            <div><b>Commented On :</b>{{log.displayCreatedTime}}</div>
+            <hr>
+          </div>
+          <div style="text-align: center" *ngIf="workFlowLog.length==0"><br><br>No records found</div>
+          <div *ngIf="this.modalSpinner" class="loader-on-popup"></div>
+        </div>
+      </div>
+    </app-modal-basic>
+ </div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+
+
+<!--Mapping forms-->
+<app-modal-basic #formGroupingModal [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Form Grouping</h4>
+    <button type="button" class="close basic-close" (click)="formGroupingModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div style="max-height: 400px;" class="app-modal-body" slimScroll railVisible="true" railColor="#004a6d" width="100%"
+    height="auto" size="12px" color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="dt-desc" style="padding: 0px;">
+      <ng-container *ngIf="!isTableFormMapping && !this.viewIndividualDataFormMapping">
+        <form #formGrouping="ngForm">
+          <div class="form-group row">
+            <label class="col-sm-2 col-form-label">Form Group Name
+              <span class="asterisk required">*</span>
+            </label>
+            <div class="col-sm-10">
+              <input type="text" [(ngModel)]="this.formMapping.name" class="form-control" name="name" #name="ngModel"
+                placeholder="Form Grouping Name" maxlength="100" required>
+              <div class="messages text-danger" *ngIf="(name.touched || submittedFormMapping) && name.errors?.required">
+                Form Group Name can't be blank</div>
+            </div>
+          </div>
+
+          <div class="form-row" *ngFor="let mapping of this.formMapping.mappingList ; let i=index;">
+            <div class="form-group col-sm-2">
+              <label>Select Form</label>
+              <select class="table-control col-sm-12" id="formId_{{i}}" name="formId_{{i}}" [(ngModel)]="mapping.formId"
+                (change)="addFormMapping(this.formMapping.mappingList,false)" #mappingId="ngModel" required>
+                <option disabled value="0">Select</option>
+                <option *ngFor="let action of compeletedMasterForm" [disabled]="action.disabled" [value]="action.id">
+                  {{action.templateName}}-00{{action.id}}
+                </option>
+              </select>
+            </div>
+            <div class="form-group col-sm-2">
+              <label style="padding-left: 15px">Order</label><br>
+              <label style="padding-left: 15px"> {{mapping.order}}</label>
+            </div>
+            <div class="form-group col-sm-2">
+              <label style="padding-left: 15px"></label><br>
+              <button type="button" class="close basic-close" style="right: auto;"
+                (click)="removeFormMapping(this.formMapping.mappingList,i)">
+                <i class="asterisk icofont icofont-close"></i>
+              </button></div>
+          </div>
+          <br>
+          <button class="btn btn-primary btn-outline-primary btn-icon"
+            (click)="addFormMapping(this.formMapping.mappingList,true)"><i
+              class="icofont icofont-plus-circle m-0 "></i></button>
+          <div class="messages text-danger" *ngIf="mappingError!=''">
+            {{mappingError}}
+          </div>
+          <br>
+          <br>
+          <br>
+          <div class="form-group row">
+            <div class="col-sm-3">Active: <ui-switch [(ngModel)]="this.formMapping.activeFlag" name="activeFlag"
+                (change)="this.formMapping.activeFlag=!this.formMapping.activeFlag" class="js-small" color="#3498DB"
+                switchColor="#fff" size="small">
+              </ui-switch>
+            </div>
+          </div>
+          <div style="text-align: center;" class="form-group row">
+            <div class="col">
+              <button type="button" *ngIf="this.formMapping.id!=0" [disabled]="!permissionModel.updateButtonFlag"
+                class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="$event.preventDefault();saveFormMapping(formGrouping.valid);">Update</button>
+              <button *ngIf="this.formMapping.id==0" type="button" [disabled]="!permissionModel.createButtonFlag" 
+                class="btn btn-sm btn-success waves-effect waves-light m-r-10" 
+                (click)="saveFormMapping(formGrouping.valid);">Save</button>
+              <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10" (click)="loadAllFormMappingData()"
+                routerLinkActive="active">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </ng-container>
+      <ng-container *ngIf="isTableFormMapping">
+        <button [disabled]="!permissionModel.createButtonFlag" *ngIf="isTableFormMapping" type="button"
+          class="btn btn-primary" (click)="addNewFormMapping();">
+          <i class="icofont icofont-plus-circle"></i>&nbsp;Add Form Grouping&nbsp;
+        </button>
+        <br><br>
+        <div class="col-xs-12 col-sm-12 col-md-12">
+          <div style="text-align: right;">
+            <label>Search:
+              <input type="search" [(ngModel)]="filterQueryGroup" class="form-control input-sm full-data-search"
+                placeholder="">
+            </label>
+          </div>
+        </div>
+        <ngx-datatable #myTable class="data-table dt-chk"
+          [rows]='formMappingList | dataFilter : filterQueryGroup' [limit]="10" [columnMode]="'force'"
+          [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [scrollbarH]="true">
+          <ngx-datatable-column name="Form Grouping Name">
+            <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['name']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Form Order">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <strong class="fontStyle">{{row['formOrder']}}</strong>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Action">
+            <ng-template let-row="row" ngx-datatable-cell-template>
+              <a container="body" href="javascript:;" *ngIf="permissionModel.updateButtonFlag" routerLinkActive="active"
+                class="m-r-15 crm-action-edit text-muted text-primary" (click)="viewForEditFormMapping(row);"
+                placement="top" ngbTooltip="Edit">
+                <i  class="icofont icofont-edit edit"></i>
+              </a>
+              <a container="body" *ngIf="permissionModel.deleteButtonFlag" href="javascript:;"
+                class="m-r-15 crm-action-delete text-danger"
+                (click)="openSuccessCancelSwalFormMapping(row , row['$$index'] );" placement="top" ngbTooltip="Delete">
+                <i  class="icofont icofont-bin bin"></i>
+              </a>
+              <a container="body" href="javascript:;" *ngIf="permissionModel.viewButtonFlag"
+                class="crm-action-view text-muted text-warning" (click)="viewRowDetailsFormMapping(row);"
+                placement="top" ngbTooltip="View">
+                <i  class="icofont icofont-resize view"></i>
+              </a>
+            </ng-template>
+          </ngx-datatable-column>
+
+        </ngx-datatable>
+
+      </ng-container>
+      <ng-container *ngIf="this.viewIndividualDataFormMapping==true">
+        <ng-container *ngFor="let data of popupdata; let in = index">
+          <h4>View Form Grouping Details
+            <div style="float: right;">
+              <a *ngIf="pdfSettingFlag" style="cursor:pointer;" (click)="documentPreview(data.id,true);">
+                <span><img style="height: 35px; width: 35px;" class="pointer" src="/assets/images/pdf.png"
+                    title="Preview"></span></a>&nbsp;&nbsp;
+              <button [disabled]="!permissionModel.updateButtonFlag" type="submit"
+                class="btn btn-outline-primary btn-primary btn-round"
+                (click)="viewForEditFormMapping(data)">Edit</button>
+              &nbsp;&nbsp;
+              <button [disabled]="!permissionModel.deleteButtonFlag" type="button"
+                class="btn btn-outline-danger btn-danger btn-round"
+                (click)="openSuccessCancelSwalFormMapping(data,data.$$index)">Delete</button> &nbsp;&nbsp;
+              <a style="cursor:pointer;font-weight: bold" class="ti-close"
+                (click)="this.viewIndividualDataFormMapping=false;this.isTableFormMapping=true;">&nbsp;&nbsp;</a>
+            </div>
+          </h4>
+          <br>
+          <squeezebox [multiple]="true">
+            <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">Form Grouping Name</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <p><span>{{data.name}}</span></p>
+                </div>
+              </sb-item-body>
+            </sb-item>
+            <sb-item class="accordion-panel" [collapsed]="false">
+              <sb-item-head class="accordion-msg">Form Order</sb-item-head>
+              <sb-item-body class="accordion-content">
+                <div class="accordion-desc">
+                  <p><span>{{data.formOrder}}</span></p>
+                </div>
+              </sb-item-body>
+            </sb-item>
+            <div *ngFor="let mapData of data.mappingList; let j=index">
+              <sb-item class="accordion-panel" [collapsed]="false">
+                <sb-item-head class="accordion-heading accordion-msg">Order-{{mapData.order}}</sb-item-head>
+                <sb-item-body class="accordion-content">
+                  <div class="accordion-desc">
+                    <p>{{mapData.formName}}</p>
+                  </div>
+                </sb-item-body>
+              </sb-item>
+            </div>
+          </squeezebox>
+        </ng-container>
+      </ng-container>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="formGroupingModal.hide()">Close</button>
+  </div>
+</app-modal-basic>
+
+<!-- class="modal-dialog modal-dialog-scrollable" -->
+<app-modal-basic #formImportModal [dialogClass]="'modal-export-form'" class="modal-dialog">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Form Import</h4>
+    <button type="button" class="close basic-close" (click)="formImportModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" railVisible="true" railColor="#004a6d" width="50%" height="200px" size="6px"
+    color="#737373" opacity="0.6" allowPageScroll="false">
+    <div class="row">
+      <div class="col-sm-12">
+        <label class="custom-file">
+          <input #myInput type="file" ng2FileSelect [uploader]="uploader" accept=".json" (change)="extractFileJson($event);">
+          <span class="custom-file-control"></span>
+        </label>
+      </div>
+    </div>
+    <div>
+      <div style="color: darkgreen" *ngIf="this.validationMessage!=''">{{validationMessage}}</div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="formImportModal.hide()">Close</button>
+  </div>
+</app-modal-basic>

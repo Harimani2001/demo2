@@ -1,0 +1,46 @@
+<app-modal-basic #cloningConfig id="modal-lg-70" [dialogClass]="'modal-lg'">
+    <div class="app-modal-header">
+      <h4 class="modal-title">Import Configuration</h4>
+      <button type="button" class="close basic-close" (click)="cloningConfig.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="app-modal-body dy-width-400 p-3" style="max-height: 400px;height: 400px !important;">
+      <div class="row">
+        <div class="col-sm-12">
+          <angular2-multiselect name="projectWithConfig" [data]="projectWithPDFSetting" #projectWithConfigModal="ngModel"
+            (onSelect)="loadDocument();" [(ngModel)]="projectId" required [settings]="dropdownSettings">
+          </angular2-multiselect>
+        </div>
+        <div class="col-sm-12">
+         <br>
+          <div class="row">
+            <div class="col-sm-2">Sl. No</div>
+            <div class="col-sm-2">Select</div>
+            <div class="col-sm-6"> Document Name </div>
+            <div class="col-sm-2"> </div>
+          </div>
+          <div class="row">
+            <ng-container *ngFor="let doc of documentListForConfig; let i=index">
+              <div class="col-sm-2">{{i+1}}</div>
+              <div class="col-sm-2"><input class="border-checkbox" type="checkbox" [checked]="doc.checkFlag"
+                  [disabled]="doc.disabled" (change)="doc.checkFlag=!doc.checkFlag"
+                  id="checkbox-{{i}}" />
+              </div>
+              <div class="col-sm-6"> {{doc.itemName}} </div>
+              <div class="col-sm-2"> {{doc.disabled?'Already Configured':''}} </div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="width: 100%;" class="app-modal-footer">
+      <div class="row">
+        <div style="text-align: right;" class="col-sm-12">
+          <button type="button" class="btn btn-default waves-effect " (click)="cloningConfig.hide()">Close</button>
+          <button type="button" class="btn btn-success waves-effect"
+            (click)="applyClone()">Apply</button>
+        </div>
+      </div>
+    </div>
+  </app-modal-basic>

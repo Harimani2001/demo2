@@ -1,0 +1,51 @@
+<app-modal-basic id="complianceModal-lg-70" #complianceAssesmentModal [dialogClass]="'modal-lg'" [hideHeader]="false" [hideFooter]="false"  class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Compliance Assesment</h4>
+    <button type="button" class="close basic-close" (click)="complianceAssesmentModal.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body">
+    <div class="row">
+      <div class="col-sm-12">
+        <ngx-datatable #selectDataTable id="parentCustomTable" class="data-table dt-chk" [limit]="10"
+        [rows]='complianceRequirements' [columnMode]="'force'" [headerHeight]="50"
+        [footerHeight]="50" [rowHeight]="'auto'">
+     
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row" let-isSelected="isSelected"
+            let-onCheckboxChangeFn="onCheckboxChangeFn">
+            <div class="checkbox-fade fade-in-primary">
+              <label>
+                <input type="checkbox" name="{{row['id']}}" [checked]="row.selected" (change)="selectCompliance(row)"/>
+                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+              </label>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Category"  [width]="250" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+        [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['status']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Description">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['description']}}</ng-template>
+        </ngx-datatable-column>
+
+        <ngx-datatable-column name="Reference"  [width]="250" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+        [resizeable]="false">
+          <ng-template let-row="row" ngx-datatable-cell-template>{{row['reference']}}</ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+      </div>
+      <div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" *ngIf="isSave" class="btn btn-success btn-sm" (click)="saveComplianceRequirements();">Save</button>
+    <button type="button" *ngIf="!isSave" class="btn btn-success btn-sm" (click)="onSubmitCR();">Submit</button>
+    <button type="button" class="btn btn-danger btn-sm" (click)="complianceAssesmentModal.hide();">Cancel</button>
+  </div>
+</app-modal-basic>

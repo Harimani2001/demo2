@@ -1,0 +1,351 @@
+<div class="row">
+    <div class="col-sm-12">
+        <app-card>
+            <div style="padding-left: 0px;" class="row" class="col-sm-12">
+                <button class="btn btn-primary" [disabled]="!permissionModal.userInWorkFlow" (click)="createTestCase()">
+                    <i class="icofont icofont-plus-circle"></i> Add {{IQTC}}
+                </button>
+                <button *ngIf="permissionModal.exportButtonFlag && viewCsvExport" [disabled]="!permissionModal.userInWorkFlow"
+                    class="btn btn-primary" (click)="excelExport()">CSV export</button>
+                <button *ngIf="permissionModal.exportButtonFlag && viewPdfPreview && this.draftIds && this.draftIds.length>0"
+                    [disabled]="!permissionModal.userInWorkFlow" class="btn btn-primary"
+                    (click)="this.viewpdf=true; draftPdfPreview.show()">PDF export</button>
+                <button *ngIf="permissionModal.publishButtonFlag && isSelectedToMaster && !isWorkflowDocumentOrderSequence"
+                    type="button" class="btn btn-warning" (click)="publishToMaster()">
+                    <i class="icofont icofont-paper-plane"></i> Publish
+                </button>
+                <button *ngIf="permissionModal.publishButtonFlag && isSelectedPublishData && !isWorkflowDocumentOrderSequence"
+                    type="button" class="btn btn-warning" (click)="publishData()">
+                    <i class="icofont icofont-paper-plane"></i> Submit For Approval
+                </button>
+
+                <div style="float: right;">
+                    <span *ngIf="this.isMultiplePDF"><i (click)="multipleDocumentPreview(false,'pdf');" placement="top"
+                            container="body" ngbTooltip="Download Pdf File" style="font-size: 34px;color: #e82c2c;"
+                            class="icofont icofont-file-pdf" title="Download Pdf File"></i></span>
+                    &nbsp;<span *ngIf="this.isMultiplePDF"><i (click)="multipleDocumentPreview(false,'docx');"
+                            placement="top" container="body" ngbTooltip="Download Doc File"
+                            style="font-size: 34px;color: #3232e6;" class="icofont icofont-file-word"
+                            title="Download Doc File"></i></span>
+                    &nbsp;
+                    <label *ngIf="this.search"> Search :
+                        <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.permissionService.helper.setPaginator(table)"
+                            class="form-control input-sm full-data-search" placeholder="search"></label>
+                </div><br>
+            </div>
+            <div class="messages text-danger"
+                *ngIf="permissionModal.publishButtonFlag && isSelectedToMaster">{{isWorkflowDocumentOrderSequence}}</div>
+            <div class="messages text-danger" *ngIf="!this.permissionModal.userInWorkFlow && !spinnerFlag">Note* : You are not in
+                workflow. Please contact admin!. </div>
+            <br>
+            <ngb-tabset #testCaseTab="ngbTabset"
+                (tabChange)="this.permissionService.helper.toggleView('testCaseTab',$event.nextId);tabChange($event.nextId);">
+                <ngb-tab id="summary" title="Summary">
+                    <ng-template ngbTabContent>
+                        <app-individual-document-summary [permissionConstant]="category"
+                            (onCloseSummary)="loadPermissions();"></app-individual-document-summary>
+                    </ng-template>
+                </ngb-tab>
+                <ngb-tab id="pending" title="Pending Items">
+                    <ng-template ngbTabContent>
+                        <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+                            [rows]='draftData | IqtcPipeFilter : filterQuery' [limit]="30" [columnMode]="'force'"
+                            [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                            <ngx-datatable-column *ngIf="permissionModal.publishButtonFlag" name="Select" [width]="70"
+                                [sortable]="false" [canAutoResize]="false" [draggable]="false" [resizeable]="false">
+
+                                <ng-template class="datatable-checkbox" ngx-datatable-header-template let-row="row">
+                                    <div class="checkbox-fade fade-in-primary datatable-header-cell-label">
+                                        <label *ngIf="!filterQuery && draftData.length !=0 " container="body"
+                                            placement="right" triggers="mouseenter:mouseleave" ngbPopover="Select All">
+                                            <input type="checkbox" [checked]="selectAll"
+                                                (click)="selectAllDataForMaster($event)" />
+                                            <span class="cr"><i
+                                                    class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                                        </label>
+                                    </div>
+                                </ng-template>
+
+                                <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                                    let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                                    <div class="checkbox-fade fade-in-primary"
+                                        *ngIf="row.allURSWFCompleted && row.allSpecWFCompleted && row.allRiskWFCompleted">
+                                        <label>
+                                            <input type="checkbox" name="{{row['testCaseCode']}}"
+                                                [checked]="row.masterFlag"
+                                                (change)="row.masterFlag=!row.masterFlag;onChangeToMasterData();" />
+                                            <span class="cr"><i
+                                                    class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                                        </label>
+                                    </div>
+                                </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="Test Id" [width]="50">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong>{{row['testCaseCode']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="Test Description">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Status">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Document Status">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['approvedStatus']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Action">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <ng-template #popContent>
+                                        <span class="text-left">
+                                            <div><b>Status :</b>&nbsp; {{row['approvedStatus']}}</div>
+                                            <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                                            <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                                            <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                                            <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                                        </span>
+                                    </ng-template>
+                                    <a container="body" href="javascript:;"
+                                        class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                                        (click)="loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info">
+                                        <i class="icofont icofont-info-square info"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.updateButtonFlag && row['status'] !== 'Fail' "
+                                        href="javascript:;" routerLinkActive="active"
+                                        [routerLink]="['/iqtc/add-iqtc',row.id]"
+                                        class="m-r-15 crm-action-edit text-muted text-primary" placement="top"
+                                        ngbTooltip="Edit">
+                                        <i class="icofont icofont-edit edit"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.deleteButtonFlag" href="javascript:;"
+                                        class="m-r-15 crm-action-delete text-muted text-danger"
+                                        (click)="openSuccessCancelSwal(row , row['$$index'] );" placement="top"
+                                        ngbTooltip="Delete">
+                                        <i class="icofont icofont-bin bin"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag" href="javascript:;"
+                                        class="m-r-15 crm-action-view text-muted text-warning"
+                                        (click)="viewRowDetails(row.id,row.commonDocumentStatusValue);"
+                                        data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                                        <i class="icofont icofont-resize view"></i>
+                                    </a>
+                                    <a container="body" *ngIf="row['status'] === 'Fail'" href="javascript:;"
+                                        class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                                        [routerLink]="['/df/add-df']"
+                                        [queryParams]="{ id: row.id,status:'/tc-execution/'+row.constantName}"
+                                        [skipLocationChange]="true" placement="top" ngbTooltip="Discrepancy form">
+                                        <i class="icofont icofont-ebook"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag && (row.imageList.length>0)"
+                                        href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"
+                                        placement="top" (click)="ViewFileList(row.imageList,true)"
+                                        ngbTooltip="View Images">
+                                        <i  class="text-primary icofont icofont-image"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag && (row.videoList.length>0)"
+                                        href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"
+                                        placement="top" (click)="ViewFileList(row.videoList,false)"
+                                        ngbTooltip="View Videos">
+                                        <i  class="text-primary icofont icofont-ui-video-play"></i>
+                                    </a>
+                                </ng-template>
+                            </ngx-datatable-column>
+                        </ngx-datatable>
+                    </ng-template>
+                </ngb-tab>
+                <ngb-tab id="master" title="Published">
+                    <ng-template ngbTabContent>
+                        <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+                            [rows]='masterData | IqtcPipeFilter : filterQuery' [limit]="30" [columnMode]="'force'"
+                            [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                            <ngx-datatable-column name="Test Id" [width]="50">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong>{{row['testCaseCode']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="Test Description">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Status">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['status']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Document Status">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['approvedStatus']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Action">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <ng-template #popContent>
+                                        <span class="text-left">
+                                            <div><b>Status :</b>&nbsp; {{row['approvedStatus']}}</div>
+                                            <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                                            <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                                            <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                                            <div><b>Last Modified On : </b>{{row['displayUpdatedTime']}}</div>
+                                        </span>
+                                    </ng-template>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag" href="javascript:;"
+                                        class="m-r-15 crm-action-view text-muted text-warning"
+                                        (click)="viewRowDetails(row.id,row.commonDocumentStatusValue);"
+                                        data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                                        <i class="icofont icofont-resize view"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag && (row.imageList.length>0)"
+                                        href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"
+                                        placement="top" (click)="ViewFileList(row.imageList,true)"
+                                        ngbTooltip="View Images">
+                                        <i style="color: blue;" class="icofont icofont-image"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag && (row.videoList.length>0)"
+                                        href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"
+                                        placement="top" (click)="ViewFileList(row.videoList,false)"
+                                        ngbTooltip="View Videos">
+                                        <i style="color: blue;" class="icofont icofont-ui-video-play"></i>
+                                    </a>
+                                </ng-template>
+                            </ngx-datatable-column>
+                        </ngx-datatable>
+                    </ng-template>
+                </ngb-tab>
+                <ngb-tab id="testPlan" title="Test Plan">
+                    <ng-template ngbTabContent>
+                        <test-run type="108" [access]="permissionModal" (onComplete)="this.loadActiveTestRun();"></test-run>
+                    </ng-template>
+                </ngb-tab>
+                <ngb-tab id="completed" title="Completed Items">
+                    <ng-template ngbTabContent>
+
+                        <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+                            [rows]='completedData | IqtcPipeFilter : filterQuery' [limit]="30" [columnMode]="'force'"
+                            [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+
+                            <ngx-datatable-column name="Test Run Name" [width]="50">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['testRunName']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Test Id" [width]="50">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong>{{row['testCaseCode']}} {{row['revisionNumber']}} </strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+                            <ngx-datatable-column name="Test Description">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['description']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Status">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;"
+                                        [ngStyle]="{'background-color': this.permissionService.helper.getTestCaseStatusColors(row['status']) }"
+                                        class="badge"
+                                        style="width: 100px;font-size:15px;color: black;">{{row['status']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Document Status">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <!-- <strong>{{row['approvedStatus']}}</strong> -->
+                                    <strong
+                                        style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['approvedStatus']}}</strong>
+                                </ng-template>
+                            </ngx-datatable-column>
+
+                            <ngx-datatable-column name="Action">
+                                <ng-template let-row="row" ngx-datatable-cell-template>
+                                    <ng-template #popContent>
+                                        <span class="text-left">
+                                            <div><b>Status :</b>&nbsp; {{row['approvedStatus']}}</div>
+                                            <div><b>Created By :</b>&nbsp; {{row['createdBy']}}</div>
+                                            <div><b>Created On :</b>&nbsp;{{row['displayCreatedTime']}}</div>
+                                            <div><b>Last Modified By : </b> {{row['updatedBy']}}</div>
+                                            <div><b>Last Modified On : </b>{{row['displayUpdatedTime'] }}</div>
+                                        </span>
+                                    </ng-template>
+                                    <a container="body" href="javascript:;"
+                                        class="m-r-15 crm-action-info text-muted text-primary" placement="right"
+                                        (click)="loadDocumentCommentLog(row)" placement="top" ngbTooltip="Info">
+                                        <i class="icofont icofont-info-square info"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag" href="javascript:;"
+                                        class="m-r-15 crm-action-view text-muted text-warning"
+                                        (click)="viewRowDetails(row.id,row.commonDocumentStatusValue);"
+                                        data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                                        <i class="icofont icofont-resize view"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag && (row.imageList.length>0)"
+                                        href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"
+                                        placement="top" (click)="ViewFileList(row.imageList,true)"
+                                        ngbTooltip="View Images">
+                                        <i style="color: blue;" class="icofont icofont-image"></i>
+                                    </a>
+                                    <a container="body" *ngIf="permissionModal.viewButtonFlag && (row.videoList.length>0)"
+                                        href="javascript:;" class="m-r-15 crm-action-view text-muted text-warning"
+                                        placement="top" (click)="ViewFileList(row.videoList,false)"
+                                        ngbTooltip="View Videos">
+                                        <i style="color: blue;" class="icofont icofont-ui-video-play"></i>
+                                    </a>
+                                </ng-template>
+
+                            </ngx-datatable-column>
+                        </ngx-datatable>
+                    </ng-template>
+                </ngb-tab>
+                <ngb-tab id="approve" title="Approve / PDF View">
+                    <ng-template ngbTabContent>
+                        <app-individual-document-workflow [permissionConstant]="category">
+                        </app-individual-document-workflow>
+                    </ng-template>
+                </ngb-tab>
+                <ngb-tab id="audit" title="Audit Trail">
+                    <ng-template ngbTabContent>
+                        <app-audit-trail-view #auditView [permission]="category"></app-audit-trail-view>
+                    </ng-template>
+                </ngb-tab>
+
+            </ngb-tabset>
+        </app-card>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12"></div>
+</div>
+
+<app-modal-basic #draftPdfPreview [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+	<div class="app-modal-header">
+		<button type="button" class="close basic-close-light-box" (click)="draftPdfPreview.hide();this.viewpdf=false;">
+			<span aria-hidden="true">&times;</span>
+		</button>
+	</div>
+	<div class="app-modal-body">
+		<app-draft-pdf *ngIf="viewpdf" [permissionConstant]="category" [draftIds]="this.draftIds"></app-draft-pdf>
+	</div>
+</app-modal-basic>

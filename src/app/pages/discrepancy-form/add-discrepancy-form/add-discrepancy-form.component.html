@@ -1,0 +1,406 @@
+<div class="row" *ngIf="showAppCard">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-8">
+          <div id="styled-select">Category<span class="asterisk">*</span>
+            <select (change)="onChangeDocument()" name="select" class="form-control input-sm full-data-search"
+              id="apiConfigurationId" required [(ngModel)]="modal.documentType"
+              [disabled]="(blockdocument || disableFeild)" name="documentType" #category="ngModel">
+              <option value="-1" selected>Select Document</option>
+              <option *ngFor="let doc of selectdocument" [ngValue]="doc.id">{{doc.name}}</option>
+            </select>
+          </div>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;
+          <div id="styled-select" *ngIf="failDocCodes.length!=0">Please select document code<span
+              class="asterisk">*</span>
+            <select class="form-control input-sm full-data-search" (change)="getTestCaseCode(modal.testCaseId)"
+              id="failDocId" required [(ngModel)]="modal.testCaseId" [disabled]="(blockdocument || disableFeild)"
+              name="testCaseId" #faildocument="ngModel">
+              <option *ngFor="let failDoc of failDocCodes" [ngValue]="failDoc.key">{{failDoc.value}}</option>
+            </select>
+          </div>
+          <div class="messages text-danger p-t-10" *ngIf="modal.documentType && failDocCodes.length==0">There is no failed test cases for the selected category.</div>
+        </div>
+
+        <div class="col-sm-4">
+          <div style="text-align: right;">
+            <a href="javascript:;" *ngIf="failDocCodes.length!=0 && modal.testCaseId" class="strong bottom"
+            (click)="urlchecklist.show();this.referenceFlag=!this.referenceFlag" placement="top"
+            ngbTooltip="Reference"><i class="icofont icofont-link m-r-10"></i></a>
+            <button *ngIf="failDocCodes.length!=0 && modal.testCaseId" type="button"
+              class="btn btn-sm btn-primary waves-effect waves-light m-r-10" style="padding-right: 8px;" (click)="show()">
+              <i class="icofont icofont-video w-25 h-25"></i></button>
+            <button type="button" *ngIf="isUpdate" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();openSuccessUpdateSwal(DFform.valid);">
+              Update</button>
+              
+            <button type="button" *ngIf="!isUpdate && failDocCodes.length!=0 && modal.testCaseId"
+              class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+              (click)="$event.preventDefault();saveAndGoto(DFform.valid);">
+              Save</button>
+            <button type="button" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+              [routerLink]="[this.routerLink]" routerLinkActive="active">
+              Cancel</button>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="col-sm-12">
+    <br><br><br>
+    <app-card>
+      <form #DFform="ngForm">
+        <table id="add-table" class="table w-100" *ngIf="failDocCodes.length!=0 && modal.testCaseId">
+          <tbody>
+            <tr>
+              <td colspan="2">
+                <div class="row">
+                  <div class="col-sm-2">
+                    <strong class="strong">Incident Description<span class="asterisk">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-10">
+                    <textarea class="form-control max-textarea" [(ngModel)]="modal.discrepancyDescription" required
+                    name="discrepancyDescription" #description="ngModel"></textarea>
+                  <div class="messages text-danger" *ngIf="(description.touched || submitted) && description.errors?.required">Incident Description can't be blank</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Issue Category<span class="asterisk">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select class="form-control input-sm" id="dfcategoryId"
+                    required [(ngModel)]="modal.category" name="category" #issuecategory="ngModel">
+                    <option *ngFor="let cat of dfCategory" [ngValue]="cat.value">{{cat.value}}</option>
+                  </select>
+                  <div class="messages text-danger"
+                    *ngIf="(issuecategory.touched || submitted) && issuecategory.errors?.required">Select any Category</div>
+                    </div>
+                </div>
+              </td>
+
+              <td>
+                <p><strong class="strong">Change request raised:(N/Y)</strong> &nbsp;&nbsp;
+                  <ui-switch (click)="this.modal.requestRaised=!this.modal.requestRaised"
+                    [checked]="this.modal.requestRaised" class="js-small" color="#FA8072" switchColor="#fff"
+                    size="small" unchecked>
+                  </ui-switch>
+                </p>
+                <div *ngIf="this.modal.requestRaised">
+                  <div class="row">
+                    <div class="col-sm-3">
+                      <strong class="strong">Change request No<span class="asterisk">*</span>:</strong>
+                    </div>
+                    <div class="col-sm-9">
+                      <input type="text" [(ngModel)]="modal.requestNo" class="form-control"
+                        name="requestNo" placeholder="" required #changeRequestNo="ngModel">
+                      <div class="messages text-danger" *ngIf="(changeRequestNo.touched || submitted) && changeRequestNo.errors?.required">Request no can't be blank</div>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Investigation :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" [(ngModel)]="modal.investigation"
+                      name="investigation"></textarea>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Root cause :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" [(ngModel)]="modal.rootCause"
+                      name="rootCause"></textarea>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Action to be taken :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" [(ngModel)]="modal.actionTaken"
+                      name="street1"></textarea>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Result from action :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea *ngIf="resultAction === false" class="form-control max-textarea"
+                      [(ngModel)]="modal.resultForAction" name="street2"></textarea>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Proposed Solution/Immediate Solution :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" [(ngModel)]="modal.solution" name="solution"></textarea>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Comments :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" [(ngModel)]="modal.discrepancyComments"
+                      name="discrepancyComments"></textarea>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Status<span class="asterisk">*</span> :</strong>
+                  </div>
+                    <div class="col-sm-9">
+                      <select class="form-control input-sm" id="dfStatusId"
+                        style="height: 35px; size: 50px;" required [(ngModel)]="modal.dfStatus" name="dfStatus" #descripencyStatus="ngModel">
+                        <option *ngFor="let status of dfStatus" [ngValue]="status.value">{{status.value}}</option>
+                      </select>
+                      <div class="messages text-danger" *ngIf="(descripencyStatus.touched || submitted) && descripencyStatus.errors?.required">Select any status</div>
+                    </div>
+                </div>
+              </td>
+
+              <td>
+                <p><strong class="strong">Is Re-test required :(N/Y)</strong> &nbsp;&nbsp;
+                  <ui-switch [checked]="this.modal.reTestFlag" class="js-small" name="reTestName" color="#FA8072" switchColor="#fff"
+                    size="small" (click)="this.modal.reTestFlag=!this.modal.reTestFlag;this.modal.createNewVersion=this.modal.reTestFlag">
+                  </ui-switch>
+                  <ng-container *ngIf="this.modal.reTestFlag"><strong class="strong">Create New Version:(N/Y)</strong> &nbsp;&nbsp;
+                    <ui-switch (click)="this.modal.createNewVersion=!this.modal.createNewVersion" name="createNewVersionName"
+                      [checked]="this.modal.createNewVersion" class="js-small" color="#FA8072" switchColor="#fff" size="small">
+                    </ui-switch>
+                  </ng-container>
+                </p>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <div *ngIf="this.inputField">
+          <app-form-extended #formExtendedId [(inputField)]='inputField' [documentId]="this.helper.DISCREPANCY_VALUE"
+            [(submitted)]='submitted'></app-form-extended>
+        </div>
+      </form>
+
+      <ng-container *ngIf="failDocCodes.length!=0 && modal.testCaseId">
+        <br>
+        <div class="form-group row" *ngIf="!isAddChecklist && !(modal.checklist.length > 0)">
+          <div class="col-sm-4"></div>
+          <div class="col-sm-4">
+            <button type="button" class="btn btn-primary" (click)="addCheckList()">
+              <i class="icofont icofont-checked"></i>Add Checklist
+            </button>
+          </div>
+          <div class="col-sm-4"></div>
+        </div>
+
+        <div *ngIf="isAddChecklist || (modal.checklist.length > 0)">
+          <div class="form-group row">
+            <span style="padding-left: 20px;"><i class="icofont icofont-checked"></i> Checklist</span>
+          </div>
+          <button class="btn btn-primary btn-sm" (click)="addChecklistItem()">Add new</button>
+
+          <div class="table-responsive">
+            <table class="table table-bordered" style="width: 50%;">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Display Order</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let checkList of modal.checklist; let i = index">
+                  <td>
+                    <input type="text" class="form-control" [(ngModel)]="checkList.checklistName"
+                      (ngModelChange)="onChangecheckList()" [ngModelOptions]="{standalone: true}" />
+                  </td>
+                  <td width="10px">
+                    {{checkList.displayOrder}}
+                  </td>
+                  <td width="10px">
+                    <i style="cursor: pointer;" (click)="deleteChecklistItem(checkList);onChangecheckList()"
+                      class="icofont icofont-ui-delete" title="delete"></i>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div style="color: red;" *ngIf="isCheckListEntered">Please Fill the Details to Continue . . .</div>
+        <div style="color: red;" *ngIf="this.isValidDocumentOrder">Display Order can't be Duplicate . . .</div>
+
+        <!-- <div *ngIf="modal.executionFlag">
+          <div class="form-group row">
+            <span style="padding-left: 20px;">
+              <i class="icofont icofont-checked"></i> Checklist</span>
+          </div>
+          <div *ngIf="modal.checklist && modal.checklist.length != 0">
+            <table style="width:100%">
+              <tr class="header-bg">
+                <th style="padding: 7px;">Select</th>
+                <th>Checklist Name</th>
+                <th>Status</th>
+                <th>Select Files</th>
+                <th>Remarks</th>
+              </tr>
+              <tr *ngFor="let item of modal.checklist; let i = index">
+                <td style="padding: 7px; width: 10px;">
+                  <div class="checkbox-fade fade-in-primary">
+                    <label style="padding-left: 20px;">
+                      <input type="checkbox" name="{{item.checklistName}}" [checked]="item.completedFlag"
+                        (change)="item.completedFlag=!item.completedFlag;" />
+                      <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                    </label>
+                  </div>
+                </td>
+                <td>{{item.checklistName}}</td>
+                <td>
+                  <select [(ngModel)]="item.status" name="{{item.checklistName}}{{i}}" class="form-control">
+                    <option value="" disabled selected>Select Status</option>
+                    <option value="NA">NA</option>
+                    <option value="In-Progress">In-Progress</option>
+                    <option value="Pass">Pass</option>
+                    <option value="Fail">Fail</option>
+                  </select>
+                </td>
+                <td>
+                  <div id="upload_button">
+                    <label>
+                      <input #checkListFileInput type="file" accept=".png,.jpg" multiple
+                        (change)="onChangeCheckListImage($event,item)">
+                      <span class="btn btn-info">{{item.files.length > 0?'Add Images':'Choose images'}}</span>
+                    </label>
+                    &nbsp;
+                    <input type="text" style="height: 43px;margin-top: 8px;width: 160px;" id="pasteArea"
+                      (paste)="onChangeChecklistImage($event,item)" placeholder="Ctrl+V to paste here">
+                  </div>
+                  &nbsp;
+                  <button type="button" class="btn btn-warning" style="height: 43px;" *ngIf="item.files.length > 0"
+                    (click)="showCheckListModal(item);"><i class="fa fa-eye" aria-hidden="true">&nbsp;View
+                      {{item.files.length}} {{item.files.length === 1?'image':'images'}}</i></button>
+                  <a *ngIf="item.files.length > 0" (click)="deleteCheckListImages(item)" placement="top"
+                    ngbTooltip="Delete Image"><i class="icofont icofont-bin"></i></a>
+                </td>
+                <td>
+                  <input type="text" class="form-control" [(ngModel)]="item.remarks" placeholder="remarks"
+                    name="{{i}}" />
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div> -->
+        <div class="form-group row">
+          <app-file-upload-for-doc #fileupload [uniqueCodeForAudit]="this.modal.testCaseName" [multiple]='true'
+            [onlyView]='false' [documentId]="this.receivedId" [update]="this.isUpdate" [dfFile]='true'
+            [documentCode]="this.helper.DISCREPANCY_VALUE" (onfileUpload)="addFileToModal($event)">
+          </app-file-upload-for-doc>
+        </div>
+      </ng-container>
+      
+    </app-card>
+  </div>
+</div>
+
+<app-modal-basic #modalImageViewer [hideHeader]="false" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+    <button type="button" class="close basic-close-light-box" (click)="modalImageViewer.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Screenshot Image</h5>
+    <button class="btn btn-success" style="float: right;" (click)="saveImage();modalImageViewer.hide()">Save Image</button>
+  </div>
+
+  <div style="max-height: 400px;" class="app-modal-body">
+    <hr>
+    <div slimScroll railVisible="true" railColor="#004a6d" width="100%" height="450px" size="8px" color="#999"
+      opacity="0.6" allowPageScroll="false">
+      <img style="height:100%; width:100%" [src]="modal.imageBase64" />
+    </div>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #checkListImageModal [dialogClass]="'modal-xl'" hidden=false>
+  <div class="loading-spinner" *ngIf="spinnerFlag">
+    <span
+      class="loading-spinner-msg-align">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing&#8230;</span>
+  </div>
+  <div class="app-modal-header">
+    <h4 class="modal-title">Image View</h4>
+    <button type="button" class="close basic-close" (click)="checkListImageModal.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" style="overflow-y: auto;overflow-x: auto;"
+    *ngFor="let data of processedChecklistImages;let in = index">
+    <a class="prev" (click)="plusCheckListSlides(-1)">&#10094;</a>
+    <a (click)="deleteCheckListSlide()"><i class="fa fa-trash delete"></i></a>
+    <img *ngIf="data.visible == true" src="{{data.imageDataUrl}}" height="500" width="100%" alt="" />
+    <a class="next" (click)="plusCheckListSlides(1)">&#10095;</a>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect" (click)="closereference(modal.urlChecklist)"><i
+        class="icofont icofont-close"></i>Close</button>
+  </div>
+</app-modal-basic>
+
+<app-modal-basic #urlchecklist [hideHeader]="false" [hideFooter]="false" [dialogClass]="'modal-lg'">
+  <div class="app-modal-header">
+      <h4 class="modal-title">Reference</h4>
+    <button type="button" class="close basic-close"
+      (click)="closereference(modal.urlChecklist)">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+<div class="app-modal-body" *ngIf="this.referenceFlag">
+          <app-urlchecklist #checkListURL  [checkList]="modal.urlChecklist"></app-urlchecklist>
+</div>
+  <div class="app-modal-footer">
+      <button type="button" class="btn btn-default waves-effect"
+      (click)="validateReference(modal.urlChecklist)">Submit</button>
+    <button type="button" class="btn btn-default waves-effect"
+      (click)="closereference(modal.urlChecklist)">Close</button>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

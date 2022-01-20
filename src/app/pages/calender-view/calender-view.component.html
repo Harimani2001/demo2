@@ -1,0 +1,206 @@
+<div class="row">
+  <div class="col-sm-12">
+    <br>
+    <ngb-tabset (tabChange)="tabChange($event.nextId);">
+      <ngb-tab title="Holiday Planner" id="holiday">
+        <ng-template ngbTabContent>
+          <app-card>
+            <h3>
+              Holiday Planner
+              <button style="float: right;" *ngIf="permissionModal.createButtonFlag" class="btn btn-primary"
+                (click)="addEvent()"><i class="icofont icofont-plus-circle"></i>Add new
+              </button>
+              <div class="clearfix"></div>
+            </h3>
+            <div style="min-height: 500px;" class="table-responsive mh-100">
+              <table class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th class="w-20">Title</th>
+                    <th class="w-10">Primary color</th>
+                    <th class="w-10">Secondary color</th>
+                    <th class="w-20">Starts at</th>
+                    <th class="w-20">Ends at</th>
+                    <th class="w-10">Holiday</th>
+                    <th class="w-10">Actions</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  <tr *ngFor="let event of holidayEvents;let i=index">
+                    <td>
+                      <input type="text" class="form-control" name="title-{{i}}" [(ngModel)]="event.title"
+                        (keyup)="refresh.next()" />
+                    </td>
+                    <td>
+                      <input type="color" [(ngModel)]="event.color.primary" (change)="refresh.next()" />
+                    </td>
+                    <td>
+                      <input type="color" [(ngModel)]="event.color.secondary" (change)="refresh.next()" />
+                    </td>
+                    <td>
+                      <my-date-picker (keypress)="$event.preventDefault();" name="start-{{i}}"
+                        [(ngModel)]="event.startCalender" #fromDateView #startDate="ngModel" placeholder=""
+                        [options]="myDatePickerOptions" (dateChanged)="onDateChanged($event,true,i)" required>
+                      </my-date-picker>
+                      <div class="messages text-danger"
+                        *ngIf="(startDate.touched || submitted) && startDate.errors?.required">
+                        Start date is required</div>
+                    </td>
+                    <td>
+                      <my-date-picker (keypress)="$event.preventDefault();" name="end-{{i}}"
+                        [(ngModel)]="event.endCalender" #toDateView #endDate="ngModel"
+                        (dateChanged)="onDateChanged($event,false,i)" placeholder="" [options]="myDatePickerOptions"
+                        required>
+                      </my-date-picker>
+                      <div class="messages text-danger"
+                        *ngIf="(endDate.touched || submitted) && endDate.errors?.required">
+                        End date is required</div>
+                    </td>
+                    <td>
+                      <select class="form-control" name="holidayFlag-{{i}}" [(ngModel)]="event.holidayFlag">
+                        <option value="" disabled>Select</option>
+                        <option value="Y">Yes</option>
+                        <option value="N">No</option>
+                      </select>
+                    </td>
+                    <td>
+                      <button *ngIf="permissionModal.createButtonFlag"
+                        class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+                        (click)="saveEvent(event,i)">Save</button>
+                      <button *ngIf="permissionModal.deleteButtonFlag"
+                        class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+                        (click)="openSuccessCancelSwal(event,i)">Delete</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </app-card>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab title="Calendar View" id="calendar">
+        <ng-template ngbTabContent>
+          <app-card *ngIf="calendarViewFlag">
+            <div class="row text-center">
+              <div class="col-md-4">
+                <div class="btn-group">
+                  <div class="btn btn-primary" mwlCalendarPreviousView [view]='view' [(viewDate)]="viewDate"
+                    (viewDateChange)="closeOpenMonthViewDay()">
+                    Previous
+                  </div>
+                  <div class="btn btn-outline-secondary" mwlCalendarToday [(viewDate)]="viewDate">
+                    Today
+                  </div>
+                  <div class="btn btn-primary" mwlCalendarNextView [view]="view" [(viewDate)]="viewDate"
+                    (viewDateChange)="closeOpenMonthViewDay()">
+                    Next
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <h3>{{ viewDate | calendarDate:(view + 'ViewTitle'):'en'}}</h3>
+              </div>
+              <div class="col-md-4">
+                <div class="btn-group">
+                  <div class="btn btn-primary" (click)="setView('month')" [class.active]="view === 'month'">
+                    Month
+                  </div>
+                  <div class="btn btn-primary" (click)="setView('week')" [class.active]="view === 'week'">
+                    Week
+                  </div>
+                  <div class="btn btn-primary" (click)="setView('day')" [class.active]="view === 'day'">
+                    Day
+                  </div>
+                </div>
+              </div>
+            </div>
+            <br />
+            <div [ngSwitch]="view">
+              <mwl-calendar-month-view *ngSwitchCase="'month'" [viewDate]="viewDate" [events]="this.calenderEvents"
+                [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)"
+                (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)"
+                (beforeViewRender)="beforeMonthViewRender($event)">
+              </mwl-calendar-month-view>
+              <mwl-calendar-week-view *ngSwitchCase="'week'" [viewDate]="viewDate" [events]="this.calenderEvents"
+                [refresh]="refresh" (eventClicked)="handleEvent('Clicked', $event.event)"
+                (eventTimesChanged)="eventTimesChanged($event)">
+              </mwl-calendar-week-view>
+              <mwl-calendar-day-view *ngSwitchCase="'day'" [viewDate]="viewDate" [events]="this.calenderEvents"
+                [refresh]="refresh" (eventClicked)="handleEvent('Clicked', $event.event)"
+                (eventTimesChanged)="eventTimesChanged($event)">
+              </mwl-calendar-day-view>
+            </div>
+            <div>
+            </div>
+            <ng-template #modalContent let-close="close">
+              <div class="modal-header">
+                <h5 class="modal-title">Event Details</h5>
+                <button type="button" class="close" (click)="close()">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div>
+                  Event:
+                  <pre>{{ modalData?.event.title}}</pre>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" (click)="close()">
+                  OK
+                </button>
+              </div>
+            </ng-template>
+          </app-card>
+        </ng-template>
+      </ngb-tab>
+
+      <ngb-tab title="Weekdays Planner" id="weekday">
+        <ng-template ngbTabContent>
+          <app-card>
+            <h3>
+              Weekdays Planner
+              <div class="clearfix"></div>
+            </h3>
+            <div class="table-responsive">
+              <table class="table table-bordered" style="width: 50%;">
+                <thead>
+                  <tr>
+                    <th>Select</th>
+                    <th>Week Day</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let day of weekDaysList">
+                    <td width="30%">
+                      <div class="checkbox-fade fade-in-primary">
+                        <label>
+                          <input type="checkbox" name="day.weekdayId" [checked]="day.selectedFlag"
+                            (change)="day.selectedFlag = !day.selectedFlag" />
+                          <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                        </label>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="cr">{{day.weekday}}</span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div>
+                <button [disabled]="!permissionModal.createButtonFlag"
+                  class="btn btn-sm btn-success waves-effect waves-light m-r-10" (click)="saveWeekdays(true)">
+                  Save
+                </button>
+              </div>
+            </div>
+          </app-card>
+        </ng-template>
+      </ngb-tab>
+    </ngb-tabset>
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

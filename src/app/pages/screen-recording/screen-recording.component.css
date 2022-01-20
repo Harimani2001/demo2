@@ -1,0 +1,15 @@
+  .modal-content{
+    max-width: 100%;
+  }
+.modal-md{
+  max-width: 45%;
+}
+
+.my-custom-scrollbar {
+  /* position: relative; */
+  height: 550px;
+  overflow: auto;
+  }
+  .modal-view-scroll-y {
+  display: block;
+  }

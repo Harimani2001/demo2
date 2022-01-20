@@ -1,0 +1,62 @@
+<div class="row">
+  <div id="float-action" class="col-sm-12" style="margin-top: 10px;">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="page-header-title">
+            <i style="width: 30px;height: 30px;" class="icofont icofont-data bg-c-blue"></i>
+            <div class="d-inline" style="padding-top: 4px;">
+              <h4>My Tasks</h4>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  <div class="col-sm-12">
+    <br><br> <br>
+  </div>
+  <div class="col-sm-12" style="margin-top:5px">
+    <div style="display: flex;overflow: auto;">
+      <div *ngFor="let project of filterData">
+        <div class="card list-wrapper">
+          <div class="card-block list">
+            <h4 class="card-title">{{project.name}}</h4>
+            <div class="list-cards" [ngStyle]="{'max-height':windowHeight.innerHeight-250+'px'}">
+              <div class="card-margin" *ngFor="let dto of project.dto">
+                <expansion-panels-container>
+                  <expansion-panel>
+                    <expansion-panel-title style="width: 250px;">
+                      <span *ngIf="dto.priority === 'High'" class="text-danger"><i class="fa fa-circle"></i></span>
+                      <span *ngIf="dto.priority === 'Medium'" class="text-warning"><i class="fa fa-circle"></i></span>
+                      <span *ngIf="dto.priority === 'Low'" class="text-info"><i class="fa fa-circle"></i></span>
+                      {{dto.taskCode}}
+                    </expansion-panel-title>
+                    <expansion-panel-content>
+                      <div class="content-margin">
+                        <p class="text-c-blue"
+                          style="cursor: pointer !important; font-family:'Roboto', sans-serif; font-size: 18px;"
+                          (click)="routeView(dto);">
+                          <a href="javascript:"></a>
+                          {{dto.title}}</p>
+                      </div>
+                      <div class="content-margin">
+                        <div><strong>Assigned to</strong> : {{dto.userName}}</div>
+                        <div *ngIf="dto.workflowLevelName"><strong>Level</strong> : {{dto.workflowLevelName}}</div>
+                        <div><strong>Created Date</strong> : {{dto.updatedDate}}</div>
+                        <div><strong>Due Date</strong> : {{dto.dueDate}}</div>
+                        <div><strong>Remaining</strong> : {{dto.remaingDays}}</div>
+                      </div>
+                    </expansion-panel-content>
+                  </expansion-panel>
+                </expansion-panels-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

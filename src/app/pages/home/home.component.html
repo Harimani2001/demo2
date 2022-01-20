@@ -1,0 +1,333 @@
+<div class="row">
+  <div class="project text-left col-sm-4">
+    <label> Welcome {{user.name}},&nbsp;{{message}}</label>
+  </div>
+</div>
+<hr>
+
+<app-card [cardClass]="'card-current-prog'" *ngIf="filterData.length > 0">
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="page-header-title">
+        <div class="d-inline">
+          <h5>Project Tasks</h5>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-8">
+      <div class="nav-item nav-grid">
+        <a *ngIf="!tableView" href="javascript:" class="m-r-20"><img class="image-radius rounded-0 img-25"
+            src="assets/icon/png-icons/tableView.png" alt="Table View" placement="top" ngbTooltip="Table view"
+            (click)="changeview(true)"></a>
+        <a *ngIf="tableView" href="javascript:" class="m-r-20"><img class="image-radius rounded-0 img-30"
+            src="assets/icon/png-icons/cardView.png" alt="Card View" placement="top" ngbTooltip="Card View"
+            (click)="changeview(false)"></a>
+      </div>
+    </div>
+  </div>
+  <br>
+  <div class="table-responsive" *ngIf="tableView">
+    <table id="dtBasicExample" class="table table-bordered" [mfData]="filterData" #mf="mfDataTable" [mfRowsOnPage]="2">
+      <tbody>
+        <ng-container *ngFor="let m of mf.data; let i = index;">
+          <tr>
+            <th colspan="5">{{m.name}}</th>
+          </tr>
+          <tr class="lightGary" width="100%">
+            <th>Task Id</th>
+            <th>Title</th>
+            <th>Created Date</th>
+            <th>Due Date</th>
+            <th>Remaining</th>
+          </tr>
+          <tr *ngFor="let row of m.dto ; let i=index;">
+            <td>{{row['taskCode']}}</td>
+            <td>
+              <label class="text-c-blue" style="cursor: pointer !important;" (click)="routeView(row);">
+                <a href="javascript:"></a>{{row['title']}}
+              </label>
+            </td>
+            <td>{{row['updatedDate']}}</td>
+            <td>{{row['dueDate']}}</td>
+            <td>{{row['remaingDays']}}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="5">
+            <mfBootstrapPaginator></mfBootstrapPaginator>
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <div class="col-sm-12" style="margin-top:5px" *ngIf="!tableView">
+    <div style="display: flex;overflow: auto;">
+      <div *ngFor="let project of filterData">
+        <div class="card list-wrapper">
+          <div class="card-block list">
+            <h4 class="card-title">{{project.name}}</h4>
+            <div class="list-cards" style="max-height:380px">
+              <div *ngFor="let dto of project.dto" style="margin-top: -20px;">
+                <expansion-panels-container>
+                  <app-card>
+                    <expansion-panel-title style="width: 290px;">
+                      <span style="text-overflow: ellipsis;
+                      display: -webkit-box;
+                      -webkit-line-clamp: 2;
+                      overflow: hidden !important;
+                      -webkit-box-orient: vertical;">
+                        <span *ngIf="dto.priority === 'High'" class="text-danger"><i class="fa fa-circle"></i></span>
+                        <span *ngIf="dto.priority === 'Medium'" class="text-warning"><i class="fa fa-circle"></i></span>
+                        <span *ngIf="dto.priority === 'Low'" class="text-info"><i class="fa fa-circle"></i></span>
+                        {{dto.taskCode}} : <span class="font-13">{{dto.title}}</span>
+                      </span>
+                      <hr class="horzontal_line">
+                      <span class="font-13">
+                        <strong>Due Date</strong> : <span>{{dto.dueDate}}</span>
+                        |
+                        <strong>Created Date</strong> : {{dto.updatedDate}}</span>
+                      <hr class="horzontal_line">
+                      <span class="font-13">
+                        <strong>Remaining</strong> : {{dto.remaingDays}}
+                      </span>
+                      <div class="font-13" style="text-align: right;">
+                        <span class="text-c-blue" style="cursor: pointer;" (click)="routeView(dto);">View More</span>
+                      </div>
+                    </expansion-panel-title>
+                  </app-card>
+                </expansion-panels-container>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-card>
+
+<app-card [cardClass]="'card-current-prog'" *ngIf="this.enableData.summary && filteredDocumentSummaryList.length>0">
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="page-header-title">
+        <div class="d-inline">
+          <h5>Document Summary</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row col-sm-12" style="overflow: auto;">
+    <ng-container *ngFor="let doc of filteredDocumentSummaryList; let k=index">
+      <div class="list-wrapper-custom-css">
+        <div class="card-block">
+          <h4 class="card-title"><strong class="strong">{{doc.documentName}}</strong></h4>
+          <div class="list-cards">
+            <div class="row card-body p-t-0">
+              <ng-container
+                *ngIf="(doc.documentCategory == 'Document' || doc.documentCategory == 'Link' )&& doc.documentType !='108' && doc.documentType !='109' && doc.documentType != '110' && doc.documentType != '207' && doc.documentType !='208' ">
+                <div [ngStyle]="{'width':'350px,height:150px'}">
+                  <canvas baseChart [data]="pieChartView(doc)" [labels]="pieChartLabels(doc)" [legend]="true"
+                    [options]="this.pieChartOptions" [chartType]="this.pieChartType" [colors]="this.pieChartColors">
+                  </canvas>
+                </div>
+              </ng-container>
+              <ng-container
+                *ngIf="doc.documentCategory == 'Document' && doc.documentType =='108' || doc.documentType =='109' || doc.documentType == '110' || doc.documentType == '207' || doc.documentType =='208' ">
+                <span><strong class="strong">Test Run: &nbsp;</strong>
+                  {{doc['testRunName']}} </span>
+                <canvas baseChart [data]="pieChartViewTestCase(doc)" [labels]="donaltChartLabel(doc)" [legend]="true"
+                  [options]="this.pieChartOptions" [chartType]="this.doughnutChartType"
+                  [colors]="this.pieChartColorsForTestCase">
+                </canvas>
+              </ng-container>
+              <ng-container
+                *ngIf="doc.documentCategory == 'Form' ||  doc.documentCategory == 'Template' ||  doc.documentCategory == 'Form_Group'">
+                <google-chart [data]="doc['comboChartData']"></google-chart>
+              </ng-container>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+</app-card>
+
+<div class="row">
+  <div class="col-md-12 col-xl-8">
+    <app-card [title]="'Tasks'" [cardClass]="'card-current-prog'" *ngIf="taskList.length > 0">
+      <div *ngFor="let task of taskList" (click)="taskDetails(task)">
+        <div class="row">
+          <div class="col-sm-1 card-img">
+            <a href="javascript:"><img class="image-radius img-40" src="assets/images/homePage/Task.jpg" alt=""></a>
+          </div>
+          <div class="col-sm-6 card-contain">
+            <label class="f-w-600" style="display: inline;">{{task.taskTitle}}</label><br>
+            <p class="text-muted">Status : {{task.status}}</p>
+          </div>
+          <div class="col-sm-2">
+            <label>
+              Priority : <span
+                [ngStyle]="{'color': task.priority == 'High' ? '#FF5050' : '#1A1110'}">{{task.priority}}</span>
+            </label>
+          </div>
+          <div class="col-sm-3">
+            <label><span> <i class="icofont icofont-ui-clock text-muted mr-0"></i>
+                Due Date : <span class="text-muted">{{task.dueDate}}</span></span></label>
+          </div>
+        </div>
+        <hr class="horzontal_line">
+      </div>
+    </app-card>
+    <app-card *ngIf="equipmentList.length > 0" [title]="'Equipment Report'" [cardClass]="'review-project'"
+      [blockClass]="'p-t-0 p-b-0 w-100'">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th style="text-align: center;">Name</th>
+              &nbsp;<th>Status</th>
+              <th>From Date</th>
+              <th>To Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let equipment of equipmentList" (click)="eqDetails()">
+              <td>
+                <a href="javascript:"><img class="image-radius img-50" src="assets/images/homePage/tool.png"
+                    alt="chat-user"></a>
+                <div class="project-contain">
+                  <h6>{{equipment.equipmentName}}</h6>
+                  <p class="text-muted">Batch : {{equipment.batchName}}</p>
+                </div>
+              </td>
+              <td>
+                <span class="pie_1" style="display: none;">1/5</span>
+              </td>
+              <td>
+                {{equipment.statusDesc}}
+              </td>
+              <td>
+                {{equipment.displayFromDate}}
+              </td>
+              <td>
+                {{equipment.displayToDate}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  </div>
+  <div class="col-md-12 col-xl-4">
+    <div *ngIf="spinning" class="loading">Loading&#8230;</div>
+    <app-card [title]="'Recent Activites'" [blockClass]="'p-t-20'" *ngIf="recentActivites.length > 0">
+      <div class="card-notification" *ngFor="let activites of recentActivites">
+        <div class="card-noti-conatin" (click)="activitesData(activites.url)">
+          <small>{{activites.lastDuration}}</small>
+          <p class="text-muted m-b-30">{{activites.documentName}}
+            &nbsp;&nbsp;|&nbsp;&nbsp;{{activites.documentCode}}&nbsp;&nbsp;|&nbsp;&nbsp;{{activites.displayUpdatedTime}}
+          </p>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="col-md-12 col-xl-4" *ngFor="let count of approvalCount">
+    <div class="{{count.cssClass}}">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-sm-2">
+            <i class="icofont icofont-social-dribbble"></i>
+          </div>
+          <div class="col-sm-10">
+            <div class="d-inline-block">
+              <h5>{{count.documentName}}</h5>
+              <span> Item(s) pending for Approval/Esign </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-block text-center">
+        <div class="row">
+          <div class="col-6 b-r-default" *ngFor="let list of count.list; let i = index">
+            <h2>{{list.count}}</h2>
+            <p class="text-muted">{{list.levelName}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngFor="let module of modulesList">
+  <div *ngIf="module.moduleType === 'Master Data setup'">
+    <p class="module-heading"><strong>{{module.moduleType}}</strong></p>
+    <div class="row">
+      <div class="col-md-12 col-xl-3" *ngFor="let child of module.modulesList">
+        <div class="card widget-statstic-card" (click)="urlRedirect(child)">
+          <div class="card-header">
+            <div class="card-header-left">
+              <p class="f-w-600 f-16 m-b-0" style="color: blueviolet;">{{child.value}}</p>
+            </div>
+          </div>
+          <div class="card-block">
+            <i class="icofont icofont-chart-line st-icon bg-c-yellow"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="module.moduleType === 'Project Setup'">
+    <p class="module-heading"><strong>{{module.moduleType}}</strong> </p>
+    <div class="row">
+      <div class="col-md-12 col-xl-3" *ngFor="let child of module.modulesList">
+        <div class="card widget-statstic-card" (click)="urlRedirect(child)">
+          <div class="card-header">
+            <div class="card-header-left">
+              <p class="f-w-600 f-16 m-b-0" style="color: #2E5894;">{{child.value}}</p>
+            </div>
+          </div>
+          <div class="card-block">
+            <i class="icofont icofont-presentation-alt st-icon bg-c-blue"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="module.moduleType === 'Equipment'">
+    <p class="module-heading"><strong>{{module.moduleType}}</strong> </p>
+    <div class="row">
+      <div class="col-md-12 col-xl-3" *ngFor="let child of module.modulesList">
+        <div class="card widget-statstic-card" (click)="urlRedirect(child)">
+          <div class="card-header">
+            <div class="card-header-left">
+              <p class="f-w-600 f-16 m-b-0" style="color: #45A27D;">{{child.value}}</p>
+            </div>
+          </div>
+          <div class="card-block">
+            <i class="icofont icofont-dashboard-web st-icon bg-c-pink txt-lite-color"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="module.moduleType === 'Common Modules'">
+    <p class="module-heading"><strong> {{module.moduleType}}</strong></p>
+    <div class="row">
+      <div class="col-md-12 col-xl-3" *ngFor="let child of module.modulesList">
+        <div class="card widget-statstic-card" (click)="urlRedirect(child)">
+          <div class="card-header">
+            <div class="card-header-left">
+              <p class="f-w-600 f-16 m-b-0">{{child.value}}</p>
+            </div>
+          </div>
+          <div class="card-block">
+            <i class="icofont icofont-ui-home st-icon bg-c-green"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

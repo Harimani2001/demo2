@@ -1,0 +1,759 @@
+<div *ngIf="!iscreate && !viewIndividualTaskData" class="row">
+  <div class="col-sm-12">
+    <app-card>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="page-header-title">
+            <i class="icofont icofont-key-hole bg-c-blue"></i>
+            <div class="d-inline">
+              <h4>Tasks</h4>
+              <span>View all Task</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-8">
+          <div class="nav-item nav-grid">
+            <a *ngIf="permisionModal.createButtonFlag" href="javascript:" container="body" class="m-r-15"><img
+                class="image-radius rounded-0 img-25" src="assets/icon/png-icons/addDoc.png" alt="Create Task"
+                placement="top" ngbTooltip="Create Task" (click)="onClickCreate()"></a>
+
+            <a *ngIf="!tableView" href="javascript:" container="body"><img class="image-radius rounded-0 img-25"
+                src="assets/icon/png-icons/tableView.png" alt="Table View" placement="top" ngbTooltip="Table view"
+                (click)="changeview(true)"></a>
+
+            <a *ngIf="tableView" href="javascript:" container="body"><img class="image-radius rounded-0 img-30"
+                src="assets/icon/png-icons/cardView.png" alt="Board View" placement="top" ngbTooltip="Board View"
+                (click)="changeview(false)"></a>
+          </div>
+        </div>
+      </div>
+    </app-card>
+
+    <app-card>
+      <ngb-tabset #taskTab="ngbTabset">
+        <ngb-tab id="All Data" title="Draft">
+          <ng-template ngbTabContent>
+            <app-card [cardClass]="'card-current-prog'" *ngIf="!tableView && this.taskBoardData">
+              <div style="overflow-x: scroll; display: -webkit-box;">
+                <div *ngFor="let task of this.taskBoardData" class="m-r-10 w-25">
+                  <div class="green-contain-card" [ngStyle]="{'background-color' : 'slategrey'}">
+                    <div style="padding: 10px 10px 2px 10px;">
+                      <h6 style="color: aliceblue;">{{task.name}}</h6>
+                    </div>
+                    <div style="background-color: lightgray; padding: 10px; max-height: 400px; overflow-y: scroll;">
+                      <app-card *ngFor="let row of task.list">
+                        <div class="row">
+                          <div class="col-sm-6">
+                            <span class="f-s-13">
+                              <strong>Category </strong> : {{row.taskCategory}}
+                            </span>
+                          </div>
+                          <div class="col-sm-6 text-right">
+                            <a *ngIf="row.status != 'Closed' && row.startTimerFlag == 'Y'" container="body"
+                              href="javascript:;" class="m-r-5 crm-action-view text-muted text-warning"
+                              (click)="startTime(row);" data-ng-open="modalSmall" placement="top" ngbTooltip="Start">
+                              <i class="icofont icofont-wall-clock view"></i></a>
+
+                            <a *ngIf="row.status != 'Closed' && row.endTimerFlag == 'Y'" container="body"
+                              href="javascript:;" class="m-r-5 crm-action-view text-muted text-warning"
+                              (click)="endTime(row);" data-ng-open="modalSmall" placement="top" ngbTooltip="Stop">
+                              <i class="icofont icofont-wall-clock bin"></i></a>
+
+                            <a *ngIf="!row.completedFlag && permisionModal.updateButtonFlag" href="javascript:;"
+                              (click)="editTask(row)" class="m-r-5 crm-action-edit text-muted text-primary"
+                              container="body" placement="top" ngbTooltip="Edit">
+                              <i class="icofont icofont-edit edit"></i>
+                            </a>
+
+                            <a *ngIf="permisionModal.viewButtonFlag" container="body" href="javascript:;"
+                              class="crm-action-view text-muted text-warning" (click)="viewRowDetails(row);"
+                              data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                              <i class="icofont icofont-resize view"></i></a>
+                          </div>
+                        </div>
+                        <span class="f-s-13">
+                          <hr class="horzontal_line">
+                          <strong>Title </strong> : <a href="javascript:;" (click)="taskRouteView(row)">{{row.taskTitle}}</a>
+                        </span>
+                        <span class="f-s-13">
+                          <hr class="horzontal_line">
+                          <span><strong>Status </strong> : {{row.status}}</span>
+                        </span>
+                        <span class="f-s-13">
+                          <hr class="horzontal_line">
+                          <span><strong>Due Date</strong> : {{row.dueDate}}</span>
+                          <span class="m-l-10">|<strong class="m-l-10">Check List</strong> : {{row.checkListStatus.result}}</span>
+                          <a *ngIf="row.checklist && row.checklist.length>0" class="font-size-9px float-right"
+                            style="margin-top: -5px;">{{row.checkListStatus.percentage}}%
+                          </a>
+                          <a *ngIf="row.checklist && row.checklist.length>0" class="progress w-15 float-right m-t-15"
+                            style="height: 0.5em !important; margin-right: -20px;">
+                            <a class="progress-bar" role="progressbar" aria-valuenow=row.checkListStatus.percentage
+                              aria-valuemin="0" aria-valuemax="100"
+                              [style.width]="row.checkListStatus.percentage + '%'">
+                            </a>
+                          </a>
+                        </span>
+                      </app-card>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </app-card>
+
+            <div *ngIf="tableView">
+              <div class="row">
+                <div class="col-xs-12 col-sm-12 col-md-1">
+                  <div style="padding-top: 10px;">
+                    <label>Filter by: &nbsp;&nbsp;</label>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-sm-12 col-md-2">
+                  <div style="text-align: left;">
+                    <angular2-multiselect [data]="userItemList" [(ngModel)]="selectedUserItems" [settings]="settings"
+                      (ngModelChange)="onChangeFilters()">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-sm-12 col-md-2">
+                  <div style="text-align: left;padding-top: 10px;">
+                    <select style="border: none;color: #0091ae;" name="Priorities" name="status"
+                      [(ngModel)]="selectedPriority" (ngModelChange)="onChangeFilters()">
+                      <option value="">All Priorities</option>
+                      <option *ngFor="let priority of priorityList" [value]="priority.key">{{priority.value}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-sm-12 col-md-2">
+                  <div style="text-align: left;">
+                    <angular2-multiselect [data]="statusList" [(ngModel)]="selectedStatusItems"
+                      [settings]="statusSettings" (ngModelChange)="onChangeFilters()">
+                    </angular2-multiselect>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-sm-12 col-md-2">
+                  <div style="text-align: left;padding-top: 10px;">
+                    <select style="border: none;color: #1d66d4;" name="tasks" name="tasks"
+                      [(ngModel)]="selectedTaskCategory" (ngModelChange)="onChangeFilters()">
+                      <option value="">All Tasks</option>
+                      <option *ngFor="let tasks of taskCategoryList" [value]="tasks.key">{{tasks.value}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-xs-12 col-sm-12 col-md-3">
+                  <div style="text-align: right;">
+                    <label>Search:
+                      <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+                        class="form-control input-sm full-data-search" name=search placeholder="Search">
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <ngx-datatable [scrollbarH]="true" #myTable class="data-table dt-chk"
+                [rows]='filterData | TaskFilterPipe : filterQuery' [limit]="10" [columnMode]="'force'"
+                [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'">
+                <ngx-datatable-column name="Complete" [width]="50" [sortable]="false" [canAutoResize]="false"
+                  [draggable]="false" [resizeable]="false">
+                  <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                    let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                    <div class="checkbox-fade fade-in-primary">
+                      <label *ngIf="!(filterData[row['$$index']].status == 'Closed' || row['isManualEntry']!='Y')">
+                        <input type="checkbox" name="{{row['taskTitle']}}" (change)="onChangeCompleteFlag(row);" />
+                        <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+                      </label>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Code" [width]="90" prop="taskCode">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskCode']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Type" [width]="70" prop="taskCategory">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskCategory']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Title" prop="taskTitle">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['taskTitle']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Priority" [width]="90" prop="priority">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">
+                      <span *ngIf="row['priority'] === 'High'"
+                        class="badge badge-pill badge-danger">{{row['priority']}}</span>
+                      <span *ngIf="row['priority'] === 'Medium'"
+                        class="badge badge-pill badge-warning">{{row['priority']}}</span>
+                      <span *ngIf="row['priority'] === 'Low'"
+                        class="badge badge-pill badge-info">{{row['priority']}}</span>
+                    </strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Status" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+                  [resizeable]="false" prop="status">
+                  <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row"
+                    let-isSelected="isSelected" let-onCheckboxChangeFn="onCheckboxChangeFn">
+                    <div class="checkbox-fade fade-in-primary">
+                      <label
+                        *ngIf="!filterData[row['$$index']].completedFlag && filterData[row['$$index']].isManualEntry == 'Y'">
+                        <select [disabled]="!permisionModal.updateButtonFlag" name="select" class="form-control"
+                          name="{{row['$$index']}}" [(ngModel)]="filterData[row['$$index']].status"
+                          (ngModelChange)="statusChange(row)">
+                          <option *ngFor="let status of topStatusList" [value]="status.key">{{status.value}}</option>
+                        </select>
+                      </label>
+                      <label *ngIf="filterData[row['$$index']].completedFlag">
+                        <span>{{row['status']}}</span>
+                      </label>
+                      <label
+                        *ngIf="filterData[row['$$index']].isManualEntry != 'Y' && !filterData[row['$$index']].completedFlag">
+                        <span>{{row['status']}}</span>
+                      </label>
+                    </div>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Due Date">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['dueDate']|
+                      date:'dd-MM-yyyy'}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Remaining Days" [width]="90" prop="remaingDays">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong *ngIf="!data[row['$$index']].completedFlag"
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['remaingDays']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column style="font-weight: bold;" name="Time Duration" [width]="90">
+                  <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+                    <strong
+                      style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['timeDuration']}}</strong>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Timer" [width]="60">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <a *ngIf="row.status != 'Closed' && row.startTimerFlag == 'Y'" container="body" href="javascript:;"
+                      class="crm-action-view text-muted text-warning" (click)="startTime(row);"
+                      data-ng-open="modalSmall" placement="top" ngbTooltip="Start">
+                      <i class="icofont icofont-wall-clock view"></i></a>
+                    &nbsp;
+                    <a *ngIf="row.status != 'Closed' && row.endTimerFlag == 'Y'" container="body" href="javascript:;"
+                      class="crm-action-view text-muted text-warning" (click)="endTime(row);" data-ng-open="modalSmall"
+                      placement="top" ngbTooltip="Stop">
+                      <i class="icofont icofont-wall-clock bin"></i></a>
+                  </ng-template>
+                </ngx-datatable-column>
+                <ngx-datatable-column name="Action">
+                  <ng-template let-row="row" ngx-datatable-cell-template>
+                    <a *ngIf="!data[row['$$index']].completedFlag && permisionModal.updateButtonFlag"
+                      href="javascript:;" (click)="editTask(row)" class="m-r-15 crm-action-edit text-muted text-primary"
+                      container="body" placement="top" ngbTooltip="Edit">
+                      <i class="icofont icofont-edit edit"></i>
+                    </a>
+                    <a *ngIf="data[row['$$index']].completedFlag && permisionModal.updateButtonFlag" href="javascript:;"
+                      class="m-r-15 crm-action-edit text-muted text-primary">
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </a>
+                    <a *ngIf="permisionModal.deleteButtonFlag && filterData[row['$$index']].isManualEntry == 'Y'"
+                      href="javascript:;" container="body" class="m-r-15 crm-action-delete text-muted text-danger"
+                      (click)="openSuccessCancelSwal(row);" placement="top" ngbTooltip="Delete">
+                      <i class="icofont icofont-bin bin"></i>
+                    </a>
+                    <a *ngIf="permisionModal.viewButtonFlag" container="body" href="javascript:;"
+                      class="crm-action-view text-muted text-warning" (click)="viewRowDetails(row);"
+                      data-ng-open="modalSmall" placement="top" ngbTooltip="View">
+                      <i class="icofont icofont-resize view"></i></a>
+                  </ng-template>
+                </ngx-datatable-column>
+              </ngx-datatable>
+            </div>
+          </ng-template>
+        </ngb-tab>
+        <ngb-tab id="audit" title="Audit Trail">
+          <ng-template ngbTabContent>
+            <app-audit-trail-view #auditView [permission]="this.helper.TASK_CREATION"></app-audit-trail-view>
+          </ng-template>
+        </ngb-tab>
+      </ngb-tabset>
+    </app-card>
+  </div>
+</div>
+
+<div *ngIf="iscreate" class="row">
+  <div class="col-sm-12" id="float-action">
+    <app-card>
+      <div class="row">
+        <div class="page-header-title col-sm-9">
+          <i class="icofont icofont-law-document bg-c-blue"></i>
+          <div class="d-inline">
+            <h4 *ngIf="this.modal.id==0">Add Task</h4>
+            <h4 *ngIf="this.modal.id!=0">Edit Task</h4>
+            <span *ngIf="this.modal.id==0">Task</span>
+            <span *ngIf="this.modal.id!=0">Task Code : {{this.modal.taskCode}}</span>
+          </div>
+        </div>
+        <div class="col-sm-3" style="text-align: right;">
+          <a *ngIf="this.modal.id!=0 && this.modal.status!='Closed' && this.modal.startTimerFlag=='Y'" container="body"
+            href="javascript:;" class="crm-action-view text-muted text-warning" (click)="startTime(this.modal);"
+            data-ng-open="modalSmall" placement="top" ngbTooltip="Start">
+            <i class="icofont icofont-wall-clock view"></i>&nbsp;</a>
+          <a *ngIf="this.modal.id!=0 && this.modal.status!='Closed' && this.modal.endTimerFlag=='Y'" container="body"
+            href="javascript:;" class="crm-action-view text-muted text-warning" (click)="endTime(this.modal);"
+            data-ng-open="modalSmall" placement="top" ngbTooltip="Stop">
+            <i class="icofont icofont-wall-clock bin"></i></a>
+          <button type="button" *ngIf="isUpdate" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+            [disabled]="!permisionModal.updateButtonFlag" (click)="onClickSave();">Update&nbsp;</button>
+          <button type="button" *ngIf="isSave" class="btn btn-sm btn-success waves-effect waves-light m-r-10"
+            [disabled]="!permisionModal.createButtonFlag" (click)="onClickSave();">Save&nbsp;</button>
+          <button type="button" *ngIf="isCancel" class="btn btn-sm btn-danger waves-effect waves-light m-r-10"
+            (click)="onClickCancel()">Cancel</button>
+        </div>
+      </div>
+    </app-card>
+  </div>
+
+  <div class="col-sm-12">
+    <br><br><br><br>
+    <app-card>
+      <form [formGroup]="onTaskForm">
+        <table id="task-table" class="table w-100">
+          <tbody>
+            <tr>
+              <td colspan="2">
+                <div class="row">
+                  <div class="col-sm-2">
+                    <strong class="strong">Title<span class="asterisk">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-10">
+                    <input type="text" name="code" class="form-control" id="taskTitle"
+                      [attr.disabled]="this.isManualEntry!='Y'?'':null" placeholder="" formControlName="taskTitle">
+                    <div class="col-sm-10" *ngFor="let validation of validation_messages.taskTitle">
+                      <p class="text-danger" *ngIf="onTaskForm.get('taskTitle').hasError(validation.type) && submitted">
+                        <span>{{ validation.message }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Category<span class="asterisk">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select name="taskCategory" [attr.disabled]="this.isManualEntry!='Y'?'':null" class="form-control"
+                      formControlName="taskCategory">
+                      <option *ngFor="let task of taskCategoryList" [value]="task.key">{{task.value}}</option>
+                    </select>
+                    <div class="col-sm-10" *ngFor="let validation of validation_messages.taskCategory">
+                      <p class="text-danger"
+                        *ngIf="onTaskForm.get('taskCategory').hasError(validation.type) && submitted"><span>{{
+                          validation.message }}</span></p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Priority<span class="asterisk">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select name="priority" [attr.disabled]="this.isManualEntry!='Y'?'':null" class="form-control"
+                      formControlName="priority">
+                      <option value="">Select Priority</option>
+                      <option *ngFor="let priority of priorityList" [value]="priority.key">{{priority.value}}</option>
+                    </select>
+                    <div class="col-sm-10" *ngFor="let validation of validation_messages.priority">
+                      <p class="text-danger" *ngIf="onTaskForm.get('priority').hasError(validation.type) && submitted">
+                        <span>{{ validation.message }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Assigned To<span class="asterisk">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <span *ngIf="!this.modal.flag" class="text-primary pointer"><u class="black" (click)="loadUserModal()">Click here to select multiple users</u></span>
+                    <ng-select
+                      [disabled]="this.modal.flag || !(this.isUserInWorkFlow && (this.isManualEntry == 'N' || this.isManualEntry == 'Y'))"
+                      [ngClass]="'ng-select'" [options]="usersList" [multiple]="true" formControlName="assignedTo"
+                      (ngModelChange)="onChangeUsers($event)">
+                    </ng-select>
+                    <div class="col-sm-10" *ngFor="let validation of validation_messages.assignedTo">
+                      <p class="text-danger" *ngIf="onTaskForm.get('assignedTo').hasError(validation.type) && submitted"><span>{{validation.message}}</span></p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Status<span class="asterisk">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <select name="status" [attr.disabled]="this.modal.id==0?'':this.isManualEntry=='Y'?null:''"
+                      class="form-control" formControlName="status">
+                      <option value="">Select Status</option>
+                      <option *ngFor="let status of topStatusList" [value]="status.key">{{status.value}}</option>
+                    </select>
+                    <div class="col-sm-9" *ngFor="let validation of validation_messages.status">
+                      <p class="text-danger" *ngIf="onTaskForm.get('status').hasError(validation.type) && submitted">
+                        <span>{{ validation.message }}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Due Date <span class="asterisk">*</span> :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <my-date-picker (keypress)="$event.preventDefault();" [disabled]="this.isManualEntry!='Y'"
+                      name="dueDate" formControlName="dueDate" #date (click)="openBtnClicked()" placeholder="Due Date"
+                      [options]="myDatePickerOptions" required>
+                    </my-date-picker>
+                    <div class="col-sm-10" *ngFor="let validation of validation_messages.dueDate">
+                      <p class="text-danger" *ngIf="onTaskForm.get('dueDate').hasError(validation.type) && submitted">
+                        <span>{{validation.message}}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Send Reminder :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <label class="switch">
+                      <input type="checkbox" name="activeFlag" formControlName="remainderFlag"
+                        (ngModelChange)="onChangeRemainderFlag($event)" />
+                      <span class="slider round"></span>
+                    </label>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Document Type :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ng-select [disabled]="this.isManualEntry!='Y'" [ngClass]="'ng-select'" [options]="documentTypeList"
+                      [multiple]="true" formControlName="documentType" (ngModelChange)="onChangeDocumentType($event)">
+                    </ng-select>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Item Code(s) :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ng-select [disabled]="this.isManualEntry!='Y'" [ngClass]="'ng-select'"
+                      [options]="documentTypeIdList" [multiple]="true" formControlName="documentId">
+                    </ng-select>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Equipment :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <ng-select [disabled]="this.isManualEntry!='Y'" [ngClass]="'ng-select'" [options]="equipment"
+                      [multiple]="true" formControlName="selectedEquipment"></ng-select>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <strong class="strong">Notes :</strong>
+                  </div>
+                  <div class="col-sm-9">
+                    <textarea class="form-control max-textarea" formControlName="description" rows="2"
+                      name="Description"></textarea>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td *ngIf="isRemainderFlag" colspan="2">
+                <div class="row">
+                  <div class="col-sm-2">
+                    <strong class="strong">Due Date Mailing Frequency :</strong>
+                  </div>
+                  <div class="col-sm-10">
+                    <select name="frequency" formControlName="frequency" class="form-control">
+                      <option value="" disabled>Select</option>
+                      <option *ngFor="let frequency of this.frequencyList " [value]="frequency.key">{{frequency.value}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div>
+          <div class="form-group row">
+            <span class="p-l-20"><i class="icofont icofont-checked"></i> Check List</span>
+          </div>
+          <button class="btn btn-primary btn-sm p-l-20" (click)="addChecklistItem()">Add new</button>
+          <br> <br>
+          <ng-container *ngIf="modal.checklist.length>0">
+            <div class="col-sm-12">
+              <table id="equipment-table-checkList" class="table">
+                <thead class="panel-heading">
+                  <tr class="w-100">
+                    <td class="w-2"><label class="strong"></label></td>
+                    <td class="w-40"><label class="strong">Name</label></td>
+                    <td class="w-2"><label class="strong">Actions</label></td>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let checkList of modal.checklist; let i=index;">
+                    <td>
+                      <input type="checkbox" [(ngModel)]="checkList.completed" [ngModelOptions]="{standalone: true}" />
+                    </td>
+                    <td width="10px">
+                      <span *ngIf="!checkList.focusFlag"
+                        (click)="checkList.completed?checkList.focusFlag=false:checkList.focusFlag=true"
+                        title="Double Click to Edit" style="cursor: pointer;"
+                        [style.text-decoration]="checkList.completed ? 'line-through' : 'none'">{{checkList.checklistName}}</span>
+                      <input *ngIf="checkList.focusFlag" id="check_list_name_id_{{i}}" type="text" class="form-control"
+                        [(ngModel)]="checkList.checklistName" [ngModelOptions]="{standalone: true}"
+                        (focusout)="checkList.focusFlag=false" />
+                    </td>
+                    <td>
+                      <i style="cursor: pointer;" (click)="deleteCheckList(checkList)" class="icofont icofont-ui-delete"
+                        title="delete"></i>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </ng-container>
+        </div>
+        <div style="color: red;" *ngIf="isCheckListEntered">Please Fill the Details to Continue . . .</div>
+        <div style="color: red;" *ngIf="this.isValidDocumentOrder">Display Order can't be Duplicate . . .
+          <br>
+        </div>
+        <div class="form-group row">
+          <app-file-upload-for-doc #fileupload [multiple]='true' [onlyView]='false' [documentId]="this.receivedId"
+            [update]="this.isUpdate" [documentCode]="this.helper.TASK_CREATION"></app-file-upload-for-doc>
+        </div>
+      </form>
+    </app-card>
+  </div>
+</div>
+
+<app-card [blockClass]="'accordion-block scale-accordion'" *ngIf="this.viewIndividualTaskData==true">
+  <div>
+    <div><br>
+      <h4>&nbsp;&nbsp;Task Details
+        <div style="float: right;">
+          <a style="cursor:pointer;font-weight: bold" *ngIf="!routeback" class="ti-close"
+            (click)="this.viewIndividualTaskData=false;onClickCancel();">&nbsp;&nbsp;</a>
+          <a (click)="navigate();" style="cursor:pointer;font-weight: bold" *ngIf="routeback"
+            class="ti-close">&nbsp;&nbsp;</a>
+        </div>
+      </h4>
+    </div>
+    <br>
+    <table id="task-table" class="table w-100">
+      <tbody>
+        <tr>
+          <td colspan="2">
+            <div><strong class="strong">Task Title : </strong>{{viewData.taskTitle}} </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div><strong class="strong">Code : </strong>{{viewData.taskCode}}</div>
+          </td>
+          <td>
+            <div class="row"><strong class="strong col-sm-2">Category : </strong>
+              <p *ngIf="viewData.taskCategory == 'Task'"><span
+                  style="color:	rgb(7, 7, 7)">{{viewData.taskCategory}}</span></p>
+              <p *ngIf="viewData.taskCategory == 'Bug'"><span
+                  style="color:	rgb(235, 16, 16)">{{viewData.taskCategory}}</span></p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div><strong class="strong">Priority : </strong>{{viewData.priority}}</div>
+          </td>
+          <td>
+            <div><strong class="strong">Users : </strong>{{viewData.selectedUserNames}} </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div><strong class="strong">Status : </strong>{{viewData.status}} </div>
+          </td>
+          <td>
+            <div><strong class="strong">Due Date : </strong>{{viewData.dueDate}}</div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div><strong class="strong">Equipment : </strong>{{viewData.equipmentName}}</div>
+          </td>
+          <td>
+            <div><strong class="strong">Document Types : </strong>{{viewData.selectedDocumentTypeNames}} </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <div><strong class="strong">Item Code(s) : </strong><span *ngFor="let rowData of viewData.documentTypeIds">
+                <a container="body" href="javascript:;" class="m-r-15 crm-action-view"
+                  (click)="routeView(rowData,viewData.id);" placement="top" ngbTooltip="View">
+                  {{rowData.documentCode}},
+                </a>
+              </span></div>
+          </td>
+          <td colspan="2">
+            <div><strong class="strong">Description : </strong>{{viewData.description}}</div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="col-sm-12"><strong class="strong">Check List</strong></div>
+    <table id="equipment-table-checkList" class="table">
+      <tr *ngFor="let item of viewData.checklist; let i = index">
+        <td>
+          <div class="row ">
+            <div class="col-sm-12 ">
+              {{i+1}}.
+              <span class="form-contol-label">{{item.checklistName}}</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
+    <div class="col-sm-12"><strong class="strong">View Uploaded Files</strong></div>
+    <div class="col-sm-12 p-0">
+      <app-file-upload-for-doc #fileupload [multiple]=false [onlyView]=true [documentCode]="this.helper.TASK_CREATION">
+      </app-file-upload-for-doc>
+    </div>
+    <br>
+    <div class="col-sm-12"><strong class="strong">Time Tracking</strong></div>
+    <div class="accordion-desc">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">Type</th>
+            <th scope="col">Code</th>
+            <th scope="col">Start Date</th>
+            <th scope="col">Start Time</th>
+            <th scope="col">End Date</th>
+            <th scope="col">End Time</th>
+            <th scope="col">Duration</th>
+            <th scope="col">Comments</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let timerdata of viewTimeTrackingData ">
+            <th scope="row">{{timerdata.taskType}}</th>
+            <td>{{timerdata.taskCode}}</td>
+            <td>{{timerdata.startDate}}</td>
+            <td>{{timerdata.startTimer}}</td>
+            <td>{{timerdata.endDate}}</td>
+            <td>{{timerdata.endTimer}}</td>
+            <td>{{timerdata.duration}}</td>
+            <td>{{timerdata.comments}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <app-individual-audit-trail [permission]="this.helper.TASK_CREATION" [id]="viewData.id">
+    </app-individual-audit-trail>
+  </div>
+</app-card>
+
+<app-modal-basic #modalUsers [dialogClass]="'modal-lg'" class="modal-dialog modal-dialog-scrollable">
+  <div class="app-modal-header">
+    <h4 class="modal-title">Select Users</h4>
+    <button type="button" class="close basic-close" (click)="modalUsers.hide();onCloseUrsPopup(false);">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="app-modal-body" *ngIf="modalUsers.visible" slimScroll>
+    <div class="dt-desc" style="padding: 0px;">
+      <div style="padding-left: 0px;" class="row" class="col-sm-12">
+        <label style="float: right;"> Search :
+          <input type="search" [(ngModel)]="filterQuery" (ngModelChange)="this.helper.setPaginator(table)"
+            class="form-control input-sm full-data-search" placeholder="search"></label><br><br>
+      </div>
+      <ngx-datatable [scrollbarH]="true" #selectUserTable class="data-table dt-chk" style="overflow: unset!important;"
+        [rows]='selectUserList | userFilter : filterQuery' [limit]="10" [columnMode]="'force'" [headerHeight]="50"
+        [footerHeight]="50" [rowHeight]="'auto'">
+        <ngx-datatable-column name="Select" [width]="70" [sortable]="false" [canAutoResize]="false" [draggable]="false"
+          [resizeable]="false">
+          <ng-template class="datatable-checkbox" ngx-datatable-cell-template let-row="row" let-isSelected="isSelected"
+            let-onCheckboxChangeFn="onCheckboxChangeFn">
+            <div class="checkbox-fade fade-in-primary">
+              <label>
+                <input type="checkbox" name="{{row['userName']}}" [checked]="row.selected"
+                  (change)="row.selected=!row.selected;" />
+                <span class="cr"><i class="cr-icon icofont icofont-ui-check txt-primary"></i></span>
+              </label>
+            </div>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Name">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <strong>{{row['userName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column style="font-weight: bold;" name="Designation">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template> <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['designation']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Department">
+          <ng-template let-row="row" ngx-datatable-cell-template>
+            <strong
+              style="font-family: Verdana, Geneva, Tahoma, sans-serif; font-weight: normal;">{{row['departmentIdName']}}</strong>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>
+  <div class="app-modal-footer">
+    <button type="button" class="btn btn-default waves-effect"
+      (click)="modalUsers.hide();onCloseUrsPopup(true);">Submit</button>
+  </div>
+</app-modal-basic>
+
+<div *ngIf="spinnerFlag" class="loading">Loading&#8230;</div>

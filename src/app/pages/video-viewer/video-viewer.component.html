@@ -1,0 +1,15 @@
+<app-modal-basic #modalVideoViewer [hideHeader]="true" [hideFooter]="true" [dialogClass]="'modal-lg'">
+  <div class="app-modal-body">
+    <button type="button" class="close basic-close-light-box" (click)="closeView()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h5>Recorded Video</h5>
+    <br>
+    <hr>
+    <div slimScroll railVisible="true" railColor="#004a6d" width="100%" height="auto" size="8px" color="#999" opacity="0.6" allowPageScroll="false">
+      <iframe *ngIf="videoURL" src="this.videoURL" id="videoViewerId" height="100%" width="100%"></iframe>
+    </div>
+    <hr>
+    <br>
+  </div>
+</app-modal-basic>

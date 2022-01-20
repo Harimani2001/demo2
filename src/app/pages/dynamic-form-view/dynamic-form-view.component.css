@@ -1,0 +1,13 @@
+.modal-body .slimScrollDiv {
+    height: 400px !important; 
+}
+
+/* .data-table .datatable-row-wrapper:nth-child((odd+1)) {
+    background-color:rgba(9, 149, 243, 0.8)
+} */
+
+.forum-icon{
+    position: absolute;
+    right: 10px;
+    top: -40px;
+}
